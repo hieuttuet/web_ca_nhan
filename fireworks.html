@@ -323,6 +323,30 @@
     }
     body.tiktok-clean #btn-clean-mode { opacity: 0.3; }
 
+    .modal-close-corner {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-close-corner:hover {
+      background: rgba(255, 42, 133, 0.4);
+      border-color: #ff2a85;
+      transform: scale(1.08);
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -491,7 +515,9 @@
 
   <!-- Modal Thanh Toán VietQR Tự Động -->
   <div id="modal-share" class="modal-overlay">
-    <div class="glass-card" style="max-width: 420px; padding: 26px 22px;">
+    <div class="glass-card" style="max-width: 420px; padding: 26px 22px; position: relative;">
+      <button class="modal-close-corner" onclick="closeShareModal()" title="Đóng">✕</button>
+
       <div id="step-payment-waiting">
         <div class="badge-top">📲 Thanh Toán Tự Động VietQR</div>
         <h3 class="card-title" style="font-size: 1.9rem;">Mở Khóa Link & QR Riêng</h3>
@@ -526,12 +552,10 @@
           </div>
         </div>
 
-        <div class="status-waiting">
+        <div class="status-waiting" style="margin-bottom: 0;">
           <div class="spinner"></div>
           <span>Đang chờ xác nhận thanh toán tự động...</span>
         </div>
-
-        <button id="btn-close-pay" type="button" class="mini-btn" style="width: 100%;">Đóng lại</button>
       </div>
 
       <div id="step-payment-paid" style="display: none;">
@@ -549,14 +573,9 @@
 
         <input id="share-url-box" type="text" class="neon-input" readonly style="font-size: 0.8rem; margin-bottom: 12px; text-align: center;" />
 
-        <div style="display: flex; gap: 8px;">
-          <button id="btn-copy-link" type="button" class="btn-launch" style="margin-top: 0; padding: 12px;">
-            📋 Sao Chép Link
-          </button>
-          <button id="btn-close-modal" type="button" class="mini-btn" style="padding: 12px 18px;">
-            Đóng
-          </button>
-        </div>
+        <button id="btn-copy-link" type="button" class="btn-launch" style="margin-top: 0; padding: 13px; width: 100%;">
+          📋 Sao Chép Link
+        </button>
       </div>
     </div>
   </div>
@@ -1239,9 +1258,6 @@
       if (pollTimer) clearInterval(pollTimer);
       document.getElementById('modal-share').classList.remove('active');
     }
-
-    document.getElementById('btn-close-pay').addEventListener('click', closeShareModal);
-    document.getElementById('btn-close-modal').addEventListener('click', closeShareModal);
   </script>
 </body>
 </html>

@@ -75,9 +75,26 @@
     }
     .modal-wrap.active { opacity: 1; visibility: visible; pointer-events: auto; }
     .modal-box {
+      position: relative;
       width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto;
       background: var(--glass-bg); border: 1px solid var(--glass-border);
       border-radius: 24px; padding: 26px 22px; text-align: center;
+    }
+    .modal-close-corner {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .modal-close-corner:hover {
+      background: rgba(255, 42, 133, 0.4);
+      border-color: #ff2a85;
+      transform: scale(1.08);
     }
     .input-field {
       width: 100%; padding: 12px 14px; border-radius: 12px;
@@ -136,24 +153,24 @@
   <!-- Modal Thanh Toán VietQR -->
   <div id="modal-pay" class="modal-wrap">
     <div class="modal-box">
+      <button class="modal-close-corner" onclick="closePayModal()" title="Đóng">✕</button>
+
       <div id="bday-pay-waiting">
         <h3 style="font-size: 1.35rem; margin-bottom: 6px;">📲 Quét VietQR Mở Khóa Link</h3>
         <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 12px;">
           Hệ thống tự động mở khóa Link ngay sau 3 giây khi nhận chuyển khoản!
         </p>
         <div class="qr-card"><img id="bday-vietqr" src="" alt="VietQR" /></div>
-        <div style="font-size: 0.84rem; margin-bottom: 12px; color: #fde047;">
+        <div style="font-size: 0.84rem; margin-bottom: 0; color: #fde047;">
           Số tiền: <b id="bday-amount">29.000đ</b> • Nội dung: <b id="bday-code">LOVE...</b>
         </div>
-        <button id="btn-close-pay" class="action-btn" style="width:100%;">Đóng</button>
       </div>
 
       <div id="bday-pay-success" style="display:none;">
         <h3 style="font-size: 1.4rem; color:#6ee7b7; margin-bottom: 8px;">🎉 Đã Tạo Link Quà Sinh Nhật!</h3>
         <div class="qr-card"><img id="bday-gift-qr" src="" alt="Gift QR" /></div>
-        <input id="bday-share-url" class="input-field" readonly />
-        <button id="btn-bday-copy" class="action-btn primary" style="width:100%; margin-bottom:8px;">📋 Sao Chép Link</button>
-        <button id="btn-close-success" class="action-btn" style="width:100%;">Đóng</button>
+        <input id="bday-share-url" class="input-field" readonly style="margin-bottom: 10px;" />
+        <button id="btn-bday-copy" class="action-btn primary" style="width:100%;">📋 Sao Chép Link</button>
       </div>
     </div>
   </div>
@@ -451,13 +468,10 @@
       navigator.clipboard.writeText(el.value);
     });
 
-    document.getElementById('btn-close-pay').addEventListener('click', () => {
+    function closePayModal() {
       if (pollTimer) clearInterval(pollTimer);
       document.getElementById('modal-pay').classList.remove('active');
-    });
-    document.getElementById('btn-close-success').addEventListener('click', () => {
-      document.getElementById('modal-pay').classList.remove('active');
-    });
+    }
 
     window.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);

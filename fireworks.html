@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pháo Hoa Ghép Tên Cá Nhân Hóa ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --neon-pink: #ff2a85;
+      --neon-purple: #a855f7;
+      --neon-cyan: #38bdf8;
+      --glass-bg: rgba(15, 10, 32, 0.74);
+      --glass-border: rgba(255, 120, 196, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(ellipse at bottom, #16092b 0%, #070312 65%, #020108 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #ffffff;
+    }
+
+    .stars-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background-image:
+        radial-gradient(1.5px 1.5px at 15% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 35% 65%, #ffd1e8, transparent),
+        radial-gradient(2px 2px at 55% 15%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 75% 45%, #c4b5fd, transparent),
+        radial-gradient(1px 1px at 85% 80%, #fff, transparent),
+        radial-gradient(2px 2px at 25% 85%, #bae6fd, transparent),
+        radial-gradient(1.5px 1.5px at 65% 75%, #fff, transparent),
+        radial-gradient(1px 1px at 90% 25%, #ffd1e8, transparent),
+        radial-gradient(1.5px 1.5px at 10% 55%, #fff, transparent),
+        radial-gradient(2px 2px at 48% 42%, #fbcfe8, transparent);
+      background-size: 320px 320px;
+      animation: twinkleStars 4.5s ease-in-out infinite alternate;
+    }
+
+    .stars-layer.layer-2 {
+      background-size: 460px 460px;
+      background-position: 120px 80px;
+      animation-duration: 6.5s;
+      opacity: 0.7;
+    }
+
+    @keyframes twinkleStars {
+      0% { opacity: 0.35; transform: scale(0.99); }
+      50% { opacity: 0.95; }
+      100% { opacity: 0.45; transform: scale(1.01); }
+    }
+
+    #fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      display: block;
+    }
+
+    .ui-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                  visibility 0.85s;
+    }
+
+    .ui-wrapper.fade-out {
+      opacity: 0;
+      transform: scale(0.92) translateY(20px);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .glass-card {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 32px 26px 28px;
+      border-radius: 28px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        0 0 35px rgba(255, 42, 133, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      text-align: center;
+    }
+
+    .glass-card::-webkit-scrollbar { width: 5px; }
+    .glass-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 99px; }
+
+    .badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 42, 133, 0.16);
+      border: 1px solid rgba(255, 120, 196, 0.4);
+      color: #ff9ec6;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.1rem, 6vw, 2.65rem);
+      background: linear-gradient(135deg, #ffffff 0%, #ffb3d9 50%, #d8b4fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .card-subtitle {
+      font-size: 0.86rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #f8d8ea;
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .neon-input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.25s ease;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .neon-input::placeholder {
+      color: rgba(255, 255, 255, 0.38);
+    }
+
+    .neon-input:focus {
+      border-color: var(--neon-pink);
+      background: rgba(255, 42, 133, 0.08);
+      box-shadow: 0 0 18px rgba(255, 42, 133, 0.35);
+    }
+
+    .btn-launch {
+      position: relative;
+      width: 100%;
+      margin-top: 8px;
+      padding: 15px 24px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff2a85 0%, #a855f7 55%, #6366f1 100%);
+      background-size: 200% 200%;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.02rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 28px rgba(255, 42, 133, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+      animation: pulseGlow 2.2s infinite ease-in-out, gradientShift 4s ease infinite;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-launch:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-launch:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 22px rgba(255, 42, 133, 0.55), 0 0 0 0 rgba(255, 42, 133, 0.4); }
+      50% { box-shadow: 0 0 36px rgba(168, 85, 247, 0.85), 0 0 0 10px rgba(255, 42, 133, 0); }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .top-bar-tools {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 12;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .top-bar-tools > * {
+      pointer-events: auto;
+    }
+
+    .icon-circle-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(15, 10, 32, 0.75);
+      border: 1px solid rgba(255, 120, 196, 0.35);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .icon-circle-btn:hover {
+      background: rgba(255, 42, 133, 0.35);
+      transform: scale(1.05);
+    }
+
+    .floating-controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 12;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 92%;
+      max-width: 560px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+    }
+
+    .floating-controls.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .mini-btn {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(15, 10, 32, 0.78);
+      border: 1px solid rgba(255, 120, 196, 0.38);
+      color: #fce7f3;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .mini-btn:hover {
+      background: rgba(255, 42, 133, 0.32);
+      border-color: #ff2a85;
+      transform: translateY(-2px);
+    }
+
+    .mini-btn.highlight {
+      background: linear-gradient(135deg, #ff2a85 0%, #9333ea 100%);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 18px rgba(255, 42, 133, 0.5);
+    }
+
+    body.tiktok-clean .floating-controls,
+    body.tiktok-clean #btn-back-store,
+    body.tiktok-clean #btn-sound {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    body.tiktok-clean #btn-clean-mode { opacity: 0.3; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(4, 2, 10, 0.84);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .qr-box {
+      background: #fff;
+      padding: 12px;
+      border-radius: 16px;
+      width: 220px;
+      margin: 0 auto 12px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    }
+
+    .qr-box img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .pay-info-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .pay-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .pay-row:last-child { border-bottom: none; }
+
+    .status-waiting {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fde047;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid rgba(253, 224, 71, 0.3);
+      border-top-color: #fde047;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .toast-msg {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      z-index: 50;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+  <script src="templates-catalog.js"></script>
+</head>
+<body>
+
+  <div class="stars-layer"></div>
+  <div class="stars-layer layer-2"></div>
+
+  <div id="toast" class="toast-msg">Đã sao chép đường link!</div>
+
+  <!-- Thanh công cụ phía trên -->
+  <div class="top-bar-tools">
+    <a id="btn-back-store" href="index.html" class="icon-circle-btn">⬅️ Kho Mẫu Quà Tặng</a>
+    <div style="display:flex; gap:8px;">
+      <button id="btn-sound" class="icon-circle-btn" title="Bật/Tắt Âm thanh">🔊</button>
+      <button id="btn-clean-mode" class="icon-circle-btn" title="Chế độ Quay TikTok">📹</button>
+    </div>
+  </div>
+
+  <canvas id="fireworks-canvas"></canvas>
+
+  <!-- Màn hình chờ (Form Kính Mờ Glassmorphism) -->
+  <div id="ui-wrapper" class="ui-wrapper">
+    <form id="confess-form" class="glass-card" autocomplete="off">
+      <div id="form-badge" class="badge-top">✨ Pháo Hoa Tỏ Tình Cá Nhân Hóa ✨</div>
+      <h1 id="form-title" class="card-title">Thắp Sáng Bầu Trời Đêm</h1>
+      <p id="form-desc" class="card-subtitle">
+        Nhập tên của hai bạn để bắn pháo hoa rực rỡ và ghép thành tên người thương giữa ngàn vì sao.
+      </p>
+
+      <div id="form-inputs-area">
+        <div class="input-group">
+          <label class="input-label" for="your-name">Tên của bạn (Người gửi)</label>
+          <input id="your-name" type="text" class="neon-input" placeholder="Ví dụ: Bảo Nam" maxlength="22" required />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="crush-name">Tên người nhận</label>
+          <input id="crush-name" type="text" class="neon-input" placeholder="Ví dụ: Minh Anh" maxlength="22" required />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="wish-note">Lời chúc dưới tên (Tùy chọn)</label>
+          <input id="wish-note" type="text" class="neon-input" placeholder="Ví dụ: Mãi bên nhau nhé!" maxlength="32" />
+        </div>
+      </div>
+
+      <button type="submit" id="btn-submit-launch" class="btn-launch">
+        Bắn Pháo Hoa 🚀
+      </button>
+    </form>
+  </div>
+
+  <!-- Nút điều khiển nổi sau khi pháo hoa ghép chữ xong -->
+  <div id="floating-controls" class="floating-controls">
+    <button id="btn-replay" type="button" class="mini-btn">🎆 Bắn Lại</button>
+    <button id="btn-edit-names" type="button" class="mini-btn">✏️ Sửa Nội Dung</button>
+    <button id="btn-share-link" type="button" class="mini-btn highlight">
+      💝 Tạo Link & QR Gửi Người Ấy (<span id="btn-price-label">19.000đ</span>)
+    </button>
+  </div>
+
+  <!-- Modal Thanh Toán VietQR Tự Động -->
+  <div id="modal-share" class="modal-overlay">
+    <div class="glass-card" style="max-width: 420px; padding: 26px 22px;">
+      <div id="step-payment-waiting">
+        <div class="badge-top">📲 Thanh Toán Tự Động VietQR</div>
+        <h3 class="card-title" style="font-size: 1.9rem;">Mở Khóa Link & QR Riêng</h3>
+        <p class="card-subtitle" style="margin-bottom: 12px;">
+          Quét mã QR bằng App Ngân hàng bất kỳ. Hệ thống tự động mở khóa Link ngay sau 3 giây khi nhận được chuyển khoản!
+        </p>
+
+        <div class="qr-box">
+          <img id="vietqr-img" src="" alt="VietQR" />
+        </div>
+
+        <div class="pay-info-box">
+          <div class="pay-row">
+            <span style="color:#94a3b8;">Ngân hàng:</span>
+            <strong id="pay-bank">MB</strong>
+          </div>
+          <div class="pay-row">
+            <span style="color:#94a3b8;">Chủ TK:</span>
+            <strong id="pay-acc-name">---</strong>
+          </div>
+          <div class="pay-row">
+            <span style="color:#94a3b8;">Số tài khoản:</span>
+            <strong id="pay-acc-no">---</strong>
+          </div>
+          <div class="pay-row">
+            <span style="color:#94a3b8;">Số tiền:</span>
+            <strong id="pay-amount" style="color:#fde047;">19.000đ</strong>
+          </div>
+          <div class="pay-row">
+            <span style="color:#94a3b8;">Nội dung CK (Bắt buộc):</span>
+            <strong id="pay-code" style="color:#ff9ec6;">LOVE...</strong>
+          </div>
+        </div>
+
+        <div class="status-waiting">
+          <div class="spinner"></div>
+          <span>Đang chờ xác nhận thanh toán tự động...</span>
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <input id="input-vip-code" type="text" class="neon-input" placeholder="Mã VIP (Nếu có trên Live)" style="padding: 9px 12px; font-size: 0.82rem;" />
+          <button id="btn-verify-vip" type="button" class="mini-btn" style="padding: 0 14px;">Áp dụng</button>
+        </div>
+
+        <button id="btn-close-pay" type="button" class="mini-btn" style="width: 100%;">Đóng lại</button>
+      </div>
+
+      <div id="step-payment-paid" style="display: none;">
+        <div class="badge-top" style="background: rgba(16,185,129,0.2); border-color: #10b981; color: #6ee7b7;">
+          ✅ Đã Thanh Toán Thành Công
+        </div>
+        <h3 class="card-title" style="font-size: 2rem;">Link Pháo Hoa Của Bạn</h3>
+        <p class="card-subtitle" style="margin-bottom: 12px;">
+          Gửi đường link hoặc mã QR này cho người thương để họ mở bầu trời pháo hoa mang tên hai bạn nhé!
+        </p>
+
+        <div class="qr-box">
+          <img id="gift-qr-img" src="" alt="QR Quà Tặng" />
+        </div>
+
+        <input id="share-url-box" type="text" class="neon-input" readonly style="font-size: 0.8rem; margin-bottom: 12px; text-align: center;" />
+
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-copy-link" type="button" class="btn-launch" style="margin-top: 0; padding: 12px;">
+            📋 Sao Chép Link
+          </button>
+          <button id="btn-close-modal" type="button" class="mini-btn" style="padding: 12px 18px;">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTemplateId = 'fireworks_confess';
+
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playLaunchWhistle() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(980, now + 0.85);
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.08, now + 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.92);
+      }
+      playExplosionBoom(isMain = true) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const duration = isMain ? 1.3 : 0.65;
+        const bufferSize = this.ctx.sampleRate * duration;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * (isMain ? 0.32 : 0.15)));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(isMain ? 620 : 900, now);
+        filter.frequency.exponentialRampToValueAtTime(110, now + duration);
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(isMain ? 0.38 : 0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+      }
+      playMagicChord() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+          const now = this.ctx.currentTime + idx * 0.11;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.07, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0005, now + 2.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 2.5);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const textCanvas = document.createElement('canvas');
+    const textCtx = textCanvas.getContext('2d', { willReadFrequently: true });
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    let mainRocket = null;
+    let morphParticles = [];
+    let bgRockets = [];
+    let bgSparks = [];
+    let textTargets = [];
+
+    let currentPhase = 'IDLE';
+    let explodeTimestamp = 0;
+    let coupleName1 = '';
+    let coupleName2 = '';
+    let coupleNote = '';
+
+    const pointer = { x: -9999, y: -9999 };
+    const PALETTE = [
+      '#ff2a85', '#ff6bb5', '#ff9ec6', '#fbbf24',
+      '#fde047', '#c084fc', '#a855f7', '#38bdf8', '#ffffff'
+    ];
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      textCanvas.width = width;
+      textCanvas.height = height;
+      if (currentPhase === 'MORPH' && coupleName1 && coupleName2) {
+        generateTextTargets(coupleName1, coupleName2, coupleNote);
+        assignTargetsToParticles();
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('pointermove', (e) => {
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+    });
+    window.addEventListener('pointerleave', () => {
+      pointer.x = -9999;
+      pointer.y = -9999;
+    });
+
+    canvas.addEventListener('pointerdown', (e) => {
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      if (currentPhase === 'MORPH') {
+        bgRockets.push(new Rocket(width * 0.5, height + 10, e.clientX, e.clientY, false));
+        sound.playLaunchWhistle();
+      }
+    });
+
+    function generateTextTargets(name1, name2, note = '') {
+      textCtx.clearRect(0, 0, width, height);
+      textTargets = [];
+
+      const isMobilePortrait = width < 680;
+      const fullSingleLine = `${name1} ❤️ ${name2}`;
+      textCtx.textAlign = 'center';
+      textCtx.textBaseline = 'middle';
+      const centerY = height * 0.44;
+
+      if (isMobilePortrait || fullSingleLine.length > 20) {
+        let fontSize = Math.min(Math.floor(width * 0.145), 68);
+        textCtx.font = `700 ${fontSize}px 'Dancing Script', 'Pacifico', cursive`;
+        const maxAllowedWidth = width * 0.88;
+        while (
+          (textCtx.measureText(name1).width > maxAllowedWidth ||
+           textCtx.measureText(name2).width > maxAllowedWidth) &&
+          fontSize > 28
+        ) {
+          fontSize -= 2;
+          textCtx.font = `700 ${fontSize}px 'Dancing Script', 'Pacifico', cursive`;
+        }
+        const lineSpacing = fontSize * 1.22;
+        textCtx.fillStyle = '#ffffff';
+        textCtx.fillText(name1, width / 2, centerY - lineSpacing);
+
+        const heartSize = Math.round(fontSize * 0.85);
+        textCtx.font = `${heartSize}px sans-serif`;
+        textCtx.fillStyle = '#ff2a85';
+        textCtx.fillText('❤️', width / 2, centerY);
+
+        textCtx.font = `700 ${fontSize}px 'Dancing Script', 'Pacifico', cursive`;
+        textCtx.fillStyle = '#ffffff';
+        textCtx.fillText(name2, width / 2, centerY + lineSpacing);
+
+        if (note) {
+          const noteSize = Math.max(20, Math.round(fontSize * 0.48));
+          textCtx.font = `700 ${noteSize}px 'Dancing Script', cursive`;
+          textCtx.fillStyle = '#fde047';
+          textCtx.fillText(note, width / 2, centerY + lineSpacing * 2.05);
+        }
+      } else {
+        let fontSize = Math.min(Math.floor(width * 0.085), 92);
+        textCtx.font = `700 ${fontSize}px 'Dancing Script', 'Pacifico', cursive`;
+        const maxAllowedWidth = width * 0.88;
+        while (textCtx.measureText(fullSingleLine).width > maxAllowedWidth && fontSize > 32) {
+          fontSize -= 2;
+          textCtx.font = `700 ${fontSize}px 'Dancing Script', 'Pacifico', cursive`;
+        }
+        textCtx.fillStyle = '#ffffff';
+        textCtx.fillText(fullSingleLine, width / 2, centerY);
+
+        if (note) {
+          const noteSize = Math.max(24, Math.round(fontSize * 0.46));
+          textCtx.font = `700 ${noteSize}px 'Dancing Script', cursive`;
+          textCtx.fillStyle = '#fde047';
+          textCtx.fillText(note, width / 2, centerY + fontSize * 1.15);
+        }
+      }
+
+      const gap = width < 600 ? 3 : 4;
+      const imgData = textCtx.getImageData(0, 0, width, height).data;
+
+      for (let y = 0; y < height; y += gap) {
+        for (let x = 0; x < width; x += gap) {
+          const idx = (y * width + x) * 4;
+          const alpha = imgData[idx + 3];
+          if (alpha > 128) {
+            const r = imgData[idx];
+            const g = imgData[idx + 1];
+            const b = imgData[idx + 2];
+            let particleColor;
+            if (r > 200 && g < 110) particleColor = '#ff2a85';
+            else if (r > 220 && g > 190 && b < 100) particleColor = '#fde047';
+            else particleColor = PALETTE[(x + y) % PALETTE.length];
+            textTargets.push({ x, y, color: particleColor });
+          }
+        }
+      }
+
+      const haloParticles = 140;
+      const haloScale = Math.min(width, height) * (isMobilePortrait ? 0.025 : 0.027);
+      for (let i = 0; i < haloParticles; i++) {
+        const t = (i / haloParticles) * Math.PI * 2;
+        const hx = 16 * Math.pow(Math.sin(t), 3);
+        const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+        textTargets.push({
+          x: width / 2 + hx * haloScale,
+          y: centerY + hy * haloScale,
+          color: i % 2 === 0 ? '#ff2a85' : '#ff9ec6'
+        });
+      }
+    }
+
+    class Rocket {
+      constructor(startX, startY, targetX, targetY, isMain = true) {
+        this.x = startX;
+        this.y = startY;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.isMain = isMain;
+        const angle = Math.atan2(targetY - startY, targetX - startX);
+        const distance = Math.hypot(targetX - startX, targetY - startY);
+        this.speed = isMain ? distance * 0.026 : distance * 0.022;
+        this.vx = Math.cos(angle) * this.speed;
+        this.vy = Math.sin(angle) * this.speed;
+        this.trail = [];
+        this.exploded = false;
+      }
+      update() {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > (this.isMain ? 14 : 8)) this.trail.shift();
+        this.x += this.vx + (Math.random() - 0.5) * 0.6;
+        this.y += this.vy;
+        this.vy *= 0.985;
+        if (this.y <= this.targetY || Math.abs(this.vy) < 1.5) this.exploded = true;
+      }
+      draw() {
+        ctx.save();
+        for (let i = 0; i < this.trail.length; i++) {
+          const pt = this.trail[i];
+          const ratio = (i + 1) / this.trail.length;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, (this.isMain ? 3.2 : 2) * ratio, 0, Math.PI * 2);
+          ctx.fillStyle = this.isMain
+            ? `rgba(255, 190, 230, ${ratio * 0.85})`
+            : `rgba(253, 224, 71, ${ratio * 0.65})`;
+          ctx.fill();
+        }
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.isMain ? 4 : 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class MorphParticle {
+      constructor(originX, originY, targetObj) {
+        this.x = originX;
+        this.y = originY;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.pow(Math.random(), 0.7) * (Math.min(width, height) * 0.025) + 1.2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.962;
+        this.gravity = 0.09;
+        this.alpha = 1;
+        this.decay = 0.0045 + Math.random() * 0.005;
+        this.targetX = targetObj ? targetObj.x : originX;
+        this.targetY = targetObj ? targetObj.y : originY;
+        this.hasTarget = Boolean(targetObj);
+        this.color = targetObj ? targetObj.color : PALETTE[Math.floor(Math.random() * PALETTE.length)];
+        this.size = (width < 600 ? 1.7 : 2.1) + Math.random() * 0.9;
+        this.phaseOffset = Math.random() * Math.PI * 2;
+        this.morphSpeed = 0.048 + Math.random() * 0.035;
+      }
+      update(timeSec) {
+        if (currentPhase === 'EXPLODE') {
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          const minAlpha = this.hasTarget ? 0.32 : 0;
+          this.alpha = Math.max(minAlpha, this.alpha - this.decay);
+        } else if (currentPhase === 'MORPH') {
+          if (this.hasTarget) {
+            const hoverX = Math.cos(timeSec * 3.2 + this.phaseOffset) * 1.35;
+            const hoverY = Math.sin(timeSec * 2.8 + this.phaseOffset) * 1.35;
+            const destX = this.targetX + hoverX;
+            const destY = this.targetY + hoverY;
+            this.x += (destX - this.x) * this.morphSpeed;
+            this.y += (destY - this.y) * this.morphSpeed;
+
+            const dx = this.x - pointer.x;
+            const dy = this.y - pointer.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 65 && dist > 0.1) {
+              const force = (65 - dist) / 65;
+              this.x += (dx / dist) * force * 6;
+              this.y += (dy / dist) * force * 6;
+            }
+            const twinkle = 0.82 + Math.sin(timeSec * 5 + this.phaseOffset) * 0.18;
+            this.alpha += (twinkle - this.alpha) * 0.08;
+          } else {
+            this.vx *= 0.96;
+            this.vy += this.gravity * 0.8;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha = Math.max(0, this.alpha - 0.015);
+          }
+        }
+      }
+      draw() {
+        if (this.alpha <= 0.02) return;
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class BackgroundSpark {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4.2 + 0.8;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.96;
+        this.gravity = 0.07;
+        this.alpha = 1;
+        this.decay = 0.014 + Math.random() * 0.012;
+        this.color = color;
+        this.size = 1.6 + Math.random() * 1.2;
+      }
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw() {
+        if (this.alpha <= 0) return;
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function triggerMainExplosion(originX, originY) {
+      currentPhase = 'EXPLODE';
+      explodeTimestamp = performance.now();
+      morphParticles = [];
+      sound.playExplosionBoom(true);
+      const shuffledTargets = [...textTargets].sort(() => Math.random() - 0.5);
+      const totalParticles = Math.max(shuffledTargets.length + 320, 1500);
+      for (let i = 0; i < totalParticles; i++) {
+        const targetObj = i < shuffledTargets.length ? shuffledTargets[i] : null;
+        morphParticles.push(new MorphParticle(originX, originY, targetObj));
+      }
+    }
+
+    function assignTargetsToParticles() {
+      for (let i = 0; i < textTargets.length; i++) {
+        if (i < morphParticles.length) {
+          morphParticles[i].targetX = textTargets[i].x;
+          morphParticles[i].targetY = textTargets[i].y;
+          morphParticles[i].color = textTargets[i].color;
+          morphParticles[i].hasTarget = true;
+        } else {
+          const p = new MorphParticle(width / 2, height / 2, textTargets[i]);
+          p.x = textTargets[i].x;
+          p.y = textTargets[i].y;
+          morphParticles.push(p);
+        }
+      }
+      for (let i = textTargets.length; i < morphParticles.length; i++) {
+        morphParticles[i].hasTarget = false;
+      }
+    }
+
+    async function startConfessionShow(name1, name2, note = '') {
+      coupleName1 = name1;
+      coupleName2 = name2;
+      coupleNote = note;
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+      generateTextTargets(coupleName1, coupleName2, coupleNote);
+      document.getElementById('ui-wrapper').classList.add('fade-out');
+      document.getElementById('floating-controls').classList.remove('visible');
+      morphParticles = [];
+      bgRockets = [];
+      bgSparks = [];
+      currentPhase = 'ROCKET';
+      mainRocket = new Rocket(width / 2, height + 10, width / 2, height * 0.42, true);
+      sound.playLaunchWhistle();
+    }
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const timeSec = now * 0.001;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = currentPhase === 'MORPH' ? 'rgba(0, 0, 0, 0.28)' : 'rgba(0, 0, 0, 0.18)';
+      ctx.fillRect(0, 0, width, height);
+      ctx.globalCompositeOperation = 'lighter';
+
+      if (currentPhase === 'ROCKET' && mainRocket) {
+        mainRocket.update();
+        mainRocket.draw();
+        if (mainRocket.exploded) {
+          triggerMainExplosion(mainRocket.x, mainRocket.y);
+          mainRocket = null;
+        }
+      }
+
+      if (currentPhase === 'EXPLODE' && now - explodeTimestamp > 1350) {
+        currentPhase = 'MORPH';
+        sound.playMagicChord();
+        setTimeout(() => {
+          if (currentPhase === 'MORPH') {
+            document.getElementById('floating-controls').classList.add('visible');
+          }
+        }, 1500);
+      }
+
+      for (let i = 0; i < morphParticles.length; i++) {
+        const p = morphParticles[i];
+        p.update(timeSec);
+        p.draw();
+      }
+
+      if (currentPhase === 'MORPH') {
+        if (Math.random() < 0.026 && bgRockets.length < 3) {
+          const rx = width * (0.12 + Math.random() * 0.76);
+          const ry = height * (0.15 + Math.random() * 0.55);
+          bgRockets.push(new Rocket(rx, height + 10, rx + (Math.random() - 0.5) * 40, ry, false));
+        }
+      }
+
+      for (let i = bgRockets.length - 1; i >= 0; i--) {
+        const r = bgRockets[i];
+        r.update();
+        r.draw();
+        if (r.exploded) {
+          sound.playExplosionBoom(false);
+          const color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+          for (let s = 0; s < 48; s++) {
+            bgSparks.push(new BackgroundSpark(r.x, r.y, color));
+          }
+          bgRockets.splice(i, 1);
+        }
+      }
+
+      for (let i = bgSparks.length - 1; i >= 0; i--) {
+        const sp = bgSparks[i];
+        sp.update();
+        sp.draw();
+        if (sp.alpha <= 0) bgSparks.splice(i, 1);
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    requestAnimationFrame(animate);
+
+    const form = document.getElementById('confess-form');
+    const inputYourName = document.getElementById('your-name');
+    const inputCrushName = document.getElementById('crush-name');
+    const inputWishNote = document.getElementById('wish-note');
+
+    let activeOrderCode = null;
+    let pollTimer = null;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const tplParam = params.get('tpl');
+      if (tplParam && window.TEMPLATES_CATALOG) {
+        const found = window.TEMPLATES_CATALOG.find((t) => t.id === tplParam);
+        if (found) {
+          currentTemplateId = found.id;
+          document.getElementById('form-badge').textContent = `✨ ${found.preset?.occasion || found.title} ✨`;
+          document.getElementById('form-title').textContent = found.title;
+          document.getElementById('btn-price-label').textContent = found.price.toLocaleString('vi-VN') + 'đ';
+        }
+      }
+
+      // Chế độ xem Demo nhanh từ trang chủ
+      if (params.get('demo') === '1') {
+        inputYourName.value = 'Bảo Nam';
+        inputCrushName.value = 'Minh Anh';
+        inputWishNote.value = currentTemplateId === 'holiday_fireworks' ? 'Chúc Mừng Năm Mới An Khang' : 'Mãi bên nhau nhé!';
+        startConfessionShow(inputYourName.value, inputCrushName.value, inputWishNote.value);
+      }
+
+      const orderId = params.get('id');
+      if (orderId) {
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'PAID' && data.order) {
+            inputYourName.value = data.order.sender_name;
+            inputCrushName.value = data.order.receiver_name;
+            inputWishNote.value = data.order.message || '';
+            document.getElementById('form-inputs-area').style.display = 'none';
+            document.getElementById('form-desc').innerHTML =
+              `💌 <b>${data.order.sender_name}</b> đã gửi tặng <b>${data.order.receiver_name}</b> một bầu trời pháo hoa đặc biệt!`;
+            document.getElementById('btn-submit-launch').textContent = 'Chạm Để Mở Pháo Hoa 🚀';
+          }
+        } catch (err) {}
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name1 = inputYourName.value.trim() || 'Anh';
+      const name2 = inputCrushName.value.trim() || 'Em';
+      const note = inputWishNote.value.trim();
+      startConfessionShow(name1, name2, note);
+    });
+
+    document.getElementById('btn-replay').addEventListener('click', () => {
+      if (coupleName1 && coupleName2) {
+        startConfessionShow(coupleName1, coupleName2, coupleNote);
+      }
+    });
+
+    document.getElementById('btn-edit-names').addEventListener('click', () => {
+      currentPhase = 'IDLE';
+      morphParticles = [];
+      bgRockets = [];
+      bgSparks = [];
+      ctx.clearRect(0, 0, width, height);
+      document.getElementById('form-inputs-area').style.display = 'block';
+      document.getElementById('floating-controls').classList.remove('visible');
+      document.getElementById('ui-wrapper').classList.remove('fade-out');
+      inputYourName.focus();
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', (e) => {
+      sound.enabled = !sound.enabled;
+      e.currentTarget.textContent = sound.enabled ? '🔊' : '🔇';
+      showToast(sound.enabled ? '🔊 Đã bật âm thanh pháo hoa' : '🔇 Đã tắt âm thanh');
+    });
+
+    document.getElementById('btn-clean-mode').addEventListener('click', () => {
+      document.body.classList.toggle('tiktok-clean');
+      const isClean = document.body.classList.contains('tiktok-clean');
+      showToast(isClean ? '📹 Đã ẩn nút bấm để quay TikTok' : 'Đã hiện thanh điều khiển');
+    });
+
+    document.getElementById('btn-share-link').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-share-link');
+      const origHtml = btn.innerHTML;
+      btn.textContent = '⏳ Đang khởi tạo mã QR...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId: currentTemplateId,
+            templateType: 'fireworks',
+            senderName: coupleName1,
+            receiverName: coupleName2,
+            message: coupleNote
+          })
+        });
+
+        const data = await res.json();
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+
+        if (!res.ok) {
+          alert(data.error || 'Chưa cấu hình Biến môi trường trên Vercel.');
+          return;
+        }
+
+        activeOrderCode = data.orderCode;
+        document.getElementById('vietqr-img').src = data.qrUrl;
+        document.getElementById('pay-bank').textContent = data.bankId;
+        document.getElementById('pay-acc-name').textContent = data.accountName;
+        document.getElementById('pay-acc-no').textContent = data.accountNo;
+        document.getElementById('pay-amount').textContent = Number(data.amount).toLocaleString('vi-VN') + 'đ';
+        document.getElementById('pay-code').textContent = data.orderCode;
+
+        document.getElementById('step-payment-waiting').style.display = 'block';
+        document.getElementById('step-payment-paid').style.display = 'none';
+        document.getElementById('modal-share').classList.add('active');
+
+        startPollingOrderStatus(activeOrderCode);
+      } catch (err) {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+        alert('Hãy triển khai lên Vercel và cài đặt Biến môi trường để sử dụng thanh toán tự động.');
+      }
+    });
+
+    function startPollingOrderStatus(orderCode) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderCode)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'PAID') {
+            clearInterval(pollTimer);
+            showUnlockedShareLink(orderCode);
+          }
+        } catch (e) {}
+      }, 2500);
+    }
+
+    function showUnlockedShareLink(orderCode) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${orderCode}`;
+      document.getElementById('share-url-box').value = shareUrl;
+      document.getElementById('gift-qr-img').src =
+        `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=be185d&data=${encodeURIComponent(shareUrl)}`;
+
+      document.getElementById('step-payment-waiting').style.display = 'none';
+      document.getElementById('step-payment-paid').style.display = 'block';
+      sound.playMagicChord();
+      showToast('🎉 Thanh toán thành công! Đã mở khóa Link & QR');
+    }
+
+    document.getElementById('btn-verify-vip').addEventListener('click', async () => {
+      const vipCode = document.getElementById('input-vip-code').value.trim();
+      if (!vipCode || !activeOrderCode) return;
+
+      const res = await fetch('/api/check-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderCode: activeOrderCode, vipCode })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === 'PAID') {
+        if (pollTimer) clearInterval(pollTimer);
+        showUnlockedShareLink(activeOrderCode);
+      } else {
+        showToast(data.error || '❌ Mã VIP không đúng!');
+      }
+    });
+
+    document.getElementById('btn-copy-link').addEventListener('click', () => {
+      const box = document.getElementById('share-url-box');
+      box.select();
+      navigator.clipboard.writeText(box.value).then(() => {
+        showToast('📋 Đã sao chép đường link Pháo Hoa!');
+      });
+    });
+
+    function closeShareModal() {
+      if (pollTimer) clearInterval(pollTimer);
+      document.getElementById('modal-share').classList.remove('active');
+    }
+
+    document.getElementById('btn-close-pay').addEventListener('click', closeShareModal);
+    document.getElementById('btn-close-modal').addEventListener('click', closeShareModal);
+  </script>
+</body>
+</html>
+

@@ -103,9 +103,11 @@ const SHAPE_LABELS = {
 };
 
 let appState = {
+  templateId: 'galaxy_love_3d',
+  price: 39000,
   sender: 'Bảo Nam',
   receiver: 'Minh Anh',
-  occasion: 'Kỷ Niệm Tình Yêu • Mãi Bên Nhau',
+  occasion: 'Lời Tỏ Tình Từ Trái Tim',
   theme: 'pink',
   defaultShape: 'galaxy',
   anniversaryDate: '',
@@ -114,38 +116,58 @@ let appState = {
   photos: JSON.parse(JSON.stringify(DEFAULT_PHOTOS))
 };
 
-let adminConfig = {
-  bankId: 'MB',
-  accountNo: '0987654321',
-  accountName: 'CHU SHOP TIKTOK',
-  price: 29000,
-  vipCode: 'TIKTOK99'
-};
+let currentOrderCode = null;
+let orderPollInterval = null;
 
-try {
-  const savedAdmin = localStorage.getItem('galaxy_admin_config');
-  if (savedAdmin) {
-    adminConfig = { ...adminConfig, ...JSON.parse(savedAdmin) };
-  }
-} catch (e) {}
-
-function loadStateFromUrl() {
+// Áp dụng cấu hình từ ?tpl=... khi khách chọn mẫu từ Trang Chủ Kho Mẫu
+function applyTemplateFromUrlParam() {
   try {
-    const hash = window.location.hash;
-    if (hash && hash.startsWith('#gift=')) {
-      const compressed = hash.replace('#gift=', '');
-      const jsonStr = LZString.decompressFromEncodedURIComponent(compressed);
-      if (jsonStr) {
-        const parsed = JSON.parse(jsonStr);
-        appState = { ...appState, ...parsed };
-        if (!appState.photos || appState.photos.length === 0) {
-          appState.photos = JSON.parse(JSON.stringify(DEFAULT_PHOTOS));
+    const params = new URLSearchParams(window.location.search);
+    const tplId = params.get('tpl');
+    if (tplId && window.TEMPLATES_CATALOG) {
+      const found = window.TEMPLATES_CATALOG.find((t) => t.id === tplId);
+      if (found) {
+        appState.templateId = found.id;
+        appState.price = found.price;
+        if (found.preset) {
+          appState.occasion = found.preset.occasion || appState.occasion;
+          appState.defaultShape = found.preset.defaultShape || appState.defaultShape;
+          appState.theme = found.preset.theme || appState.theme;
+          appState.melody = found.preset.melody || appState.melody;
         }
-        return true;
       }
     }
+  } catch (e) {}
+}
+
+// Tải dữ liệu món quà từ Supabase nếu trên URL có ?id=LOVE123456
+async function loadStateFromServer() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('id');
+    if (!orderId) return false;
+
+    const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+    const data = await res.json();
+    if (res.ok && data.status === 'PAID' && data.order) {
+      const order = data.order;
+      const p = order.payload || {};
+      appState = {
+        ...appState,
+        sender: order.sender_name || appState.sender,
+        receiver: order.receiver_name || appState.receiver,
+        occasion: order.occasion || appState.occasion,
+        message: order.message || appState.message,
+        theme: p.theme || appState.theme,
+        defaultShape: p.defaultShape || appState.defaultShape,
+        anniversaryDate: p.anniversaryDate || '',
+        melody: p.melody || 'romance',
+        photos: Array.isArray(p.photos) && p.photos.length > 0 ? p.photos : appState.photos
+      };
+      return true;
+    }
   } catch (err) {
-    console.warn('Could not decode gift URL:', err);
+    console.warn('Could not load order from server:', err);
   }
   return false;
 }
@@ -777,9 +799,14 @@ function syncUIFromState() {
     chip.classList.toggle('active', chip.dataset.theme === appState.theme);
   });
 
-  const formattedPrice = Number(adminConfig.price).toLocaleString('vi-VN') + 'đ';
-  document.getElementById('cta-price-badge').textContent = formattedPrice;
-  document.getElementById('btn-pay-amount').textContent = formattedPrice;
+  const priceBadge = document.getElementById('cta-price-badge');
+  if (priceBadge && appState.price) {
+    priceBadge.textContent = Number(appState.price).toLocaleString('vi-VN') + 'đ';
+  }
+  const btnProceed = document.getElementById('btn-proceed-payment');
+  if (btnProceed && appState.price) {
+    btnProceed.innerHTML = `💳 Tạo Link & Thiệp QR (${Number(appState.price).toLocaleString('vi-VN')}đ)`;
+  }
 
   renderPhotoUploaderGrid();
 }
@@ -981,33 +1008,81 @@ function renderGiftCardCanvas(shareUrl) {
   }
 }
 
-function openVietQRModal() {
+async function openVietQRModal() {
   applyCreatorChangesTo3D();
-  document.getElementById('modal-creator').classList.add('hidden');
+  const btn = document.getElementById('btn-proceed-payment');
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Đang tạo mã QR...';
+  btn.disabled = true;
 
-  const memoCode = 'GALAXY' + Math.floor(1000 + Math.random() * 9000);
-  const amount = adminConfig.price || 29000;
-  const bankId = adminConfig.bankId || 'MB';
-  const accountNo = adminConfig.accountNo || '0987654321';
-  const accountName = encodeURIComponent(adminConfig.accountName || 'CHU SHOP TIKTOK');
+  try {
+    const res = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        templateId: appState.templateId || 'galaxy_love_3d',
+        templateType: 'galaxy',
+        senderName: appState.sender,
+        receiverName: appState.receiver,
+        occasion: appState.occasion,
+        message: appState.message,
+        payload: {
+          templateId: appState.templateId,
+          theme: appState.theme,
+          defaultShape: appState.defaultShape,
+          anniversaryDate: appState.anniversaryDate,
+          melody: appState.melody,
+          photos: appState.photos.slice(0, 8)
+        }
+      })
+    });
 
-  const vietQrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${memoCode}&accountName=${accountName}`;
+    const data = await res.json();
+    btn.textContent = origText;
+    btn.disabled = false;
 
-  document.getElementById('vietqr-img').src = vietQrUrl;
-  document.getElementById('pay-bank-name').textContent = bankId;
-  document.getElementById('pay-account-name').textContent = adminConfig.accountName;
-  document.getElementById('pay-account-no').textContent = accountNo;
-  document.getElementById('pay-amount-text').textContent = Number(amount).toLocaleString('vi-VN') + 'đ';
-  document.getElementById('pay-memo-text').textContent = memoCode;
+    if (!res.ok) {
+      alert(data.error || 'Chưa cấu hình Biến môi trường Supabase / Ngân hàng trên Vercel.');
+      return;
+    }
 
-  document.getElementById('payment-step-qr').style.display = 'block';
-  document.getElementById('payment-step-success').style.display = 'none';
-  document.getElementById('modal-payment').classList.remove('hidden');
+    currentOrderCode = data.orderCode;
+    document.getElementById('modal-creator').classList.add('hidden');
+    document.getElementById('vietqr-img').src = data.qrUrl;
+    document.getElementById('pay-bank-name').textContent = data.bankId;
+    document.getElementById('pay-account-name').textContent = data.accountName;
+    document.getElementById('pay-account-no').textContent = data.accountNo;
+    document.getElementById('pay-amount-text').textContent = Number(data.amount).toLocaleString('vi-VN') + 'đ';
+    document.getElementById('pay-memo-text').textContent = data.orderCode;
+
+    document.getElementById('payment-step-qr').style.display = 'block';
+    document.getElementById('payment-step-success').style.display = 'none';
+    document.getElementById('modal-payment').classList.remove('hidden');
+
+    startPollingGalaxyOrder(currentOrderCode);
+  } catch (err) {
+    btn.textContent = origText;
+    btn.disabled = false;
+    alert('Hãy triển khai lên Vercel và cài đặt Biến môi trường để sử dụng thanh toán tự động.');
+  }
 }
 
-function unlockAndShowShareResult() {
-  const shareUrl = generateShareableUrl();
-  window.location.hash = shareUrl.split('#')[1];
+function startPollingGalaxyOrder(orderCode) {
+  if (orderPollInterval) clearInterval(orderPollInterval);
+  orderPollInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderCode)}`);
+      const data = await res.json();
+      if (res.ok && data.status === 'PAID') {
+        clearInterval(orderPollInterval);
+        unlockAndShowShareResult(orderCode);
+      }
+    } catch (e) {}
+  }, 2500);
+}
+
+function unlockAndShowShareResult(orderCode) {
+  const shareUrl = `${window.location.origin}${window.location.pathname}?id=${orderCode}`;
   document.getElementById('share-url-input').value = shareUrl;
   renderGiftCardCanvas(shareUrl);
 
@@ -1015,14 +1090,21 @@ function unlockAndShowShareResult() {
   document.getElementById('payment-step-success').style.display = 'block';
   spawnFireworkBurst();
   setTimeout(spawnFireworkBurst, 400);
-  showToast('🎉 Đã tạo Link Vũ Trụ 3D & Thiệp QR!');
+  showToast('🎉 Thanh toán thành công! Đã tạo Link Vũ Trụ 3D & Thiệp QR!');
 }
 
 // ==================== 5. INITIALIZATION & EVENT BINDINGS ====================
-window.addEventListener('DOMContentLoaded', () => {
-  loadStateFromUrl();
+window.addEventListener('DOMContentLoaded', async () => {
+  applyTemplateFromUrlParam();
+  await loadStateFromServer();
   syncUIFromState();
   initThreeScene();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('create') === '1') {
+    document.getElementById('intro-overlay').classList.add('hidden');
+    document.getElementById('modal-creator').classList.remove('hidden');
+  }
 
   document.getElementById('btn-enter-galaxy').addEventListener('click', () => {
     document.getElementById('intro-overlay').classList.add('hidden');
@@ -1045,7 +1127,6 @@ window.addEventListener('DOMContentLoaded', () => {
     showToast(isClean ? '📹 Đã bật Chế độ Quay TikTok (Chạm lại góc phải để hiện nút)' : 'Đã hiện thanh điều khiển');
   });
 
-  // Cycle through 4 3D Shapes
   document.getElementById('btn-morph-shape').addEventListener('click', () => {
     const idx = SHAPE_MODES.indexOf(currentShape);
     currentShape = SHAPE_MODES[(idx + 1) % SHAPE_MODES.length];
@@ -1113,27 +1194,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-proceed-payment').addEventListener('click', openVietQRModal);
 
-  // VIP Code Quick Unlock
-  document.getElementById('btn-apply-vip').addEventListener('click', () => {
-    const entered = document.getElementById('input-vip-code').value.trim().toUpperCase();
-    if (entered && entered === (adminConfig.vipCode || 'TIKTOK99').toUpperCase()) {
-      unlockAndShowShareResult();
+  // Xác thực Mã VIP ở phía Server Vercel (/api/check-order)
+  document.getElementById('btn-apply-vip').addEventListener('click', async () => {
+    const vipCode = document.getElementById('input-vip-code').value.trim();
+    if (!vipCode || !currentOrderCode) return;
+
+    const res = await fetch('/api/check-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderCode: currentOrderCode, vipCode })
+    });
+    const data = await res.json();
+    if (res.ok && data.status === 'PAID') {
+      if (orderPollInterval) clearInterval(orderPollInterval);
+      unlockAndShowShareResult(currentOrderCode);
     } else {
-      showToast('❌ Mã VIP không đúng, vui lòng kiểm tra lại!');
+      showToast(data.error || '❌ Mã VIP không đúng!');
     }
-  });
-
-  document.getElementById('btn-verify-payment').addEventListener('click', () => {
-    const btn = document.getElementById('btn-verify-payment');
-    const origText = btn.innerHTML;
-    btn.innerHTML = '⏳ Đang kiểm tra giao dịch & khởi tạo Vũ Trụ...';
-    btn.disabled = true;
-
-    setTimeout(() => {
-      btn.innerHTML = origText;
-      btn.disabled = false;
-      unlockAndShowShareResult();
-    }, 1100);
   });
 
   document.getElementById('btn-copy-share-url').addEventListener('click', () => {
@@ -1153,37 +1230,12 @@ window.addEventListener('DOMContentLoaded', () => {
     showToast('📥 Đã tải Ảnh Thiệp QR về máy!');
   });
 
-  document.getElementById('btn-open-gift-view').addEventListener('click', () => {
-    document.getElementById('modal-payment').classList.add('hidden');
-    document.getElementById('intro-overlay').classList.remove('hidden');
-    showToast('🚀 Đây là giao diện mở quà khi người nhận bấm vào link!');
-  });
-
-  document.getElementById('btn-admin-config').addEventListener('click', () => {
-    document.getElementById('admin-bank-id').value = adminConfig.bankId;
-    document.getElementById('admin-account-no').value = adminConfig.accountNo;
-    document.getElementById('admin-account-name').value = adminConfig.accountName;
-    document.getElementById('admin-price').value = adminConfig.price;
-    document.getElementById('admin-vip-code').value = adminConfig.vipCode || 'TIKTOK99';
-    document.getElementById('modal-admin').classList.remove('hidden');
-  });
-
-  document.getElementById('btn-save-admin').addEventListener('click', () => {
-    adminConfig.bankId = document.getElementById('admin-bank-id').value;
-    adminConfig.accountNo = document.getElementById('admin-account-no').value.trim() || '0987654321';
-    adminConfig.accountName = document.getElementById('admin-account-name').value.trim().toUpperCase() || 'CHU SHOP';
-    adminConfig.price = parseInt(document.getElementById('admin-price').value, 10) || 29000;
-    adminConfig.vipCode = document.getElementById('admin-vip-code').value.trim().toUpperCase() || 'TIKTOK99';
-
-    localStorage.setItem('galaxy_admin_config', JSON.stringify(adminConfig));
-    syncUIFromState();
-    document.getElementById('modal-admin').classList.add('hidden');
-    showToast('💾 Đã lưu cấu hình Ngân hàng VietQR & Giá bán!');
-  });
-
   document.querySelectorAll('.modal-close').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-close');
+      if (targetId === 'modal-payment' && orderPollInterval) {
+        clearInterval(orderPollInterval);
+      }
       if (targetId) document.getElementById(targetId).classList.add('hidden');
     });
   });

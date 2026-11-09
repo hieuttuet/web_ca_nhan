@@ -3,326 +3,480 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Vũ Trụ Kỷ Niệm 3D ✨ Quà Tặng Cá Nhân Hóa</title>
+  <title>Kho Mẫu Web Quà Tặng 3D Cá Nhân Hóa ✨ Tỏ Tình • Sinh Nhật • Kỷ Niệm</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <!-- Three.js & OrbitControls & LZ-String -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="templates-catalog.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070312;
+      --card-bg: rgba(20, 11, 38, 0.78);
+      --card-border: rgba(255, 140, 205, 0.24);
+      --primary: #ff2a85;
+      --secondary: #9333ea;
+      --gold: #fde047;
+      --text-main: #ffffff;
+      --text-muted: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at top, #220b40 0%, #090316 55%, #04010a 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      padding-bottom: 60px;
+      overflow-x: hidden;
+    }
+
+    /* Nền sao lấp lánh nhẹ */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+        radial-gradient(1px 1px at 38% 62%, #ffd1e8, transparent),
+        radial-gradient(2px 2px at 62% 22%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 82% 48%, #c4b5fd, transparent),
+        radial-gradient(1px 1px at 24% 82%, #bae6fd, transparent),
+        radial-gradient(2px 2px at 74% 85%, #fbcfe8, transparent);
+      background-size: 340px 340px;
+      opacity: 0.65;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
+
+    /* Header / Hero Banner */
+    .hero {
+      text-align: center;
+      padding: 36px 0 24px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 42, 133, 0.16);
+      border: 1px solid rgba(255, 120, 196, 0.45);
+      color: #ff9ec6;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .hero-desc {
+      font-size: clamp(0.9rem, 2.2vw, 1.02rem);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 22px;
+      line-height: 1.6;
+    }
+
+    /* 3 Bước Hướng Dẫn Cực Ngắn Gọn */
+    .steps-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 15px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.8rem;
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    /* Thanh Chọn Dịp Lễ / Sự Kiện (Category Filter Tabs) */
+    .category-tabs-wrap {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      background: rgba(13, 6, 26, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 158, 198, 0.25);
+      border-radius: 999px;
+      padding: 7px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .category-tabs-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-tab {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.22s ease;
+    }
+
+    .cat-tab:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cat-tab.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 42, 133, 0.5);
+    }
+
+    /* Lưới Danh Sách Template */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
+    }
+
+    .tpl-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    .tpl-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 42, 133, 0.65);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 30px rgba(255, 42, 133, 0.22);
+    }
+
+    /* Phần Thumbnail Preview Động của từng Template */
+    .tpl-preview {
+      position: relative;
+      height: 175px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .tpl-preview-emoji {
+      font-size: 4.2rem;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
+      animation: floatEmoji 3.2s ease-in-out infinite;
+    }
+
+    @keyframes floatEmoji {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.06); }
+    }
+
+    .tpl-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(10, 4, 20, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fde047;
+      font-size: 0.74rem;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .tpl-price-box {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(10, 4, 20, 0.85);
+      border: 1px solid rgba(253, 224, 71, 0.45);
+      padding: 5px 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .tpl-price-current {
+      color: var(--gold);
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .tpl-price-old {
+      color: #94a3b8;
+      font-size: 0.74rem;
+      text-decoration: line-through;
+    }
+
+    /* Nội dung Thẻ Template */
+    .tpl-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .tpl-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .tpl-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .tpl-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .tpl-feat-tag {
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: #fbcfe8;
+      background: rgba(255, 42, 133, 0.12);
+      border: 1px solid rgba(255, 42, 133, 0.28);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .tpl-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 10px;
+    }
+
+    .btn-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-demo {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    .btn-demo:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-create {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(255, 42, 133, 0.4);
+    }
+
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(255, 42, 133, 0.65);
+    }
+  </style>
 </head>
 <body>
 
-  <!-- 3D Galaxy Canvas Container -->
-  <div id="canvas-container"></div>
+  <div class="stars-bg"></div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast">Đã sao chép đường link!</div>
-
-  <!-- Intro Screen Overlay -->
-  <div id="intro-overlay" class="intro-overlay">
-    <div class="intro-badge" id="intro-badge">✨ Món Quà Vũ Trụ 3D Đặc Biệt ✨</div>
-    <h1 class="intro-title" id="intro-title">Minh Anh ❤️ Bảo Nam</h1>
-    <p class="intro-subtitle" id="intro-subtitle">
-      Mỗi vì sao trong dải ngân hà này đều lưu giữ một khoảnh khắc tuyệt đẹp của chúng mình. Chạm để bước vào vũ trụ kỷ niệm nhé!
-    </p>
-    <button id="btn-enter-galaxy" class="btn-enter-galaxy">
-      <span>🪐 Chạm Để Khám Phá Vũ Trụ</span>
-    </button>
-  </div>
-
-  <!-- Floating Top Header -->
-  <header class="hud-header">
-    <div id="hud-occasion" class="hud-occasion">Kỷ Niệm Tình Yêu • 365 Ngày Bên Nhau</div>
-    <h2 id="hud-couple-names" class="hud-couple-names">Minh Anh ❤️ Bảo Nam</h2>
-    <div id="hud-days-counter" class="hud-days-pill" style="display: none;">💖 Bên nhau: <span id="days-count-num">365</span> ngày</div>
-    <p class="hud-hint">💡 Xoay 360° • Chạm vào Ảnh 3D hoặc Trái Tim trung tâm để mở thư</p>
-  </header>
-
-  <!-- Top Right Floating Controls -->
-  <div class="hud-top-right">
-    <button id="btn-music" class="icon-btn" title="Bật/Tắt nhạc hộp nhạc lãng mạn">🎵</button>
-    <button id="btn-firework-burst" class="icon-btn" title="Bắn Pháo Hoa 3D">🎆</button>
-    <button id="btn-tiktok-mode" class="icon-btn" title="Chế độ Quay TikTok (Ẩn nút bấm)">📹</button>
-    <button id="btn-admin-config" class="icon-btn" title="Cài đặt Tài khoản nhận tiền QR (Chủ Shop)">⚙️</button>
-  </div>
-
-  <!-- Bottom Action Bar -->
-  <nav class="hud-bottom-bar">
-    <button id="btn-morph-shape" class="pill-btn" title="Chuyển đổi giữa 4 chế độ 3D">
-      <span id="icon-morph-shape">🪐</span>
-      <span id="label-morph-shape">Đổi Hiệu Ứng 3D</span>
-    </button>
-    <button id="btn-camera-tour" class="pill-btn">
-      <span>🎬</span>
-      <span id="label-camera-tour">Bay Điện Ảnh</span>
-    </button>
-    <button id="btn-open-letter" class="pill-btn">
-      <span>💌</span>
-      <span>Đọc Tâm Thư</span>
-    </button>
-    <button id="btn-open-creator" class="pill-btn cta-create">
-      <span>✨ Tạo Web Của Bạn</span>
-      <span id="cta-price-badge" class="price-tag">29.000đ</span>
-    </button>
-  </nav>
-
-  <!-- 1. LOVE LETTER MODAL -->
-  <div id="modal-letter" class="modal-backdrop hidden">
-    <div class="modal-card letter-card">
-      <button class="modal-close" data-close="modal-letter">✕</button>
-      <div style="font-size: 2.4rem; margin-bottom: 6px;">💌</div>
-      <h3 id="letter-modal-title" class="letter-title">Gửi Người Thương Của Anh</h3>
-      <div id="letter-modal-body" class="letter-body"></div>
-      <div id="letter-modal-sign" class="letter-sign"></div>
-    </div>
-  </div>
-
-  <!-- 2. PHOTO LIGHTBOX MODAL -->
-  <div id="modal-lightbox" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width: 460px; text-align: center;">
-      <button class="modal-close" data-close="modal-lightbox">✕</button>
-      <div class="lightbox-img-wrap">
-        <img id="lightbox-img" src="" alt="Kỷ niệm" />
-      </div>
-      <h4 id="lightbox-caption" style="font-family: var(--font-script); font-size: 1.8rem; color: #ff9ec6; margin-bottom: 6px;">Khoảnh khắc ngọt ngào</h4>
-      <p id="lightbox-sub" style="font-size: 0.85rem; color: var(--text-muted);">Mãi lưu giữ trong dải ngân hà của chúng ta ✨</p>
-    </div>
-  </div>
-
-  <!-- 3. CREATOR STUDIO MODAL (TẠO WEB CÁ NHÂN HÓA) -->
-  <div id="modal-creator" class="modal-backdrop hidden">
-    <div class="modal-card">
-      <button class="modal-close" data-close="modal-creator">✕</button>
-      <h3 class="modal-title">✨ Tạo Vũ Trụ 3D Của Riêng Bạn</h3>
-      <p class="modal-desc">
-        Điền tên, lời chúc và tải ảnh kỷ niệm lên. Bạn có thể <b>Xem thử miễn phí</b> ngay trên không gian 3D trước khi tạo link & thiệp QR!
+  <div class="container">
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-badge">✨ Nền Tảng Tạo Web Quà Tặng 3D Cá Nhân Hóa ✨</div>
+      <h1 class="hero-title">Trao Gửi Yêu Thương Theo Cách Độc Đáo Nhất</h1>
+      <p class="hero-desc">
+        Chọn dịp lễ và mẫu hiệu ứng 3D yêu thích, ghép ảnh kỷ niệm & lời chúc của riêng bạn. Nhận ngay đường link & mã QR riêng biệt chỉ trong 30 giây!
       </p>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Tên của bạn (Người gửi)</label>
-          <input id="input-sender" type="text" class="form-input" placeholder="VD: Bảo Nam" maxlength="30" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tên người ấy (Người nhận)</label>
-          <input id="input-receiver" type="text" class="form-input" placeholder="VD: Minh Anh" maxlength="30" />
-        </div>
+      <div class="steps-bar">
+        <div class="step-pill"><span class="step-num">1</span> Chọn Sự Kiện & Mẫu 3D</div>
+        <div class="step-pill"><span class="step-num">2</span> Nhập Tên, Lời Chúc & Ảnh</div>
+        <div class="step-pill"><span class="step-num">3</span> Quét QR Nhận Link & Thiệp</div>
       </div>
+    </header>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Dịp đặc biệt</label>
-          <select id="input-occasion" class="form-select">
-            <option value="Kỷ Niệm Tình Yêu • Mãi Bên Nhau">💑 Kỷ niệm Tình yêu / Ngày quen nhau</option>
-            <option value="Happy Birthday • Chúc Mừng Sinh Nhật">🎂 Chúc mừng Sinh nhật</option>
-            <option value="Lời Tỏ Tình Từ Trái Tim">💘 Tỏ tình Crush / Người thương</option>
-            <option value="Happy Valentine's Day 14/2">🌹 Lễ Tình Nhân (Valentine)</option>
-            <option value="Chúc Mừng Ngày Phụ Nữ 8/3 & 20/10">🌸 Quà tặng 8/3 - 20/10</option>
-            <option value="Merry Christmas & Happy New Year">🎄 Giáng Sinh / Năm Mới</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mẫu Hiệu Ứng 3D Mở Đầu</label>
-          <select id="input-default-shape" class="form-select">
-            <option value="galaxy">🪐 Dải Ngân Hà Xoắn Ốc 3D</option>
-            <option value="heart">💖 Trái Tim Hạt Ánh Sáng 3D</option>
-            <option value="ring">💍 Vòng Nhẫn Tinh Vân Đôi</option>
-            <option value="sphere">🔮 Quả Cầu Pha Lê Vũ Trụ</option>
-          </select>
-        </div>
-      </div>
+    <!-- Thanh Chọn Sự Kiện (20/10, 8/3, Valentine, Sinh nhật, Lễ Tết, Tỏ tình, Kỷ niệm...) -->
+    <nav id="category-tabs" class="category-tabs-wrap"></nav>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Ngày bắt đầu yêu / Ngày kỷ niệm (Tùy chọn)</label>
-          <input id="input-anniversary-date" type="date" class="form-input" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Giai điệu Hộp Nhạc 3D</label>
-          <select id="input-melody" class="form-select">
-            <option value="romance">🎹 Bản Tình Ca Ngân Hà (Mặc định)</option>
-            <option value="birthday">🎂 Happy Birthday (Mừng Sinh Nhật)</option>
-            <option value="canon">🎻 Canon In D (Lãng Mạn Cổ Điển)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Tông màu Tinh Vân 3D</label>
-        <div class="theme-options" id="theme-picker">
-          <div class="theme-chip active" data-theme="pink">🌸 Hồng Tình Yêu</div>
-          <div class="theme-chip" data-theme="purple">🔮 Tím Mộng Mơ</div>
-          <div class="theme-chip" data-theme="blue">🌌 Xanh Băng Giá</div>
-          <div class="theme-chip" data-theme="gold">✨ Vàng Hoàng Kim</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="form-label">
-          <span>Lời chúc / Tâm thư bí mật</span>
-          <button type="button" id="btn-ai-wish" class="ai-suggest-btn">🪄 AI Viết Hộ Lời Chúc</button>
-        </div>
-        <textarea id="input-message" class="form-textarea" placeholder="Nhập lời chúc ngọt ngào gửi tới người ấy..."></textarea>
-      </div>
-
-      <div class="form-group">
-        <div class="form-label">
-          <span>Ảnh kỷ niệm bay trong 3D (Tối đa 8 ảnh)</span>
-          <span id="photo-count-label" style="font-size: 0.76rem; color: #ff9ec6;">6/8 ảnh</span>
-        </div>
-        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">
-          Tải ảnh từ điện thoại/máy tính và nhấn vào từng ảnh để sửa dòng chữ kỷ niệm bên dưới khung Polaroid.
-        </p>
-        <div id="photo-upload-grid" class="photo-upload-grid"></div>
-        <input id="input-photo-file" type="file" accept="image/*" multiple style="display: none;" />
-      </div>
-
-      <div class="form-grid" style="margin-top: 20px;">
-        <button type="button" id="btn-preview-3d" class="btn-full btn-secondary">
-          👁️ Xem Thử Trên 3D
-        </button>
-        <button type="button" id="btn-proceed-payment" class="btn-full btn-primary">
-          💳 Tạo Link & Thiệp QR (<span id="btn-pay-amount">29.000đ</span>)
-        </button>
-      </div>
-    </div>
+    <!-- Lưới Các Template -->
+    <main id="templates-grid" class="templates-grid"></main>
   </div>
 
-  <!-- 4. VIETQR PAYMENT & LINK EXPORT MODAL -->
-  <div id="modal-payment" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width: 490px;">
-      <button class="modal-close" data-close="modal-payment">✕</button>
-      <h3 class="modal-title">📲 Quét QR Mở Khóa Link Riêng</h3>
-      <p class="modal-desc">
-        Quét mã VietQR bên dưới bằng bất kỳ App Ngân hàng hoặc MoMo nào. Nội dung và số tiền đã được điền tự động!
-      </p>
+  <script>
+    let selectedCategory = 'all';
 
-      <div id="payment-step-qr">
-        <div class="qr-payment-box">
-          <img id="vietqr-img" src="" alt="VietQR Thanh Toán" />
-          <div style="font-size: 0.78rem; font-weight: 700; color: #334155; margin-top: 6px;">
-            Hỗ trợ VietQR • Tự động điền thông tin
+    // Nếu người nhận mở link quà tặng cũ dạng /?id=LOVE123456 ở trang chủ -> Tự động chuyển hướng đúng Template
+    async function checkAndRedirectGiftOrder() {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      if (!orderId) return;
+
+      try {
+        const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+        const data = await res.json();
+        if (res.ok && data.order) {
+          const tplType = data.order.template_type || '';
+          const matched = (window.TEMPLATES_CATALOG || []).find((t) => t.id === tplType);
+          if (matched) {
+            window.location.replace(`${matched.engineUrl}?id=${encodeURIComponent(orderId)}&tpl=${matched.id}`);
+          } else if (tplType === 'fireworks') {
+            window.location.replace(`fireworks.html?id=${encodeURIComponent(orderId)}`);
+          } else if (tplType === 'birthday') {
+            window.location.replace(`birthday.html?id=${encodeURIComponent(orderId)}`);
+          } else {
+            window.location.replace(`galaxy.html?id=${encodeURIComponent(orderId)}`);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderCategoryTabs() {
+      const wrap = document.getElementById('category-tabs');
+      wrap.innerHTML = '';
+
+      (window.EVENT_CATEGORIES || []).forEach((cat) => {
+        const btn = document.createElement('button');
+        btn.className = `cat-tab ${cat.id === selectedCategory ? 'active' : ''}`;
+        btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
+        btn.addEventListener('click', () => {
+          selectedCategory = cat.id;
+          renderCategoryTabs();
+          renderTemplateCards();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderTemplateCards() {
+      const grid = document.getElementById('templates-grid');
+      grid.innerHTML = '';
+
+      const list = (window.TEMPLATES_CATALOG || []).filter(
+        (item) => selectedCategory === 'all' || item.category === selectedCategory
+      );
+
+      list.forEach((tpl) => {
+        const card = document.createElement('article');
+        card.className = 'tpl-card';
+
+        const demoUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&demo=1`;
+        const createUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&create=1`;
+        const priceFormatted = Number(tpl.price).toLocaleString('vi-VN') + 'đ';
+        const oldPriceFormatted = tpl.oldPrice ? Number(tpl.oldPrice).toLocaleString('vi-VN') + 'đ' : '';
+
+        const featuresHtml = (tpl.features || [])
+          .map((f) => `<span class="tpl-feat-tag">✓ ${f}</span>`)
+          .join('');
+
+        card.innerHTML = `
+          <div class="tpl-preview" style="background: ${tpl.previewGradient};" onclick="window.location.href='${demoUrl}'">
+            <span class="tpl-badge">${tpl.badge}</span>
+            <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
+            <div class="tpl-price-box">
+              <span class="tpl-price-current">${priceFormatted}</span>
+              ${oldPriceFormatted ? `<span class="tpl-price-old">${oldPriceFormatted}</span>` : ''}
+            </div>
           </div>
-        </div>
-
-        <div class="payment-info-table">
-          <div class="payment-info-row">
-            <span style="color: var(--text-muted);">Ngân hàng:</span>
-            <strong id="pay-bank-name">MBBank</strong>
+          <div class="tpl-body">
+            <h2 class="tpl-title">${tpl.title}</h2>
+            <p class="tpl-subtitle">${tpl.subtitle}</p>
+            <div class="tpl-features">${featuresHtml}</div>
+            <div class="tpl-actions">
+              <a href="${demoUrl}" class="btn-card btn-demo">👁️ Xem Demo</a>
+              <a href="${createUrl}" class="btn-card btn-create">✨ Tạo Ngay (${priceFormatted})</a>
+            </div>
           </div>
-          <div class="payment-info-row">
-            <span style="color: var(--text-muted);">Chủ tài khoản:</span>
-            <strong id="pay-account-name">NGUYEN VAN A</strong>
-          </div>
-          <div class="payment-info-row">
-            <span style="color: var(--text-muted);">Số tài khoản:</span>
-            <strong id="pay-account-no">0123456789</strong>
-          </div>
-          <div class="payment-info-row">
-            <span style="color: var(--text-muted);">Số tiền:</span>
-            <strong id="pay-amount-text" style="color: #fde047;">29.000đ</strong>
-          </div>
-          <div class="payment-info-row">
-            <span style="color: var(--text-muted);">Nội dung CK:</span>
-            <strong id="pay-memo-text" style="color: #ff9ec6;">GALAXY888</strong>
-          </div>
-        </div>
+        `;
 
-        <div class="vip-code-row">
-          <input id="input-vip-code" type="text" class="form-input" placeholder="Nhập mã VIP (Nếu mua trên Live TikTok)" style="font-size: 0.84rem;" />
-          <button type="button" id="btn-apply-vip" class="btn-secondary" style="padding: 0 14px; border-radius: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">Áp dụng</button>
-        </div>
+        grid.appendChild(card);
+      });
+    }
 
-        <button type="button" id="btn-verify-payment" class="btn-full btn-primary">
-          ✅ Tôi Đã Chuyển Khoản — Nhận Link Ngay
-        </button>
-      </div>
-
-      <!-- Kết quả xuất Link và Thiệp QR Tặng Quà sau khi thanh toán -->
-      <div id="payment-step-success" class="share-result-box" style="display: none;">
-        <div style="font-size: 2rem; margin-bottom: 4px;">🎉</div>
-        <h4 style="font-size: 1.15rem; color: #6ee7b7; margin-bottom: 6px;">Tuyệt vời! Vũ Trụ 3D của bạn đã sẵn sàng</h4>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
-          Tải tấm <b>Thiệp QR Vũ Trụ</b> bên dưới hoặc gửi đường link trực tiếp cho người thương nhé!
-        </p>
-
-        <!-- Canvas Thiệp QR Quà Tặng có thể tải về máy -->
-        <div class="gift-card-preview-wrap">
-          <canvas id="gift-card-canvas" width="600" height="780"></canvas>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-          <input id="share-url-input" type="text" class="form-input" readonly style="font-size: 0.8rem;" />
-        </div>
-
-        <div class="form-grid" style="margin-bottom: 10px;">
-          <button type="button" id="btn-copy-share-url" class="btn-full btn-primary">
-            📋 Sao Chép Link
-          </button>
-          <button type="button" id="btn-download-card" class="btn-full btn-secondary">
-            📥 Tải Ảnh Thiệp QR
-          </button>
-        </div>
-        <button type="button" id="btn-open-gift-view" class="btn-full btn-secondary">
-          🚀 Mở Xem Giao Diện Người Nhận Quà
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 5. ADMIN SETTINGS MODAL (DÀNH CHO CHỦ KÊNH TIKTOK) -->
-  <div id="modal-admin" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width: 460px;">
-      <button class="modal-close" data-close="modal-admin">✕</button>
-      <h3 class="modal-title">⚙️ Cài Đặt Chủ Shop (TikTok Creator)</h3>
-      <p class="modal-desc">
-        Cấu hình tài khoản ngân hàng VietQR, mức giá (15.000đ – 49.000đ) và mã VIP khi livestream TikTok.
-      </p>
-
-      <div class="form-group">
-        <label class="form-label">Ngân hàng nhận tiền (VietQR)</label>
-        <select id="admin-bank-id" class="form-select">
-          <option value="MB">MBBank (Ngân hàng Quân Đội)</option>
-          <option value="VCB">Vietcombank</option>
-          <option value="TCB">Techcombank</option>
-          <option value="ACB">ACB</option>
-          <option value="ICB">VietinBank</option>
-          <option value="BIDV">BIDV</option>
-          <option value="VPB">VPBank</option>
-          <option value="TPB">TPBank</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Số tài khoản nhận tiền</label>
-        <input id="admin-account-no" type="text" class="form-input" placeholder="VD: 0987654321" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Tên chủ tài khoản (Không dấu)</label>
-        <input id="admin-account-name" type="text" class="form-input" placeholder="VD: NGUYEN VAN A" />
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Giá 1 lần tạo Web (VNĐ)</label>
-          <input id="admin-price" type="number" class="form-input" step="1000" min="10000" max="500000" value="29000" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mã Mở Khóa Nhanh (VIP)</label>
-          <input id="admin-vip-code" type="text" class="form-input" placeholder="VD: TIKTOK99" value="TIKTOK99" />
-        </div>
-      </div>
-
-      <button type="button" id="btn-save-admin" class="btn-full btn-primary">
-        💾 Lưu Cấu Hình Kiếm Tiền
-      </button>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAndRedirectGiftOrder();
+      renderCategoryTabs();
+      renderTemplateCards();
+    });
+  </script>
 </body>
 </html>

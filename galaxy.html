@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vũ Trụ Kỷ Niệm 3D ✨ Quà Tặng Cá Nhân Hóa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="templates-catalog.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- 3D Galaxy Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">Đã sao chép đường link!</div>
+
+  <!-- Intro Screen Overlay -->
+  <div id="intro-overlay" class="intro-overlay">
+    <div class="intro-badge" id="intro-badge">✨ Món Quà Vũ Trụ 3D Đặc Biệt ✨</div>
+    <h1 class="intro-title" id="intro-title">Minh Anh ❤️ Bảo Nam</h1>
+    <p class="intro-subtitle" id="intro-subtitle">
+      Mỗi vì sao trong dải ngân hà này đều lưu giữ một khoảnh khắc tuyệt đẹp của chúng mình. Chạm để bước vào vũ trụ kỷ niệm nhé!
+    </p>
+    <button id="btn-enter-galaxy" class="btn-enter-galaxy">
+      <span>🪐 Chạm Để Khám Phá Vũ Trụ</span>
+    </button>
+  </div>
+
+  <!-- Floating Top Header -->
+  <header class="hud-header">
+    <div id="hud-occasion" class="hud-occasion">Kỷ Niệm Tình Yêu • 365 Ngày Bên Nhau</div>
+    <h2 id="hud-couple-names" class="hud-couple-names">Minh Anh ❤️ Bảo Nam</h2>
+    <div id="hud-days-counter" class="hud-days-pill" style="display: none;">💖 Bên nhau: <span id="days-count-num">365</span> ngày</div>
+    <p class="hud-hint">💡 Xoay 360° • Chạm vào Ảnh 3D hoặc Trái Tim trung tâm để mở thư</p>
+  </header>
+
+  <!-- Top Right Floating Controls -->
+  <div class="hud-top-right">
+    <a href="index.html" class="icon-btn" title="Về Kho Mẫu Quà Tặng" style="text-decoration:none;">🏠</a>
+    <button id="btn-music" class="icon-btn" title="Bật/Tắt nhạc hộp nhạc lãng mạn">🎵</button>
+    <button id="btn-firework-burst" class="icon-btn" title="Bắn Pháo Hoa 3D">✨</button>
+    <button id="btn-tiktok-mode" class="icon-btn" title="Chế độ Quay TikTok (Ẩn nút bấm)">📹</button>
+  </div>
+
+  <!-- Bottom Action Bar -->
+  <nav class="hud-bottom-bar">
+    <a href="index.html" class="pill-btn" style="text-decoration:none;">
+      <span>⬅️</span>
+      <span>Đổi Mẫu Khác</span>
+    </a>
+    <button id="btn-morph-shape" class="pill-btn" title="Chuyển đổi giữa 4 chế độ 3D">
+      <span id="icon-morph-shape">🪐</span>
+      <span id="label-morph-shape">Đổi Hiệu Ứng 3D</span>
+    </button>
+    <button id="btn-camera-tour" class="pill-btn">
+      <span>🎬</span>
+      <span id="label-camera-tour">Bay Điện Ảnh</span>
+    </button>
+    <button id="btn-open-letter" class="pill-btn">
+      <span>💌</span>
+      <span>Đọc Tâm Thư</span>
+    </button>
+    <button id="btn-open-creator" class="pill-btn cta-create">
+      <span>✨ Tạo Ngay</span>
+      <span id="cta-price-badge" class="price-tag">39.000đ</span>
+    </button>
+  </nav>
+
+  <!-- 1. LOVE LETTER MODAL -->
+  <div id="modal-letter" class="modal-backdrop hidden">
+    <div class="modal-card letter-card">
+      <button class="modal-close" data-close="modal-letter">✕</button>
+      <div style="font-size: 2.4rem; margin-bottom: 6px;">💌</div>
+      <h3 id="letter-modal-title" class="letter-title">Gửi Người Thương Của Anh</h3>
+      <div id="letter-modal-body" class="letter-body"></div>
+      <div id="letter-modal-sign" class="letter-sign"></div>
+    </div>
+  </div>
+
+  <!-- 2. PHOTO LIGHTBOX MODAL -->
+  <div id="modal-lightbox" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 460px; text-align: center;">
+      <button class="modal-close" data-close="modal-lightbox">✕</button>
+      <div class="lightbox-img-wrap">
+        <img id="lightbox-img" src="" alt="Kỷ niệm" />
+      </div>
+      <h4 id="lightbox-caption" style="font-family: var(--font-script); font-size: 1.8rem; color: #ff9ec6; margin-bottom: 6px;">Khoảnh khắc ngọt ngào</h4>
+      <p id="lightbox-sub" style="font-size: 0.85rem; color: var(--text-muted);">Mãi lưu giữ trong dải ngân hà của chúng ta ✨</p>
+    </div>
+  </div>
+
+  <!-- 3. CREATOR STUDIO MODAL -->
+  <div id="modal-creator" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <button class="modal-close" data-close="modal-creator">✕</button>
+      <h3 class="modal-title">✨ Tạo Vũ Trụ 3D Của Riêng Bạn</h3>
+      <p class="modal-desc">
+        Điền tên, lời chúc và tải ảnh kỷ niệm lên. Bạn có thể <b>Xem thử miễn phí</b> ngay trên không gian 3D trước khi tạo link & thiệp QR!
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Tên của bạn (Người gửi)</label>
+          <input id="input-sender" type="text" class="form-input" placeholder="VD: Bảo Nam" maxlength="30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tên người ấy (Người nhận)</label>
+          <input id="input-receiver" type="text" class="form-input" placeholder="VD: Minh Anh" maxlength="30" />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Dịp đặc biệt</label>
+          <select id="input-occasion" class="form-select">
+            <option value="Kỷ Niệm Tình Yêu • Mãi Bên Nhau">💑 Kỷ niệm Tình yêu / Ngày quen nhau</option>
+            <option value="Happy Birthday • Chúc Mừng Sinh Nhật">🎂 Chúc mừng Sinh nhật</option>
+            <option value="Lời Tỏ Tình Từ Trái Tim">💘 Tỏ tình Crush / Người thương</option>
+            <option value="Happy Valentine's Day 14/2">🌹 Lễ Tình Nhân (Valentine)</option>
+            <option value="Chúc Mừng Ngày Phụ Nữ 8/3 & 20/10">🌸 Quà tặng 8/3 - 20/10</option>
+            <option value="Merry Christmas & Happy New Year">🎄 Giáng Sinh / Năm Mới</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mẫu Hiệu Ứng 3D Mở Đầu</label>
+          <select id="input-default-shape" class="form-select">
+            <option value="galaxy">🪐 Dải Ngân Hà Xoắn Ốc 3D</option>
+            <option value="heart">💖 Trái Tim Hạt Ánh Sáng 3D</option>
+            <option value="ring">💍 Vòng Nhẫn Tinh Vân Đôi</option>
+            <option value="sphere">🔮 Quả Cầu Pha Lê Vũ Trụ</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Ngày bắt đầu yêu / Ngày kỷ niệm (Tùy chọn)</label>
+          <input id="input-anniversary-date" type="date" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giai điệu Hộp Nhạc 3D</label>
+          <select id="input-melody" class="form-select">
+            <option value="romance">🎹 Bản Tình Ca Ngân Hà (Mặc định)</option>
+            <option value="birthday">🎂 Happy Birthday (Mừng Sinh Nhật)</option>
+            <option value="canon">🎻 Canon In D (Lãng Mạn Cổ Điển)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tông màu Tinh Vân 3D</label>
+        <div class="theme-options" id="theme-picker">
+          <div class="theme-chip active" data-theme="pink">🌸 Hồng Tình Yêu</div>
+          <div class="theme-chip" data-theme="purple">🔮 Tím Mộng Mơ</div>
+          <div class="theme-chip" data-theme="blue">🌌 Xanh Băng Giá</div>
+          <div class="theme-chip" data-theme="gold">✨ Vàng Hoàng Kim</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Lời chúc / Tâm thư bí mật</span>
+          <button type="button" id="btn-ai-wish" class="ai-suggest-btn">🪄 AI Viết Hộ Lời Chúc</button>
+        </div>
+        <textarea id="input-message" class="form-textarea" placeholder="Nhập lời chúc ngọt ngào gửi tới người ấy..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Ảnh kỷ niệm bay trong 3D (Tối đa 8 ảnh)</span>
+          <span id="photo-count-label" style="font-size: 0.76rem; color: #ff9ec6;">6/8 ảnh</span>
+        </div>
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">
+          Tải ảnh từ điện thoại/máy tính và nhấn vào từng ảnh để sửa dòng chữ kỷ niệm bên dưới khung Polaroid.
+        </p>
+        <div id="photo-upload-grid" class="photo-upload-grid"></div>
+        <input id="input-photo-file" type="file" accept="image/*" multiple style="display: none;" />
+      </div>
+
+      <div class="form-grid" style="margin-top: 20px;">
+        <button type="button" id="btn-preview-3d" class="btn-full btn-secondary">
+          👁️ Xem Thử Trên 3D
+        </button>
+        <button type="button" id="btn-proceed-payment" class="btn-full btn-primary">
+          💳 Tạo Link & Thiệp QR Riêng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. VIETQR PAYMENT & SUPABASE AUTO-WEBHOOK MODAL -->
+  <div id="modal-payment" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 490px;">
+      <button class="modal-close" data-close="modal-payment">✕</button>
+      <h3 class="modal-title">📲 Quét QR Mở Khóa Link Riêng</h3>
+      <p class="modal-desc">
+        Quét mã VietQR bên dưới bằng bất kỳ App Ngân hàng nào. Hệ thống tự động duyệt đơn ngay sau 3 giây khi nhận được chuyển khoản!
+      </p>
+
+      <div id="payment-step-qr">
+        <div class="qr-payment-box">
+          <img id="vietqr-img" src="" alt="VietQR Thanh Toán" />
+          <div style="font-size: 0.78rem; font-weight: 700; color: #334155; margin-top: 6px;">
+            Hỗ trợ VietQR • Tự động điền số tiền & nội dung
+          </div>
+        </div>
+
+        <div class="payment-info-table">
+          <div class="payment-info-row">
+            <span style="color: var(--text-muted);">Ngân hàng:</span>
+            <strong id="pay-bank-name">MB</strong>
+          </div>
+          <div class="payment-info-row">
+            <span style="color: var(--text-muted);">Chủ tài khoản:</span>
+            <strong id="pay-account-name">---</strong>
+          </div>
+          <div class="payment-info-row">
+            <span style="color: var(--text-muted);">Số tài khoản:</span>
+            <strong id="pay-account-no">---</strong>
+          </div>
+          <div class="payment-info-row">
+            <span style="color: var(--text-muted);">Số tiền:</span>
+            <strong id="pay-amount-text" style="color: #fde047;">---</strong>
+          </div>
+          <div class="payment-info-row">
+            <span style="color: var(--text-muted);">Nội dung CK (Bắt buộc):</span>
+            <strong id="pay-memo-text" style="color: #ff9ec6;">LOVE...</strong>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding: 10px; border-radius: 12px; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); color: #fde047; font-size: 0.84rem; font-weight: 600; margin-bottom: 12px;">
+          🔄 Đang chờ ngân hàng xác nhận tự động...
+        </div>
+
+        <div class="vip-code-row">
+          <input id="input-vip-code" type="text" class="form-input" placeholder="Nhập mã VIP (Nếu mua trên Live TikTok)" style="font-size: 0.84rem;" />
+          <button type="button" id="btn-apply-vip" class="btn-secondary" style="padding: 0 14px; border-radius: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- Kết quả xuất Link ngắn (?id=LOVE...) và Thiệp QR Tặng Quà sau khi thanh toán -->
+      <div id="payment-step-success" class="share-result-box" style="display: none;">
+        <div style="font-size: 2rem; margin-bottom: 4px;">🎉</div>
+        <h4 style="font-size: 1.15rem; color: #6ee7b7; margin-bottom: 6px;">Tuyệt vời! Vũ Trụ 3D của bạn đã sẵn sàng</h4>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
+          Tải tấm <b>Thiệp QR Vũ Trụ</b> bên dưới hoặc gửi đường link ngắn trực tiếp cho người thương nhé!
+        </p>
+
+        <div class="gift-card-preview-wrap">
+          <canvas id="gift-card-canvas" width="600" height="780"></canvas>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input id="share-url-input" type="text" class="form-input" readonly style="font-size: 0.8rem;" />
+        </div>
+
+        <div class="form-grid" style="margin-bottom: 10px;">
+          <button type="button" id="btn-copy-share-url" class="btn-full btn-primary">
+            📋 Sao Chép Link
+          </button>
+          <button type="button" id="btn-download-card" class="btn-full btn-secondary">
+            📥 Tải Ảnh Thiệp QR
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

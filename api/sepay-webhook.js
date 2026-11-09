@@ -14,29 +14,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Xác thực API Key bảo mật từ SePay (Header: "Authorization: Apikey YOUR_SEPAY_API_KEY")
-    const expectedApiKey = process.env.SEPAY_API_KEY;
+    // 1. Xác thực API Key bảo mật từ SePay (Hỗ trợ cả Header và query param/body)
+    const expectedApiKey = process.env.SEPAY_API_KEY ? process.env.SEPAY_API_KEY.trim() : '';
     if (expectedApiKey) {
       const authHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
-      const token = authHeader.replace(/^Apikey\s+/i, '').replace(/^Bearer\s+/i, '').trim();
-      if (token !== expectedApiKey) {
+      const headerToken = authHeader.replace(/^Apikey\s+/i, '').replace(/^Bearer\s+/i, '').trim();
+      const queryToken = String(req.query?.apiKey || req.query?.token || '').trim();
+      const bodyToken = String(req.body?.apiKey || '').trim();
+
+      const receivedToken = headerToken || queryToken || bodyToken;
+      if (receivedToken !== expectedApiKey) {
+        console.warn('Unauthorized Webhook Key attempt:', { receivedToken, expectedApiKey });
         return res.status(401).json({ success: false, error: 'Unauthorized Webhook Key' });
       }
     }
 
     const body = req.body || {};
 
-    // Hỗ trợ chuẩn dữ liệu của SePay.vn (content, transferAmount, id)
-    const content = String(body.content || body.description || '').toUpperCase();
-    const transferAmount = Number(body.transferAmount || body.amount || 0);
-    const transactionId = String(body.id || body.referenceCode || Date.now());
+    // Hỗ trợ chuẩn dữ liệu của SePay.vn (content, description, transaction_content)
+    const rawContent = String(
+      body.content || body.description || body.transaction_content || body.order_code || ''
+    );
+    const content = rawContent.toUpperCase();
+    const transferAmount = Number(body.transferAmount || body.amount || body.accumulated || 0);
+    const transactionId = String(body.id || body.referenceCode || body.reference_number || Date.now());
 
-    // 2. Tìm mã đơn hàng dạng LOVE + 6 chữ số trong nội dung chuyển khoản
-    const match = content.match(/LOVE\d{6}/i);
+    // 2. Tìm mã đơn hàng dạng LOVE + số (chấp nhận 4-10 chữ số)
+    const match = content.match(/LOVE\d{4,10}/i);
     if (!match) {
+      console.log('No LOVE pattern matched in content:', content);
       return res.status(200).json({
         success: true,
-        message: 'Ignored: Không tìm thấy mã đơn LOVE trong nội dung chuyển khoản'
+        message: 'Ignored: Không tìm thấy mã đơn LOVE trong nội dung: ' + content
       });
     }
 

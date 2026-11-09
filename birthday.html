@@ -145,10 +145,6 @@
         <div style="font-size: 0.84rem; margin-bottom: 12px; color: #fde047;">
           Số tiền: <b id="bday-amount">29.000đ</b> • Nội dung: <b id="bday-code">LOVE...</b>
         </div>
-        <div style="display:flex; gap:6px; margin-bottom:10px;">
-          <input id="bday-vip-in" class="input-field" placeholder="Mã VIP (Nếu có)" style="margin-bottom:0;" />
-          <button id="btn-bday-vip" class="action-btn">Áp dụng</button>
-        </div>
         <button id="btn-close-pay" class="action-btn" style="width:100%;">Đóng</button>
       </div>
 
@@ -448,23 +444,6 @@
       document.getElementById('bday-pay-waiting').style.display = 'none';
       document.getElementById('bday-pay-success').style.display = 'block';
     }
-
-    document.getElementById('btn-bday-vip').addEventListener('click', async () => {
-      const vipCode = document.getElementById('bday-vip-in').value.trim();
-      if (!vipCode || !activeOrderCode) return;
-      const res = await fetch('/api/check-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderCode: activeOrderCode, vipCode })
-      });
-      const data = await res.json();
-      if (res.ok && data.status === 'PAID') {
-        if (pollTimer) clearInterval(pollTimer);
-        unlockBdayOrder(activeOrderCode);
-      } else {
-        alert(data.error || 'Mã VIP không đúng!');
-      }
-    });
 
     document.getElementById('btn-bday-copy').addEventListener('click', () => {
       const el = document.getElementById('bday-share-url');

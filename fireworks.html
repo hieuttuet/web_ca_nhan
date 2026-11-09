@@ -531,11 +531,6 @@
           <span>Đang chờ xác nhận thanh toán tự động...</span>
         </div>
 
-        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-          <input id="input-vip-code" type="text" class="neon-input" placeholder="Mã VIP (Nếu có trên Live)" style="padding: 9px 12px; font-size: 0.82rem;" />
-          <button id="btn-verify-vip" type="button" class="mini-btn" style="padding: 0 14px;">Áp dụng</button>
-        </div>
-
         <button id="btn-close-pay" type="button" class="mini-btn" style="width: 100%;">Đóng lại</button>
       </div>
 
@@ -1231,24 +1226,6 @@
       sound.playMagicChord();
       showToast('🎉 Thanh toán thành công! Đã mở khóa Link & QR');
     }
-
-    document.getElementById('btn-verify-vip').addEventListener('click', async () => {
-      const vipCode = document.getElementById('input-vip-code').value.trim();
-      if (!vipCode || !activeOrderCode) return;
-
-      const res = await fetch('/api/check-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderCode: activeOrderCode, vipCode })
-      });
-      const data = await res.json();
-      if (res.ok && data.status === 'PAID') {
-        if (pollTimer) clearInterval(pollTimer);
-        showUnlockedShareLink(activeOrderCode);
-      } else {
-        showToast(data.error || '❌ Mã VIP không đúng!');
-      }
-    });
 
     document.getElementById('btn-copy-link').addEventListener('click', () => {
       const box = document.getElementById('share-url-box');

@@ -1194,25 +1194,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('btn-proceed-payment').addEventListener('click', openVietQRModal);
 
-  // Xác thực Mã VIP ở phía Server Vercel (/api/check-order)
-  document.getElementById('btn-apply-vip').addEventListener('click', async () => {
-    const vipCode = document.getElementById('input-vip-code').value.trim();
-    if (!vipCode || !currentOrderCode) return;
-
-    const res = await fetch('/api/check-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderCode: currentOrderCode, vipCode })
-    });
-    const data = await res.json();
-    if (res.ok && data.status === 'PAID') {
-      if (orderPollInterval) clearInterval(orderPollInterval);
-      unlockAndShowShareResult(currentOrderCode);
-    } else {
-      showToast(data.error || '❌ Mã VIP không đúng!');
-    }
-  });
-
   document.getElementById('btn-copy-share-url').addEventListener('click', () => {
     const input = document.getElementById('share-url-input');
     input.select();

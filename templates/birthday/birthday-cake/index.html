@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="templates-catalog.js"></script>
+  <script src="../../../templates-catalog.js"></script>
   <style>
     :root {
       --glass-bg: rgba(22, 10, 42, 0.78);
@@ -113,7 +113,7 @@
   <canvas id="bday-canvas"></canvas>
 
   <div class="top-nav">
-    <a href="index.html" class="pill-link">⬅️ Kho Mẫu Quà Tặng</a>
+    <a id="btn-top-back" href="../../../index.html" class="pill-link">⬅️ Kho Mẫu Quà Tặng</a>
     <button id="btn-mic-blow" class="pill-link">🎤 Bật Micro Thổi Nến</button>
   </div>
 
@@ -534,14 +534,14 @@
             const btnCustom = document.getElementById('btn-open-customize');
             if (btnCustom) btnCustom.style.display = 'none';
 
-            const topBack = document.querySelector('.top-nav a[href="index.html"]');
+            const topBack = document.getElementById('btn-top-back') || document.querySelector('.top-nav a');
             if (topBack) topBack.style.display = 'none';
 
             // Thêm nút phụ tinh tế nếu người nhận muốn tạo quà
             if (!document.getElementById('btn-bday-viral')) {
               const vA = document.createElement('a');
               vA.id = 'btn-bday-viral';
-              vA.href = 'index.html';
+              vA.href = '../../../index.html';
               vA.className = 'action-btn';
               vA.style.textDecoration = 'none';
               vA.style.opacity = '0.85';

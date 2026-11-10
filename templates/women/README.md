@@ -5,3 +5,4 @@ Thư mục chứa các bộ Template thuộc sự kiện **8/3 & 20/10** (`categ
 ## Cấu trúc thêm bộ Template mới:
 - `templates/women/tpl-01-ten-mau/index.html`
 - Khai báo vào mảng `WOMEN_TEMPLATES` trong `/templates-catalog.js`.
+

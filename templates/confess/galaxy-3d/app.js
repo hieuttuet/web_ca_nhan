@@ -816,13 +816,16 @@ function syncUIFromState() {
     const btnCreator = document.getElementById('btn-open-creator');
     if (btnCreator) btnCreator.style.display = 'none';
 
-    const backBtn = document.querySelector('.hud-bottom-bar a[href="index.html"]');
+    const backBtn = document.getElementById('btn-bottom-back') || document.querySelector('.hud-bottom-bar a');
     if (backBtn) backBtn.style.display = 'none';
+
+    const topHomeBtn = document.getElementById('btn-top-home');
+    if (topHomeBtn) topHomeBtn.style.display = 'none';
 
     if (!document.getElementById('btn-recipient-create-viral')) {
       const viralBtn = document.createElement('a');
       viralBtn.id = 'btn-recipient-create-viral';
-      viralBtn.href = 'index.html';
+      viralBtn.href = '../../../index.html';
       viralBtn.className = 'pill-btn';
       viralBtn.style.textDecoration = 'none';
       viralBtn.style.opacity = '0.85';

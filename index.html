@@ -779,11 +779,11 @@
           if (matched) {
             window.location.replace(`${matched.engineUrl}?id=${encodeURIComponent(orderId)}&tpl=${matched.id}`);
           } else if (tplType === 'fireworks') {
-            window.location.replace(`fireworks.html?id=${encodeURIComponent(orderId)}`);
+            window.location.replace(`templates/confess/fireworks/index.html?id=${encodeURIComponent(orderId)}`);
           } else if (tplType === 'birthday') {
-            window.location.replace(`birthday.html?id=${encodeURIComponent(orderId)}`);
+            window.location.replace(`templates/birthday/birthday-cake/index.html?id=${encodeURIComponent(orderId)}`);
           } else {
-            window.location.replace(`galaxy.html?id=${encodeURIComponent(orderId)}`);
+            window.location.replace(`templates/confess/galaxy-3d/index.html?id=${encodeURIComponent(orderId)}`);
           }
         }
       } catch (e) {}

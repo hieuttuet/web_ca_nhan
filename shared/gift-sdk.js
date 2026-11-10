@@ -328,3 +328,4 @@
 
   global.GiftSDK = GiftSDK;
 })(typeof window !== 'undefined' ? window : globalThis);
+

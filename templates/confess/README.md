@@ -8,3 +8,4 @@ Mỗi bộ template đặt trong 1 thư mục con riêng:
 - `templates/confess/tpl-02-ten-mau/index.html`
 ...
 Sau đó khai báo thông tin & giá bán vào mảng `CONFESS_TEMPLATES` trong `/templates-catalog.js`.
+

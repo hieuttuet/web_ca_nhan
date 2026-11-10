@@ -277,6 +277,7 @@
       display: flex;
       gap: 22px;
       overflow-x: auto;
+      overflow-y: hidden;
       scroll-behavior: smooth;
       user-select: none;
       -webkit-user-select: none;
@@ -284,6 +285,7 @@
 
     .category-tabs-wrap::-webkit-scrollbar {
       height: 2px;
+      width: 0;
     }
     .category-tabs-wrap::-webkit-scrollbar-track {
       background: transparent;
@@ -325,7 +327,7 @@
       position: absolute;
       left: 0;
       right: 0;
-      bottom: -1px;
+      bottom: 0;
       height: 3px;
       border-radius: 3px 3px 0 0;
       background: linear-gradient(90deg, #ff2a85, #fde047);

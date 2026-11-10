@@ -161,6 +161,9 @@
           Hệ thống tự động mở khóa Link ngay sau 3 giây khi nhận chuyển khoản!
         </p>
         <div class="qr-card"><img id="bday-vietqr" src="" alt="VietQR" /></div>
+        <button type="button" id="btn-bday-download-vietqr" class="action-btn" style="width: 100%; margin-bottom: 12px; font-size: 0.86rem; padding: 11px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,158,198,0.45);">
+          📥 Tải Mã QR Chuyển Tiền (Quét từ App Ngân Hàng)
+        </button>
         <div style="font-size: 0.84rem; margin-bottom: 0; color: #fde047;">
           Số tiền: <b id="bday-amount">29.000đ</b> • Nội dung: <b id="bday-code">LOVE...</b>
         </div>
@@ -170,7 +173,10 @@
         <h3 style="font-size: 1.4rem; color:#6ee7b7; margin-bottom: 8px;">🎉 Đã Tạo Link Quà Sinh Nhật!</h3>
         <div class="qr-card"><img id="bday-gift-qr" src="" alt="Gift QR" /></div>
         <input id="bday-share-url" class="input-field" readonly style="margin-bottom: 10px;" />
-        <button id="btn-bday-copy" class="action-btn primary" style="width:100%;">📋 Sao Chép Link</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-bday-copy" class="action-btn primary" style="flex:1;">📋 Sao Chép Link</button>
+          <button id="btn-bday-download-qr" class="action-btn" style="flex:1; background: linear-gradient(135deg, #059669, #10b981);">📥 Lưu Mã QR</button>
+        </div>
       </div>
     </div>
   </div>
@@ -466,7 +472,43 @@
       const el = document.getElementById('bday-share-url');
       el.select();
       navigator.clipboard.writeText(el.value);
+      alert('Đã sao chép link quà sinh nhật!');
     });
+
+    document.getElementById('btn-bday-download-vietqr').addEventListener('click', async () => {
+      const img = document.getElementById('bday-vietqr');
+      if (!img.src) return;
+      await downloadBlobImage(img.src, `VietQR-SinhNhat-${activeOrderCode || 'BIDV'}.png`);
+      alert('Đã lưu mã QR chuyển tiền! Hãy mở App Ngân hàng và chọn quét từ ảnh trong thư viện.');
+    });
+
+    document.getElementById('btn-bday-download-qr').addEventListener('click', async () => {
+      const img = document.getElementById('bday-gift-qr');
+      if (!img.src) return;
+      await downloadBlobImage(img.src, `Ma-QR-SinhNhat-${state.receiver}.png`);
+      alert('Đã lưu mã QR Quà Tặng vào máy!');
+    });
+
+    async function downloadBlobImage(url, filename) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+      } catch (e) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = filename;
+        a.click();
+      }
+    }
 
     function closePayModal() {
       if (pollTimer) clearInterval(pollTimer);

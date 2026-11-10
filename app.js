@@ -1248,6 +1248,47 @@ window.addEventListener('DOMContentLoaded', async () => {
     showToast('📥 Đã tải Ảnh Thiệp QR về máy!');
   });
 
+  // Tải trực tiếp mã VietQR để người dùng mở app ngân hàng quét từ thư viện ảnh
+  document.getElementById('btn-download-vietqr').addEventListener('click', async () => {
+    const img = document.getElementById('vietqr-img');
+    if (!img.src) return;
+    showToast('⏳ Đang tải mã VietQR thanh toán...');
+    await downloadBlobImage(img.src, `VietQR-ThanhToan-${currentOrderCode || 'BIDV'}.png`);
+    showToast('✅ Đã lưu mã VietQR! Mở App Ngân hàng quét từ ảnh nhé');
+  });
+
+  // Lưu riêng mã QR Quà tặng
+  document.getElementById('btn-download-gift-qr-only').addEventListener('click', async () => {
+    const input = document.getElementById('share-url-input');
+    const shareUrl = input.value;
+    if (!shareUrl) return;
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&color=831843&data=${encodeURIComponent(shareUrl)}`;
+    showToast('⏳ Đang lưu mã QR quà tặng...');
+    await downloadBlobImage(qrSrc, `Ma-QR-Vu-Tru-${appState.receiver}.png`);
+    showToast('✅ Đã lưu mã QR Quà Tặng vào máy!');
+  });
+
+  async function downloadBlobImage(url, filename) {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+    } catch (e) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.download = filename;
+      a.click();
+    }
+  }
+
   document.querySelectorAll('.modal-close').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-close');

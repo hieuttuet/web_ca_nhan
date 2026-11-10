@@ -529,6 +529,10 @@
           <img id="vietqr-img" src="" alt="VietQR" />
         </div>
 
+        <button type="button" id="btn-download-vietqr" class="btn-launch" style="margin-top: 0; margin-bottom: 12px; padding: 11px; width: 100%; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,158,198,0.45); animation: none; box-shadow: none;">
+          📥 Tải Mã QR Chuyển Tiền (Quét từ App Ngân Hàng)
+        </button>
+
         <div class="pay-info-box">
           <div class="pay-row">
             <span style="color:#94a3b8;">Ngân hàng:</span>
@@ -573,9 +577,14 @@
 
         <input id="share-url-box" type="text" class="neon-input" readonly style="font-size: 0.8rem; margin-bottom: 12px; text-align: center;" />
 
-        <button id="btn-copy-link" type="button" class="btn-launch" style="margin-top: 0; padding: 13px; width: 100%;">
-          📋 Sao Chép Link
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-copy-link" type="button" class="btn-launch" style="margin-top: 0; padding: 12px; flex: 1;">
+            📋 Sao Chép Link
+          </button>
+          <button id="btn-download-gift-qr" type="button" class="btn-launch" style="margin-top: 0; padding: 12px; flex: 1; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+            📥 Lưu Mã QR
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1277,6 +1286,43 @@
         showToast('📋 Đã sao chép đường link Pháo Hoa!');
       });
     });
+
+    document.getElementById('btn-download-vietqr').addEventListener('click', async () => {
+      const img = document.getElementById('vietqr-img');
+      if (!img.src) return;
+      showToast('⏳ Đang tải mã VietQR thanh toán...');
+      await downloadBlobImage(img.src, `VietQR-ThanhToan-${activeOrderCode || 'BIDV'}.png`);
+      showToast('✅ Đã lưu mã VietQR! Mở App Ngân hàng quét từ ảnh nhé');
+    });
+
+    document.getElementById('btn-download-gift-qr').addEventListener('click', async () => {
+      const img = document.getElementById('gift-qr-img');
+      if (!img.src) return;
+      showToast('⏳ Đang lưu mã QR quà tặng...');
+      await downloadBlobImage(img.src, `Ma-QR-PhaoHoa-${coupleName2 || 'Crush'}.png`);
+      showToast('✅ Đã lưu mã QR Quà Tặng vào máy!');
+    });
+
+    async function downloadBlobImage(url, filename) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+      } catch (e) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = filename;
+        a.click();
+      }
+    }
 
     function closeShareModal() {
       if (pollTimer) clearInterval(pollTimer);

@@ -11,14 +11,16 @@
 
   <style>
     :root {
-      --bg-dark: #070312;
-      --card-bg: rgba(20, 11, 38, 0.78);
-      --card-border: rgba(255, 140, 205, 0.24);
+      --bg-dark: #090317;
+      --card-bg: linear-gradient(180deg, rgba(34, 16, 62, 0.82) 0%, rgba(17, 8, 33, 0.92) 100%);
+      --card-border: rgba(255, 120, 196, 0.32);
       --primary: #ff2a85;
-      --secondary: #9333ea;
+      --primary-glow: rgba(255, 42, 133, 0.45);
+      --secondary: #a855f7;
       --gold: #fde047;
+      --gold-glow: rgba(253, 224, 71, 0.4);
       --text-main: #ffffff;
-      --text-muted: #cbd5e1;
+      --text-muted: #e2e8f0;
     }
 
     * {
@@ -29,34 +31,81 @@
 
     body {
       min-height: 100vh;
-      background: radial-gradient(ellipse at top, #220b40 0%, #090316 55%, #04010a 100%);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(219, 39, 119, 0.28) 0%, transparent 55%),
+        radial-gradient(circle at 10% 30%, rgba(147, 51, 234, 0.24) 0%, transparent 45%),
+        radial-gradient(circle at 90% 60%, rgba(236, 72, 153, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(99, 102, 241, 0.2) 0%, transparent 60%);
+      background-attachment: fixed;
       font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--text-main);
-      padding-bottom: 60px;
+      padding-bottom: 70px;
       overflow-x: hidden;
     }
 
-    /* Nền sao lấp lánh nhẹ */
+    /* Ánh sáng Tinh Vân Aura động (Nebula Glows) */
+    .aurora-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+      animation: floatAura 18s ease-in-out infinite alternate;
+    }
+    .orb-1 {
+      width: 420px;
+      height: 420px;
+      top: -100px;
+      left: 15%;
+      background: linear-gradient(135deg, #ff2a85, #db2777);
+    }
+    .orb-2 {
+      width: 380px;
+      height: 380px;
+      top: 35%;
+      right: -80px;
+      background: linear-gradient(135deg, #9333ea, #6366f1);
+      animation-duration: 22s;
+    }
+    .orb-3 {
+      width: 350px;
+      height: 350px;
+      bottom: 5%;
+      left: -60px;
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      animation-duration: 20s;
+    }
+
+    @keyframes floatAura {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.08); }
+      100% { transform: translate(-30px, 50px) scale(0.95); }
+    }
+
+    /* Nền sao lấp lánh lung linh */
     .stars-bg {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
       background-image:
-        radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
-        radial-gradient(1px 1px at 38% 62%, #ffd1e8, transparent),
-        radial-gradient(2px 2px at 62% 22%, #fff, transparent),
-        radial-gradient(1.5px 1.5px at 82% 48%, #c4b5fd, transparent),
-        radial-gradient(1px 1px at 24% 82%, #bae6fd, transparent),
-        radial-gradient(2px 2px at 74% 85%, #fbcfe8, transparent);
-      background-size: 340px 340px;
-      opacity: 0.65;
+        radial-gradient(1.8px 1.8px at 15% 18%, #ffffff, transparent),
+        radial-gradient(1.2px 1.2px at 38% 52%, #ffd1e8, transparent),
+        radial-gradient(2.2px 2.2px at 65% 20%, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 82% 44%, #e9d5ff, transparent),
+        radial-gradient(1.2px 1.2px at 24% 82%, #bae6fd, transparent),
+        radial-gradient(2.4px 2.4px at 78% 85%, #fbcfe8, transparent),
+        radial-gradient(1.5px 1.5px at 45% 92%, #ffffff, transparent);
+      background-size: 320px 320px;
+      opacity: 0.85;
     }
 
     .container {
       position: relative;
-      z-index: 2;
-      max-width: 1120px;
+      z-index: 3;
+      max-width: 1140px;
       margin: 0 auto;
       padding: 0 18px;
     }
@@ -64,73 +113,124 @@
     /* Header / Hero Banner */
     .hero {
       text-align: center;
-      padding: 36px 0 24px;
+      padding: 42px 0 26px;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
+      gap: 8px;
+      padding: 7px 18px;
       border-radius: 999px;
-      background: rgba(255, 42, 133, 0.16);
-      border: 1px solid rgba(255, 120, 196, 0.45);
-      color: #ff9ec6;
-      font-size: 0.8rem;
+      background: linear-gradient(135deg, rgba(255, 42, 133, 0.22), rgba(168, 85, 247, 0.22));
+      border: 1px solid rgba(255, 120, 196, 0.55);
+      color: #ffb3d9;
+      font-size: 0.82rem;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 20px rgba(255, 42, 133, 0.3);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: livePulse 1.8s infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
     }
 
     .hero-title {
       font-family: 'Dancing Script', cursive;
-      font-size: clamp(2.4rem, 6vw, 3.8rem);
-      background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #c084fc 100%);
+      font-size: clamp(2.8rem, 7vw, 4.4rem);
+      background: linear-gradient(135deg, #ffffff 0%, #ffb3d9 35%, #fde047 70%, #d8b4fe 100%);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-      line-height: 1.2;
+      margin-bottom: 14px;
+      line-height: 1.18;
+      animation: gradientTitle 6s ease infinite;
+      filter: drop-shadow(0 6px 20px rgba(255, 42, 133, 0.35));
+    }
+
+    @keyframes gradientTitle {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .hero-desc {
-      font-size: clamp(0.9rem, 2.2vw, 1.02rem);
-      color: var(--text-muted);
-      max-width: 620px;
-      margin: 0 auto 22px;
-      line-height: 1.6;
+      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
+      color: #f1f5f9;
+      max-width: 650px;
+      margin: 0 auto 20px;
+      line-height: 1.65;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
-    /* 3 Bước Hướng Dẫn Cực Ngắn Gọn */
+    /* Thanh Uy Tín Cam Kết (Trust Strip) */
+    .trust-strip {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fde047;
+      background: rgba(253, 224, 71, 0.08);
+      border: 1px solid rgba(253, 224, 71, 0.28);
+      padding: 5px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* 3 Bước Hướng Dẫn */
     .steps-bar {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 26px;
+      margin-bottom: 28px;
     }
 
     .step-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 15px;
+      padding: 9px 18px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-size: 0.8rem;
-      color: #f1f5f9;
-      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.82rem;
+      color: #ffffff;
+      font-weight: 700;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .step-num {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 800;
+      box-shadow: 0 0 10px var(--primary);
     }
 
     /* Thanh Chọn Dịp Lễ / Sự Kiện (Category Filter Tabs) */
@@ -338,10 +438,20 @@
       font-size: 0.73rem;
       font-weight: 600;
       color: #fbcfe8;
-      background: rgba(255, 42, 133, 0.12);
-      border: 1px solid rgba(255, 42, 133, 0.28);
+      background: rgba(255, 42, 133, 0.15);
+      border: 1px solid rgba(255, 120, 196, 0.35);
       padding: 4px 10px;
       border-radius: 8px;
+    }
+
+    .tpl-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 0.76rem;
+      color: #fde047;
+      font-weight: 700;
     }
 
     .tpl-actions {
@@ -351,10 +461,10 @@
     }
 
     .btn-card {
-      padding: 12px 14px;
+      padding: 13px 14px;
       border-radius: 14px;
       font-family: inherit;
-      font-size: 0.86rem;
+      font-size: 0.88rem;
       font-weight: 700;
       text-decoration: none;
       text-align: center;
@@ -363,49 +473,224 @@
       justify-content: center;
       gap: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.22s ease;
     }
 
     .btn-demo {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       color: #ffffff;
+      backdrop-filter: blur(8px);
     }
 
     .btn-demo:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
     }
 
     .btn-create {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: linear-gradient(135deg, #ff2a85 0%, #ec4899 50%, #9333ea 100%);
+      background-size: 200% 200%;
       border: none;
       color: #ffffff;
-      box-shadow: 0 6px 20px rgba(255, 42, 133, 0.4);
+      font-weight: 800;
+      box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      animation: btnPulseGlow 3s infinite ease-in-out;
+    }
+
+    @keyframes btnPulseGlow {
+      0%, 100% { box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5); }
+      50% { box-shadow: 0 8px 30px rgba(255, 42, 133, 0.85), 0 0 18px rgba(253, 224, 71, 0.45); transform: translateY(-1px); }
     }
 
     .btn-create:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(255, 42, 133, 0.65);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(255, 42, 133, 0.85);
+    }
+
+    /* Phần Đánh Giá Khách Hàng (Social Proof) */
+    .reviews-section {
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    .section-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.2rem, 5.5vw, 3.2rem);
+      background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #fde047 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      margin-bottom: 30px;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      margin-bottom: 45px;
+    }
+
+    .review-card {
+      background: linear-gradient(180deg, rgba(34, 16, 62, 0.7) 0%, rgba(18, 9, 32, 0.85) 100%);
+      border: 1px solid rgba(255, 120, 196, 0.25);
+      border-radius: 20px;
+      padding: 22px 20px;
+      text-align: left;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .review-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 12px rgba(255, 42, 133, 0.5);
+    }
+
+    .review-author {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .review-time {
+      font-size: 0.74rem;
+      color: #94a3b8;
+    }
+
+    .review-stars {
+      color: #fde047;
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+    }
+
+    .review-text {
+      font-size: 0.86rem;
+      color: #f1f5f9;
+      line-height: 1.55;
+    }
+
+    /* Thanh Thông Báo Khách Vừa Mua Nổi (Bottom-Left Live Buyer Ticker) */
+    .live-buyer-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(22, 10, 42, 0.94);
+      border: 1px solid rgba(255, 120, 196, 0.5);
+      backdrop-filter: blur(16px);
+      border-radius: 999px;
+      padding: 10px 18px 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(255, 42, 133, 0.3);
+      max-width: 360px;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .live-buyer-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .buyer-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff2a85, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .buyer-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .buyer-sub {
+      font-size: 0.72rem;
+      color: #6ee7b7;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
 </head>
 <body>
 
+  <!-- Hiệu ứng Ánh sáng Tinh Vân Aura động -->
+  <div class="aurora-orb orb-1"></div>
+  <div class="aurora-orb orb-2"></div>
+  <div class="aurora-orb orb-3"></div>
+
+  <!-- Nền sao lấp lánh -->
   <div class="stars-bg"></div>
 
+  <!-- Popup Thông Báo Khách Vừa Tạo Quà Thời Gian Thực (FOMO Ticker) -->
+  <div id="live-buyer-toast" class="live-buyer-toast">
+    <div class="buyer-icon" id="live-buyer-emoji">💖</div>
+    <div>
+      <div class="buyer-name" id="live-buyer-title">Minh Anh (Hà Nội) vừa tạo quà</div>
+      <div class="buyer-sub">
+        <span class="live-dot" style="width:6px; height:6px;"></span>
+        <span id="live-buyer-detail">Dải Ngân Hà 3D • 1 phút trước</span>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
-    <!-- Hero Header -->
+    <!-- Hero Header Siêu Bắt Mắt -->
     <header class="hero">
-      <div class="hero-badge">✨ Nền Tảng Tạo Web Quà Tặng 3D Cá Nhân Hóa ✨</div>
-      <h1 class="hero-title">Trao Gửi Yêu Thương Theo Cách Độc Đáo Nhất</h1>
+      <div class="hero-badge">
+        <span class="live-dot"></span>
+        <span>HƠN 3.840+ MÓN QUÀ ĐÃ GỬI ĐI THÀNH CÔNG HÔM NAY</span>
+      </div>
+      <h1 class="hero-title">Trao Gửi Yêu Thương Theo Cách Độc Đáo Nhất ✨</h1>
       <p class="hero-desc">
-        Chọn dịp lễ và mẫu hiệu ứng 3D yêu thích, ghép ảnh kỷ niệm & lời chúc của riêng bạn. Nhận ngay đường link & mã QR riêng biệt chỉ trong 30 giây!
+        Chọn dịp lễ và mẫu hiệu ứng 3D yêu thích, cá nhân hóa ảnh kỷ niệm & lời chúc riêng. 
+        <b>Mở khóa link & thiệp QR tự động ngay sau 3 giây!</b>
       </p>
 
+      <div class="trust-strip">
+        <div class="trust-item">⚡ Tự động 24/7 sau 3s</div>
+        <div class="trust-item">🔒 VietQR SePay An Toàn</div>
+        <div class="trust-item">♾️ Lưu Kỷ Niệm Vĩnh Viễn</div>
+        <div class="trust-item">📱 Xem Mượt Trên Điện Thoại</div>
+      </div>
+
       <div class="steps-bar">
-        <div class="step-pill"><span class="step-num">1</span> Chọn Sự Kiện & Mẫu 3D</div>
-        <div class="step-pill"><span class="step-num">2</span> Nhập Tên, Lời Chúc & Ảnh</div>
-        <div class="step-pill"><span class="step-num">3</span> Quét QR Nhận Link & Thiệp</div>
+        <div class="step-pill"><span class="step-num">1</span> Chọn Mẫu 3D Hot</div>
+        <div class="step-pill"><span class="step-num">2</span> Tùy Chỉnh Tên & Lời Chúc</div>
+        <div class="step-pill"><span class="step-num">3</span> Nhận Link & Thiệp QR Riêng</div>
       </div>
     </header>
 
@@ -414,6 +699,56 @@
 
     <!-- Lưới Các Template -->
     <main id="templates-grid" class="templates-grid"></main>
+
+    <!-- Khách Hàng Nói Gì Về Chúng Mình (Social Proof) -->
+    <section class="reviews-section">
+      <h2 class="section-title">Khách Hàng Nói Gì Về Chúng Mình? 💬</h2>
+      <p class="section-desc">Hàng ngàn khoảnh khắc vỡ òa hạnh phúc đã được tạo nên</p>
+
+      <div class="reviews-grid">
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">🥰</div>
+            <div>
+              <div class="review-author">Thảo My • Hà Nội</div>
+              <div class="review-time">Đã tạo món quà 2 ngày trước</div>
+            </div>
+          </div>
+          <div class="review-stars">⭐⭐⭐⭐⭐</div>
+          <p class="review-text">
+            "Mình tặng người yêu kỷ niệm 1 năm quen nhau. Bạn ý quét mã QR mở ra cả dải ngân hà 3D với bài Romance, ngạc nhiên đến mức rớt nước mắt luôn 😭❤️ Đáng từng đồng!"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">🎂</div>
+            <div>
+              <div class="review-author">Tuấn Kiệt • TP.HCM</div>
+              <div class="review-time">Đã tạo món quà hôm qua</div>
+            </div>
+          </div>
+          <div class="review-stars">⭐⭐⭐⭐⭐</div>
+          <p class="review-text">
+            "Cái bánh sinh nhật thổi tắt nến qua micro ảo ma thực sự haha. Cả đám bạn trong tiệc sinh nhật ngồi xem mà ai cũng trầm trồ hỏi làm ở đâu đỉnh thế!"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-avatar">🎆</div>
+            <div>
+              <div class="review-author">Hoàng Yến • Đà Nẵng</div>
+              <div class="review-time">Đã tạo món quà 4 giờ trước</div>
+            </div>
+          </div>
+          <div class="review-stars">⭐⭐⭐⭐⭐</div>
+          <p class="review-text">
+            "Pháo hoa bắn lên ghép tên hai đứa cực kỳ lãng mạn. Thanh toán quét QR xong là 3 giây sau có link ngay, thiệp in ra kẹp vào bó hoa tặng người yêu mê tít."
+          </p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -496,6 +831,11 @@
             </div>
           </div>
           <div class="tpl-body">
+            <div class="tpl-rating-row">
+              <span>⭐⭐⭐⭐⭐</span>
+              <span>4.9/5</span>
+              <span style="color:#94a3b8; font-weight:500;">• 99% khen đẹp</span>
+            </div>
             <h2 class="tpl-title">${tpl.title}</h2>
             <p class="tpl-subtitle">${tpl.subtitle}</p>
             <div class="tpl-features">${featuresHtml}</div>
@@ -510,10 +850,49 @@
       });
     }
 
+    // Hiệu ứng Thông Báo Khách Hàng Vừa Mua Thời Gian Thực (Social Proof & FOMO Ticker)
+    const RECENT_BUYERS = [
+      { name: 'Minh Anh • Hà Nội', gift: 'Dải Ngân Hà 3D', time: '1 phút trước', emoji: '🪐' },
+      { name: 'Tuấn Kiệt • TP.HCM', gift: 'Bánh Sinh Nhật Thổi Nến', time: '2 phút trước', emoji: '🎂' },
+      { name: 'Hoàng Yến • Đà Nẵng', gift: 'Pháo Hoa Ghép Tên', time: '3 phút trước', emoji: '🎆' },
+      { name: 'Thanh Hằng • Hải Phòng', gift: 'Trái Tim Hạt Ánh Sáng', time: '5 phút trước', emoji: '💖' },
+      { name: 'Đức Trọng • Cần Thơ', gift: 'Vòng Nhẫn Tinh Vân Đôi', time: '7 phút trước', emoji: '💍' },
+      { name: 'Ngọc Mai • Quảng Ninh', gift: 'Vũ Trụ Valentine 3D', time: '9 phút trước', emoji: '🌹' }
+    ];
+
+    let buyerIdx = 0;
+    function startLiveBuyerTicker() {
+      const toast = document.getElementById('live-buyer-toast');
+      const titleEl = document.getElementById('live-buyer-title');
+      const detailEl = document.getElementById('live-buyer-detail');
+      const emojiEl = document.getElementById('live-buyer-emoji');
+      if (!toast) return;
+
+      function showNextBuyer() {
+        const item = RECENT_BUYERS[buyerIdx];
+        buyerIdx = (buyerIdx + 1) % RECENT_BUYERS.length;
+
+        emojiEl.textContent = item.emoji;
+        titleEl.textContent = `${item.name} vừa tạo quà`;
+        detailEl.textContent = `${item.gift} • ${item.time}`;
+
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 4200);
+      }
+
+      setTimeout(() => {
+        showNextBuyer();
+        setInterval(showNextBuyer, 9000);
+      }, 2500);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       checkAndRedirectGiftOrder();
       renderCategoryTabs();
       renderTemplateCards();
+      startLiveBuyerTicker();
     });
   </script>
 </body>

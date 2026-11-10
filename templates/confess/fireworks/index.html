@@ -617,7 +617,7 @@
 
         // Vận tốc nổ ban đầu tỏa tròn 360 độ (Giai đoạn 2)
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 11.5 + 1.8;
+        const speed = Math.random() * 10.5 + 2.0;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
 
@@ -625,9 +625,9 @@
         this.friction = 0.952;
         this.gravity = 0.055;
 
-        // Thuộc tính hiển thị
+        // Thuộc tính hiển thị: kích thước hạt siêu mịn 1.0px - 1.45px (giảm từ >2.5px để không bị thô)
         this.color = ROMANTIC_PALETTE[index % ROMANTIC_PALETTE.length];
-        this.baseRadius = Math.random() * 1.45 + 1.25;
+        this.baseRadius = Math.random() * 0.45 + 0.95; // 0.95px - 1.4px
         this.radius = this.baseRadius;
         this.phaseOffset = Math.random() * Math.PI * 2;
         this.springFactor = 0.055 + Math.random() * 0.035;
@@ -652,16 +652,16 @@
           this.x += dx * this.springFactor;
           this.y += dy * this.springFactor;
 
-          // Khi hạt đã hội tụ gần vị trí chữ -> Dao động nhẹ (Jitter) & Lấp lánh ma thuật
-          if (dist < 4.5) {
-            const jitterX = Math.sin(timeSec * 5.2 + this.phaseOffset) * 0.55 + (Math.random() - 0.5) * 0.45;
-            const jitterY = Math.cos(timeSec * 4.8 + this.phaseOffset) * 0.55 + (Math.random() - 0.5) * 0.45;
+          // Khi hạt đã hội tụ gần vị trí chữ -> Dao động nhẹ dạng sóng hài êm ái, giữ nét chữ nguyên khối không bị vỡ nét
+          if (dist < 3.2) {
+            const jitterX = Math.sin(timeSec * 4.2 + this.phaseOffset) * 0.32;
+            const jitterY = Math.cos(timeSec * 3.8 + this.phaseOffset) * 0.32;
             this.x = this.tx + jitterX;
             this.y = this.ty + jitterY;
           }
 
-          // Hiệu ứng nhấp nháy kích thước hạt
-          this.radius = this.baseRadius * (0.82 + 0.34 * Math.sin(timeSec * 6.5 + this.phaseOffset));
+          // Hiệu ứng nhấp nháy lấp lánh nhẹ
+          this.radius = this.baseRadius * (0.88 + 0.22 * Math.sin(timeSec * 5.5 + this.phaseOffset));
         }
       }
 
@@ -675,66 +675,131 @@
 
     /**
      * ============================================================================
-     * 4. OFFSCREEN CANVAS TEXT SCANNER (Quét tọa độ pixel "Làm người yêu anh nhé [Tên]?")
+     * 4. OFFSCREEN CANVAS TEXT SCANNER (Quét tọa độ pixel & Layout chữ Neon chống rớt chữ)
      * ============================================================================
      */
     class TextPixelScanner {
+      // 1. Tự động viết hoa chữ cái đầu cho tên người nhận (Title Case chuẩn tiếng Việt)
+      static formatProperName(rawName) {
+        if (!rawName) return 'Em';
+        const clean = rawName.trim().replace(/\s+/g, ' ');
+        if (!clean) return 'Em';
+        return clean
+          .split(' ')
+          .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''))
+          .join(' ');
+      }
+
+      // 2. Thuật toán tính toán ngắt dòng (Line Breaking) thông minh:
+      // Tuyệt đối không để rớt chữ hay rớt dấu hỏi "?", giữ câu từ cân đối, đẹp mắt
+      static computeBalancedLines(receiverName, maxAllowedWidth, octx, targetFontSize) {
+        const formattedName = this.formatProperName(receiverName);
+        const linePrefix = 'Làm người yêu anh nhé';
+        const nameWords = formattedName.split(' ').filter(Boolean);
+
+        // Kịch bản A: 2 dòng chuẩn lãng mạn
+        const option2Lines = [linePrefix, `${formattedName}? ❤️`];
+
+        octx.font = `700 ${targetFontSize}px "Dancing Script", cursive, sans-serif`;
+        const w1 = octx.measureText(option2Lines[0]).width;
+        const w2 = octx.measureText(option2Lines[1]).width;
+
+        // Nếu cả 2 dòng vừa vặn trong màn hình
+        if (w1 <= maxAllowedWidth && w2 <= maxAllowedWidth) {
+          return option2Lines;
+        }
+
+        // Nếu tên dài (>= 3 từ) khiến dòng 2 bị tràn -> Chia thành 3 dòng cân đối
+        if (nameWords.length >= 3) {
+          const splitIdx = Math.ceil(nameWords.length / 2);
+          const part1 = nameWords.slice(0, splitIdx).join(' ');
+          const part2 = nameWords.slice(splitIdx).join(' ');
+          return [linePrefix, part1, `${part2}? ❤️`];
+        }
+
+        // Nếu tên 2 từ nhưng màn hình hẹp khiến dòng 2 bị tràn
+        if (nameWords.length === 2 && w2 > maxAllowedWidth) {
+          return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
+        }
+
+        // Nếu dòng 1 bị tràn trên màn hình siêu nhỏ
+        if (w1 > maxAllowedWidth) {
+          return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
+        }
+
+        return option2Lines;
+      }
+
+      // 3. Quét tọa độ pixel từ Offscreen Canvas với mật độ hạt cao & dày đặc
       static sampleTextCoordinates(receiverName, viewportWidth, viewportHeight) {
         const offCanvas = document.createElement('canvas');
         offCanvas.width = viewportWidth;
         offCanvas.height = viewportHeight;
         const octx = offCanvas.getContext('2d');
 
-        const cleanName = (receiverName || 'Em').trim();
-        const line1 = 'Làm người yêu anh nhé';
-        const line2 = `${cleanName}? ❤️`;
+        const maxAllowedWidth = viewportWidth * 0.86;
 
-        // Tự động co giãn cỡ chữ vừa khít màn hình Mobile hoặc Desktop
-        const maxAllowedWidth = viewportWidth * 0.88;
-        let fontSize = Math.min(Math.floor(viewportWidth * 0.115), 86);
-        fontSize = Math.max(fontSize, 32);
+        // Tính toán kích thước chữ tối ưu theo thiết bị (Mobile vs Desktop)
+        let fontSize = viewportWidth < 600
+          ? Math.max(34, Math.min(Math.floor(viewportWidth * 0.108), 48))
+          : Math.min(Math.floor(viewportWidth * 0.082), 76);
+
+        // Tính toán ngắt dòng hợp lý
+        let lines = this.computeBalancedLines(receiverName, maxAllowedWidth, octx, fontSize);
+
+        // Thu nhỏ nhẹ fontSize nếu dòng vẫn dài hơn màn hình điện thoại
+        while (fontSize > 22) {
+          octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
+          const allFit = lines.every((line) => octx.measureText(line).width <= maxAllowedWidth);
+          if (allFit) break;
+          fontSize -= 1;
+        }
 
         octx.textAlign = 'center';
         octx.textBaseline = 'middle';
-
-        // Giảm fontSize nếu dòng chữ dài hơn chiều ngang màn hình điện thoại
-        octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
-        while (
-          (octx.measureText(line1).width > maxAllowedWidth ||
-           octx.measureText(line2).width > maxAllowedWidth) &&
-          fontSize > 26
-        ) {
-          fontSize -= 2;
-          octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
-        }
-
-        const centerX = viewportWidth / 2;
-        const centerY = viewportHeight * 0.45;
-        const lineGap = fontSize * 1.22;
-
         octx.fillStyle = '#ffffff';
-        octx.fillText(line1, centerX, centerY - lineGap * 0.48);
+        octx.strokeStyle = '#ffffff';
+        // Stroke viền tròn giúp nét chữ dày đặc, loại bỏ hoàn toàn hiện tượng rỗ nét
+        octx.lineWidth = Math.max(1.8, fontSize * 0.045);
+        octx.lineJoin = 'round';
+        octx.lineCap = 'round';
 
-        // Dòng 2 (Tên người nhận) lớn hơn một chút để tạo điểm nhấn
-        octx.font = `700 ${Math.round(fontSize * 1.14)}px "Dancing Script", cursive, sans-serif`;
-        octx.fillText(line2, centerX, centerY + lineGap * 0.58);
+        // Căn giữa hoàn hảo cả trục X và trục Y
+        const centerX = viewportWidth / 2;
+        const centerY = viewportHeight * 0.43;
+        const lineHeight = fontSize * 1.32;
+        const totalBlockHeight = (lines.length - 1) * lineHeight;
+        const startY = centerY - totalBlockHeight / 2;
 
-        // Dùng getImageData quét các pixel không trong suốt
+        lines.forEach((line, idx) => {
+          const y = startY + idx * lineHeight;
+          octx.fillText(line, centerX, y);
+          octx.strokeText(line, centerX, y);
+        });
+
+        // Giới hạn vùng quét quanh khối chữ để tối ưu tốc độ xử lý tuyệt đối
+        const minY = Math.max(0, Math.floor(startY - fontSize * 1.1));
+        const maxY = Math.min(viewportHeight, Math.ceil(startY + lines.length * lineHeight + fontSize * 0.5));
+        const minX = Math.max(0, Math.floor(centerX - maxAllowedWidth * 0.56));
+        const maxX = Math.min(viewportWidth, Math.ceil(centerX + maxAllowedWidth * 0.56));
+
         const imageData = octx.getImageData(0, 0, viewportWidth, viewportHeight).data;
-        const step = viewportWidth < 600 ? 3 : 4;
+        // Bước nhảy 2px: Đảm bảo khoảng cách giữa các hạt cực khít, hạt 1.2px gối đầu lên nhau
+        const step = 2;
         const coords = [];
 
-        for (let y = 0; y < viewportHeight; y += step) {
-          for (let x = 0; x < viewportWidth; x += step) {
+        for (let y = minY; y < maxY; y += step) {
+          for (let x = minX; x < maxX; x += step) {
             const alphaIndex = (y * viewportWidth + x) * 4 + 3;
-            if (imageData[alphaIndex] > 135) {
+            // Ngưỡng alpha thấp > 40 bắt trọn vẹn nét cong antialiasing mềm mại, không bị răng cưa
+            if (imageData[alphaIndex] > 40) {
               coords.push({ x, y });
             }
           }
         }
 
-        // Giới hạn số lượng hạt tối ưu để luôn giữ vững 60FPS mượt mà
-        const maxParticles = viewportWidth < 600 ? 1850 : 2800;
+        // Tăng trần số lượng hạt lên 4.500 - 6.200 hạt (tăng mật độ gấp đôi so với trước)
+        const maxParticles = viewportWidth < 600 ? 4600 : 6200;
         if (coords.length > maxParticles) {
           const ratio = coords.length / maxParticles;
           const sampled = [];
@@ -808,7 +873,8 @@
 
     // Kích hoạt chuỗi 3 giai đoạn Pháo Hoa Chốt Hạ
     async function triggerConfessionFirework(receiverName) {
-      currentReceiverName = (receiverName || 'Trang').trim();
+      currentReceiverName = TextPixelScanner.formatProperName(receiverName || 'Trang');
+      nameInput.value = currentReceiverName;
       dockShown = false;
       document.getElementById('floating-dock').classList.remove('visible');
 
@@ -904,9 +970,11 @@
         }
         ctx.globalAlpha = 1;
 
-        // Cập nhật & vẽ hàng ngàn hạt chính (Additive Blending giúp hạt phát sáng rực rỡ)
+        // Cập nhật & vẽ hàng ngàn hạt chính (Additive Blending + ShadowBlur tạo hiệu ứng Neon rực rỡ)
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
+        ctx.shadowBlur = currentPhase === 'MORPHING' ? 7 : 4;
+        ctx.shadowColor = '#ff2a85';
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
           p.update(currentPhase, elapsed, timeSec);
@@ -945,6 +1013,7 @@
       document.getElementById('floating-dock').classList.remove('visible');
       document.getElementById('input-container').style.display = 'block';
       document.getElementById('input-screen').classList.remove('fade-out');
+      nameInput.value = currentReceiverName;
       nameInput.focus();
     });
 
@@ -958,14 +1027,14 @@
       const params = new URLSearchParams(window.location.search);
       const prefilledName = params.get('name');
       if (prefilledName) {
-        nameInput.value = prefilledName;
+        nameInput.value = TextPixelScanner.formatProperName(prefilledName);
       }
 
       if (window.GiftSDK) {
         await window.GiftSDK.init({
           templateId: 'fireworks_confess',
           onGiftLoaded(order) {
-            const receiver = order.receiver_name || 'Em';
+            const receiver = TextPixelScanner.formatProperName(order.receiver_name || 'Em');
             currentReceiverName = receiver;
             nameInput.value = receiver;
 

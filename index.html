@@ -11,16 +11,14 @@
 
   <style>
     :root {
-      --bg-dark: #090317;
-      --card-bg: linear-gradient(180deg, rgba(34, 16, 62, 0.82) 0%, rgba(17, 8, 33, 0.92) 100%);
-      --card-border: rgba(255, 120, 196, 0.32);
+      --bg-dark: #090414;
+      --card-bg: rgba(24, 13, 44, 0.72);
+      --card-border: rgba(255, 255, 255, 0.1);
       --primary: #ff2a85;
-      --primary-glow: rgba(255, 42, 133, 0.45);
-      --secondary: #a855f7;
+      --secondary: #9333ea;
       --gold: #fde047;
-      --gold-glow: rgba(253, 224, 71, 0.4);
       --text-main: #ffffff;
-      --text-muted: #e2e8f0;
+      --text-muted: #94a3b8;
     }
 
     * {
@@ -32,379 +30,338 @@
     body {
       min-height: 100vh;
       background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(219, 39, 119, 0.28) 0%, transparent 55%),
-        radial-gradient(circle at 10% 30%, rgba(147, 51, 234, 0.24) 0%, transparent 45%),
-        radial-gradient(circle at 90% 60%, rgba(236, 72, 153, 0.22) 0%, transparent 50%),
-        radial-gradient(circle at 50% 90%, rgba(99, 102, 241, 0.2) 0%, transparent 60%);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(219, 39, 119, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 15% 35%, rgba(147, 51, 234, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 85% 65%, rgba(236, 72, 153, 0.14) 0%, transparent 50%);
       background-attachment: fixed;
       font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--text-main);
-      padding-bottom: 70px;
+      padding-bottom: 80px;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Ánh sáng Tinh Vân Aura động (Nebula Glows) */
+    /* Ánh sáng Tinh Vân dịu mắt tạo chiều sâu */
     .aurora-orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(90px);
+      filter: blur(110px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.6;
-      animation: floatAura 18s ease-in-out infinite alternate;
+      opacity: 0.42;
     }
     .orb-1 {
       width: 420px;
       height: 420px;
-      top: -100px;
-      left: 15%;
+      top: -120px;
+      left: 20%;
       background: linear-gradient(135deg, #ff2a85, #db2777);
     }
     .orb-2 {
-      width: 380px;
-      height: 380px;
-      top: 35%;
-      right: -80px;
+      width: 360px;
+      height: 360px;
+      top: 40%;
+      right: -100px;
       background: linear-gradient(135deg, #9333ea, #6366f1);
-      animation-duration: 22s;
-    }
-    .orb-3 {
-      width: 350px;
-      height: 350px;
-      bottom: 5%;
-      left: -60px;
-      background: linear-gradient(135deg, #ec4899, #f43f5e);
-      animation-duration: 20s;
     }
 
-    @keyframes floatAura {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(40px, 30px) scale(1.08); }
-      100% { transform: translate(-30px, 50px) scale(0.95); }
-    }
-
-    /* Nền sao lấp lánh lung linh */
+    /* Nền sao tinh tế */
     .stars-bg {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 1;
       background-image:
-        radial-gradient(1.8px 1.8px at 15% 18%, #ffffff, transparent),
-        radial-gradient(1.2px 1.2px at 38% 52%, #ffd1e8, transparent),
-        radial-gradient(2.2px 2.2px at 65% 20%, #ffffff, transparent),
-        radial-gradient(1.5px 1.5px at 82% 44%, #e9d5ff, transparent),
-        radial-gradient(1.2px 1.2px at 24% 82%, #bae6fd, transparent),
-        radial-gradient(2.4px 2.4px at 78% 85%, #fbcfe8, transparent),
-        radial-gradient(1.5px 1.5px at 45% 92%, #ffffff, transparent);
-      background-size: 320px 320px;
-      opacity: 0.85;
+        radial-gradient(1.5px 1.5px at 15% 18%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 38% 52%, rgba(255,209,232,0.6), transparent),
+        radial-gradient(1.8px 1.8px at 65% 20%, rgba(255,255,255,0.65), transparent),
+        radial-gradient(1.2px 1.2px at 82% 44%, rgba(233,213,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 24% 82%, rgba(251,207,232,0.6), transparent);
+      background-size: 340px 340px;
+      opacity: 0.65;
     }
 
     .container {
       position: relative;
       z-index: 3;
-      max-width: 1140px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 0 18px;
+      padding: 0 20px;
     }
 
-    /* Header / Hero Banner */
+    /* ==================== 1. HERO SECTION ==================== */
     .hero {
       text-align: center;
-      padding: 42px 0 26px;
+      padding: 44px 0 28px;
     }
 
-    .hero-badge {
+    .hero-live-stat {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 18px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(255, 42, 133, 0.22), rgba(168, 85, 247, 0.22));
-      border: 1px solid rgba(255, 120, 196, 0.55);
-      color: #ffb3d9;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.03em;
       margin-bottom: 14px;
-      box-shadow: 0 0 20px rgba(255, 42, 133, 0.3);
     }
 
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 10px #10b981;
-      animation: livePulse 1.8s infinite;
+      box-shadow: 0 0 8px #10b981;
+      animation: livePulse 2s infinite;
     }
 
     @keyframes livePulse {
       0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.6; }
+      50% { transform: scale(1.35); opacity: 0.55; }
     }
 
+    /* Typography hiện đại, rõ ràng, chỉ nhấn Script ở từ khóa "Yêu Thương" */
     .hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.85rem, 4.6vw, 3.1rem);
+      color: #ffffff;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .script-highlight {
       font-family: 'Dancing Script', cursive;
-      font-size: clamp(2.8rem, 7vw, 4.4rem);
-      background: linear-gradient(135deg, #ffffff 0%, #ffb3d9 35%, #fde047 70%, #d8b4fe 100%);
-      background-size: 200% 200%;
+      font-weight: 700;
+      font-size: 1.26em;
+      background: linear-gradient(135deg, #ff5ca8 0%, #fde047 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 14px;
-      line-height: 1.18;
-      animation: gradientTitle 6s ease infinite;
-      filter: drop-shadow(0 6px 20px rgba(255, 42, 133, 0.35));
-    }
-
-    @keyframes gradientTitle {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      padding: 0 4px;
+      display: inline-block;
     }
 
     .hero-desc {
-      font-size: clamp(0.95rem, 2.4vw, 1.1rem);
-      color: #f1f5f9;
-      max-width: 650px;
-      margin: 0 auto 20px;
-      line-height: 1.65;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      font-size: clamp(0.92rem, 2vw, 1.04rem);
+      color: #cbd5e1;
+      max-width: 580px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+      font-weight: 400;
     }
 
-    /* Thanh Uy Tín Cam Kết (Trust Strip) */
+    /* Thanh Tiến Trình 3 Bước (Linear Stepper nối bằng đường kẻ thẳng) */
+    .steps-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 640px;
+      margin: 0 auto 24px;
+      gap: 0;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .step-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 42, 133, 0.18);
+      border: 1.5px solid #ff2a85;
+      color: #ff9ec6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      min-width: 24px;
+      max-width: 60px;
+      background: linear-gradient(90deg, rgba(255,42,133,0.4), rgba(147,51,234,0.4));
+      margin: 0 12px;
+    }
+
+    /* Cam Kết Dịch Vụ (Icon + Text trơn, bỏ hoàn toàn khung viên thuốc) */
     .trust-strip {
       display: flex;
       justify-content: center;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 22px;
+      gap: 8px 18px;
+      padding-top: 8px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 500;
     }
 
     .trust-item {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #fde047;
-      background: rgba(253, 224, 71, 0.08);
-      border: 1px solid rgba(253, 224, 71, 0.28);
-      padding: 5px 14px;
-      border-radius: 999px;
-      backdrop-filter: blur(8px);
+      gap: 5px;
     }
 
-    /* 3 Bước Hướng Dẫn */
-    .steps-bar {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 28px;
+    .trust-divider {
+      color: rgba(255, 255, 255, 0.18);
+      user-select: none;
     }
 
-    .step-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 0.82rem;
-      color: #ffffff;
-      font-weight: 700;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    @media (max-width: 640px) {
+      .steps-stepper {
+        gap: 4px;
+      }
+      .step-line {
+        min-width: 12px;
+        margin: 0 6px;
+      }
+      .step-node {
+        font-size: 0.74rem;
+        gap: 5px;
+      }
+      .trust-divider {
+        display: none;
+      }
     }
 
-    .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.76rem;
-      font-weight: 800;
-      box-shadow: 0 0 10px var(--primary);
-    }
-
-    /* Thanh Chọn Dịp Lễ / Sự Kiện (Category Filter Bar) */
+    /* ==================== 2. FILTER MENU (UNDERLINE TABS) ==================== */
     .category-nav-bar-container {
       position: sticky;
-      top: 10px;
+      top: 0;
       z-index: 20;
+      background: rgba(9, 4, 20, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 28px;
+      gap: 4px;
+      margin: 0 -20px 32px;
+      padding: 0 20px;
     }
 
     .tab-arrow-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 120, 196, 0.45);
-      background: rgba(22, 10, 42, 0.92);
-      backdrop-filter: blur(16px);
-      color: #ff9ec6;
-      font-size: 1.15rem;
-      font-weight: 800;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: all 0.22s ease;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+      transition: color 0.2s ease;
     }
 
     .tab-arrow-btn:hover {
-      background: linear-gradient(135deg, #ff2a85, #9333ea);
       color: #ffffff;
-      transform: scale(1.1);
-      box-shadow: 0 0 18px rgba(255, 42, 133, 0.65);
-      border-color: transparent;
-    }
-
-    .tab-arrow-btn:active {
-      transform: scale(0.95);
     }
 
     .category-tabs-wrap {
       flex: 1;
-      background: rgba(18, 8, 36, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 158, 198, 0.35);
-      border-radius: 999px;
-      padding: 7px 10px 9px;
       display: flex;
-      gap: 8px;
+      gap: 22px;
       overflow-x: auto;
       scroll-behavior: smooth;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15);
       user-select: none;
       -webkit-user-select: none;
     }
 
-    /* Hiển thị thanh cuộn Scrollbar phát sáng đẹp mắt */
     .category-tabs-wrap::-webkit-scrollbar {
-      height: 4px;
+      height: 2px;
     }
-
     .category-tabs-wrap::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 99px;
-      margin: 0 20px;
+      background: transparent;
     }
-
     .category-tabs-wrap::-webkit-scrollbar-thumb {
-      background: linear-gradient(90deg, #ff2a85, #f59e0b);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 99px;
-      box-shadow: 0 0 8px rgba(255, 42, 133, 0.7);
-    }
-
-    .category-tabs-wrap::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(90deg, #ff4d94, #fbbf24);
     }
 
     .cat-tab {
-      padding: 10px 18px;
-      border-radius: 999px;
+      position: relative;
+      padding: 14px 4px;
       border: none;
       background: transparent;
-      color: #cbd5e1;
+      color: #94a3b8;
       font-family: inherit;
-      font-size: 0.86rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      transition: all 0.22s ease;
+      gap: 6px;
+      transition: color 0.2s ease;
     }
 
     .cat-tab:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
     }
 
     .cat-tab.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       color: #ffffff;
-      box-shadow: 0 4px 16px rgba(255, 42, 133, 0.5);
-    }
-
-    /* Tab Nổi Bật: Mẫu Hot Trend */
-    .cat-tab.tab-hot {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2));
-      border: 1px solid rgba(245, 158, 11, 0.55);
-      color: #fde047;
-      animation: pulseFire 2.4s infinite ease-in-out;
-    }
-
-    @keyframes pulseFire {
-      0%, 100% { box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
-      50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.45); }
-    }
-
-    .cat-tab.tab-hot.active {
-      background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
-      color: #ffffff;
-      border-color: transparent;
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.65);
-    }
-
-    .tpl-sales-pill {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(10, 4, 20, 0.82);
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      color: #fde047;
-      font-size: 0.72rem;
       font-weight: 700;
-      backdrop-filter: blur(8px);
     }
 
-    /* Lưới Danh Sách Template */
+    /* Gạch chân phát sáng cho Tab đang chọn */
+    .cat-tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: linear-gradient(90deg, #ff2a85, #fde047);
+      box-shadow: 0 -2px 10px rgba(255, 42, 133, 0.6);
+    }
+
+    /* ==================== 3. PRODUCT CARDS (CLEAN & LUXURIOUS) ==================== */
     .templates-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 22px;
+      gap: 26px;
     }
 
     .tpl-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
+      border-radius: 20px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
     }
 
     .tpl-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(255, 42, 133, 0.65);
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 30px rgba(255, 42, 133, 0.22);
+      transform: translateY(-5px);
+      border-color: rgba(255, 120, 196, 0.45);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.55);
     }
 
-    /* Phần Thumbnail Preview Động của từng Template */
+    /* Thumbnail Preview */
     .tpl-preview {
       position: relative;
-      height: 175px;
+      height: 170px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
@@ -412,39 +369,61 @@
     }
 
     .tpl-preview-emoji {
-      font-size: 4.2rem;
-      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
-      animation: floatEmoji 3.2s ease-in-out infinite;
+      font-size: 4rem;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+      animation: floatEmoji 3.4s ease-in-out infinite;
     }
 
     @keyframes floatEmoji {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-8px) scale(1.06); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
     }
 
+    /* Chỉ giữ 1 Badge duy nhất góc trên bên trái */
     .tpl-badge {
       position: absolute;
       top: 12px;
       left: 12px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: rgba(10, 4, 20, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 4px 11px;
+      border-radius: 6px;
+      background: rgba(9, 4, 20, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fde047;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(6px);
     }
 
-    .tpl-price-box {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(10, 4, 20, 0.85);
-      border: 1px solid rgba(253, 224, 71, 0.45);
-      padding: 5px 12px;
-      border-radius: 12px;
-      backdrop-filter: blur(8px);
+    /* Nội dung Card thoáng đãng (More Whitespace) */
+    .tpl-body {
+      padding: 22px 22px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .tpl-header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .tpl-rating-compact {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tpl-rating-compact b {
+      color: #fde047;
+    }
+
+    .tpl-price-inline {
       display: flex;
       align-items: baseline;
       gap: 6px;
@@ -452,77 +431,87 @@
 
     .tpl-price-current {
       color: var(--gold);
-      font-size: 1.02rem;
+      font-size: 1.1rem;
       font-weight: 800;
     }
 
     .tpl-price-old {
-      color: #94a3b8;
-      font-size: 0.74rem;
+      color: #64748b;
+      font-size: 0.76rem;
       text-decoration: line-through;
     }
 
-    /* Nội dung Thẻ Template */
-    .tpl-body {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
     .tpl-title {
-      font-size: 1.15rem;
+      font-size: 1.16rem;
       font-weight: 700;
       color: #ffffff;
-      margin-bottom: 6px;
-    }
-
-    .tpl-subtitle {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.35;
       margin-bottom: 14px;
-      flex: 1;
     }
 
+    /* Danh sách tính năng gọn gàng (Bỏ khung pill rườm rà) */
     .tpl-features {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 18px;
+      gap: 6px 14px;
+      margin-bottom: 22px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .tpl-feat-tag {
-      font-size: 0.73rem;
-      font-weight: 600;
-      color: #fbcfe8;
-      background: rgba(255, 42, 133, 0.15);
-      border: 1px solid rgba(255, 120, 196, 0.35);
-      padding: 4px 10px;
-      border-radius: 8px;
+    .tpl-feat-item {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .tpl-rating-row {
+    .tpl-feat-check {
+      color: #ff5ca8;
+      font-weight: 800;
+    }
+
+    /* ==================== 4. CTA HIERARCHY (PRIMARY VS SECONDARY) ==================== */
+    .tpl-actions {
+      margin-top: auto;
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
-      font-size: 0.76rem;
-      color: #fde047;
-      font-weight: 700;
+      gap: 14px;
     }
 
-    .tpl-actions {
-      display: grid;
-      grid-template-columns: 1fr 1.35fr;
-      gap: 10px;
-    }
-
-    .btn-card {
-      padding: 13px 14px;
-      border-radius: 14px;
+    /* Secondary CTA: Xem Demo nhẹ nhàng, không tranh chấp thị giác */
+    .btn-demo {
+      padding: 10px 6px;
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-color: rgba(203, 213, 225, 0.4);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+
+    .btn-demo:hover {
+      color: #ffffff;
+      text-decoration-color: #ffffff;
+    }
+
+    /* Primary CTA: Tạo Ngay nổi bật tuyệt đối */
+    .btn-create {
+      flex: 1;
+      padding: 13px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff2a85 0%, #db2777 55%, #9333ea 100%);
+      border: none;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
       font-weight: 700;
       text-decoration: none;
       text-align: center;
@@ -531,140 +520,91 @@
       justify-content: center;
       gap: 6px;
       cursor: pointer;
-      transition: all 0.22s ease;
-    }
-
-    .btn-demo {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: #ffffff;
-      backdrop-filter: blur(8px);
-    }
-
-    .btn-demo:hover {
-      background: rgba(255, 255, 255, 0.18);
-      transform: translateY(-2px);
-    }
-
-    .btn-create {
-      background: linear-gradient(135deg, #ff2a85 0%, #ec4899 50%, #9333ea 100%);
-      background-size: 200% 200%;
-      border: none;
-      color: #ffffff;
-      font-weight: 800;
-      box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-      animation: btnPulseGlow 3s infinite ease-in-out;
-    }
-
-    @keyframes btnPulseGlow {
-      0%, 100% { box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5); }
-      50% { box-shadow: 0 8px 30px rgba(255, 42, 133, 0.85), 0 0 18px rgba(253, 224, 71, 0.45); transform: translateY(-1px); }
+      box-shadow: 0 6px 22px rgba(255, 42, 133, 0.42);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .btn-create:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 32px rgba(255, 42, 133, 0.85);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 42, 133, 0.68);
     }
 
-    /* Phần Đánh Giá Khách Hàng (Social Proof) */
+    /* ==================== 5. REVIEWS SECTION ==================== */
     .reviews-section {
-      margin-top: 60px;
+      margin-top: 72px;
       text-align: center;
     }
 
     .section-title {
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(2.2rem, 5.5vw, 3.2rem);
-      background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #fde047 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: clamp(1.5rem, 3.8vw, 2.1rem);
+      font-weight: 800;
+      color: #ffffff;
       margin-bottom: 8px;
     }
 
     .section-desc {
-      font-size: 0.92rem;
-      color: #cbd5e1;
-      margin-bottom: 30px;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 28px;
     }
 
     .reviews-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 18px;
-      margin-bottom: 45px;
+      gap: 20px;
     }
 
     .review-card {
-      background: linear-gradient(180deg, rgba(34, 16, 62, 0.7) 0%, rgba(18, 9, 32, 0.85) 100%);
-      border: 1px solid rgba(255, 120, 196, 0.25);
-      border-radius: 20px;
-      padding: 22px 20px;
+      background: rgba(24, 13, 44, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 22px;
       text-align: left;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
     .review-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .review-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      box-shadow: 0 0 12px rgba(255, 42, 133, 0.5);
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
     .review-author {
-      font-size: 0.94rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #ffffff;
     }
 
-    .review-time {
-      font-size: 0.74rem;
-      color: #94a3b8;
-    }
-
     .review-stars {
       color: #fde047;
-      font-size: 0.88rem;
-      margin-bottom: 8px;
+      font-size: 0.8rem;
     }
 
     .review-text {
-      font-size: 0.86rem;
-      color: #f1f5f9;
-      line-height: 1.55;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.6;
     }
 
-    /* Thanh Thông Báo Khách Vừa Mua Nổi (Bottom-Left Live Buyer Ticker) */
+    /* ==================== 6. NON-INTRUSIVE FOMO NOTIFICATION ==================== */
     .live-buyer-toast {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 100;
-      background: rgba(22, 10, 42, 0.94);
-      border: 1px solid rgba(255, 120, 196, 0.5);
-      backdrop-filter: blur(16px);
-      border-radius: 999px;
-      padding: 10px 18px 10px 12px;
+      bottom: 24px;
+      left: 24px;
+      z-index: 90;
+      background: rgba(18, 9, 34, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(14px);
+      border-radius: 12px;
+      padding: 9px 14px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(255, 42, 133, 0.3);
-      max-width: 360px;
-      transform: translateY(120%);
+      gap: 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      max-width: 310px;
+      transform: translateY(130%);
       opacity: 0;
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events: none;
     }
 
@@ -674,139 +614,144 @@
     }
 
     .buyer-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ff2a85, #f59e0b);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       flex-shrink: 0;
     }
 
     .buyer-name {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f1f5f9;
     }
 
     .buyer-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #6ee7b7;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    }
+
+    /* Trên Mobile: Đẩy thông báo lên góc trên (dạng Top Banner nhỏ gọn) để TUYỆT ĐỐI không che nút Tạo Ngay */
+    @media (max-width: 768px) {
+      .live-buyer-toast {
+        bottom: auto;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-150%);
+        padding: 7px 14px;
+        border-radius: 999px;
+        max-width: 90vw;
+        white-space: nowrap;
+      }
+      .live-buyer-toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Hiệu ứng Ánh sáng Tinh Vân Aura động -->
+  <!-- Ánh sáng nền dịu -->
   <div class="aurora-orb orb-1"></div>
   <div class="aurora-orb orb-2"></div>
-  <div class="aurora-orb orb-3"></div>
-
-  <!-- Nền sao lấp lánh -->
   <div class="stars-bg"></div>
 
-  <!-- Popup Thông Báo Khách Vừa Tạo Quà Thời Gian Thực (FOMO Ticker) -->
+  <!-- Thông báo FOMO tinh tế (Không che nút bấm trên Mobile) -->
   <div id="live-buyer-toast" class="live-buyer-toast">
     <div class="buyer-icon" id="live-buyer-emoji">💖</div>
     <div>
       <div class="buyer-name" id="live-buyer-title">Minh Anh (Hà Nội) vừa tạo quà</div>
-      <div class="buyer-sub">
-        <span class="live-dot" style="width:6px; height:6px;"></span>
-        <span id="live-buyer-detail">Dải Ngân Hà 3D • 1 phút trước</span>
-      </div>
+      <div class="buyer-sub" id="live-buyer-detail">Dải Ngân Hà 3D • 1 phút trước</div>
     </div>
   </div>
 
   <div class="container">
-    <!-- Hero Header Siêu Bắt Mắt -->
+    <!-- 1. HERO HEADER -->
     <header class="hero">
-      <div class="hero-badge">
+      <div class="hero-live-stat">
         <span class="live-dot"></span>
-        <span>HƠN 3.840+ MÓN QUÀ ĐÃ GỬI ĐI THÀNH CÔNG HÔM NAY</span>
+        <span>3.840+ món quà đã được tạo & gửi trao</span>
       </div>
-      <h1 class="hero-title">Trao Gửi Yêu Thương Theo Cách Độc Đáo Nhất ✨</h1>
+
+      <h1 class="hero-title">
+        Trao Gửi <span class="script-highlight">Yêu Thương</span><br />
+        Theo Cách Độc Đáo Nhất
+      </h1>
+
       <p class="hero-desc">
-        Chọn dịp lễ và mẫu hiệu ứng 3D yêu thích, cá nhân hóa ảnh kỷ niệm & lời chúc riêng. 
-        <b>Mở khóa link & thiệp QR tự động ngay sau 3 giây!</b>
+        Chọn mẫu hiệu ứng 3D yêu thích, ghép ảnh kỷ niệm & lời chúc riêng.
+        Nhận ngay đường link và thiệp QR tự động chỉ sau 3 giây!
       </p>
 
-      <div class="trust-strip">
-        <div class="trust-item">⚡ Tự động 24/7 sau 3s</div>
-        <div class="trust-item">🔒 VietQR SePay An Toàn</div>
-        <div class="trust-item">♾️ Lưu Kỷ Niệm Vĩnh Viễn</div>
-        <div class="trust-item">📱 Xem Mượt Trên Điện Thoại</div>
+      <!-- Thanh tiến trình 3 bước dạng Stepper nối thẳng -->
+      <div class="steps-stepper">
+        <div class="step-node">
+          <span class="step-circle">1</span>
+          <span>Chọn mẫu 3D</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node">
+          <span class="step-circle">2</span>
+          <span>Nhập tên & ảnh</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node">
+          <span class="step-circle">3</span>
+          <span>Nhận Link & QR</span>
+        </div>
       </div>
 
-      <div class="steps-bar">
-        <div class="step-pill"><span class="step-num">1</span> Chọn Mẫu 3D Hot</div>
-        <div class="step-pill"><span class="step-num">2</span> Tùy Chỉnh Tên & Lời Chúc</div>
-        <div class="step-pill"><span class="step-num">3</span> Nhận Link & Thiệp QR Riêng</div>
+      <!-- Cam kết dịch vụ dạng Text trơn đi kèm Icon -->
+      <div class="trust-strip">
+        <span class="trust-item">⚡ Mở khóa tự động sau 3s</span>
+        <span class="trust-divider">•</span>
+        <span class="trust-item">🔒 Thanh toán VietQR an toàn</span>
+        <span class="trust-divider">•</span>
+        <span class="trust-item">♾️ Lưu giữ kỷ niệm trọn đời</span>
       </div>
     </header>
 
-    <!-- Thanh Chọn Sự Kiện (Có nút cuộn trái/phải & thanh scrollbar) -->
+    <!-- 2. THANH BỘ LỌC DANH MỤC (UNDERLINE TAB MENU) -->
     <div class="category-nav-bar-container">
       <button type="button" id="tab-arrow-prev" class="tab-arrow-btn" title="Cuộn sang trái">❮</button>
       <nav id="category-tabs" class="category-tabs-wrap"></nav>
       <button type="button" id="tab-arrow-next" class="tab-arrow-btn" title="Cuộn sang phải">❯</button>
     </div>
 
-    <!-- Lưới Các Template -->
+    <!-- 3. LƯỚI THẺ SẢN PHẨM -->
     <main id="templates-grid" class="templates-grid"></main>
 
-    <!-- Khách Hàng Nói Gì Về Chúng Mình (Social Proof) -->
+    <!-- 4. ĐÁNH GIÁ TỪ KHÁCH HÀNG -->
     <section class="reviews-section">
-      <h2 class="section-title">Khách Hàng Nói Gì Về Chúng Mình? 💬</h2>
-      <p class="section-desc">Hàng ngàn khoảnh khắc vỡ òa hạnh phúc đã được tạo nên</p>
+      <h2 class="section-title">Cảm Nhận Từ Người Nhận Quà 💬</h2>
+      <p class="section-desc">Những khoảnh khắc bất ngờ và hạnh phúc thật sự</p>
 
       <div class="reviews-grid">
         <div class="review-card">
           <div class="review-header">
-            <div class="review-avatar">🥰</div>
-            <div>
-              <div class="review-author">Thảo My • Hà Nội</div>
-              <div class="review-time">Đã tạo món quà 2 ngày trước</div>
-            </div>
+            <span class="review-author">Thảo My • Hà Nội</span>
+            <span class="review-stars">★★★★★</span>
           </div>
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
           <p class="review-text">
-            "Mình tặng người yêu kỷ niệm 1 năm quen nhau. Bạn ý quét mã QR mở ra cả dải ngân hà 3D với bài Romance, ngạc nhiên đến mức rớt nước mắt luôn 😭❤️ Đáng từng đồng!"
+            "Mình tặng người yêu kỷ niệm 1 năm. Bạn ấy quét mã QR mở ra cả dải ngân hà 3D với bài Romance, xúc động đến rớt nước mắt luôn ❤️"
           </p>
         </div>
 
         <div class="review-card">
           <div class="review-header">
-            <div class="review-avatar">🎂</div>
-            <div>
-              <div class="review-author">Tuấn Kiệt • TP.HCM</div>
-              <div class="review-time">Đã tạo món quà hôm qua</div>
-            </div>
+            <span class="review-author">Tuấn Kiệt • TP.HCM</span>
+            <span class="review-stars">★★★★★</span>
           </div>
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
           <p class="review-text">
-            "Cái bánh sinh nhật thổi tắt nến qua micro ảo ma thực sự haha. Cả đám bạn trong tiệc sinh nhật ngồi xem mà ai cũng trầm trồ hỏi làm ở đâu đỉnh thế!"
+            "Bánh sinh nhật thổi tắt nến qua micro điện thoại ảo diệu thực sự. Cả bàn tiệc ai cũng trầm trồ hỏi làm ở đâu đỉnh thế!"
           </p>
         </div>
 
         <div class="review-card">
           <div class="review-header">
-            <div class="review-avatar">🎆</div>
-            <div>
-              <div class="review-author">Hoàng Yến • Đà Nẵng</div>
-              <div class="review-time">Đã tạo món quà 4 giờ trước</div>
-            </div>
+            <span class="review-author">Hoàng Yến • Đà Nẵng</span>
+            <span class="review-stars">★★★★★</span>
           </div>
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
           <p class="review-text">
-            "Pháo hoa bắn lên ghép tên hai đứa cực kỳ lãng mạn. Thanh toán quét QR xong là 3 giây sau có link ngay, thiệp in ra kẹp vào bó hoa tặng người yêu mê tít."
+            "Pháo hoa bắn lên ghép tên hai đứa cực kỳ lãng mạn. Chuyển khoản xong đúng 3 giây có ngay thiệp QR tải về in kẹp vào bó hoa."
           </p>
         </div>
       </div>
@@ -816,7 +761,7 @@
   <script>
     let selectedCategory = 'hot';
 
-    // Nếu người nhận mở link quà tặng cũ dạng /?id=LOVE123456 ở trang chủ -> Tự động chuyển hướng đúng Template
+    // Tự động chuyển hướng nếu người nhận mở link quà tặng cũ ở trang chủ
     async function checkAndRedirectGiftOrder() {
       const params = new URLSearchParams(window.location.search);
       const orderId = params.get('id');
@@ -847,8 +792,7 @@
 
       (window.EVENT_CATEGORIES || []).forEach((cat) => {
         const btn = document.createElement('button');
-        const isHotClass = cat.id === 'hot' ? 'tab-hot' : '';
-        btn.className = `cat-tab ${isHotClass} ${cat.id === selectedCategory ? 'active' : ''}`.trim();
+        btn.className = `cat-tab ${cat.id === selectedCategory ? 'active' : ''}`.trim();
         btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
         btn.addEventListener('click', () => {
           selectedCategory = cat.id;
@@ -877,33 +821,30 @@
         const createUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&create=1`;
         const priceFormatted = Number(tpl.price).toLocaleString('vi-VN') + 'đ';
         const oldPriceFormatted = tpl.oldPrice ? Number(tpl.oldPrice).toLocaleString('vi-VN') + 'đ' : '';
+        const salesText = tpl.salesCount || '650+ đã tạo';
 
         const featuresHtml = (tpl.features || [])
-          .map((f) => `<span class="tpl-feat-tag">✓ ${f}</span>`)
+          .map((f) => `<span class="tpl-feat-item"><span class="tpl-feat-check">✓</span> ${f}</span>`)
           .join('');
 
         card.innerHTML = `
           <div class="tpl-preview" style="background: ${tpl.previewGradient};" onclick="window.location.href='${demoUrl}'">
             <span class="tpl-badge">${tpl.badge}</span>
-            ${tpl.salesCount ? `<span class="tpl-sales-pill">🔥 ${tpl.salesCount}</span>` : ''}
             <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
-            <div class="tpl-price-box">
-              <span class="tpl-price-current">${priceFormatted}</span>
-              ${oldPriceFormatted ? `<span class="tpl-price-old">${oldPriceFormatted}</span>` : ''}
-            </div>
           </div>
           <div class="tpl-body">
-            <div class="tpl-rating-row">
-              <span>⭐⭐⭐⭐⭐</span>
-              <span>4.9/5</span>
-              <span style="color:#94a3b8; font-weight:500;">• 99% khen đẹp</span>
+            <div class="tpl-header-meta">
+              <span class="tpl-rating-compact"><b>★ 4.9</b> (${salesText})</span>
+              <div class="tpl-price-inline">
+                ${oldPriceFormatted ? `<span class="tpl-price-old">${oldPriceFormatted}</span>` : ''}
+                <span class="tpl-price-current">${priceFormatted}</span>
+              </div>
             </div>
             <h2 class="tpl-title">${tpl.title}</h2>
-            <p class="tpl-subtitle">${tpl.subtitle}</p>
             <div class="tpl-features">${featuresHtml}</div>
             <div class="tpl-actions">
-              <a href="${demoUrl}" class="btn-card btn-demo">👁️ Xem Demo</a>
-              <a href="${createUrl}" class="btn-card btn-create">✨ Tạo Ngay (${priceFormatted})</a>
+              <a href="${demoUrl}" class="btn-demo">Xem Demo</a>
+              <a href="${createUrl}" class="btn-create">✨ Tạo Ngay • ${priceFormatted}</a>
             </div>
           </div>
         `;
@@ -912,14 +853,13 @@
       });
     }
 
-    // Hiệu ứng Thông Báo Khách Hàng Vừa Mua Thời Gian Thực (Social Proof & FOMO Ticker)
+    // Thông báo FOMO tinh tế
     const RECENT_BUYERS = [
       { name: 'Minh Anh • Hà Nội', gift: 'Dải Ngân Hà 3D', time: '1 phút trước', emoji: '🪐' },
       { name: 'Tuấn Kiệt • TP.HCM', gift: 'Bánh Sinh Nhật Thổi Nến', time: '2 phút trước', emoji: '🎂' },
       { name: 'Hoàng Yến • Đà Nẵng', gift: 'Pháo Hoa Ghép Tên', time: '3 phút trước', emoji: '🎆' },
       { name: 'Thanh Hằng • Hải Phòng', gift: 'Trái Tim Hạt Ánh Sáng', time: '5 phút trước', emoji: '💖' },
-      { name: 'Đức Trọng • Cần Thơ', gift: 'Vòng Nhẫn Tinh Vân Đôi', time: '7 phút trước', emoji: '💍' },
-      { name: 'Ngọc Mai • Quảng Ninh', gift: 'Vũ Trụ Valentine 3D', time: '9 phút trước', emoji: '🌹' }
+      { name: 'Đức Trọng • Cần Thơ', gift: 'Vòng Nhẫn Tinh Vân Đôi', time: '7 phút trước', emoji: '💍' }
     ];
 
     let buyerIdx = 0;
@@ -941,16 +881,16 @@
         toast.classList.add('show');
         setTimeout(() => {
           toast.classList.remove('show');
-        }, 4200);
+        }, 3800);
       }
 
       setTimeout(() => {
         showNextBuyer();
-        setInterval(showNextBuyer, 9000);
-      }, 2500);
+        setInterval(showNextBuyer, 10000);
+      }, 3000);
     }
 
-    // Điều khiển Cuộn Thanh Menu Sự Kiện (Nút Mũi Tên, Lăn Chuột & Kéo Chuột)
+    // Điều khiển Cuộn Thanh Menu Danh Mục
     function initCategoryTabsScroll() {
       const tabsWrap = document.getElementById('category-tabs');
       const arrowPrev = document.getElementById('tab-arrow-prev');
@@ -959,16 +899,15 @@
 
       if (arrowPrev) {
         arrowPrev.addEventListener('click', () => {
-          tabsWrap.scrollBy({ left: -220, behavior: 'smooth' });
+          tabsWrap.scrollBy({ left: -200, behavior: 'smooth' });
         });
       }
       if (arrowNext) {
         arrowNext.addEventListener('click', () => {
-          tabsWrap.scrollBy({ left: 220, behavior: 'smooth' });
+          tabsWrap.scrollBy({ left: 200, behavior: 'smooth' });
         });
       }
 
-      // Cuộn ngang tự nhiên bằng con lăn chuột
       tabsWrap.addEventListener('wheel', (e) => {
         if (e.deltaY !== 0) {
           e.preventDefault();
@@ -976,7 +915,6 @@
         }
       }, { passive: false });
 
-      // Kéo chuột để cuộn mượt mà trên Desktop
       let isDown = false;
       let startX = 0;
       let scrollLeftPos = 0;

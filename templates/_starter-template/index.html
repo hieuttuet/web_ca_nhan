@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Món Quà Đặc Biệt ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Nhúng Danh mục & Bộ SDK Thanh Toán Dùng Chung -->
+  <script src="/templates-catalog.js"></script>
+  <script src="/shared/gift-sdk.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #090414;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    /* Thanh điều khiển dưới cùng (Tự động ẩn các nút có class .creator-only khi Người Nhận mở link quà) */
+    .bottom-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      gap: 10px;
+      background: rgba(18, 9, 34, 0.85);
+      backdrop-filter: blur(14px);
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .bar-btn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .bar-btn.primary {
+      background: linear-gradient(135deg, #ff2a85, #9333ea);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Khu vực hiển thị Hiệu ứng 3D / Canvas của Template -->
+  <div id="stage-container"></div>
+
+  <!-- Thanh công cụ -->
+  <nav class="bottom-bar">
+    <a href="/index.html" class="bar-btn creator-only">⬅️ Kho Mẫu</a>
+    <button type="button" id="btn-pay" class="bar-btn primary creator-only">✨ Tạo Link & QR Riêng</button>
+  </nav>
+
+  <script>
+    const state = {
+      templateId: 'starter_tpl',
+      sender: 'Bảo Nam',
+      receiver: 'Minh Anh',
+      message: 'Chúc em luôn rạng rỡ và hạnh phúc! ❤️'
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      // 1. Khởi tạo SDK (Tự động nhận diện ?id=LOVE..., ?demo=1, ?create=1)
+      await GiftSDK.init({
+        templateId: state.templateId,
+        onGiftLoaded(order) {
+          state.sender = order.sender_name || state.sender;
+          state.receiver = order.receiver_name || state.receiver;
+          state.message = order.message || state.message;
+          // Render hiệu ứng với dữ liệu thật của người nhận tại đây
+        }
+      });
+
+      // 2. Mở thanh toán VietQR chỉ với 1 lệnh gọi hàm
+      document.getElementById('btn-pay').addEventListener('click', () => {
+        GiftSDK.openPayment({
+          templateId: state.templateId,
+          senderName: state.sender,
+          receiverName: state.receiver,
+          message: state.message,
+          payload: {}
+        });
+      });
+    });
+  </script>
+</body>
+</html>

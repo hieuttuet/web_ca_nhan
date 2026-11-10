@@ -1,6 +1,14 @@
 /**
- * DANH MỤC SỰ KIỆN & TEMPLATE QUÀ TẶNG CÁ NHÂN HÓA (CENTRAL CATALOG)
- * Dễ dàng thêm sự kiện mới, thêm template mới và chỉnh giá tiền riêng cho từng mẫu tại đây.
+ * CENTRAL REGISTRY: DANH MỤC SỰ KIỆN & TEMPLATE QUÀ TẶNG CÁ NHÂN HÓA
+ * Cấu trúc tách biệt theo từng Sự kiện (Category), mỗi sự kiện hỗ trợ mở rộng 6 - 10+ bộ Template độc lập.
+ *
+ * Cấu trúc thư mục phát triển từng bộ Template:
+ * - templates/confess/<ten-bo-template>/index.html
+ * - templates/anniversary/<ten-bo-template>/index.html
+ * - templates/birthday/<ten-bo-template>/index.html
+ * - templates/valentine/<ten-bo-template>/index.html
+ * - templates/women/<ten-bo-template>/index.html
+ * - templates/holiday/<ten-bo-template>/index.html
  */
 
 const EVENT_CATEGORIES = [
@@ -14,8 +22,10 @@ const EVENT_CATEGORIES = [
   { id: 'holiday', name: 'Lễ Tết & Noel', icon: '🧧' }
 ];
 
-const TEMPLATES_CATALOG = [
-  // ==================== 1. SỰ KIỆN TỎ TÌNH (CONFESS) ====================
+// ============================================================================
+// 1. SỰ KIỆN TỎ TÌNH (CONFESS) -> Thư mục: templates/confess/
+// ============================================================================
+const CONFESS_TEMPLATES = [
   {
     id: 'galaxy_love_3d',
     category: 'confess',
@@ -76,9 +86,13 @@ const TEMPLATES_CATALOG = [
       theme: 'pink',
       melody: 'canon'
     }
-  },
+  }
+];
 
-  // ==================== 2. SỰ KIỆN KỶ NIỆM YÊU (ANNIVERSARY) ====================
+// ============================================================================
+// 2. SỰ KIỆN KỶ NIỆM YÊU (ANNIVERSARY) -> Thư mục: templates/anniversary/
+// ============================================================================
+const ANNIVERSARY_TEMPLATES = [
   {
     id: 'ring_anniversary_3d',
     category: 'anniversary',
@@ -103,6 +117,7 @@ const TEMPLATES_CATALOG = [
   {
     id: 'crystal_memory_3d',
     category: 'anniversary',
+    salesCount: '640+ đã tạo',
     title: 'Quả Cầu Pha Lê Kỷ Niệm 3D',
     subtitle: 'Quả cầu ánh sáng lấp lánh bao bọc những bức ảnh kỷ niệm đẹp nhất của hai đứa',
     badge: '🔮 Độc Đáo',
@@ -118,9 +133,13 @@ const TEMPLATES_CATALOG = [
       theme: 'blue',
       melody: 'romance'
     }
-  },
+  }
+];
 
-  // ==================== 3. SỰ KIỆN SINH NHẬT (BIRTHDAY) ====================
+// ============================================================================
+// 3. SỰ KIỆN SINH NHẬT (BIRTHDAY) -> Thư mục: templates/birthday/
+// ============================================================================
+const BIRTHDAY_TEMPLATES = [
   {
     id: 'birthday_cake_interactive',
     category: 'birthday',
@@ -142,6 +161,7 @@ const TEMPLATES_CATALOG = [
   {
     id: 'birthday_galaxy_3d',
     category: 'birthday',
+    salesCount: '780+ đã tạo',
     title: 'Vũ Trụ Tuổi Mới Hoàng Kim 3D',
     subtitle: 'Dải ngân hà ánh vàng hoàng kim lưu giữ những bức ảnh rực rỡ nhất mừng tuổi mới',
     badge: '✨ Sang Trọng',
@@ -157,12 +177,17 @@ const TEMPLATES_CATALOG = [
       theme: 'gold',
       melody: 'birthday'
     }
-  },
+  }
+];
 
-  // ==================== 4. VALENTINE 14/2 ====================
+// ============================================================================
+// 4. SỰ KIỆN VALENTINE 14/2 (VALENTINE) -> Thư mục: templates/valentine/
+// ============================================================================
+const VALENTINE_TEMPLATES = [
   {
     id: 'valentine_heart_3d',
     category: 'valentine',
+    salesCount: '1.1k+ đã tạo',
     title: 'Vũ Trụ Valentine Ngọt Ngào 3D',
     subtitle: 'Không gian 3D sắc hồng tình nhân kết hợp trái tim pha lê và bộ sưu tập ảnh đôi',
     badge: '🌹 14/2 Đặc Biệt',
@@ -178,12 +203,17 @@ const TEMPLATES_CATALOG = [
       theme: 'pink',
       melody: 'romance'
     }
-  },
+  }
+];
 
-  // ==================== 5. NGÀY PHỤ NỮ 8/3 & 20/10 ====================
+// ============================================================================
+// 5. SỰ KIỆN NGÀY PHỤ NỮ 8/3 & 20/10 (WOMEN) -> Thư mục: templates/women/
+// ============================================================================
+const WOMEN_TEMPLATES = [
   {
     id: 'women_day_galaxy_3d',
     category: 'women',
+    salesCount: '890+ đã tạo',
     title: 'Tinh Vân Hoa Hồng 8/3 & 20/10 3D',
     subtitle: 'Món quà công nghệ 3D bất ngờ dành tặng Mẹ, Vợ, Người yêu nhân ngày 8/3 và 20/10',
     badge: '🌸 Quà Phái Đẹp',
@@ -199,12 +229,17 @@ const TEMPLATES_CATALOG = [
       theme: 'pink',
       melody: 'canon'
     }
-  },
+  }
+];
 
-  // ==================== 6. LỄ TẾT & GIÁNG SINH ====================
+// ============================================================================
+// 6. SỰ KIỆN LỄ TẾT & GIÁNG SINH (HOLIDAY) -> Thư mục: templates/holiday/
+// ============================================================================
+const HOLIDAY_TEMPLATES = [
   {
     id: 'holiday_fireworks',
     category: 'holiday',
+    salesCount: '1.4k+ đã tạo',
     title: 'Pháo Hoa Giao Thừa & Lời Chúc Lễ Tết',
     subtitle: 'Bắn pháo hoa rực rỡ ghép tên người nhận và lời chúc Giáng Sinh / Năm Mới An Khang',
     badge: '🧧 Lễ Tết / Noel',
@@ -221,12 +256,32 @@ const TEMPLATES_CATALOG = [
   }
 ];
 
+// Gộp tất cả bộ Template từ 6 Sự kiện vào Danh mục Tổng (TEMPLATES_CATALOG)
+const TEMPLATES_CATALOG = [
+  ...CONFESS_TEMPLATES,
+  ...ANNIVERSARY_TEMPLATES,
+  ...BIRTHDAY_TEMPLATES,
+  ...VALENTINE_TEMPLATES,
+  ...WOMEN_TEMPLATES,
+  ...HOLIDAY_TEMPLATES
+];
+
+const TEMPLATES_BY_CATEGORY = {
+  confess: CONFESS_TEMPLATES,
+  anniversary: ANNIVERSARY_TEMPLATES,
+  birthday: BIRTHDAY_TEMPLATES,
+  valentine: VALENTINE_TEMPLATES,
+  women: WOMEN_TEMPLATES,
+  holiday: HOLIDAY_TEMPLATES
+};
+
 if (typeof window !== 'undefined') {
   window.EVENT_CATEGORIES = EVENT_CATEGORIES;
   window.TEMPLATES_CATALOG = TEMPLATES_CATALOG;
+  window.TEMPLATES_BY_CATEGORY = TEMPLATES_BY_CATEGORY;
 }
 if (typeof globalThis !== 'undefined') {
   globalThis.EVENT_CATEGORIES = EVENT_CATEGORIES;
   globalThis.TEMPLATES_CATALOG = TEMPLATES_CATALOG;
+  globalThis.TEMPLATES_BY_CATEGORY = TEMPLATES_BY_CATEGORY;
 }
-

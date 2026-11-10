@@ -485,6 +485,28 @@
             state.receiver = data.order.receiver_name;
             state.wish = data.order.message || state.wish;
             document.getElementById('hud-bday-name').textContent = `Chúc Mừng Sinh Nhật ${state.receiver} ✨`;
+            document.getElementById('hud-bday-wish').innerHTML =
+              `💌 <b>${state.sender}</b> đã chuẩn bị chiếc bánh sinh nhật đặc biệt này tặng bạn! Hãy ước một điều rồi <b>Thổi vào Micro</b> hoặc <b>Chạm vào nến</b> nhé 🕯️`;
+
+            // Ẩn nút "Tạo Bánh Sinh Nhật Riêng (29.000đ)" và link Kho mẫu của người tạo
+            const btnCustom = document.getElementById('btn-open-customize');
+            if (btnCustom) btnCustom.style.display = 'none';
+
+            const topBack = document.querySelector('.top-nav a[href="index.html"]');
+            if (topBack) topBack.style.display = 'none';
+
+            // Thêm nút phụ tinh tế nếu người nhận muốn tạo quà
+            if (!document.getElementById('btn-bday-viral')) {
+              const vA = document.createElement('a');
+              vA.id = 'btn-bday-viral';
+              vA.href = 'index.html';
+              vA.className = 'action-btn';
+              vA.style.textDecoration = 'none';
+              vA.style.opacity = '0.85';
+              vA.innerHTML = '🎁 Tạo Quà Tương Tự';
+              const dock = document.querySelector('.bottom-dock');
+              if (dock) dock.appendChild(vA);
+            }
           }
         } catch (e) {}
       }

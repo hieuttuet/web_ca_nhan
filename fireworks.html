@@ -1126,9 +1126,33 @@
             inputCrushName.value = data.order.receiver_name;
             inputWishNote.value = data.order.message || '';
             document.getElementById('form-inputs-area').style.display = 'none';
+            document.getElementById('form-badge').textContent = '✨ Món Quà Pháo Hoa Đặc Biệt ✨';
+            document.getElementById('form-title').textContent = `${data.order.sender_name} ❤️ ${data.order.receiver_name}`;
             document.getElementById('form-desc').innerHTML =
-              `💌 <b>${data.order.sender_name}</b> đã gửi tặng <b>${data.order.receiver_name}</b> một bầu trời pháo hoa đặc biệt!`;
-            document.getElementById('btn-submit-launch').textContent = 'Chạm Để Mở Pháo Hoa 🚀';
+              `💌 <b>${data.order.sender_name}</b> đã gửi tặng <b>${data.order.receiver_name}</b> một bầu trời pháo hoa rực rỡ mang tên hai bạn!`;
+            document.getElementById('btn-submit-launch').textContent = 'Chạm Để Bắn Pháo Hoa 🚀';
+
+            // Ẩn các nút công cụ của người tạo (Sửa tên, Tạo link & QR thanh toán, Trở về kho mẫu)
+            const editBtn = document.getElementById('btn-edit-names');
+            if (editBtn) editBtn.style.display = 'none';
+
+            const shareBtn = document.getElementById('btn-share-link');
+            if (shareBtn) shareBtn.style.display = 'none';
+
+            const backStoreBtn = document.getElementById('btn-back-store');
+            if (backStoreBtn) backStoreBtn.style.display = 'none';
+
+            // Thêm nút phụ tinh tế nếu người nhận muốn tạo quà tặng người khác
+            if (!document.getElementById('btn-viral-create')) {
+              const viralA = document.createElement('a');
+              viralA.id = 'btn-viral-create';
+              viralA.href = 'index.html';
+              viralA.className = 'mini-btn';
+              viralA.style.textDecoration = 'none';
+              viralA.style.opacity = '0.85';
+              viralA.innerHTML = '🎁 Tạo Quà Tương Tự';
+              document.getElementById('floating-controls').appendChild(viralA);
+            }
           }
         } catch (err) {}
       }

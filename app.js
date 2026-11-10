@@ -140,6 +140,8 @@ function applyTemplateFromUrlParam() {
   } catch (e) {}
 }
 
+let isRecipientGiftMode = false;
+
 // Tải dữ liệu món quà từ Supabase nếu trên URL có ?id=LOVE123456
 async function loadStateFromServer() {
   try {
@@ -150,6 +152,7 @@ async function loadStateFromServer() {
     const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
     const data = await res.json();
     if (res.ok && data.status === 'PAID' && data.order) {
+      isRecipientGiftMode = true;
       const order = data.order;
       const p = order.payload || {};
       appState = {
@@ -806,6 +809,40 @@ function syncUIFromState() {
   const btnProceed = document.getElementById('btn-proceed-payment');
   if (btnProceed && appState.price) {
     btnProceed.innerHTML = `💳 Tạo Link & Thiệp QR (${Number(appState.price).toLocaleString('vi-VN')}đ)`;
+  }
+
+  // Chế độ dành cho Người Nhận Quà (khi mở link có ?id=LOVE...)
+  if (isRecipientGiftMode) {
+    const btnCreator = document.getElementById('btn-open-creator');
+    if (btnCreator) btnCreator.style.display = 'none';
+
+    const backBtn = document.querySelector('.hud-bottom-bar a[href="index.html"]');
+    if (backBtn) backBtn.style.display = 'none';
+
+    if (!document.getElementById('btn-recipient-create-viral')) {
+      const viralBtn = document.createElement('a');
+      viralBtn.id = 'btn-recipient-create-viral';
+      viralBtn.href = 'index.html';
+      viralBtn.className = 'pill-btn';
+      viralBtn.style.textDecoration = 'none';
+      viralBtn.style.opacity = '0.85';
+      viralBtn.innerHTML = `<span>🎁</span><span>Tạo Món Quà Tương Tự</span>`;
+      const bottomBar = document.querySelector('.hud-bottom-bar');
+      if (bottomBar) bottomBar.appendChild(viralBtn);
+    }
+
+    const introBadge = document.getElementById('intro-badge');
+    if (introBadge) introBadge.textContent = `✨ Món Quà Vũ Trụ Dành Riêng Cho ${appState.receiver} ✨`;
+
+    const introSubtitle = document.getElementById('intro-subtitle');
+    if (introSubtitle) {
+      introSubtitle.innerHTML = `💌 <b>${appState.sender}</b> đã dành trọn yêu thương gửi tặng bạn một vũ trụ 3D kỳ diệu. Chạm để bước vào dải ngân hà kỷ niệm nhé!`;
+    }
+
+    const btnEnter = document.getElementById('btn-enter-galaxy');
+    if (btnEnter) {
+      btnEnter.innerHTML = `<span>🪐 Mở Món Quà Của ${appState.sender}</span>`;
+    }
   }
 
   renderPhotoUploaderGrid();

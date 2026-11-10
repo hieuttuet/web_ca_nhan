@@ -4,7 +4,8 @@
  */
 
 const EVENT_CATEGORIES = [
-  { id: 'all', name: 'Tất Cả Mẫu', icon: '🔥' },
+  { id: 'hot', name: 'Mẫu Hot Trend', icon: '🔥', isHighlight: true },
+  { id: 'all', name: 'Tất Cả Mẫu', icon: '✨' },
   { id: 'confess', name: 'Tỏ Tình', icon: '💘' },
   { id: 'anniversary', name: 'Kỷ Niệm Yêu', icon: '💑' },
   { id: 'birthday', name: 'Sinh Nhật', icon: '🎂' },
@@ -18,6 +19,8 @@ const TEMPLATES_CATALOG = [
   {
     id: 'galaxy_love_3d',
     category: 'confess',
+    isHot: true,
+    salesCount: '1.8k+ đã tạo',
     title: 'Dải Ngân Hà Kỷ Niệm 3D',
     subtitle: '16.000 vì sao xoắn ốc 3D bay quanh trái tim pha lê & khung ảnh Polaroid',
     badge: '🔥 Best Seller TikTok',
@@ -37,6 +40,8 @@ const TEMPLATES_CATALOG = [
   {
     id: 'fireworks_confess',
     category: 'confess',
+    isHot: true,
+    salesCount: '3.4k+ đã tạo',
     title: 'Pháo Hoa Ghép Tên Bầu Trời Đêm',
     subtitle: 'Tên lửa bắn lên trời đêm nổ tung và hội tụ hạt sáng thành [Tên Bạn] ❤️ [Tên Người Ấy]',
     badge: '⚡ Trend Tỏ Tình',
@@ -54,6 +59,8 @@ const TEMPLATES_CATALOG = [
   {
     id: 'heart_universe_3d',
     category: 'confess',
+    isHot: true,
+    salesCount: '1.5k+ đã tạo',
     title: 'Trái Tim Hạt Ánh Sáng 3D',
     subtitle: 'Hàng vạn hạt tinh vân tụ lại thành Trái Tim 3D khổng lồ đập nhịp nhàng giữa vũ trụ',
     badge: '💖 Siêu Lãng Mạn',
@@ -75,6 +82,8 @@ const TEMPLATES_CATALOG = [
   {
     id: 'ring_anniversary_3d',
     category: 'anniversary',
+    isHot: true,
+    salesCount: '920+ đã tạo',
     title: 'Vòng Nhẫn Tinh Vân Đôi & Đếm Ngày Yêu',
     subtitle: 'Hai vòng nhẫn ánh sao đan vào nhau kèm bộ đếm số ngày bên nhau & album ảnh bay 3D',
     badge: '💍 Kỷ Niệm Ngày Yêu',
@@ -115,6 +124,8 @@ const TEMPLATES_CATALOG = [
   {
     id: 'birthday_cake_interactive',
     category: 'birthday',
+    isHot: true,
+    salesCount: '2.1k+ đã tạo',
     title: 'Bánh Sinh Nhật Thổi Nến & Pháo Hoa',
     subtitle: 'Thổi vào micro hoặc chạm để tắt nến ước nguyện, bầu trời lập tức bắn pháo hoa ghép tên!',
     badge: '🎂 Hot Sinh Nhật',

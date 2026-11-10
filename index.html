@@ -183,6 +183,40 @@
       box-shadow: 0 4px 16px rgba(255, 42, 133, 0.5);
     }
 
+    /* Tab Nổi Bật: Mẫu Hot Trend */
+    .cat-tab.tab-hot {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2));
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      color: #fde047;
+      animation: pulseFire 2.4s infinite ease-in-out;
+    }
+
+    @keyframes pulseFire {
+      0%, 100% { box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+      50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.45); }
+    }
+
+    .cat-tab.tab-hot.active {
+      background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.65);
+    }
+
+    .tpl-sales-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(10, 4, 20, 0.82);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fde047;
+      font-size: 0.72rem;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
     /* Lưới Danh Sách Template */
     .templates-grid {
       display: grid;
@@ -383,7 +417,7 @@
   </div>
 
   <script>
-    let selectedCategory = 'all';
+    let selectedCategory = 'hot';
 
     // Nếu người nhận mở link quà tặng cũ dạng /?id=LOVE123456 ở trang chủ -> Tự động chuyển hướng đúng Template
     async function checkAndRedirectGiftOrder() {
@@ -416,7 +450,8 @@
 
       (window.EVENT_CATEGORIES || []).forEach((cat) => {
         const btn = document.createElement('button');
-        btn.className = `cat-tab ${cat.id === selectedCategory ? 'active' : ''}`;
+        const isHotClass = cat.id === 'hot' ? 'tab-hot' : '';
+        btn.className = `cat-tab ${isHotClass} ${cat.id === selectedCategory ? 'active' : ''}`.trim();
         btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
         btn.addEventListener('click', () => {
           selectedCategory = cat.id;
@@ -431,9 +466,11 @@
       const grid = document.getElementById('templates-grid');
       grid.innerHTML = '';
 
-      const list = (window.TEMPLATES_CATALOG || []).filter(
-        (item) => selectedCategory === 'all' || item.category === selectedCategory
-      );
+      const list = (window.TEMPLATES_CATALOG || []).filter((item) => {
+        if (selectedCategory === 'hot') return item.isHot === true;
+        if (selectedCategory === 'all') return true;
+        return item.category === selectedCategory;
+      });
 
       list.forEach((tpl) => {
         const card = document.createElement('article');
@@ -451,6 +488,7 @@
         card.innerHTML = `
           <div class="tpl-preview" style="background: ${tpl.previewGradient};" onclick="window.location.href='${demoUrl}'">
             <span class="tpl-badge">${tpl.badge}</span>
+            ${tpl.salesCount ? `<span class="tpl-sales-pill">🔥 ${tpl.salesCount}</span>` : ''}
             <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
             <div class="tpl-price-box">
               <span class="tpl-price-current">${priceFormatted}</span>

@@ -237,6 +237,24 @@ const WOMEN_TEMPLATES = [
 // ============================================================================
 const HOLIDAY_TEMPLATES = [
   {
+    id: 'christmas_tree_3d',
+    category: 'holiday',
+    isHot: true,
+    salesCount: '2.8k+ đã tạo',
+    title: 'Cây Thông Noel 3D Hoàng Gia & Cử Chỉ Tay',
+    subtitle: 'Cây thông 3D đính album ảnh, tuyết rơi lãng mạn, biến hình Trái Tim và hỗ trợ điều khiển cử chỉ tay AI',
+    badge: '🎄 Hot Giáng Sinh',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/holiday/christmas-tree-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #051923 0%, #003554 50%, #d4af37 100%)',
+    previewEmoji: '🎄',
+    features: ['Cây thông tuyết rơi 3D', 'Điều khiển cử chỉ tay AI', 'Tải 8 ảnh + Thiệp QR Noel'],
+    preset: {
+      occasion: 'Merry Christmas & Happy New Year'
+    }
+  },
+  {
     id: 'holiday_fireworks',
     category: 'holiday',
     salesCount: '1.4k+ đã tạo',

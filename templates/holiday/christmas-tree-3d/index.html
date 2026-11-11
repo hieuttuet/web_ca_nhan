@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cây Thông Noel 3D Hoàng Gia ✨ Quà Tặng Giáng Sinh Cá Nhân Hóa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="../../../templates-catalog.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg-dark: #050d1a;
+      --gold-primary: #d4af37;
+      --gold-light: #fceea7;
+      --accent-red: #d32f2f;
+      --glass-bg: rgba(7, 18, 36, 0.78);
+      --glass-border: rgba(212, 175, 55, 0.38);
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-title: 'Cinzel', serif;
+      --font-script: 'Dancing Script', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0f2334 0%, #071422 55%, #030811 100%);
+      background-color: var(--bg-dark);
+      font-family: var(--font-main);
+      color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+    }
+
+    /* ==================== 1. FLOATING TOP HUD ==================== */
+    .top-hud-bar {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 25;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .top-hud-bar > * {
+      pointer-events: auto;
+    }
+
+    .nav-btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-size: 0.84rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(212, 175, 55, 0.22);
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 0 18px rgba(212, 175, 55, 0.4);
+    }
+
+    .top-right-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Live gesture pill */
+    .gesture-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(5, 13, 26, 0.85);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Mini Webcam Feed */
+    #webcam-container {
+      position: fixed;
+      top: 68px;
+      right: 16px;
+      width: 130px;
+      height: 98px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid var(--gold-primary);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 15px rgba(212, 175, 55, 0.3);
+      z-index: 25;
+      background: #000;
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    #webcam-container.active {
+      display: block;
+    }
+
+    #camera-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .webcam-close-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    /* ==================== 2. CENTER OCCASION BANNER ==================== */
+    .center-hud-header {
+      position: fixed;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      text-align: center;
+      width: 92%;
+      max-width: 640px;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .occasion-pill {
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.16);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      color: var(--gold-light);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+
+    .hud-title {
+      font-family: var(--font-title);
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 0%, #fceea7 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(212, 175, 55, 0.45);
+      margin-bottom: 4px;
+    }
+
+    .hud-names {
+      font-family: var(--font-script);
+      font-size: clamp(1.6rem, 4.5vw, 2.3rem);
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 51, 102, 0.8), 0 0 35px rgba(212, 175, 55, 0.5);
+    }
+
+    .hud-hint {
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    /* ==================== 3. BOTTOM DOCK ACTION BAR ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 95%;
+      max-width: 780px;
+    }
+
+    .dock-pill-btn {
+      padding: 10px 17px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      transition: all 0.22s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .dock-pill-btn:hover {
+      background: rgba(212, 175, 55, 0.25);
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.45);
+    }
+
+    .dock-pill-btn.active {
+      background: rgba(212, 175, 55, 0.35);
+      border-color: #ffd700;
+      color: #ffd700;
+      box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
+    }
+
+    .dock-pill-btn.primary-cta {
+      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 45%, #d4af37 100%);
+      border: 1px solid rgba(255, 238, 167, 0.6);
+      box-shadow: 0 0 25px rgba(211, 47, 47, 0.65), 0 0 15px rgba(212, 175, 55, 0.4);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(211, 47, 47, 0.6); }
+      50% { transform: scale(1.04); box-shadow: 0 0 32px rgba(211, 47, 47, 0.9), 0 0 20px rgba(212, 175, 55, 0.6); }
+    }
+
+    /* ==================== 4. MODALS (LETTER, CREATOR, PAYMENT) ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(3, 8, 18, 0.84);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 1;
+      visibility: visible;
+      transition: all 0.3s ease;
+    }
+
+    .modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(13, 27, 46, 0.95) 0%, rgba(5, 14, 28, 0.96) 100%);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(212, 175, 55, 0.22);
+      padding: 28px 24px;
+    }
+
+    .modal-card::-webkit-scrollbar { width: 5px; }
+    .modal-card::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.35); border-radius: 99px; }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-close-corner:hover {
+      background: rgba(211, 47, 47, 0.4);
+      border-color: #ff4d4d;
+      transform: scale(1.08);
+    }
+
+    .modal-title {
+      font-family: var(--font-title);
+      font-size: 1.45rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.84rem;
+      color: #cbd5e1;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* Form elements */
+    .form-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.3);
+    }
+
+    .form-textarea {
+      min-height: 85px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .ai-btn {
+      background: none;
+      border: none;
+      color: #ffd700;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* Photo upload grid */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .photo-cell {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px dashed rgba(212, 175, 55, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .photo-cell:hover {
+      border-color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.12);
+    }
+
+    .photo-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-cell .remove-tag {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      color: #ff6b6b;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Action buttons in modal */
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d32f2f, #d4af37);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(211, 47, 47, 0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(212, 175, 55, 0.6);
+    }
+
+    /* Love letter card styling */
+    .letter-card {
+      background: linear-gradient(135deg, #130a1c 0%, #1e1028 100%);
+      border: 1px solid rgba(255, 105, 180, 0.4);
+      text-align: center;
+    }
+
+    .letter-body {
+      font-family: var(--font-script);
+      font-size: 1.45rem;
+      line-height: 1.6;
+      color: #fff1f5;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin: 14px 0;
+      border-left: 3px solid #ff3366;
+    }
+
+    /* VietQR Modal */
+    .qr-box-center {
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 16px;
+      width: 220px;
+      margin: 0 auto 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .qr-box-center img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .info-table {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      margin-bottom: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .info-row:last-child { border-bottom: none; }
+
+    /* Canvas preview for Christmas Card */
+    .gift-card-preview {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .gift-card-preview canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Toast notification */
+    .toast-msg {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      z-index: 99;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Intro Overlay for Recipient */
+    .intro-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: radial-gradient(circle at center, rgba(15, 35, 52, 0.94) 0%, rgba(3, 8, 17, 0.98) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.6s ease;
+    }
+
+    .intro-splash.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 3D WebGL Canvas -->
+  <div id="canvas-container"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-msg">Đã sao chép đường link!</div>
+
+  <!-- Video stream for MediaPipe (Hidden) -->
+  <video id="input-video" playsinline style="display:none"></video>
+
+  <!-- Mini Webcam Mirror Preview -->
+  <div id="webcam-container">
+    <div class="webcam-close-btn" onclick="toggleHandTracking(false)" title="Tắt camera">✕</div>
+    <canvas id="camera-preview"></canvas>
+  </div>
+
+  <!-- Top Floating HUD -->
+  <header class="top-hud-bar">
+    <a href="../../../index.html" class="nav-btn creator-only" title="Về Kho Mẫu Quà Tặng">
+      <span>🏠</span><span>Kho Mẫu</span>
+    </a>
+    <div id="gesture-status" class="gesture-badge" style="display:none;">
+      <span>🖐</span><span id="gesture-text">Đang nhận diện cử chỉ...</span>
+    </div>
+    <div class="top-right-group">
+      <button type="button" id="btn-toggle-camera" class="nav-btn" title="Bật/Tắt Cử chỉ tay AI">
+        <span>📷</span><span>Cử Chỉ Tay</span>
+      </button>
+      <button type="button" id="btn-toggle-music" class="nav-btn" title="Bật/Tắt Nhạc Noel">
+        <span>🎵</span><span>Nhạc</span>
+      </button>
+      <button type="button" id="btn-toggle-snow" class="nav-btn active" title="Bật/Tắt Tuyết rơi">
+        <span>❄️</span><span>Tuyết</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Center Occasion Banner -->
+  <div class="center-hud-header">
+    <div id="hud-occasion" class="occasion-pill">🎄 MERRY CHRISTMAS & HAPPY NEW YEAR 🎄</div>
+    <h1 id="hud-title" class="hud-title">Cây Thông Noel 3D</h1>
+    <div id="hud-names" class="hud-names">Bảo Nam ❤️ Minh Anh</div>
+    <p class="hud-hint">💡 Chạm xoay 360° • Bấm vào khung ảnh để xem cận cảnh</p>
+  </div>
+
+  <!-- Bottom Action Dock -->
+  <nav class="bottom-dock">
+    <button type="button" id="btn-mode-tree" class="dock-pill-btn active">
+      <span>🎄</span><span>Cây Thông</span>
+    </button>
+    <button type="button" id="btn-mode-explode" class="dock-pill-btn">
+      <span>🎁</span><span>Bung Quà & Ảnh</span>
+    </button>
+    <button type="button" id="btn-mode-heart" class="dock-pill-btn">
+      <span>💖</span><span>Trái Tim 3D</span>
+    </button>
+    <button type="button" id="btn-mode-photo" class="dock-pill-btn">
+      <span>📸</span><span>Xem Ảnh</span>
+    </button>
+    <button type="button" id="btn-open-letter" class="dock-pill-btn">
+      <span>💌</span><span>Tâm Thư</span>
+    </button>
+    <button type="button" id="btn-open-creator" class="dock-pill-btn primary-cta creator-only">
+      <span>✨ Tạo Cây Thông Riêng</span>
+      <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem;">39.000đ</span>
+    </button>
+  </nav>
+
+  <!-- INTRO SPLASH OVERLAY (Dành cho Người nhận quà khi mở link) -->
+  <div id="intro-splash" class="intro-splash hidden">
+    <div class="occasion-pill" id="splash-occasion">✨ MÓN QUÀ GIÁNG SINH ĐẶC BIỆT ✨</div>
+    <h1 id="splash-title" class="hud-title" style="margin-bottom: 8px;">Minh Anh ❤️ Bảo Nam</h1>
+    <p id="splash-sub" style="max-width: 480px; font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
+      Một cây thông Noel 3D đính đầy những vì sao lấp lánh và kỷ niệm ngọt ngào của hai đứa. Chạm để bước vào không gian Giáng Sinh kỳ diệu nhé! 🎄
+    </p>
+    <button type="button" id="btn-enter-gift" class="nav-btn primary-cta" style="padding: 14px 32px; font-size: 1rem;">
+      <span>🎄 Mở Cây Thông Giáng Sinh</span>
+    </button>
+  </div>
+
+  <!-- 1. MODAL ĐỌC TÂM THƯ / LỜI CHÚC NOEL -->
+  <div id="modal-letter" class="modal-backdrop hidden">
+    <div class="modal-card letter-card">
+      <div class="modal-close-corner" onclick="closeModal('modal-letter')">✕</div>
+      <div style="font-size: 2.4rem; margin-bottom: 4px;">💌</div>
+      <h3 id="letter-title" class="modal-title" style="color: #ff9ec6;">Gửi Người Thương Của Anh</h3>
+      <div id="letter-content" class="letter-body"></div>
+      <div id="letter-sign" style="text-align: right; font-weight: 700; color: #ffd700; font-size: 1.1rem;"></div>
+    </div>
+  </div>
+
+  <!-- 2. CREATOR STUDIO: TỰ TẠO CÂY THÔNG 3D RIÊNG -->
+  <div id="modal-creator" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-close-corner" onclick="closeModal('modal-creator')">✕</div>
+      <h3 class="modal-title">✨ Thiết Kế Cây Thông Noel 3D</h3>
+      <p class="modal-subtitle">
+        Nhập tên, tâm thư Giáng Sinh và tải 6 - 8 ảnh kỷ niệm của hai bạn để gắn lên cây thông 3D nhé!
+      </p>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Tên của bạn (Người gửi)</label>
+          <input id="in-sender" type="text" class="form-input" placeholder="VD: Bảo Nam" maxlength="30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tên người ấy (Người nhận)</label>
+          <input id="in-receiver" type="text" class="form-input" placeholder="VD: Minh Anh" maxlength="30" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Dịp kỷ niệm</label>
+        <select id="in-occasion" class="form-select">
+          <option value="Merry Christmas & Happy New Year">🎄 Merry Christmas & Happy New Year</option>
+          <option value="Giáng Sinh An Lành Bên Em">❤️ Giáng Sinh An Lành Bên Em</option>
+          <option value="Kỷ Niệm Tình Yêu Mùa Đông">❄️ Kỷ Niệm Tình Yêu Mùa Đông</option>
+          <option value="Happy New Year 2027">🧧 Chúc Mừng Năm Mới 2027</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Lời chúc / Tâm thư bí mật</span>
+          <button type="button" id="btn-ai-wish" class="ai-btn">🪄 AI Viết Lời Chúc</button>
+        </div>
+        <textarea id="in-message" class="form-textarea" placeholder="Nhập lời chúc Giáng Sinh ấm áp gửi tới người ấy..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Ảnh kỷ niệm bay quanh cây thông (Tối đa 8 ảnh)</span>
+          <span id="photo-count-badge" style="color: #ffd700; font-size: 0.78rem;">6/8 ảnh</span>
+        </div>
+        <div id="photo-upload-grid" class="photo-grid"></div>
+        <input id="in-photo-file" type="file" accept="image/*" multiple style="display:none;" />
+      </div>
+
+      <div class="modal-btn-row">
+        <button type="button" id="btn-preview-3d" class="btn-full btn-secondary">
+          👁️ Xem Thử 3D
+        </button>
+        <button type="button" id="btn-proceed-pay" class="btn-full btn-primary">
+          💳 Lấy Link & Thiệp QR (39k)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MODAL THANH TOÁN VIETQR & XUẤT THIỆP QR -->
+  <div id="modal-payment" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-close-corner" onclick="closeModal('modal-payment')">✕</div>
+
+      <div id="pay-step-waiting">
+        <div class="occasion-pill" style="margin-bottom: 8px;">📲 Thanh Toán Tự Động VietQR</div>
+        <h3 class="modal-title">Quét Mã Mở Khóa Cây Thông 3D</h3>
+        <p class="modal-subtitle">
+          Quét mã VietQR bằng bất kỳ App Ngân Hàng nào. Hệ thống tự động mở khóa link sau 3 giây khi nhận được chuyển khoản!
+        </p>
+
+        <div class="qr-box-center">
+          <img id="pay-vietqr-img" src="" alt="VietQR" />
+        </div>
+
+        <button type="button" id="btn-download-vietqr" class="btn-full btn-secondary" style="margin-bottom: 12px; font-size: 0.86rem;">
+          📥 Tải Mã QR Chuyển Tiền (Quét từ App Ngân Hàng)
+        </button>
+
+        <div class="info-table">
+          <div class="info-row">
+            <span style="color:#94a3b8;">Ngân hàng:</span>
+            <strong id="pay-bank-name">MB</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Chủ tài khoản:</span>
+            <strong id="pay-account-name">---</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Số tài khoản:</span>
+            <strong id="pay-account-no">---</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Số tiền:</span>
+            <strong id="pay-amount-text" style="color: #ffd700;">39.000đ</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Nội dung CK (Bắt buộc):</span>
+            <strong id="pay-memo-text" style="color: #ff9ec6;">LOVE...</strong>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding: 10px; border-radius: 12px; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); color: #fde047; font-size: 0.82rem; font-weight: 700;">
+          🔄 Đang chờ ngân hàng xác nhận tự động...
+        </div>
+      </div>
+
+      <!-- Thành công: Xuất Link & Thiệp QR -->
+      <div id="pay-step-success" style="display:none; text-align: center;">
+        <div style="font-size: 2.2rem; margin-bottom: 4px;">🎉</div>
+        <h3 class="modal-title" style="color: #6ee7b7;">Cây Thông Noel 3D Của Bạn Đã Sẵn Sàng!</h3>
+        <p class="modal-subtitle">
+          Tải tấm <b>Thiệp QR Giáng Sinh</b> bên dưới hoặc sao chép đường link gửi cho người ấy nhé!
+        </p>
+
+        <div class="gift-card-preview">
+          <canvas id="gift-card-canvas" width="600" height="780"></canvas>
+        </div>
+
+        <input id="share-url-input" type="text" class="form-input" readonly style="font-size: 0.82rem; text-align: center; margin-bottom: 10px;" />
+
+        <div class="modal-btn-row" style="margin-bottom: 8px;">
+          <button type="button" id="btn-copy-url" class="btn-full btn-primary">
+            📋 Sao Chép Link
+          </button>
+          <button type="button" id="btn-download-card-img" class="btn-full btn-secondary">
+            📥 Tải Ảnh Thiệp QR
+          </button>
+        </div>
+        <button type="button" id="btn-download-qr-only" class="btn-full btn-secondary" style="font-size: 0.82rem; color: #ffd700; border-color: rgba(255, 215, 0, 0.35);">
+          📥 Lưu Riêng Mã QR Quà Tặng (.png)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. APP STATE & CONFIG
+     * ============================================================================
+     */
+    const appState = {
+      templateId: 'christmas_tree_3d',
+      sender: 'Bảo Nam',
+      receiver: 'Minh Anh',
+      occasion: 'Merry Christmas & Happy New Year',
+      message: 'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất của anh là luôn có em bên cạnh sưởi ấm trái tim. Chúc công chúa nhỏ của anh một mùa Giáng Sinh an lành, hạnh phúc và luôn ngập tràn nụ cười nhé! Yêu em rất nhiều ❤️',
+      price: 39000,
+      photos: [] // Sẽ khởi tạo 6 ảnh mặc định lãng mạn
+    };
+
+    const AI_WISH_SAMPLES = [
+      'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất của anh là luôn có em bên cạnh sưởi ấm trái tim. Chúc em một mùa Giáng Sinh an lành, hạnh phúc và ngập tràn nụ cười nhé! ❤️',
+      'Đêm Noel ngoài kia có thể lạnh, nhưng trong lòng anh lúc nào cũng ấm áp vì đã có em. Cảm ơn em vì đã đến và làm cho thanh xuân của anh trở nên rực rỡ nhất! 🎄✨',
+      'Merry Christmas em yêu! Chúc người thương của anh luôn xinh đẹp, rạng rỡ và đạt được mọi ước nguyện. Mãi là cô bé đáng yêu của anh nhé! 🎁💖',
+      'Noel này tuy không có tuyết rơi thật, nhưng anh có cả một cây thông 3D gửi gắm trọn vẹn tình yêu dành cho em. Chúc em Giáng Sinh thật vui và ấm áp! ❄️🌟'
+    ];
+
+    let currentMode = 'TREE'; // 'TREE' | 'EXPLODE' | 'HEART' | 'PHOTO'
+    let selectedPhotoIdx = 0;
+    let isSnowEnabled = true;
+    let isCameraActive = false;
+    let pollTimer = null;
+    let activeOrderCode = null;
+
+    // MediaPipe Hand tracking state
+    let handTracker = null;
+    let cameraInstance = null;
+    let handX = 0.5;
+    let heartRotation = 0;
+
+    /**
+     * ============================================================================
+     * 2. AUDIO SYNTHESIZER & SOUND ENGINE
+     * ============================================================================
+     */
+    class ChristmasMusicBox {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.noteTimer = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playJingleNote(freq, time, duration = 0.35) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, time);
+
+        gain.gain.setValueAtTime(0.001, time);
+        gain.gain.linearRampToValueAtTime(0.09, time + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0005, time + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(time);
+        osc.stop(time + duration);
+      }
+      start() {
+        this.init();
+        if (!this.ctx) return;
+        this.isPlaying = true;
+        document.getElementById('btn-toggle-music').classList.add('active');
+
+        // Giai điệu Jingle Bells / We Wish You A Merry Christmas âm sắc hộp nhạc pha lê
+        const melody = [
+          { f: 330, d: 0.3 }, { f: 330, d: 0.3 }, { f: 330, d: 0.6 },
+          { f: 330, d: 0.3 }, { f: 330, d: 0.3 }, { f: 330, d: 0.6 },
+          { f: 330, d: 0.3 }, { f: 392, d: 0.3 }, { f: 261.6, d: 0.4 }, { f: 293.7, d: 0.2 }, { f: 330, d: 0.8 },
+          { f: 349.2, d: 0.3 }, { f: 349.2, d: 0.3 }, { f: 349.2, d: 0.4 }, { f: 349.2, d: 0.2 },
+          { f: 349.2, d: 0.3 }, { f: 330, d: 0.3 }, { f: 330, d: 0.3 }, { f: 330, d: 0.2 }, { f: 330, d: 0.2 },
+          { f: 392, d: 0.3 }, { f: 392, d: 0.3 }, { f: 349.2, d: 0.3 }, { f: 293.7, d: 0.3 }, { f: 261.6, d: 0.8 }
+        ];
+
+        let curIdx = 0;
+        const playNext = () => {
+          if (!this.isPlaying) return;
+          const note = melody[curIdx];
+          this.playJingleNote(note.f, this.ctx.currentTime, note.d);
+          curIdx = (curIdx + 1) % melody.length;
+          this.noteTimer = setTimeout(playNext, note.d * 1000 + 40);
+        };
+        playNext();
+      }
+      stop() {
+        this.isPlaying = false;
+        if (this.noteTimer) clearTimeout(this.noteTimer);
+        document.getElementById('btn-toggle-music').classList.remove('active');
+      }
+      toggle() {
+        if (this.isPlaying) this.stop();
+        else this.start();
+      }
+    }
+    const musicBox = new ChristmasMusicBox();
+
+    /**
+     * ============================================================================
+     * 3. PROCEDURAL TEXTURES & DEFAULT PHOTO GENERATOR
+     * ============================================================================
+     */
+    function createGlowTexture(type) {
+      const c = document.createElement('canvas');
+      c.width = 128; c.height = 128;
+      const ctx = c.getContext('2d');
+      const cx = 64, cy = 64;
+
+      if (type === 'gold_glow') {
+        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 46);
+        grd.addColorStop(0, '#FFFFFF');
+        grd.addColorStop(0.25, '#FFF6B7');
+        grd.addColorStop(0.6, '#FFD700');
+        grd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, 128, 128);
+      } else if (type === 'red_light') {
+        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
+        grd.addColorStop(0, '#FFAAAA');
+        grd.addColorStop(0.35, '#FF1E56');
+        grd.addColorStop(0.7, '#990020');
+        grd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, 128, 128);
+      } else if (type === 'gift_red') {
+        ctx.fillStyle = '#D32F2F';
+        ctx.fillRect(20, 20, 88, 88);
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(54, 20, 20, 88);
+        ctx.fillRect(20, 54, 88, 20);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(20, 20, 88, 88);
+      }
+      return new THREE.CanvasTexture(c);
+    }
+
+    const textures = {
+      gold: createGlowTexture('gold_glow'),
+      red: createGlowTexture('red_light'),
+      gift: createGlowTexture('gift_red')
+    };
+
+    // Tạo ảnh Polaroid lãng mạn mặc định bằng Canvas (Đẹp tức thì, không lo thiếu file)
+    function generateFestivePhoto(title, sub, icon = '🎄') {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 512, 512);
+      grad.addColorStop(0, '#10263e');
+      grad.addColorStop(0.5, '#1e3a5f');
+      grad.addColorStop(1, '#081726');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Viền tuyết sao
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (let i = 0; i < 45; i++) {
+        const x = (i * 87) % 500 + 6;
+        const y = (i * 123) % 500 + 6;
+        ctx.beginPath();
+        ctx.arc(x, y, (i % 2) + 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.font = '90px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(icon, 256, 210);
+
+      ctx.font = 'bold 36px "Cinzel", serif';
+      ctx.fillStyle = '#fceea7';
+      ctx.fillText(title, 256, 310);
+
+      ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#ffd1e8';
+      ctx.fillText(sub, 256, 360);
+
+      return c.toDataURL('image/jpeg', 0.85);
+    }
+
+    function initDefaultPhotos() {
+      const presets = [
+        { t: 'Kỷ Niệm Ngọt Ngào', s: 'Khoảnh khắc bên em ✨', icon: '🎄' },
+        { t: 'Đêm Giáng Sinh', s: 'Ấm áp & Bình yên ❤️', icon: '🎁' },
+        { t: 'Trái Tim Mùa Đông', s: 'Mãi dành riêng cho em 💖', icon: '✨' },
+        { t: 'Nụ Cười Rạng Rỡ', s: 'Điều tuyệt vời nhất của anh 🌸', icon: '❄️' },
+        { t: 'Nắm Chặt Tay Nhau', s: 'Đi qua mọi mùa đông 👫', icon: '🌟' },
+        { t: 'Hạnh Phúc Trọn Vẹn', s: 'Merry Christmas My Love 🥂', icon: '🎅' }
+      ];
+      appState.photos = presets.map((p) => ({
+        url: generateFestivePhoto(p.t, p.s, p.icon),
+        caption: `${p.t} • ${appState.receiver}`
+      }));
+    }
+
+    /**
+     * ============================================================================
+     * 4. THREE.JS 3D SCENE & CHRISTMAS TREE ENGINE
+     * ============================================================================
+     */
+    const CONFIG_3D = {
+      goldCount: 2200,
+      redCount: 320,
+      giftCount: 160,
+      dustCount: 800,
+      snowCount: 1000,
+      explodeRadius: 65,
+      photoOrbitRadius: 26,
+      treeHeight: 70,
+      treeBaseRadius: 34,
+      heartSize: 40
+    };
+
+    let scene, camera, renderer;
+    let groupGold, groupRed, groupGift, dustPoints, snowPoints;
+    let photoMeshes = [];
+    let titleMesh, starMesh, loveTextMesh;
+    let isDragging = false, prevPointerX = 0, prevPointerY = 0;
+    let sceneRotationY = 0;
+
+    function initThreeScene() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050d1a, 0.0025);
+
+      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 4, 105);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      setupSceneLights();
+      buildParticleSystems();
+      buildSnowSystem();
+      build3DDecorations();
+      rebuildPhotoFrames();
+
+      setupInteractions();
+      animate3D();
+    }
+
+    function setupSceneLights() {
+      const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambient);
+
+      const coreLight = new THREE.PointLight(0xffaa00, 2.5, 55);
+      coreLight.position.set(0, 10, 0);
+      scene.add(coreLight);
+
+      const spotGold = new THREE.SpotLight(0xffcc66, 1.8);
+      spotGold.position.set(35, 45, 50);
+      spotGold.angle = 0.55;
+      spotGold.penumbra = 0.5;
+      scene.add(spotGold);
+
+      const spotCyan = new THREE.SpotLight(0x38bdf8, 1.2);
+      spotCyan.position.set(-35, 30, -35);
+      scene.add(spotCyan);
+    }
+
+    function createParticleGroup(type, count, size) {
+      const pPositions = [];
+      const pExplodeTargets = [];
+      const pTreeTargets = [];
+      const pHeartTargets = [];
+
+      for (let i = 0; i < count; i++) {
+        // 1. CÂY THÔNG NOEL (TREE)
+        const h = Math.random() * CONFIG_3D.treeHeight;
+        const y = h - CONFIG_3D.treeHeight / 2;
+        const radiusRatio = (type === 'gold') ? Math.sqrt(Math.random()) : 0.88 + Math.random() * 0.12;
+        const maxR = (1 - (h / CONFIG_3D.treeHeight)) * CONFIG_3D.treeBaseRadius;
+        const r = maxR * radiusRatio;
+        const theta = Math.random() * Math.PI * 2;
+        const tx = r * Math.cos(theta);
+        const tz = r * Math.sin(theta);
+        pTreeTargets.push(tx, y, tz);
+
+        // 2. BUNG QUÀ & ÁNH SÁNG (EXPLODE)
+        const u = Math.random();
+        const v = Math.random();
+        const phi = Math.acos(2 * v - 1);
+        const lam = 2 * Math.PI * u;
+        const radMult = (type === 'gift') ? 1.2 : 1.0;
+        const rad = CONFIG_3D.explodeRadius * Math.cbrt(Math.random()) * radMult;
+        const ex = rad * Math.sin(phi) * Math.cos(lam);
+        const ey = rad * Math.sin(phi) * Math.sin(lam);
+        const ez = rad * Math.cos(phi);
+        pExplodeTargets.push(ex, ey, ez);
+
+        // 3. TRÁI TIM GIÁNG SINH 3D (HEART)
+        const t = Math.random() * Math.PI * 2;
+        const s = CONFIG_3D.heartSize;
+        const hx = s * 16 * Math.pow(Math.sin(t), 3) / 16;
+        const hy = s * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16;
+        const hz = (Math.random() - 0.5) * 16;
+        pHeartTargets.push(hx, hy, hz);
+
+        pPositions.push(tx, y, tz);
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pPositions, 3));
+      geo.userData = { tree: pTreeTargets, explode: pExplodeTargets, heart: pHeartTargets };
+
+      const mat = new THREE.PointsMaterial({
+        size: size,
+        map: textures[type],
+        transparent: true,
+        opacity: 0.95,
+        blending: (type === 'gift') ? THREE.NormalBlending : THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+
+      const points = new THREE.Points(geo, mat);
+      scene.add(points);
+      return points;
+    }
+
+    function buildParticleSystems() {
+      groupGold = createParticleGroup('gold', CONFIG_3D.goldCount, 2.2);
+      groupRed = createParticleGroup('red', CONFIG_3D.redCount, 3.6);
+      groupGift = createParticleGroup('gift', CONFIG_3D.giftCount, 3.2);
+
+      // Gold Sparkle Dust
+      const dustGeo = new THREE.BufferGeometry();
+      const dustPos = [];
+      for (let i = 0; i < CONFIG_3D.dustCount; i++) {
+        dustPos.push(
+          (Math.random() - 0.5) * 90,
+          (Math.random() - 0.5) * 80,
+          (Math.random() - 0.5) * 90
+        );
+      }
+      dustGeo.setAttribute('position', new THREE.Float32BufferAttribute(dustPos, 3));
+      const dustMat = new THREE.PointsMaterial({
+        size: 1.2,
+        color: 0xffd966,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      dustPoints = new THREE.Points(dustGeo, dustMat);
+      scene.add(dustPoints);
+    }
+
+    // Hệ thống tuyết rơi mềm mại (Snow System)
+    function buildSnowSystem() {
+      const snowGeo = new THREE.BufferGeometry();
+      const vertices = [];
+      const speeds = [];
+
+      for (let i = 0; i < CONFIG_3D.snowCount; i++) {
+        vertices.push(
+          (Math.random() - 0.5) * 120,
+          (Math.random() - 0.5) * 90,
+          (Math.random() - 0.5) * 120
+        );
+        speeds.push(Math.random() * 0.22 + 0.1, Math.random() * 0.06);
+      }
+
+      snowGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      snowGeo.setAttribute('userSpeed', new THREE.Float32BufferAttribute(speeds, 2));
+
+      // Snow particle canvas
+      const sc = document.createElement('canvas');
+      sc.width = 32; sc.height = 32;
+      const sctx = sc.getContext('2d');
+      sctx.fillStyle = '#ffffff';
+      sctx.beginPath();
+      sctx.arc(16, 16, 14, 0, Math.PI * 2);
+      sctx.fill();
+      const snowTex = new THREE.CanvasTexture(sc);
+
+      const snowMat = new THREE.PointsMaterial({
+        size: 0.85,
+        color: 0xffffff,
+        map: snowTex,
+        transparent: true,
+        opacity: 0.75,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      snowPoints = new THREE.Points(snowGeo, snowMat);
+      scene.add(snowPoints);
+    }
+
+    function updateSnowParticles(timeSec) {
+      if (!snowPoints || !isSnowEnabled) return;
+      const pos = snowPoints.geometry.attributes.position.array;
+      const spd = snowPoints.geometry.attributes.userSpeed.array;
+
+      for (let i = 0; i < CONFIG_3D.snowCount; i++) {
+        const fall = spd[i * 2];
+        const sway = spd[i * 2 + 1];
+        pos[i * 3 + 1] -= fall;
+        pos[i * 3] += Math.sin(timeSec * 2 + i) * sway * 0.2;
+
+        if (pos[i * 3 + 1] < -45) {
+          pos[i * 3 + 1] = 45;
+          pos[i * 3] = (Math.random() - 0.5) * 120;
+          pos[i * 3 + 2] = (Math.random() - 0.5) * 120;
+        }
+      }
+      snowPoints.geometry.attributes.position.needsUpdate = true;
+    }
+
+    function build3DDecorations() {
+      // 1. NGÔI SAO 5 CÁNH XOAY TRÊN ĐỈNH CÂY THÔNG
+      const starShape = new THREE.Shape();
+      const points = 5, outer = 4.2, inner = 1.8;
+      for (let i = 0; i < points * 2; i++) {
+        const a = (i * Math.PI) / points + Math.PI / 2;
+        const r = (i % 2 === 0) ? outer : inner;
+        const x = Math.cos(a) * r;
+        const y = Math.sin(a) * r;
+        if (i === 0) starShape.moveTo(x, y);
+        else starShape.lineTo(x, y);
+      }
+      starShape.closePath();
+
+      const starGeo = new THREE.ExtrudeGeometry(starShape, {
+        depth: 1.2, bevelEnabled: true, bevelThickness: 0.4, bevelSize: 0.4, bevelSegments: 2
+      });
+      starGeo.center();
+      const starMat = new THREE.MeshStandardMaterial({
+        color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 0.8,
+        metalness: 0.9, roughness: 0.15
+      });
+      starMesh = new THREE.Mesh(starGeo, starMat);
+      starMesh.position.set(0, CONFIG_3D.treeHeight / 2 + 3.5, 0);
+      scene.add(starMesh);
+
+      // 2. BIỂN HIỆU "MERRY CHRISTMAS" NỔI TRÊN CAO
+      update3DTitleMesh();
+
+      // 3. CHỮ NỔI "I LOVE YOU" TRONG TRÁI TIM 3D
+      update3DLoveTextMesh();
+    }
+
+    function update3DTitleMesh() {
+      if (titleMesh) scene.remove(titleMesh);
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.font = 'bold 78px "Cinzel", serif';
+      ctx.fillStyle = '#FFD700';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#FF0000';
+      ctx.shadowBlur = 35;
+      ctx.fillText(appState.occasion.toUpperCase(), 512, 115);
+
+      ctx.font = 'bold 58px "Dancing Script", cursive';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#FF3366';
+      ctx.fillText(`${appState.receiver} ❤️ ${appState.sender}`, 512, 195);
+
+      const tex = new THREE.CanvasTexture(c);
+      const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
+      titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(58, 14.5), mat);
+      titleMesh.position.set(0, CONFIG_3D.treeHeight / 2 + 13, 0);
+      scene.add(titleMesh);
+    }
+
+    function update3DLoveTextMesh() {
+      if (loveTextMesh) scene.remove(loveTextMesh);
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.font = 'bold 100px "Dancing Script", cursive';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#FF3366';
+      ctx.shadowColor = '#FFAAAA';
+      ctx.shadowBlur = 40;
+      ctx.fillText(`I LOVE YOU ${appState.receiver.toUpperCase()}`, 512, 155);
+
+      const tex = new THREE.CanvasTexture(c);
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      loveTextMesh = new THREE.Mesh(new THREE.PlaneGeometry(42, 10.5), mat);
+      loveTextMesh.position.set(0, 0, 0);
+      loveTextMesh.visible = false;
+      scene.add(loveTextMesh);
+    }
+
+    // Dựng khung ảnh Polaroid 3D đính trên cây thông
+    function rebuildPhotoFrames() {
+      photoMeshes.forEach((mesh) => scene.remove(mesh));
+      photoMeshes = [];
+
+      const count = appState.photos.length;
+      const loader = new THREE.TextureLoader();
+
+      appState.photos.forEach((photoData, idx) => {
+        const tex = loader.load(photoData.url);
+        const geo = new THREE.PlaneGeometry(8, 8);
+        const borderGeo = new THREE.PlaneGeometry(9.2, 9.2);
+        const borderMat = new THREE.MeshStandardMaterial({
+          color: 0xd4af37, metalness: 0.8, roughness: 0.2
+        });
+
+        const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(geo, mat);
+        const border = new THREE.Mesh(borderGeo, borderMat);
+        border.position.z = -0.15;
+        mesh.add(border);
+
+        // Vị trí gắn trên cây thông (theo hình xoắn ốc quanh cây)
+        const hRatio = (idx + 1) / (count + 1);
+        const y = hRatio * (CONFIG_3D.treeHeight * 0.75) - (CONFIG_3D.treeHeight * 0.38);
+        const maxR = (1 - ((y + CONFIG_3D.treeHeight / 2) / CONFIG_3D.treeHeight)) * CONFIG_3D.treeBaseRadius;
+        const r = maxR + 2.5;
+        const angle = hRatio * Math.PI * 4.5;
+        mesh.userData = {
+          treePos: new THREE.Vector3(Math.cos(angle) * r, y, Math.sin(angle) * r),
+          orbitAngle: (Math.PI * 2 / count) * idx,
+          photoIndex: idx
+        };
+
+        mesh.position.copy(mesh.userData.treePos);
+        mesh.lookAt(0, y, 0);
+        mesh.rotateY(Math.PI);
+        mesh.scale.set(0.65, 0.65, 0.65);
+
+        scene.add(mesh);
+        photoMeshes.push(mesh);
+      });
+    }
+
+    function updateParticleMorphGroup(group, targetState, speed, timeSec) {
+      const positions = group.geometry.attributes.position.array;
+      let targetKey = 'tree';
+      if (targetState === 'EXPLODE' || targetState === 'PHOTO') targetKey = 'explode';
+      else if (targetState === 'HEART') targetKey = 'heart';
+
+      const targets = group.geometry.userData[targetKey];
+
+      for (let i = 0; i < positions.length; i++) {
+        positions[i] += (targets[i] - positions[i]) * speed;
+      }
+      group.geometry.attributes.position.needsUpdate = true;
+
+      if (targetState === 'TREE') {
+        group.rotation.y = sceneRotationY;
+      } else if (targetState === 'HEART') {
+        group.rotation.y = heartRotation;
+      } else {
+        const handRotY = (handX - 0.5) * 2.2;
+        group.rotation.y += (handRotY - group.rotation.y) * 0.05;
+      }
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      const timeSec = Date.now() * 0.001;
+      const morphSpeed = 0.055;
+
+      if (!isDragging && currentMode === 'TREE') {
+        sceneRotationY += 0.004;
+      }
+
+      updateParticleMorphGroup(groupGold, currentMode, morphSpeed, timeSec);
+      updateParticleMorphGroup(groupRed, currentMode, morphSpeed, timeSec);
+      updateParticleMorphGroup(groupGift, currentMode, morphSpeed, timeSec);
+
+      updateSnowParticles(timeSec);
+
+      if (dustPoints) {
+        dustPoints.rotation.y += 0.0015;
+      }
+
+      // Xử lý hiển thị theo từng Mode
+      if (currentMode === 'TREE') {
+        if (loveTextMesh) loveTextMesh.visible = false;
+        if (titleMesh) {
+          titleMesh.visible = true;
+          titleMesh.lookAt(camera.position);
+        }
+        if (starMesh) {
+          starMesh.visible = true;
+          starMesh.rotation.y += 0.02;
+          starMesh.rotation.z = Math.sin(timeSec * 2) * 0.15;
+        }
+
+        photoMeshes.forEach((mesh) => {
+          mesh.visible = true;
+          const pos = mesh.userData.treePos;
+          // Xoay theo cây thông
+          const rotAngle = sceneRotationY;
+          const rx = pos.x * Math.cos(rotAngle) - pos.z * Math.sin(rotAngle);
+          const rz = pos.x * Math.sin(rotAngle) + pos.z * Math.cos(rotAngle);
+
+          mesh.position.lerp(new THREE.Vector3(rx, pos.y, rz), 0.08);
+          mesh.lookAt(0, pos.y, 0);
+          mesh.rotateY(Math.PI);
+          mesh.scale.lerp(new THREE.Vector3(0.65, 0.65, 0.65), 0.08);
+        });
+
+      } else if (currentMode === 'HEART') {
+        if (titleMesh) titleMesh.visible = false;
+        if (starMesh) starMesh.visible = false;
+
+        heartRotation += 0.008;
+        if (loveTextMesh) {
+          loveTextMesh.visible = true;
+          const pulse = 1 + Math.sin(timeSec * 3.5) * 0.06;
+          loveTextMesh.scale.set(pulse, pulse, 1);
+          loveTextMesh.lookAt(camera.position);
+        }
+        photoMeshes.forEach((m) => m.scale.lerp(new THREE.Vector3(0, 0, 0), 0.1));
+
+      } else if (currentMode === 'EXPLODE') {
+        if (loveTextMesh) loveTextMesh.visible = false;
+        if (titleMesh) titleMesh.visible = false;
+        if (starMesh) starMesh.visible = false;
+
+        const baseAngle = groupGold.rotation.y + timeSec * 0.18;
+        const total = photoMeshes.length;
+        let bestIdx = 0, maxZ = -999;
+
+        photoMeshes.forEach((mesh, idx) => {
+          mesh.visible = true;
+          const angle = baseAngle + (Math.PI * 2 / total) * idx;
+          const x = Math.sin(angle) * CONFIG_3D.photoOrbitRadius;
+          const z = Math.cos(angle) * CONFIG_3D.photoOrbitRadius;
+          const y = Math.sin(timeSec * 1.5 + idx) * 3;
+
+          mesh.position.lerp(new THREE.Vector3(x, y, z), 0.08);
+          mesh.lookAt(camera.position);
+
+          if (z > maxZ) {
+            maxZ = z;
+            bestIdx = idx;
+          }
+
+          if (z > 4) {
+            const scale = 1.0 + (z / CONFIG_3D.photoOrbitRadius) * 0.75;
+            mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.08);
+          } else {
+            mesh.scale.lerp(new THREE.Vector3(0.6, 0.6, 0.6), 0.08);
+          }
+        });
+        selectedPhotoIdx = bestIdx;
+
+      } else if (currentMode === 'PHOTO') {
+        if (loveTextMesh) loveTextMesh.visible = false;
+        if (titleMesh) titleMesh.visible = false;
+        if (starMesh) starMesh.visible = false;
+
+        photoMeshes.forEach((mesh, idx) => {
+          if (idx === selectedPhotoIdx) {
+            mesh.visible = true;
+            mesh.position.lerp(new THREE.Vector3(0, 2, 65), 0.09);
+            mesh.scale.lerp(new THREE.Vector3(3.6, 3.6, 3.6), 0.09);
+            mesh.lookAt(camera.position);
+          } else {
+            mesh.scale.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+          }
+        });
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    /**
+     * ============================================================================
+     * 5. MOUSE, TOUCH & MEDIAPIPE GESTURE INTERACTIONS
+     * ============================================================================
+     */
+    function setupInteractions() {
+      const container = document.getElementById('canvas-container');
+
+      // Drag to rotate 360 degrees
+      container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        prevPointerX = e.clientX;
+        prevPointerY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevPointerX;
+        sceneRotationY += dx * 0.008;
+        prevPointerX = e.clientX;
+        prevPointerY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', () => { isDragging = false; });
+      window.addEventListener('pointercancel', () => { isDragging = false; });
+
+      // Click on photo in 3D scene to zoom in
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+
+      container.addEventListener('click', (e) => {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+
+        const intersects = raycaster.intersectObjects(photoMeshes);
+        if (intersects.length > 0) {
+          const hitMesh = intersects[0].object;
+          const idx = hitMesh.userData.photoIndex;
+          if (typeof idx === 'number') {
+            selectedPhotoIdx = idx;
+            switchMode('PHOTO');
+            showToast(`📸 ${appState.photos[idx]?.caption || 'Kỷ niệm ngọt ngào'}`);
+          }
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (camera) {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+      });
+    }
+
+    function switchMode(newMode) {
+      currentMode = newMode;
+      document.querySelectorAll('.bottom-dock .dock-pill-btn').forEach((btn) => btn.classList.remove('active'));
+
+      if (newMode === 'TREE') document.getElementById('btn-mode-tree')?.classList.add('active');
+      else if (newMode === 'EXPLODE') document.getElementById('btn-mode-explode')?.classList.add('active');
+      else if (newMode === 'HEART') document.getElementById('btn-mode-heart')?.classList.add('active');
+      else if (newMode === 'PHOTO') document.getElementById('btn-mode-photo')?.classList.add('active');
+    }
+
+    // Bật/tắt camera MediaPipe nhận diện cử chỉ tay AI
+    async function toggleHandTracking(forceState) {
+      isCameraActive = (typeof forceState === 'boolean') ? forceState : !isCameraActive;
+      const container = document.getElementById('webcam-container');
+      const badge = document.getElementById('gesture-status');
+      const btn = document.getElementById('btn-toggle-camera');
+
+      if (isCameraActive) {
+        try {
+          showToast('📷 Đang khởi động Camera AI...');
+          container.classList.add('active');
+          badge.style.display = 'inline-flex';
+          btn.classList.add('active');
+
+          const video = document.getElementById('input-video');
+          const canvas = document.getElementById('camera-preview');
+          const ctx = canvas.getContext('2d');
+          canvas.width = 160; canvas.height = 120;
+
+          if (!handTracker) {
+            handTracker = new Hands({
+              locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+            handTracker.setOptions({
+              maxNumHands: 2,
+              modelComplexity: 0,
+              minDetectionConfidence: 0.5,
+              minTrackingConfidence: 0.5
+            });
+
+            handTracker.onResults((results) => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+              const statusTxt = document.getElementById('gesture-text');
+
+              // 1. Kiểm tra 2 tay chắp hình trái tim
+              if (results.multiHandLandmarks && results.multiHandLandmarks.length === 2) {
+                const h1 = results.multiHandLandmarks[0];
+                const h2 = results.multiHandLandmarks[1];
+                const thumbDist = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
+                const indexDist = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
+
+                if (thumbDist < 0.1 && indexDist > 0.14) {
+                  switchMode('HEART');
+                  statusTxt.textContent = '🤲 2 Tay Ghép Trái Tim';
+                  return;
+                }
+              }
+
+              // 2. Nhận diện 1 bàn tay
+              if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const lm = results.multiHandLandmarks[0];
+                handX = lm[9].x;
+
+                const tips = [8, 12, 16, 20];
+                const wrist = lm[0];
+                let openDist = 0;
+                tips.forEach((i) => {
+                  openDist += Math.hypot(lm[i].x - wrist.x, lm[i].y - wrist.y);
+                });
+                const avgDist = openDist / 4;
+                const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+
+                if (avgDist < 0.24) {
+                  switchMode('TREE');
+                  statusTxt.textContent = '✊ Nắm: Thu Cây Thông';
+                } else if (pinchDist < 0.055) {
+                  switchMode('PHOTO');
+                  statusTxt.textContent = '👌 Pinch: Xem Ảnh';
+                } else {
+                  switchMode('EXPLODE');
+                  statusTxt.textContent = '🖐 Xòe: Bung Quà & Ảnh';
+                }
+              }
+            });
+          }
+
+          if (!cameraInstance) {
+            cameraInstance = new Camera(video, {
+              onFrame: async () => {
+                if (isCameraActive && handTracker) {
+                  await handTracker.send({ image: video });
+                }
+              },
+              width: 320,
+              height: 240
+            });
+          }
+          await cameraInstance.start();
+          showToast('✅ Camera AI đã sẵn sàng! Hãy vẫy tay trước ống kính');
+        } catch (e) {
+          isCameraActive = false;
+          container.classList.remove('active');
+          badge.style.display = 'none';
+          btn.classList.remove('active');
+          alert('Không thể mở camera. Bạn vẫn có thể chạm các nút trên màn hình để điều khiển cây thông 3D nhé!');
+        }
+      } else {
+        container.classList.remove('active');
+        badge.style.display = 'none';
+        btn.classList.remove('active');
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 6. CREATOR STUDIO & VIETQR PAYMENT WORKFLOW
+     * ============================================================================
+     */
+    function syncUIFromState() {
+      document.getElementById('hud-names').textContent = `${appState.receiver} ❤️ ${appState.sender}`;
+      document.getElementById('hud-occasion').textContent = `🎄 ${appState.occasion.toUpperCase()} 🎄`;
+
+      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver} Của Anh`;
+      document.getElementById('letter-content').textContent = appState.message;
+      document.getElementById('letter-sign').textContent = `Yêu em, ${appState.sender} ❤️`;
+
+      update3DTitleMesh();
+      update3DLoveTextMesh();
+      rebuildPhotoFrames();
+    }
+
+    function renderPhotoUploaderGrid() {
+      const grid = document.getElementById('photo-upload-grid');
+      grid.innerHTML = '';
+
+      appState.photos.forEach((photo, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'photo-cell';
+        cell.innerHTML = `
+          <img src="${photo.url}" alt="Ảnh ${idx + 1}" />
+          <div class="remove-tag" title="Xóa ảnh">✕</div>
+        `;
+        cell.querySelector('img').addEventListener('click', () => {
+          const cap = prompt('Sửa lời chú thích cho bức ảnh này:', photo.caption || '');
+          if (cap !== null) {
+            photo.caption = cap.trim() || 'Kỷ niệm ngọt ngào';
+            showToast('✨ Đã sửa chú thích!');
+          }
+        });
+        cell.querySelector('.remove-tag').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (appState.photos.length <= 1) {
+            showToast('Cần giữ lại ít nhất 1 ảnh nhé!');
+            return;
+          }
+          appState.photos.splice(idx, 1);
+          renderPhotoUploaderGrid();
+        });
+        grid.appendChild(cell);
+      });
+
+      if (appState.photos.length < 8) {
+        const addCell = document.createElement('div');
+        addCell.className = 'photo-cell';
+        addCell.innerHTML = `<span style="font-size:1.6rem; color:#ffd700;">➕</span><span style="font-size:0.68rem; color:#cbd5e1;">Thêm</span>`;
+        addCell.addEventListener('click', () => document.getElementById('in-photo-file').click());
+        grid.appendChild(addCell);
+      }
+
+      document.getElementById('photo-count-badge').textContent = `${appState.photos.length}/8 ảnh`;
+    }
+
+    function compressUploadedImage(file, maxSize = 340, quality = 0.75) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const c = document.createElement('canvas');
+            const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+            c.width = Math.round(img.width * scale);
+            c.height = Math.round(img.height * scale);
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Vẽ Thiệp QR Giáng Sinh 3D tải về máy (Canvas 600x780)
+    function renderChristmasGiftCard(shareUrl) {
+      const canvas = document.getElementById('gift-card-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Nền Xanh Đêm Giáng Sinh Hoàng Gia
+      const grad = ctx.createLinearGradient(0, 0, 600, 780);
+      grad.addColorStop(0, '#0a233a');
+      grad.addColorStop(0.5, '#051320');
+      grad.addColorStop(1, '#020910');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 780);
+
+      // Tuyết rơi trang trí
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (let i = 0; i < 70; i++) {
+        const x = (i * 91) % 580 + 10;
+        const y = (i * 127) % 760 + 10;
+        ctx.beginPath();
+        ctx.arc(x, y, (i % 2) + 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Viền vàng kim sang trọng
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.7)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(24, 24, 552, 732, 28);
+      ctx.stroke();
+
+      // Huy hiệu Noel
+      ctx.font = 'bold 20px "Cinzel", serif';
+      ctx.fillStyle = '#ffd700';
+      ctx.textAlign = 'center';
+      ctx.fillText('🎄 MÓN QUÀ GIÁNG SINH 3D ĐẶC BIỆT 🎄', 300, 84);
+
+      // Tên Cặp đôi
+      ctx.font = 'bold 44px "Dancing Script", cursive';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${appState.receiver} ❤️ ${appState.sender}`, 300, 146);
+
+      // Dịp kỷ niệm
+      ctx.font = '500 17px "Cinzel", serif';
+      ctx.fillStyle = '#fceea7';
+      ctx.fillText(appState.occasion, 300, 186);
+
+      // Hộp chứa QR
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(145, 222, 310, 310, 24);
+      ctx.fill();
+
+      const qrData = encodeURIComponent(shareUrl);
+      const qrImg = new Image();
+      qrImg.crossOrigin = 'anonymous';
+      qrImg.onload = () => {
+        ctx.drawImage(qrImg, 165, 242, 270, 270);
+      };
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&color=0f2334&data=${qrData}`;
+
+      // Hướng dẫn
+      ctx.font = 'bold 21px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#ffd700';
+      ctx.fillText('📲 Quét mã QR để mở Cây Thông Noel 3D', 300, 590);
+
+      ctx.font = 'italic 17px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = '#e2e8f0';
+      const shortWish = appState.message.length > 85 ? appState.message.slice(0, 85) + '...' : appState.message;
+      ctx.fillText(`"${shortWish.slice(0, 45)}"`, 300, 640);
+      if (shortWish.length > 45) {
+        ctx.fillText(`"${shortWish.slice(45)}"`, 300, 670);
+      }
+    }
+
+    async function openVietQRPayment() {
+      applyCreatorFormChanges();
+      const btn = document.getElementById('btn-proceed-pay');
+      const origText = btn.textContent;
+      btn.textContent = '⏳ Đang tạo mã VietQR...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId: 'christmas_tree_3d',
+            templateType: 'holiday',
+            senderName: appState.sender,
+            receiverName: appState.receiver,
+            occasion: appState.occasion,
+            message: appState.message,
+            payload: {
+              templateId: 'christmas_tree_3d',
+              occasion: appState.occasion,
+              message: appState.message,
+              photos: appState.photos.slice(0, 8)
+            }
+          })
+        });
+
+        const data = await res.json();
+        btn.textContent = origText;
+        btn.disabled = false;
+
+        if (!res.ok) {
+          alert(data.error || 'Chưa cấu hình Supabase trên Vercel.');
+          return;
+        }
+
+        activeOrderCode = data.orderCode;
+        closeModal('modal-creator');
+
+        document.getElementById('pay-vietqr-img').src = data.qrUrl;
+        document.getElementById('pay-bank-name').textContent = data.bankId;
+        document.getElementById('pay-account-name').textContent = data.accountName;
+        document.getElementById('pay-account-no').textContent = data.accountNo;
+        document.getElementById('pay-amount-text').textContent = Number(data.amount).toLocaleString('vi-VN') + 'đ';
+        document.getElementById('pay-memo-text').textContent = data.orderCode;
+
+        document.getElementById('pay-step-waiting').style.display = 'block';
+        document.getElementById('pay-step-success').style.display = 'none';
+        document.getElementById('modal-payment').classList.remove('hidden');
+
+        startPollingOrderStatus(activeOrderCode);
+      } catch (err) {
+        btn.textContent = origText;
+        btn.disabled = false;
+        alert('Hãy triển khai lên Vercel để sử dụng chức năng thanh toán tự động.');
+      }
+    }
+
+    function startPollingOrderStatus(orderCode) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderCode)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'PAID') {
+            clearInterval(pollTimer);
+            unlockAndShowShareSuccess(orderCode);
+          }
+        } catch (e) {}
+      }, 2500);
+    }
+
+    function unlockAndShowShareSuccess(orderCode) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${orderCode}`;
+      document.getElementById('share-url-input').value = shareUrl;
+      renderChristmasGiftCard(shareUrl);
+
+      document.getElementById('pay-step-waiting').style.display = 'none';
+      document.getElementById('pay-step-success').style.display = 'block';
+      showToast('🎉 Thanh toán thành công! Đã tạo Cây Thông 3D & Thiệp QR!');
+    }
+
+    function applyCreatorFormChanges() {
+      appState.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      appState.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      appState.occasion = document.getElementById('in-occasion').value;
+      appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
+      syncUIFromState();
+    }
+
+    async function downloadBlobImage(url, filename) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+      } catch (e) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = filename;
+        a.click();
+      }
+    }
+
+    function closeModal(id) {
+      if (id === 'modal-payment' && pollTimer) clearInterval(pollTimer);
+      document.getElementById(id)?.classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /**
+     * ============================================================================
+     * 7. INITIALIZATION & DOM EVENTS
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      initDefaultPhotos();
+      initThreeScene();
+      syncUIFromState();
+
+      // Kiểm tra chế độ người nhận quà (?id=LOVE...)
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+
+      if (orderId) {
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'PAID' && data.order) {
+            const ord = data.order;
+            appState.sender = ord.sender_name || appState.sender;
+            appState.receiver = ord.receiver_name || appState.receiver;
+            appState.occasion = ord.occasion || appState.occasion;
+            appState.message = ord.message || appState.message;
+
+            if (ord.payload && Array.isArray(ord.payload.photos) && ord.payload.photos.length > 0) {
+              appState.photos = ord.payload.photos;
+            }
+
+            syncUIFromState();
+
+            // Ẩn toàn bộ nút của người tạo quà
+            document.querySelectorAll('.creator-only').forEach((el) => el.style.display = 'none');
+
+            // Nút viral cho người nhận
+            if (!document.getElementById('btn-viral-create')) {
+              const vBtn = document.createElement('a');
+              vBtn.id = 'btn-viral-create';
+              vBtn.href = window.location.pathname;
+              vBtn.className = 'dock-pill-btn';
+              vBtn.style.textDecoration = 'none';
+              vBtn.style.opacity = '0.9';
+              vBtn.innerHTML = '<span>🎁</span><span>Tạo Cây Thông Tương Tự</span>';
+              document.querySelector('.bottom-dock').appendChild(vBtn);
+            }
+
+            // Hiện màn hình chào mừng người nhận
+            document.getElementById('splash-title').textContent = `${appState.receiver} ❤️ ${appState.sender}`;
+            document.getElementById('splash-sub').innerHTML = `💌 <b>${appState.sender}</b> đã dành tặng bạn một Cây Thông Noel 3D lung linh tuyết trắng. Chạm để mở quà nhé!`;
+            document.getElementById('intro-splash').classList.remove('hidden');
+          }
+        } catch (e) {}
+      }
+
+      // Nút mở quà trên màn hình Splash
+      document.getElementById('btn-enter-gift').addEventListener('click', () => {
+        document.getElementById('intro-splash').classList.add('hidden');
+        musicBox.start();
+        switchMode('TREE');
+      });
+
+      // Bottom Dock buttons
+      document.getElementById('btn-mode-tree').addEventListener('click', () => switchMode('TREE'));
+      document.getElementById('btn-mode-explode').addEventListener('click', () => switchMode('EXPLODE'));
+      document.getElementById('btn-mode-heart').addEventListener('click', () => switchMode('HEART'));
+      document.getElementById('btn-mode-photo').addEventListener('click', () => {
+        switchMode('PHOTO');
+        showToast('📸 Bấm lại để chuyển sang ảnh tiếp theo!');
+        selectedPhotoIdx = (selectedPhotoIdx + 1) % appState.photos.length;
+      });
+
+      document.getElementById('btn-open-letter').addEventListener('click', () => {
+        document.getElementById('modal-letter').classList.remove('hidden');
+      });
+
+      document.getElementById('btn-toggle-camera').addEventListener('click', () => toggleHandTracking());
+
+      document.getElementById('btn-toggle-music').addEventListener('click', () => musicBox.toggle());
+
+      document.getElementById('btn-toggle-snow').addEventListener('click', (e) => {
+        isSnowEnabled = !isSnowEnabled;
+        e.currentTarget.classList.toggle('active', isSnowEnabled);
+        if (snowPoints) snowPoints.visible = isSnowEnabled;
+        showToast(isSnowEnabled ? '❄️ Đã bật tuyết rơi' : 'Đã tắt tuyết rơi');
+      });
+
+      // Creator Studio
+      document.getElementById('btn-open-creator').addEventListener('click', () => {
+        document.getElementById('in-sender').value = appState.sender;
+        document.getElementById('in-receiver').value = appState.receiver;
+        document.getElementById('in-occasion').value = appState.occasion;
+        document.getElementById('in-message').value = appState.message;
+        renderPhotoUploaderGrid();
+        document.getElementById('modal-creator').classList.remove('hidden');
+      });
+
+      let wishIdx = 0;
+      document.getElementById('btn-ai-wish').addEventListener('click', () => {
+        wishIdx = (wishIdx + 1) % AI_WISH_SAMPLES.length;
+        const receiver = document.getElementById('in-receiver').value.trim() || 'em';
+        document.getElementById('in-message').value = AI_WISH_SAMPLES[wishIdx].replace(/em/g, receiver);
+        showToast('🪄 AI đã viết lời chúc Noel mới!');
+      });
+
+      document.getElementById('in-photo-file').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        showToast('⏳ Đang tối ưu ảnh kỷ niệm...');
+        for (const f of files) {
+          if (appState.photos.length >= 8) break;
+          const compressed = await compressUploadedImage(f, 340, 0.75);
+          appState.photos.push({
+            url: compressed,
+            caption: `${appState.receiver} ❤️ ${appState.sender}`
+          });
+        }
+        e.target.value = '';
+        renderPhotoUploaderGrid();
+        showToast('✅ Đã thêm ảnh vào Cây Thông 3D!');
+      });
+
+      document.getElementById('btn-preview-3d').addEventListener('click', () => {
+        applyCreatorFormChanges();
+        closeModal('modal-creator');
+        showToast('✨ Đã cập nhật Cây Thông 3D theo thông tin của bạn!');
+      });
+
+      document.getElementById('btn-proceed-pay').addEventListener('click', openVietQRPayment);
+
+      // Payment actions
+      document.getElementById('btn-download-vietqr').addEventListener('click', async () => {
+        const img = document.getElementById('pay-vietqr-img');
+        if (!img.src) return;
+        showToast('⏳ Đang tải mã VietQR thanh toán...');
+        await downloadBlobImage(img.src, `VietQR-Noel-${activeOrderCode || 'BIDV'}.png`);
+        showToast('✅ Đã lưu mã VietQR! Mở App Ngân Hàng quét từ ảnh nhé');
+      });
+
+      document.getElementById('btn-copy-url').addEventListener('click', () => {
+        const inp = document.getElementById('share-url-input');
+        inp.select();
+        navigator.clipboard.writeText(inp.value).then(() => showToast('📋 Đã sao chép link Cây Thông 3D!'));
+      });
+
+      document.getElementById('btn-download-card-img').addEventListener('click', () => {
+        const canvas = document.getElementById('gift-card-canvas');
+        const a = document.createElement('a');
+        a.download = `Thiep-Giang-Sinh-3D-${appState.receiver}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        showToast('📥 Đã tải Ảnh Thiệp QR về máy!');
+      });
+
+      document.getElementById('btn-download-qr-only').addEventListener('click', async () => {
+        const url = document.getElementById('share-url-input').value;
+        if (!url) return;
+        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&color=0f2334&data=${encodeURIComponent(url)}`;
+        showToast('⏳ Đang lưu mã QR quà tặng...');
+        await downloadBlobImage(qrSrc, `Ma-QR-Noel-${appState.receiver}.png`);
+        showToast('✅ Đã lưu mã QR Quà Tặng vào máy!');
+      });
+    });
+  </script>
+</body>
+</html>

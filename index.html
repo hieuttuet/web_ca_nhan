@@ -678,37 +678,12 @@
       }
     }
 
-    /* ==================== 7. SUPPORT & COMPLAINT SYSTEM ==================== */
+    /* ==================== 7. FLOATING SUPPORT WIDGET (BOTTOM-RIGHT) ==================== */
     .hero-live-stat-wrap {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 10px;
       margin-bottom: 20px;
-    }
-
-    .hero-support-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #7dd3fc;
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: all 0.2s ease;
-    }
-
-    .hero-support-pill:hover {
-      background: rgba(56, 189, 248, 0.22);
-      border-color: #38bdf8;
-      transform: translateY(-1px);
     }
 
     /* Floating Support Button */
@@ -717,66 +692,41 @@
       bottom: 24px;
       right: 24px;
       z-index: 85;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       padding: 10px 18px;
       border-radius: 999px;
-      background: rgba(18, 9, 34, 0.9);
+      background: rgba(18, 9, 34, 0.92);
       border: 1px solid rgba(56, 189, 248, 0.45);
       color: #ffffff;
       font-family: inherit;
-      font-size: 0.82rem;
+      font-size: 0.84rem;
       font-weight: 700;
       cursor: pointer;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.25);
       transition: all 0.25s ease;
+      user-select: none;
     }
 
     .floating-support-btn:hover {
-      background: rgba(28, 14, 52, 0.96);
+      background: rgba(28, 14, 52, 0.98);
       border-color: #38bdf8;
       transform: translateY(-2px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.45);
     }
 
     .floating-online-dot {
-      width: 7px;
-      height: 7px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-    }
-
-    /* Section Trung tâm xử lý khiếu nại */
-    .support-section {
-      margin-top: 56px;
-      margin-bottom: 40px;
-    }
-
-    .support-card {
-      background: linear-gradient(145deg, rgba(26, 16, 48, 0.7) 0%, rgba(13, 8, 28, 0.85) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      padding: 36px 30px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .support-card::before {
-      content: '';
-      position: absolute;
-      top: -50px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 320px;
-      height: 100px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
-      pointer-events: none;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseGreen 1.8s infinite ease-in-out;
+      display: inline-block;
+      flex-shrink: 0;
     }
 
     .support-badge {
@@ -799,78 +749,19 @@
       border-radius: 50%;
       background: #10b981;
       box-shadow: 0 0 10px #10b981;
-      animation: pulseGreen 2s infinite ease-in-out;
+      animation: pulseGreen 1.8s infinite ease-in-out;
+      display: inline-block;
     }
 
     @keyframes pulseGreen {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px #10b981; }
+      50% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 3px #10b981; }
     }
 
-    .support-title {
-      font-size: clamp(1.3rem, 3.2vw, 1.8rem);
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 10px;
-    }
-
-    .support-desc {
-      font-size: 0.88rem;
-      color: #cbd5e1;
-      max-width: 650px;
-      margin: 0 auto 28px;
-      line-height: 1.6;
-    }
-
-    .support-features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 30px;
-      text-align: left;
-    }
-
-    .support-feat-box {
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 18px;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .support-feat-box:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56, 189, 248, 0.35);
-    }
-
-    .feat-icon {
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
-
-    .feat-title {
-      font-size: 0.94rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-
-    .feat-desc {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      line-height: 1.5;
-    }
-
-    .support-action-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .btn-support-primary,
-    .btn-support-secondary,
     .btn-support-zalo {
+      background: rgba(0, 104, 255, 0.18);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.4);
       padding: 12px 24px;
       border-radius: 999px;
       font-family: inherit;
@@ -882,35 +773,6 @@
       gap: 8px;
       transition: all 0.22s ease;
       text-decoration: none;
-    }
-
-    .btn-support-primary {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      color: #ffffff;
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);
-    }
-
-    .btn-support-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(2, 132, 199, 0.6);
-    }
-
-    .btn-support-secondary {
-      background: rgba(255, 255, 255, 0.07);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-    }
-
-    .btn-support-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: translateY(-2px);
-    }
-
-    .btn-support-zalo {
-      background: rgba(0, 104, 255, 0.18);
-      color: #60a5fa;
-      border: 1px solid rgba(96, 165, 250, 0.4);
     }
 
     .btn-support-zalo:hover {
@@ -1228,9 +1090,6 @@
           <span class="live-dot"></span>
           <span>3.840+ món quà đã được tạo & gửi trao</span>
         </div>
-        <button type="button" class="hero-support-pill" onclick="openComplaintModal('lookup')">
-          <span>🛡️ Tra cứu đơn & Khiếu nại 24/7</span>
-        </button>
       </div>
 
       <h1 class="hero-title">
@@ -1324,60 +1183,13 @@
         <span>Dữ liệu hình ảnh và tên của bạn chỉ được sử dụng để tự động tạo món quà 3D này không nhằm mục đích gì khác</span>
       </div>
     </section>
-
-    <!-- 5. TRUNG TÂM TIẾP NHẬN & XỬ LÝ KHIẾU NẠI -->
-    <section class="support-section">
-      <div class="support-card">
-        <div class="support-header-area">
-          <div class="support-badge">
-            <span class="live-dot-green"></span>
-            <span>Bộ Phận CSKH Đang Trực Tuyến</span>
-          </div>
-          <h2 class="support-title">🛡️ Trung Tâm Xử Lý Khiếu Nại & Hỗ Trợ 24/7</h2>
-          <p class="support-desc">
-            Chuyển khoản chưa tự động mở link? Mất mã đơn hàng? Muốn đổi ảnh / sửa lời chúc hay yêu cầu hoàn tiền?
-            Đừng lo lắng, chúng tôi luôn ở đây để bảo vệ quyền lợi của bạn!
-          </p>
-        </div>
-
-        <div class="support-features-grid">
-          <div class="support-feat-box">
-            <div class="feat-icon">⚡</div>
-            <div class="feat-title">Tra Cứu & Tự Mở Khóa</div>
-            <div class="feat-desc">Nhập mã đơn để lấy lại đường link & thiệp QR tự động trong 3 giây</div>
-          </div>
-          <div class="support-feat-box">
-            <div class="feat-icon">⏱️</div>
-            <div class="feat-title">Phản Hồi Siêu Tốc</div>
-            <div class="feat-desc">Kỹ thuật viên kiểm tra đối soát và xử lý khiếu nại trong vòng 5 - 15 phút</div>
-          </div>
-          <div class="support-feat-box">
-            <div class="feat-icon">💰</div>
-            <div class="feat-title">Bảo Vệ Quyền Lợi 100%</div>
-            <div class="feat-desc">Cam kết hoàn tiền đầy đủ nếu phát sinh lỗi kỹ thuật hệ thống</div>
-          </div>
-        </div>
-
-        <div class="support-action-row">
-          <button type="button" class="btn-support-primary" onclick="openComplaintModal('lookup')">
-            <span>⚡ Tra Cứu & Lấy Lại Link</span>
-          </button>
-          <button type="button" class="btn-support-secondary" onclick="openComplaintModal('form')">
-            <span>📝 Gửi Phiếu Khiếu Nại</span>
-          </button>
-          <button type="button" class="btn-support-zalo" onclick="openComplaintModal('direct')">
-            <span>💬 Kênh Hỗ Trợ Trực Tiếp</span>
-          </button>
-        </div>
-      </div>
-    </section>
   </div>
 
-  <!-- Nút Hỗ Trợ & Khiếu Nại Nổi Cố Định -->
-  <button type="button" id="floating-support-btn" class="floating-support-btn" onclick="openComplaintModal()" title="Xử lý khiếu nại & Hỗ trợ 24/7">
-    <span style="font-size: 1.15rem;">🛡️</span>
-    <span>Khiếu nại & Hỗ trợ</span>
+  <!-- Nút Hỗ Trợ Nổi Cố Định (Floating Widget) -->
+  <button type="button" id="floating-support-btn" class="floating-support-btn" onclick="openComplaintModal()" title="Khiếu nại & Hỗ trợ 24/7">
     <span class="floating-online-dot"></span>
+    <span style="font-size: 1.05rem;">🛡️</span>
+    <span>Khiếu nại & Hỗ trợ</span>
   </button>
 
   <!-- MODAL XỬ LÝ KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG -->

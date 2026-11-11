@@ -257,18 +257,19 @@ const HOLIDAY_TEMPLATES = [
   {
     id: 'holiday_fireworks',
     category: 'holiday',
+    isHot: true,
     salesCount: '1.4k+ đã tạo',
-    title: 'Pháo Hoa Giao Thừa & Lời Chúc Lễ Tết',
-    subtitle: 'Bắn pháo hoa rực rỡ ghép tên người nhận và lời chúc Giáng Sinh / Năm Mới An Khang',
-    badge: '🧧 Lễ Tết / Noel',
+    title: 'Pháo Hoa Giao Thừa & Countdown Tết 2026',
+    subtitle: 'Mô phỏng pháo hoa đa tầng chân thực (11 loại pháo hoa), âm thanh nổ sống động, màn chúc Tết thiêng liêng',
+    badge: '🧧 Tết Ất Tỵ 2026',
     price: 25000,
     oldPrice: 45000,
-    engineUrl: 'templates/confess/fireworks/index.html',
+    engineUrl: 'templates/holiday/tet-fireworks/index.html',
     previewGradient: 'linear-gradient(135deg, #450a0a 0%, #b91c1c 55%, #f59e0b 100%)',
-    previewEmoji: '🧧',
-    features: ['Pháo hoa ghép chữ', 'Hạt sáng Hoàng Kim', 'Giá siêu hạt dẻ'],
+    previewEmoji: '🎆',
+    features: ['11 loại pháo hoa chân thực', 'Âm thanh nổ đa tầng Web Audio', 'Đại tiệc pháo hoa Finale'],
     preset: {
-      occasion: 'Chúc Mừng Năm Mới & Giáng Sinh An Lành',
+      occasion: 'Chúc Mừng Năm Mới 2026 • Tết Ất Tỵ',
       theme: 'gold'
     }
   }

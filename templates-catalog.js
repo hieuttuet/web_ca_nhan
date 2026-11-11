@@ -259,9 +259,9 @@ const HOLIDAY_TEMPLATES = [
     category: 'holiday',
     isHot: true,
     salesCount: '1.4k+ đã tạo',
-    title: 'Pháo Hoa Giao Thừa & Countdown Tết 2026',
+    title: 'Pháo Hoa Giao Thừa & Countdown Tết 2027',
     subtitle: 'Mô phỏng pháo hoa đa tầng chân thực (11 loại pháo hoa), âm thanh nổ sống động, màn chúc Tết thiêng liêng',
-    badge: '🧧 Tết Ất Tỵ 2026',
+    badge: '🧧 Tết Đinh Mùi 2027',
     price: 25000,
     oldPrice: 45000,
     engineUrl: 'templates/holiday/tet-fireworks/index.html',
@@ -269,7 +269,7 @@ const HOLIDAY_TEMPLATES = [
     previewEmoji: '🎆',
     features: ['11 loại pháo hoa chân thực', 'Âm thanh nổ đa tầng Web Audio', 'Đại tiệc pháo hoa Finale'],
     preset: {
-      occasion: 'Chúc Mừng Năm Mới 2026 • Tết Ất Tỵ',
+      occasion: 'Chúc Mừng Năm Mới 2027 • Tết Đinh Mùi',
       theme: 'gold'
     }
   }

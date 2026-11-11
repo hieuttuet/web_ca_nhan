@@ -13,7 +13,6 @@
 
 const EVENT_CATEGORIES = [
   { id: 'hot', name: 'Mẫu Hot Trend', icon: '🔥', isHighlight: true },
-  { id: 'all', name: 'Tất Cả Mẫu', icon: '✨' },
   { id: 'confess', name: 'Tỏ Tình', icon: '💘' },
   { id: 'anniversary', name: 'Kỷ Niệm Yêu', icon: '💑' },
   { id: 'birthday', name: 'Sinh Nhật', icon: '🎂' },

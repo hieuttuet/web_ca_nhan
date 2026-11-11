@@ -235,6 +235,11 @@
       .trust-divider {
         display: none;
       }
+      .privacy-notice-strip {
+        border-radius: 14px;
+        padding: 10px 16px;
+        font-size: 0.78rem;
+      }
     }
 
     /* ==================== 2. FILTER MENU (UNDERLINE TABS) ==================== */
@@ -589,6 +594,30 @@
       line-height: 1.6;
     }
 
+    /* Cam kết bảo mật dữ liệu */
+    .privacy-notice-strip {
+      margin: 36px auto 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      max-width: 90%;
+      line-height: 1.5;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .privacy-notice-strip .privacy-icon {
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
     /* ==================== 6. NON-INTRUSIVE FOMO NOTIFICATION ==================== */
     .live-buyer-toast {
       position: fixed;
@@ -757,6 +786,12 @@
             "Pháo hoa bắn lên ghép tên hai đứa cực kỳ lãng mạn. Chuyển khoản xong đúng 3 giây có ngay thiệp QR tải về in kẹp vào bó hoa."
           </p>
         </div>
+      </div>
+
+      <!-- Cam kết bảo mật dữ liệu khách hàng -->
+      <div class="privacy-notice-strip">
+        <span class="privacy-icon">🔒</span>
+        <span>Dữ liệu hình ảnh và tên của bạn chỉ được sử dụng để tự động tạo món quà 3D này không nhằm mục đích gì khác</span>
       </div>
     </section>
   </div>

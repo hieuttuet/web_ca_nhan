@@ -660,12 +660,22 @@
       .hud-names {
         font-size: 1.25rem;
       }
-      .nav-btn span:last-child {
-        display: none;
+      .top-right-group {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
       }
       .nav-btn {
-        padding: 0 10px;
+        width: 36px;
         height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .nav-btn span:last-child {
+        display: none;
       }
       .top-hud-bar {
         top: 12px;
@@ -1086,6 +1096,11 @@
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 512, 512);
 
+      // Viền vàng mỏng sang trọng
+      ctx.strokeStyle = 'rgba(252, 238, 167, 0.45)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(6, 6, 500, 500);
+
       // Viền tuyết sao
       ctx.fillStyle = 'rgba(255,255,255,0.7)';
       for (let i = 0; i < 45; i++) {
@@ -1408,15 +1423,19 @@
       appState.photos.forEach((photoData, idx) => {
         const tex = loader.load(photoData.url);
         const geo = new THREE.PlaneGeometry(8, 8);
-        const borderGeo = new THREE.PlaneGeometry(9.2, 9.2);
+        const borderGeo = new THREE.PlaneGeometry(8.25, 8.25);
         const borderMat = new THREE.MeshStandardMaterial({
-          color: 0xd4af37, metalness: 0.8, roughness: 0.2
+          color: 0xffdf78,
+          emissive: 0x996515,
+          emissiveIntensity: 0.45,
+          metalness: 0.25,
+          roughness: 0.35
         });
 
         const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
         const mesh = new THREE.Mesh(geo, mat);
         const border = new THREE.Mesh(borderGeo, borderMat);
-        border.position.z = -0.15;
+        border.position.z = -0.08;
         mesh.add(border);
 
         // Vị trí gắn trên cây thông (theo hình xoắn ốc quanh cây)

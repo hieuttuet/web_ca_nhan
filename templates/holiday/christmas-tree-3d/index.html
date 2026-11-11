@@ -104,21 +104,29 @@
       align-items: center;
     }
 
-    /* Live gesture pill */
+    /* Live gesture pill - đặt sát phía trên bottom dock */
     .gesture-badge {
+      position: fixed;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 26;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 6px 16px;
       border-radius: 999px;
-      background: rgba(5, 13, 26, 0.85);
+      background: rgba(5, 13, 26, 0.9);
       border: 1px solid var(--gold-primary);
       color: var(--gold-light);
       font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.5px;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
       backdrop-filter: blur(10px);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.3s ease;
     }
 
     /* Mini Webcam Feed */
@@ -691,9 +699,15 @@
         font-size: 0.74rem;
       }
       .hud-hint-bottom {
-        bottom: 110px;
+        bottom: 104px;
         font-size: 0.7rem;
         padding: 4px 12px;
+      }
+      .gesture-badge {
+        bottom: 104px;
+        font-size: 0.72rem;
+        padding: 5px 12px;
+        max-width: 90vw;
       }
     }
   </style>
@@ -721,9 +735,6 @@
     <a href="../../../index.html" class="nav-btn creator-only" title="Về Kho Mẫu Quà Tặng">
       <span>🏠</span><span>Kho Mẫu</span>
     </a>
-    <div id="gesture-status" class="gesture-badge" style="display:none;">
-      <span>🖐</span><span id="gesture-text">Đang nhận diện cử chỉ...</span>
-    </div>
     <div class="top-right-group">
       <button type="button" id="btn-toggle-camera" class="nav-btn" title="Bật/Tắt Cử chỉ tay AI">
         <span>📷</span><span>Cử Chỉ Tay</span>
@@ -743,9 +754,14 @@
     <div id="hud-names" class="hud-names">Bảo Nam ❤️ Minh Anh</div>
   </div>
 
+  <!-- Live Gesture Status (Đặt sát phía trên Bottom Dock) -->
+  <div id="gesture-status" class="gesture-badge" style="display:none;">
+    <span>🖐</span><span id="gesture-text">Đang nhận diện cử chỉ...</span>
+  </div>
+
   <!-- Bottom Interaction Hint -->
   <div id="hud-hint" class="hud-hint-bottom">
-    💡 Chạm xoay 360° • Bấm vào khung ảnh để xem cận cảnh
+    💡 Chạm xoay 360° • Trượt ngang chuyển ảnh • Bấm ảnh xem cận cảnh
   </div>
 
   <!-- Bottom Action Dock -->
@@ -753,14 +769,11 @@
     <button type="button" id="btn-mode-tree" class="dock-pill-btn active">
       <span>🎄</span><span>Cây Thông</span>
     </button>
-    <button type="button" id="btn-mode-explode" class="dock-pill-btn">
-      <span>🎁</span><span>Bung Quà & Ảnh</span>
-    </button>
     <button type="button" id="btn-mode-heart" class="dock-pill-btn">
       <span>💖</span><span>Trái Tim 3D</span>
     </button>
-    <button type="button" id="btn-mode-photo" class="dock-pill-btn">
-      <span>📸</span><span>Xem Ảnh</span>
+    <button type="button" id="btn-mode-explode" class="dock-pill-btn">
+      <span>🎁</span><span>Bung Quà & Ảnh</span>
     </button>
     <button type="button" id="btn-open-letter" class="dock-pill-btn">
       <span>💌</span><span>Tâm Thư</span>
@@ -1164,7 +1177,9 @@
     let photoMeshes = [];
     let starMesh, loveTextMesh;
     let isDragging = false, prevPointerX = 0, prevPointerY = 0;
+    let startPointerX = 0, startPointerY = 0, startPointerTime = 0;
     let sceneRotationY = 0;
+    let explodeAngle = 0, targetExplodeAngle = 0;
 
     function initThreeScene() {
       const container = document.getElementById('canvas-container');
@@ -1541,13 +1556,23 @@
         if (loveTextMesh) loveTextMesh.visible = false;
         if (starMesh) starMesh.visible = false;
 
-        const baseAngle = groupGold.rotation.y + timeSec * 0.18;
-        const total = photoMeshes.length;
+        // Tự động xoay nhẹ khi rảnh tay, hoặc lerp mượt mà theo targetExplodeAngle khi lướt/trượt
+        if (!isDragging) {
+          if (Math.abs(targetExplodeAngle - explodeAngle) < 0.003) {
+            targetExplodeAngle += 0.002;
+            explodeAngle += 0.002;
+          } else {
+            explodeAngle += (targetExplodeAngle - explodeAngle) * 0.12;
+          }
+        }
+
+        const total = photoMeshes.length || 1;
+        const step = (Math.PI * 2) / total;
         let bestIdx = 0, maxZ = -999;
 
         photoMeshes.forEach((mesh, idx) => {
           mesh.visible = true;
-          const angle = baseAngle + (Math.PI * 2 / total) * idx;
+          const angle = explodeAngle + step * idx;
           const x = Math.sin(angle) * CONFIG_3D.photoOrbitRadius;
           const z = Math.cos(angle) * CONFIG_3D.photoOrbitRadius;
           const y = Math.sin(timeSec * 1.5 + idx) * 3;
@@ -1596,22 +1621,68 @@
     function setupInteractions() {
       const container = document.getElementById('canvas-container');
 
-      // Drag to rotate 360 degrees
+      // Drag / Swipe xoay 360 độ hoặc lướt chuyển ảnh
       container.addEventListener('pointerdown', (e) => {
         isDragging = true;
         prevPointerX = e.clientX;
         prevPointerY = e.clientY;
+        startPointerX = e.clientX;
+        startPointerY = e.clientY;
+        startPointerTime = Date.now();
       });
 
       window.addEventListener('pointermove', (e) => {
         if (!isDragging) return;
         const dx = e.clientX - prevPointerX;
-        sceneRotationY += dx * 0.008;
+
+        if (currentMode === 'TREE') {
+          sceneRotationY += dx * 0.008;
+        } else if (currentMode === 'EXPLODE') {
+          explodeAngle += dx * 0.01;
+          targetExplodeAngle = explodeAngle;
+        } else if (currentMode === 'HEART') {
+          heartRotation += dx * 0.008;
+        }
+
         prevPointerX = e.clientX;
         prevPointerY = e.clientY;
       });
 
-      window.addEventListener('pointerup', () => { isDragging = false; });
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        const totalDx = e.clientX - startPointerX;
+        const totalDy = e.clientY - startPointerY;
+        const duration = Date.now() - startPointerTime;
+        const isHorizontalSwipe = Math.abs(totalDx) > 28 && Math.abs(totalDx) > Math.abs(totalDy) * 1.2 && duration < 500;
+
+        if (isHorizontalSwipe) {
+          if (currentMode === 'EXPLODE') {
+            const total = photoMeshes.length || 1;
+            const step = (Math.PI * 2) / total;
+            // Vuốt trái -> qua ảnh kế tiếp; Vuốt phải -> lùi lại ảnh trước
+            if (totalDx < 0) {
+              targetExplodeAngle -= step;
+            } else {
+              targetExplodeAngle += step;
+            }
+          } else if (currentMode === 'PHOTO') {
+            const total = appState.photos.length || 1;
+            if (totalDx < 0) {
+              selectedPhotoIdx = (selectedPhotoIdx + 1) % total;
+            } else {
+              selectedPhotoIdx = (selectedPhotoIdx - 1 + total) % total;
+            }
+            showToast(`📸 ${appState.photos[selectedPhotoIdx]?.caption || `Ảnh ${selectedPhotoIdx + 1}`}`);
+          }
+        } else if (currentMode === 'EXPLODE') {
+          // Snap về ảnh gần nhất khi nhả tay sau khi kéo tự do
+          const total = photoMeshes.length || 1;
+          const step = (Math.PI * 2) / total;
+          targetExplodeAngle = Math.round(explodeAngle / step) * step;
+        }
+      });
       window.addEventListener('pointercancel', () => { isDragging = false; });
 
       // Click on photo in 3D scene to zoom in
@@ -1619,6 +1690,10 @@
       const mouse = new THREE.Vector2();
 
       container.addEventListener('click', (e) => {
+        // Chỉ kích hoạt click nếu không phải là một cú vuốt/kéo
+        const dragDist = Math.hypot(e.clientX - startPointerX, e.clientY - startPointerY);
+        if (dragDist > 10) return;
+
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
@@ -1660,9 +1735,8 @@
       document.querySelectorAll('.bottom-dock .dock-pill-btn').forEach((btn) => btn.classList.remove('active'));
 
       if (newMode === 'TREE') document.getElementById('btn-mode-tree')?.classList.add('active');
-      else if (newMode === 'EXPLODE') document.getElementById('btn-mode-explode')?.classList.add('active');
+      else if (newMode === 'EXPLODE' || newMode === 'PHOTO') document.getElementById('btn-mode-explode')?.classList.add('active');
       else if (newMode === 'HEART') document.getElementById('btn-mode-heart')?.classList.add('active');
-      else if (newMode === 'PHOTO') document.getElementById('btn-mode-photo')?.classList.add('active');
     }
 
     // Bật/tắt camera MediaPipe nhận diện cử chỉ tay AI
@@ -1677,6 +1751,8 @@
           showToast('📷 Đang khởi động Camera AI...');
           container.classList.add('active');
           badge.style.display = 'inline-flex';
+          const hint = document.getElementById('hud-hint');
+          if (hint) hint.style.display = 'none';
           btn.classList.add('active');
 
           const video = document.getElementById('input-video');
@@ -1760,12 +1836,16 @@
           isCameraActive = false;
           container.classList.remove('active');
           badge.style.display = 'none';
+          const hint = document.getElementById('hud-hint');
+          if (hint) hint.style.display = '';
           btn.classList.remove('active');
           alert('Không thể mở camera. Bạn vẫn có thể chạm các nút trên màn hình để điều khiển cây thông 3D nhé!');
         }
       } else {
         container.classList.remove('active');
         badge.style.display = 'none';
+        const hint = document.getElementById('hud-hint');
+        if (hint) hint.style.display = '';
         btn.classList.remove('active');
       }
     }
@@ -2108,13 +2188,8 @@
 
       // Bottom Dock buttons
       document.getElementById('btn-mode-tree').addEventListener('click', () => switchMode('TREE'));
-      document.getElementById('btn-mode-explode').addEventListener('click', () => switchMode('EXPLODE'));
       document.getElementById('btn-mode-heart').addEventListener('click', () => switchMode('HEART'));
-      document.getElementById('btn-mode-photo').addEventListener('click', () => {
-        switchMode('PHOTO');
-        showToast('📸 Bấm lại để chuyển sang ảnh tiếp theo!');
-        selectedPhotoIdx = (selectedPhotoIdx + 1) % appState.photos.length;
-      });
+      document.getElementById('btn-mode-explode').addEventListener('click', () => switchMode('EXPLODE'));
 
       document.getElementById('btn-open-letter').addEventListener('click', () => {
         document.getElementById('modal-letter').classList.remove('hidden');

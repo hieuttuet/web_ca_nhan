@@ -597,9 +597,6 @@
     </a>
     
     <div class="top-right-group">
-      <button type="button" id="btn-toggle-finale" class="nav-btn" title="Khai tiệc pháo hoa giao thừa rực sáng">
-        <span>⚡</span><span>Đại Tiệc Finale</span>
-      </button>
       <button type="button" id="btn-toggle-sound" class="nav-btn active" title="Bật/Tắt Âm thanh pháo hoa">
         <span id="sound-icon">🔊</span><span id="sound-label">Âm Thanh</span>
       </button>
@@ -612,7 +609,7 @@
   <!-- Center Festive HUD Header -->
   <div class="center-hud-header">
     <div id="hud-occasion" class="occasion-pill">🧧 CHÚC MỪNG NĂM MỚI 2027 • ĐINH MÙI 🧧</div>
-    <h1 id="hud-names" class="tet-names">Gia Đình Thân Yêu ❤️</h1>
+    <h1 id="hud-names" class="tet-names">Bé Yêu Thúy Quỳnh ❤️</h1>
   </div>
 
   <!-- Bottom Interaction Hint -->
@@ -641,7 +638,7 @@
   <div id="intro-splash" class="intro-splash hidden">
     <div class="occasion-pill" id="splash-occasion">🧧 MÓN QUÀ NĂM MỚI ĐẶC BIỆT 🧧</div>
     <h1 id="splash-title" class="tet-names" style="font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 10px;">
-      Gia Đình Thân Yêu ❤️
+      Bé Yêu Thúy Quỳnh ❤️
     </h1>
     <p id="splash-sub" style="max-width: 480px; font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
       Một màn bắn pháo hoa giao thừa rực sáng trời đêm cùng lời chúc năm mới may mắn, an khang thịnh vượng được gửi tặng riêng cho bạn! 🎆
@@ -717,7 +714,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Tên người nhận</label>
-          <input id="in-receiver" type="text" class="form-input" placeholder="VD: Gia đình yêu thương" maxlength="30" />
+          <input id="in-receiver" type="text" class="form-input" placeholder="VD: Bé Yêu Thúy Quỳnh" maxlength="30" />
         </div>
       </div>
 
@@ -1606,7 +1603,6 @@
         if (store.state.config.finale) {
           autoLaunchTimer = seqFinale();
           store.state.config.finale = false;
-          document.getElementById('btn-toggle-finale').classList.remove('active');
           document.getElementById('btn-dock-finale').classList.remove('active');
         } else {
           const r = Math.random();
@@ -1810,14 +1806,14 @@
      */
     const appState = {
       sender: 'Minh Quân',
-      receiver: 'Gia Đình Thân Yêu',
+      receiver: 'Bé Yêu Thúy Quỳnh',
       occasion: 'Chúc Mừng Năm Mới 2027 • Đinh Mùi',
-      message: `Kính chúc cả nhà một năm mới Đinh Mùi 2027 đong đầy hạnh phúc, sức khỏe dồi dào, vạn sự hanh thông và tài lộc rực rỡ như những chùm pháo hoa này nhé! 🧧🎆`
+      message: `Gửi tặng Bé Yêu Thúy Quỳnh màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc em một năm mới Đinh Mùi 2027 luôn xinh đẹp, hạnh phúc, bình an và luôn nở nụ cười rạng rỡ bên anh nhé. Yêu em thật nhiều! 💖🎆`
     };
 
     const AI_WISH_SAMPLES = [
+      `Gửi tặng Bé Yêu Thúy Quỳnh màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc em một năm mới Đinh Mùi 2027 luôn xinh đẹp, hạnh phúc, bình an và luôn nở nụ cười rạng rỡ bên anh nhé. Yêu em thật nhiều! 💖🎆`,
       `Kính chúc Gia Đình một năm mới Đinh Mùi 2027 vạn sự như ý, sức khỏe dồi dào, an khang thịnh vượng, tiền vào như nước và luôn ngập tràn tiếng cười rộn rã! 🧧✨`,
-      `Gửi tặng em yêu màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc em năm mới luôn xinh đẹp, hạnh phúc và bình an bên anh nhé. Yêu em thật nhiều! 💖🎆`,
       `Chúc bạn thân một năm mới 2027 bứt phá rực rỡ, công danh tấn tới, tiền tài ngập lối, vạn điều may mắn và luôn giữ mãi nụ cười tươi trên môi nhé! 🚀💰`,
       `Kính chúc Quý Đối Tác một năm mới An Khang Thịnh Vượng, Vạn Sự Hanh Thông, gặt hái thêm nhiều thành công vang dội và vững bền thịnh đạt! 🧧🏆`
     ];
@@ -1910,12 +1906,10 @@
       const triggerFinale = () => {
         soundManager.init();
         store.state.config.finale = true;
-        document.getElementById('btn-toggle-finale').classList.add('active');
         document.getElementById('btn-dock-finale').classList.add('active');
         showToast('🎆 Khai tiệc đại bác pháo hoa Giao Thừa!');
         autoLaunchTimer = 0;
       };
-      document.getElementById('btn-toggle-finale').addEventListener('click', triggerFinale);
       document.getElementById('btn-dock-finale').addEventListener('click', triggerFinale);
 
       // Auto Fire Toggle
@@ -1950,7 +1944,7 @@
 
       document.getElementById('btn-preview-tet').addEventListener('click', () => {
         appState.sender = document.getElementById('in-sender').value.trim() || 'Minh Quân';
-        appState.receiver = document.getElementById('in-receiver').value.trim() || 'Gia Đình';
+        appState.receiver = document.getElementById('in-receiver').value.trim() || 'Bé Yêu Thúy Quỳnh';
         appState.occasion = document.getElementById('in-occasion').value;
         appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
         syncUIFromState();
@@ -1961,7 +1955,7 @@
       // VietQR Payment Workflow
       document.getElementById('btn-proceed-pay').addEventListener('click', async () => {
         appState.sender = document.getElementById('in-sender').value.trim() || 'Minh Quân';
-        appState.receiver = document.getElementById('in-receiver').value.trim() || 'Gia Đình';
+        appState.receiver = document.getElementById('in-receiver').value.trim() || 'Bé Yêu Thúy Quỳnh';
         appState.occasion = document.getElementById('in-occasion').value;
         appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
         syncUIFromState();

@@ -52,4 +52,40 @@ create policy "Allow Upload Gift Photos"
   for insert
   with check (bucket_id = 'gift-photos');
 
+-- ============================================================================
+-- BẢNG KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG (COMPLAINTS & SUPPORT TICKETS)
+-- ============================================================================
+create table if not exists public.complaints (
+  id uuid default gen_random_uuid() primary key,
+  complaint_code text unique not null,      -- Mã khiếu nại (VD: KN-M8K3X9A7)
+  order_code text default '',               -- Mã đơn hàng liên quan (VD: LOVE...)
+  contact text not null,                    -- SĐT / Zalo nhận phản hồi
+  issue_type text not null,                 -- Loại vấn đề (chuyển khoản chưa mở link, sửa lời chúc, hoàn tiền...)
+  description text not null,                -- Chi tiết vấn đề khách gặp phải
+  evidence_url text default '',             -- Link ảnh chụp biên lai / ảnh chụp màn hình lỗi
+  status text not null default 'PENDING',   -- 'PENDING' (Chờ xử lý), 'PROCESSING' (Đang xử lý), 'RESOLVED' (Đã xong)
+  admin_note text default '',               -- Ghi chú nội bộ của chủ shop
+  created_at timestamptz default now()
+);
+
+-- Index tăng tốc tra cứu khiếu nại
+create index if not exists idx_complaints_code on public.complaints (complaint_code);
+create index if not exists idx_complaints_order on public.complaints (order_code);
+create index if not exists idx_complaints_contact on public.complaints (contact);
+
+alter table public.complaints enable row level security;
+
+-- Cho phép khách hàng gửi khiếu nại công khai
+create policy "Allow public submit complaints"
+  on public.complaints
+  for insert
+  with check (true);
+
+-- Cho phép đọc khiếu nại
+create policy "Allow read complaints"
+  on public.complaints
+  for select
+  using (true);
+
+
 

@@ -677,6 +677,531 @@
         transform: translateX(-50%) translateY(0);
       }
     }
+
+    /* ==================== 7. SUPPORT & COMPLAINT SYSTEM ==================== */
+    .hero-live-stat-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .hero-support-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #7dd3fc;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .hero-support-pill:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+
+    /* Floating Support Button */
+    .floating-support-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 85;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(18, 9, 34, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .floating-support-btn:hover {
+      background: rgba(28, 14, 52, 0.96);
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.45);
+    }
+
+    .floating-online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Section Trung tâm xử lý khiếu nại */
+    .support-section {
+      margin-top: 56px;
+      margin-bottom: 40px;
+    }
+
+    .support-card {
+      background: linear-gradient(145deg, rgba(26, 16, 48, 0.7) 0%, rgba(13, 8, 28, 0.85) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 36px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .support-card::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .support-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .live-dot-green {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseGreen 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .support-title {
+      font-size: clamp(1.3rem, 3.2vw, 1.8rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .support-desc {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      max-width: 650px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    .support-features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .support-feat-box {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .support-feat-box:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .feat-icon {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .feat-title {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .feat-desc {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .support-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-support-primary,
+    .btn-support-secondary,
+    .btn-support-zalo {
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.22s ease;
+      text-decoration: none;
+    }
+
+    .btn-support-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn-support-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(2, 132, 199, 0.6);
+    }
+
+    .btn-support-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .btn-support-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .btn-support-zalo {
+      background: rgba(0, 104, 255, 0.18);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+    }
+
+    .btn-support-zalo:hover {
+      background: rgba(0, 104, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ==================== 8. COMPLAINT & SUPPORT MODAL ==================== */
+    .complaint-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5, 2, 12, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 1;
+      visibility: visible;
+      transition: all 0.28s ease;
+    }
+
+    .complaint-modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .complaint-modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 26px;
+      background: linear-gradient(150deg, rgba(24, 13, 44, 0.98) 0%, rgba(10, 5, 20, 0.99) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.18);
+      padding: 28px 24px;
+    }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-corner:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .complaint-header {
+      margin-bottom: 20px;
+      padding-right: 32px;
+    }
+
+    .complaint-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .complaint-sub {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Modal Navigation Tabs */
+    .complaint-tabs-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .complaint-tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .complaint-tab-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Form controls in modal */
+    .c-form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .c-form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .c-form-input,
+    .c-form-select,
+    .c-form-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .c-form-input:focus,
+    .c-form-select:focus,
+    .c-form-textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .c-form-textarea {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .c-btn-submit {
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.22s ease;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .c-btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.6);
+    }
+
+    .c-btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Lookup result card */
+    .lookup-result-card {
+      margin-top: 16px;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .lookup-result-card.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .lookup-result-card.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+
+    .lookup-result-card.danger {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
+
+    .lookup-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-lookup-action {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .btn-lookup-action.primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #34d399;
+    }
+
+    .btn-lookup-action:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Image upload in complaint */
+    .complaint-upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .complaint-preview-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .complaint-remove-img {
+      color: #f87171;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .floating-support-btn {
+        bottom: 16px;
+        right: 16px;
+        padding: 8px 14px;
+        font-size: 0.76rem;
+      }
+      .support-card {
+        padding: 24px 18px;
+      }
+      .support-features-grid {
+        grid-template-columns: 1fr;
+      }
+      .complaint-modal-card {
+        padding: 22px 16px;
+      }
+      .complaint-tabs-bar {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -698,9 +1223,14 @@
   <div class="container">
     <!-- 1. HERO HEADER -->
     <header class="hero">
-      <div class="hero-live-stat">
-        <span class="live-dot"></span>
-        <span>3.840+ món quà đã được tạo & gửi trao</span>
+      <div class="hero-live-stat-wrap">
+        <div class="hero-live-stat">
+          <span class="live-dot"></span>
+          <span>3.840+ món quà đã được tạo & gửi trao</span>
+        </div>
+        <button type="button" class="hero-support-pill" onclick="openComplaintModal('lookup')">
+          <span>🛡️ Tra cứu đơn & Khiếu nại 24/7</span>
+        </button>
       </div>
 
       <h1 class="hero-title">
@@ -794,6 +1324,185 @@
         <span>Dữ liệu hình ảnh và tên của bạn chỉ được sử dụng để tự động tạo món quà 3D này không nhằm mục đích gì khác</span>
       </div>
     </section>
+
+    <!-- 5. TRUNG TÂM TIẾP NHẬN & XỬ LÝ KHIẾU NẠI -->
+    <section class="support-section">
+      <div class="support-card">
+        <div class="support-header-area">
+          <div class="support-badge">
+            <span class="live-dot-green"></span>
+            <span>Bộ Phận CSKH Đang Trực Tuyến</span>
+          </div>
+          <h2 class="support-title">🛡️ Trung Tâm Xử Lý Khiếu Nại & Hỗ Trợ 24/7</h2>
+          <p class="support-desc">
+            Chuyển khoản chưa tự động mở link? Mất mã đơn hàng? Muốn đổi ảnh / sửa lời chúc hay yêu cầu hoàn tiền?
+            Đừng lo lắng, chúng tôi luôn ở đây để bảo vệ quyền lợi của bạn!
+          </p>
+        </div>
+
+        <div class="support-features-grid">
+          <div class="support-feat-box">
+            <div class="feat-icon">⚡</div>
+            <div class="feat-title">Tra Cứu & Tự Mở Khóa</div>
+            <div class="feat-desc">Nhập mã đơn để lấy lại đường link & thiệp QR tự động trong 3 giây</div>
+          </div>
+          <div class="support-feat-box">
+            <div class="feat-icon">⏱️</div>
+            <div class="feat-title">Phản Hồi Siêu Tốc</div>
+            <div class="feat-desc">Kỹ thuật viên kiểm tra đối soát và xử lý khiếu nại trong vòng 5 - 15 phút</div>
+          </div>
+          <div class="support-feat-box">
+            <div class="feat-icon">💰</div>
+            <div class="feat-title">Bảo Vệ Quyền Lợi 100%</div>
+            <div class="feat-desc">Cam kết hoàn tiền đầy đủ nếu phát sinh lỗi kỹ thuật hệ thống</div>
+          </div>
+        </div>
+
+        <div class="support-action-row">
+          <button type="button" class="btn-support-primary" onclick="openComplaintModal('lookup')">
+            <span>⚡ Tra Cứu & Lấy Lại Link</span>
+          </button>
+          <button type="button" class="btn-support-secondary" onclick="openComplaintModal('form')">
+            <span>📝 Gửi Phiếu Khiếu Nại</span>
+          </button>
+          <button type="button" class="btn-support-zalo" onclick="openComplaintModal('direct')">
+            <span>💬 Kênh Hỗ Trợ Trực Tiếp</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Nút Hỗ Trợ & Khiếu Nại Nổi Cố Định -->
+  <button type="button" id="floating-support-btn" class="floating-support-btn" onclick="openComplaintModal()" title="Xử lý khiếu nại & Hỗ trợ 24/7">
+    <span style="font-size: 1.15rem;">🛡️</span>
+    <span>Khiếu nại & Hỗ trợ</span>
+    <span class="floating-online-dot"></span>
+  </button>
+
+  <!-- MODAL XỬ LÝ KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG -->
+  <div id="modal-complaint" class="complaint-modal-backdrop hidden" onclick="handleComplaintBackdropClick(event)">
+    <div class="complaint-modal-card">
+      <div class="modal-close-corner" onclick="closeComplaintModal()" title="Đóng">✕</div>
+
+      <div class="complaint-header">
+        <div class="support-badge" style="margin-bottom: 8px;">
+          <span class="live-dot-green"></span>
+          <span>Hỗ Trợ Khách Hàng 24/7</span>
+        </div>
+        <h3 class="complaint-title">🛡️ Trung Tâm Xử Lý Khiếu Nại</h3>
+        <p class="complaint-sub">
+          Cam kết bảo vệ quyền lợi khách hàng 100% • Tiếp nhận đối soát và phản hồi trong 5 - 15 phút.
+        </p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="complaint-tabs-bar">
+        <button type="button" id="tab-btn-lookup" class="complaint-tab-btn active" onclick="switchComplaintTab('lookup')">
+          ⚡ Tra Cứu & Tự Mở Khóa
+        </button>
+        <button type="button" id="tab-btn-form" class="complaint-tab-btn" onclick="switchComplaintTab('form')">
+          📝 Gửi Phiếu Khiếu Nại
+        </button>
+        <button type="button" id="tab-btn-direct" class="complaint-tab-btn" onclick="switchComplaintTab('direct')">
+          💬 Kênh Hỗ Trợ Trực Tiếp
+        </button>
+      </div>
+
+      <!-- TAB 1: TRA CỨU ĐƠN HÀNG TỰ ĐỘNG -->
+      <div id="panel-tab-lookup">
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 16px; line-height: 1.5;">
+          💡 <b>Tự động lấy lại link:</b> Nếu bạn đã chuyển khoản nhưng lỡ tắt màn hình thanh toán, hãy nhập mã đơn hàng (bắt đầu bằng <code>LOVE...</code> trong nội dung chuyển tiền ngân hàng) để kiểm tra và nhận lại link quà tặng ngay tức khắc!
+        </div>
+
+        <div class="c-form-group">
+          <label class="c-form-label">Mã đơn hàng của bạn</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="lookup-order-code" class="c-form-input" placeholder="VD: LOVEM8K3X9A7" style="text-transform: uppercase;" />
+            <button type="button" id="btn-do-lookup" class="c-btn-submit" style="width: auto; padding: 0 20px; white-space: nowrap;" onclick="handleLookupOrder()">
+              <span>🔍 Tra Cứu</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="lookup-result-box" style="display: none;"></div>
+      </div>
+
+      <!-- TAB 2: GỬI PHIẾU KHIẾU NẠI -->
+      <div id="panel-tab-form" style="display: none;">
+        <form id="form-complaint" onsubmit="handleSubmitComplaint(event)">
+          <div class="c-form-group">
+            <label class="c-form-label">Mã đơn hàng (nếu có)</label>
+            <input type="text" id="complaint-order-code" class="c-form-input" placeholder="VD: LOVEM8K3X9A7" style="text-transform: uppercase;" />
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Số điện thoại hoặc Zalo nhận phản hồi <span style="color:#f87171;">*</span></label>
+            <input type="tel" id="complaint-contact" class="c-form-input" placeholder="VD: 0987654321" required />
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Vấn đề bạn đang gặp phải <span style="color:#f87171;">*</span></label>
+            <select id="complaint-issue-type" class="c-form-select">
+              <option value="NOT_UNLOCKED">Đã chuyển tiền nhưng chưa nhận được link quà (Kèm ảnh bill)</option>
+              <option value="LOST_LINK">Quên mã đơn hàng / Cần tìm lại đường link quà</option>
+              <option value="EDIT_INFO">Muốn chỉnh sửa lại ảnh / lời chúc / tên người nhận</option>
+              <option value="TECH_ERROR">Lỗi giao diện / Không nghe được nhạc trên điện thoại</option>
+              <option value="REFUND">Yêu cầu hoàn tiền do sự cố</option>
+              <option value="OTHER">Vấn đề khác</option>
+            </select>
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Mô tả chi tiết sự cố <span style="color:#f87171;">*</span></label>
+            <textarea id="complaint-desc" class="c-form-textarea" placeholder="Mô tả cụ thể vấn đề hoặc thông tin cần chỉnh sửa để kỹ thuật viên hỗ trợ bạn nhanh nhất..." required></textarea>
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Ảnh chụp biên lai chuyển tiền / Ảnh lỗi (nếu có)</label>
+            <input type="file" id="complaint-file" accept="image/*" style="display: none;" onchange="handleComplaintImageSelect(event)" />
+            <button type="button" class="btn-lookup-action" onclick="document.getElementById('complaint-file').click()">
+              <span>📷 Chọn ảnh biên lai / Ảnh lỗi</span>
+            </button>
+            <div id="complaint-upload-preview" class="complaint-upload-preview" style="display: none;">
+              <img id="complaint-preview-img" class="complaint-preview-thumb" src="" alt="Biên lai" />
+              <div>
+                <div id="complaint-preview-name" style="font-size: 0.8rem; color: #cbd5e1;"></div>
+                <span class="complaint-remove-img" onclick="removeComplaintImage()">Xóa ảnh</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-submit-complaint" class="c-btn-submit">
+            <span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>
+          </button>
+        </form>
+
+        <div id="complaint-success-box" style="display: none;"></div>
+      </div>
+
+      <!-- TAB 3: KÊNH HỖ TRỢ TRỰC TIẾP -->
+      <div id="panel-tab-direct" style="display: none;">
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;">
+          <div style="font-size: 2.2rem; margin-bottom: 8px;">💬</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Chat Trực Tiếp Với Kỹ Thuật Viên</h4>
+          <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin-bottom: 18px;">
+            Nếu bạn đang cần quà gấp trong ngày kỷ niệm hoặc gặp sự cố khẩn cấp, vui lòng liên hệ trực tiếp với chúng tôi qua Zalo:
+          </p>
+          <a href="https://zalo.me" target="_blank" class="btn-support-zalo" style="justify-content: center; font-size: 0.92rem; padding: 12px 28px;">
+            <span>💬 Mở Chat Zalo CSKH Tức Thì</span>
+          </a>
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">🤝 Cam Kết Quyền Lợi Khách Hàng:</div>
+          <div>• <b>Thời gian trực:</b> 8h00 - 24h00 hàng ngày (kể cả Lễ, Tết).</div>
+          <div>• <b>Xử lý đơn chưa mở khóa:</b> Mở khóa thủ công trong vòng 5 phút sau khi nhận được bill.</div>
+          <div>• <b>Chính sách hoàn tiền:</b> Hoàn tiền 100% không phiền hà nếu phát sinh lỗi kỹ thuật hệ thống.</div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script>
@@ -971,6 +1680,230 @@
         const walk = (x - startX) * 1.5;
         tabsWrap.scrollLeft = scrollLeftPos - walk;
       });
+    }
+
+    // ============================================================================
+    // CONTROLLER: TRUNG TÂM XỬ LÝ KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG
+    // ============================================================================
+    let complaintEvidenceBase64 = '';
+
+    function openComplaintModal(initialTab = 'lookup') {
+      const modal = document.getElementById('modal-complaint');
+      if (modal) {
+        modal.classList.remove('hidden');
+        switchComplaintTab(initialTab);
+      }
+    }
+
+    function closeComplaintModal() {
+      const modal = document.getElementById('modal-complaint');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleComplaintBackdropClick(e) {
+      if (e.target.id === 'modal-complaint') {
+        closeComplaintModal();
+      }
+    }
+
+    function switchComplaintTab(tabKey) {
+      const tabs = ['lookup', 'form', 'direct'];
+      tabs.forEach((key) => {
+        const btn = document.getElementById(`tab-btn-${key}`);
+        const panel = document.getElementById(`panel-tab-${key}`);
+        if (btn) btn.classList.toggle('active', key === tabKey);
+        if (panel) panel.style.display = (key === tabKey) ? 'block' : 'none';
+      });
+    }
+
+    // Tra cứu mã đơn hàng tự động
+    async function handleLookupOrder() {
+      const input = document.getElementById('lookup-order-code');
+      const resultBox = document.getElementById('lookup-result-box');
+      const code = (input.value || '').trim().toUpperCase();
+
+      if (!code) {
+        alert('Vui lòng nhập mã đơn hàng (Ví dụ: LOVEM8K3...)');
+        input.focus();
+        return;
+      }
+
+      resultBox.style.display = 'block';
+      resultBox.className = 'lookup-result-card';
+      resultBox.innerHTML = '<div style="color:#94a3b8; font-size:0.86rem; text-align:center;">⏳ Đang kiểm tra dữ liệu đơn hàng...</div>';
+
+      try {
+        const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
+        const data = await res.json();
+
+        if (res.ok && data.order) {
+          const ord = data.order;
+          if (data.status === 'PAID') {
+            const tplType = ord.template_type || 'galaxy';
+            const matched = (window.TEMPLATES_CATALOG || []).find((t) => t.id === tplType || t.engineUrl.includes(tplType));
+            const engineUrl = matched ? matched.engineUrl : 'templates/confess/galaxy-3d/index.html';
+            const giftUrl = `${window.location.origin}/${engineUrl}?id=${encodeURIComponent(code)}&tpl=${encodeURIComponent(tplType)}`;
+
+            resultBox.className = 'lookup-result-card success';
+            resultBox.innerHTML = `
+              <div style="font-weight:700; color:#34d399; font-size:0.96rem; margin-bottom:6px;">
+                🎉 Đơn Hàng Đã Thanh Toán Thành Công!
+              </div>
+              <div style="font-size:0.84rem; color:#cbd5e1; line-height:1.6;">
+                <div>• <b>Mã đơn:</b> <span style="color:#ffd700;">${code}</span></div>
+                <div>• <b>Người gửi:</b> ${ord.sender_name || 'Anh'} ❤️ <b>Người nhận:</b> ${ord.receiver_name || 'Em'}</div>
+                <div>• <b>Dịp kỷ niệm:</b> ${ord.occasion || 'Món quà đặc biệt'}</div>
+              </div>
+              <div class="lookup-actions-row">
+                <a href="${giftUrl}" target="_blank" class="btn-lookup-action primary">
+                  <span>🚀 Mở Quà Tặng Ngay</span>
+                </a>
+                <button type="button" class="btn-lookup-action" onclick="navigator.clipboard.writeText('${giftUrl}'); alert('Đã sao chép link quà tặng vào bộ nhớ đệm!');">
+                  <span>📋 Sao Chép Link</span>
+                </button>
+              </div>
+            `;
+          } else {
+            resultBox.className = 'lookup-result-card warning';
+            resultBox.innerHTML = `
+              <div style="font-weight:700; color:#fbbf24; font-size:0.96rem; margin-bottom:6px;">
+                ⏳ Đơn Hàng Đang Chờ Thanh Toán
+              </div>
+              <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">
+                Hệ thống ghi nhận đơn hàng <b>${code}</b> chưa nhận được thông báo tiền về từ ngân hàng.<br />
+                Nếu bạn <b>ĐÃ TRỪ TIỀN</b> rồi, hãy bấm nút dưới để gửi ảnh biên lai, chúng tôi sẽ kích hoạt thủ công trong 5 phút!
+              </p>
+              <button type="button" class="btn-lookup-action" style="background:#f59e0b; border-color:#d97706; color:#000;" onclick="prefillComplaintWithOrder('${code}')">
+                <span>📝 Gửi Biên Lai Để Kích Hoạt Ngay</span>
+              </button>
+            `;
+          }
+        } else {
+          resultBox.className = 'lookup-result-card danger';
+          resultBox.innerHTML = `
+            <div style="font-weight:700; color:#f87171; font-size:0.94rem; margin-bottom:4px;">
+              ❌ Không Tìm Thấy Mã Đơn Hàng
+            </div>
+            <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+              Không có dữ liệu cho mã <b>${code}</b>. Vui lòng kiểm tra lại nội dung chuyển khoản trên ứng dụng ngân hàng của bạn.
+            </p>
+            <button type="button" class="btn-lookup-action" onclick="prefillComplaintWithOrder('${code}')">
+              <span>📝 Gửi Khiếu Nại Cho CSKH</span>
+            </button>
+          `;
+        }
+      } catch (err) {
+        resultBox.className = 'lookup-result-card danger';
+        resultBox.innerHTML = `
+          <div style="font-weight:700; color:#f87171;">⚠️ Lỗi kết nối</div>
+          <p style="font-size:0.84rem; color:#cbd5e1;">Không thể kiểm tra đơn lúc này. Vui lòng thử lại hoặc gửi khiếu nại qua Tab 2.</p>
+        `;
+      }
+    }
+
+    function prefillComplaintWithOrder(code) {
+      document.getElementById('complaint-order-code').value = code;
+      switchComplaintTab('form');
+    }
+
+    function handleComplaintImageSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        complaintEvidenceBase64 = evt.target.result;
+        document.getElementById('complaint-preview-img').src = complaintEvidenceBase64;
+        document.getElementById('complaint-preview-name').textContent = file.name;
+        document.getElementById('complaint-upload-preview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeComplaintImage() {
+      complaintEvidenceBase64 = '';
+      document.getElementById('complaint-file').value = '';
+      document.getElementById('complaint-upload-preview').style.display = 'none';
+    }
+
+    async function handleSubmitComplaint(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-complaint');
+      const orderCode = document.getElementById('complaint-order-code').value.trim();
+      const contact = document.getElementById('complaint-contact').value.trim();
+      const issueType = document.getElementById('complaint-issue-type').value;
+      const description = document.getElementById('complaint-desc').value.trim();
+
+      if (!contact) {
+        alert('Vui lòng nhập Số điện thoại hoặc Zalo để CSKH liên hệ hỗ trợ bạn!');
+        return;
+      }
+      if (!description) {
+        alert('Vui lòng nhập chi tiết sự cố bạn đang gặp phải!');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Đang gửi yêu cầu khiếu nại...</span>';
+
+      try {
+        const res = await fetch('/api/submit-complaint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderCode,
+            contact,
+            issueType,
+            description,
+            evidenceBase64: complaintEvidenceBase64
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const form = document.getElementById('form-complaint');
+          const successBox = document.getElementById('complaint-success-box');
+          form.style.display = 'none';
+          successBox.style.display = 'block';
+          successBox.className = 'lookup-result-card success';
+          successBox.innerHTML = `
+            <div style="font-weight:700; color:#34d399; font-size:1.05rem; margin-bottom:8px;">
+              🎉 ĐÃ TIẾP NHẬN PHIẾU KHIẾU NẠI!
+            </div>
+            <div style="font-size:0.86rem; color:#cbd5e1; line-height:1.6; margin-bottom:14px;">
+              <div>• <b>Mã tiếp nhận:</b> <span style="color:#ffd700; font-weight:700;">${data.complaintCode}</span></div>
+              <div>• <b>Thông tin liên hệ:</b> ${contact}</div>
+              <div style="margin-top:6px;">Bộ phận CSKH đã ghi nhận yêu cầu và đang kiểm tra đối soát với ngân hàng. Chúng tôi sẽ liên hệ phản hồi qua Zalo/SĐT của bạn trong <b>5 - 15 phút</b>!</div>
+            </div>
+            <div class="lookup-actions-row">
+              <a href="https://zalo.me" target="_blank" class="btn-lookup-action primary">
+                <span>💬 Chat Zalo Khẩn Cấp</span>
+              </a>
+              <button type="button" class="btn-lookup-action" onclick="resetComplaintForm()">
+                <span>➕ Gửi Yêu Cầu Khác</span>
+              </button>
+            </div>
+          `;
+        } else {
+          alert(data.error || 'Đã có lỗi xảy ra khi gửi khiếu nại. Vui lòng thử lại!');
+          btn.disabled = false;
+          btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ. Bạn có thể chat trực tiếp qua Zalo để được xử lý ngay!');
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+      }
+    }
+
+    function resetComplaintForm() {
+      document.getElementById('form-complaint').reset();
+      document.getElementById('form-complaint').style.display = 'block';
+      document.getElementById('complaint-success-box').style.display = 'none';
+      const btn = document.getElementById('btn-submit-complaint');
+      btn.disabled = false;
+      btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+      removeComplaintImage();
     }
 
     window.addEventListener('DOMContentLoaded', () => {

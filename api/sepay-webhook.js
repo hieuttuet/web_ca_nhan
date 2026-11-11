@@ -39,8 +39,8 @@ export default async function handler(req, res) {
     const transferAmount = Number(body.transferAmount || body.amount || body.accumulated || 0);
     const transactionId = String(body.id || body.referenceCode || body.reference_number || Date.now());
 
-    // 2. Tìm mã đơn hàng dạng LOVE + số (chấp nhận 4-10 chữ số)
-    const match = content.match(/LOVE\d{4,10}/i);
+    // 2. Tìm mã đơn hàng LOVE (chấp nhận cả định dạng số cũ LOVE123456 lẫn định dạng mới Base36 LOVEM8K3X9A7B)
+    const match = content.match(/LOVE[A-Z0-9]{4,14}/i);
     if (!match) {
       console.log('No LOVE pattern matched in content:', content);
       return res.status(200).json({

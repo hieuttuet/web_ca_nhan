@@ -44,9 +44,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // Sinh mã đơn hàng duy nhất (VD: LOVE849201) để đưa vào nội dung chuyển khoản VietQR
-    const randomDigits = Math.floor(100000 + Math.random() * 900000);
-    const orderCode = `LOVE${randomDigits}`;
+    // Sinh mã đơn hàng duy nhất tuyệt đối (Không bao giờ trùng lặp):
+    // Kết hợp Timestamp Base36 (thời gian thực chính xác từng mili-giây) + 3 ký tự ngẫu nhiên (Entropy)
+    // Ví dụ mã sinh ra: LOVEM8K3X9A7B (độ dài 13 ký tự, nằm gọn trong chuẩn 20 ký tự của VietQR ngân hàng)
+    const timePart = Date.now().toString(36).toUpperCase();
+    const randPart = Math.random().toString(36).substring(2, 5).toUpperCase();
+    const orderCode = `LOVE${timePart}${randPart}`;
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

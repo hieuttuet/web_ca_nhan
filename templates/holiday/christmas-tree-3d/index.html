@@ -170,35 +170,36 @@
     /* ==================== 2. CENTER OCCASION BANNER ==================== */
     .center-hud-header {
       position: fixed;
-      top: 68px;
+      top: 18px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 20;
       text-align: center;
-      width: 92%;
-      max-width: 640px;
+      width: 90%;
+      max-width: 480px;
       pointer-events: none;
       transition: opacity 0.4s ease;
     }
 
     .occasion-pill {
       display: inline-block;
-      padding: 4px 16px;
+      padding: 3px 14px;
       border-radius: 999px;
       background: rgba(212, 175, 55, 0.16);
       border: 1px solid rgba(212, 175, 55, 0.45);
       color: var(--gold-light);
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      backdrop-filter: blur(8px);
     }
 
     .hud-title {
       font-family: var(--font-title);
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
       font-weight: 700;
       letter-spacing: 2px;
       background: linear-gradient(135deg, #ffffff 0%, #fceea7 50%, #d4af37 100%);
@@ -210,16 +211,30 @@
 
     .hud-names {
       font-family: var(--font-script);
-      font-size: clamp(1.6rem, 4.5vw, 2.3rem);
+      font-size: clamp(1.4rem, 3.8vw, 2.0rem);
       color: #ffffff;
-      text-shadow: 0 0 20px rgba(255, 51, 102, 0.8), 0 0 35px rgba(212, 175, 55, 0.5);
+      margin: 0;
+      line-height: 1.2;
+      text-shadow: 0 0 18px rgba(255, 51, 102, 0.8), 0 0 30px rgba(212, 175, 55, 0.5);
     }
 
-    .hud-hint {
-      font-size: 0.78rem;
+    .hud-hint-bottom {
+      position: fixed;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 22;
+      font-size: 0.76rem;
       color: #cbd5e1;
-      opacity: 0.85;
-      margin-top: 4px;
+      background: rgba(5, 13, 26, 0.65);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 5px 16px;
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.5s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
     }
 
     /* ==================== 3. BOTTOM DOCK ACTION BAR ==================== */
@@ -629,6 +644,48 @@
       visibility: hidden;
       pointer-events: none;
     }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .center-hud-header {
+        top: 12px;
+        max-width: 240px;
+      }
+      .occasion-pill {
+        font-size: 0.62rem;
+        padding: 2px 10px;
+        letter-spacing: 0.8px;
+        margin-bottom: 2px;
+      }
+      .hud-names {
+        font-size: 1.25rem;
+      }
+      .nav-btn span:last-child {
+        display: none;
+      }
+      .nav-btn {
+        padding: 0 10px;
+        height: 36px;
+      }
+      .top-hud-bar {
+        top: 12px;
+        left: 10px;
+        right: 10px;
+      }
+      .bottom-dock {
+        bottom: 12px;
+        gap: 6px;
+      }
+      .dock-pill-btn {
+        padding: 8px 11px;
+        font-size: 0.74rem;
+      }
+      .hud-hint-bottom {
+        bottom: 110px;
+        font-size: 0.7rem;
+        padding: 4px 12px;
+      }
+    }
   </style>
 </head>
 
@@ -673,9 +730,12 @@
   <!-- Center Occasion Banner -->
   <div class="center-hud-header">
     <div id="hud-occasion" class="occasion-pill">🎄 MERRY CHRISTMAS & HAPPY NEW YEAR 🎄</div>
-    <h1 id="hud-title" class="hud-title">Cây Thông Noel 3D</h1>
     <div id="hud-names" class="hud-names">Bảo Nam ❤️ Minh Anh</div>
-    <p class="hud-hint">💡 Chạm xoay 360° • Bấm vào khung ảnh để xem cận cảnh</p>
+  </div>
+
+  <!-- Bottom Interaction Hint -->
+  <div id="hud-hint" class="hud-hint-bottom">
+    💡 Chạm xoay 360° • Bấm vào khung ảnh để xem cận cảnh
   </div>
 
   <!-- Bottom Action Dock -->
@@ -1087,7 +1147,7 @@
     let scene, camera, renderer;
     let groupGold, groupRed, groupGift, dustPoints, snowPoints;
     let photoMeshes = [];
-    let titleMesh, starMesh, loveTextMesh;
+    let starMesh, loveTextMesh;
     let isDragging = false, prevPointerX = 0, prevPointerY = 0;
     let sceneRotationY = 0;
 
@@ -1096,8 +1156,10 @@
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(0x050d1a, 0.0025);
 
+      const isMobile = window.innerWidth < 768;
       camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 4, 105);
+      camera.position.set(0, isMobile ? 8 : 6, isMobile ? 122 : 112);
+      camera.lookAt(0, 0, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1309,35 +1371,8 @@
       starMesh.position.set(0, CONFIG_3D.treeHeight / 2 + 3.5, 0);
       scene.add(starMesh);
 
-      // 2. BIỂN HIỆU "MERRY CHRISTMAS" NỔI TRÊN CAO
-      update3DTitleMesh();
-
-      // 3. CHỮ NỔI "I LOVE YOU" TRONG TRÁI TIM 3D
+      // 2. CHỮ NỔI "I LOVE YOU" TRONG TRÁI TIM 3D
       update3DLoveTextMesh();
-    }
-
-    function update3DTitleMesh() {
-      if (titleMesh) scene.remove(titleMesh);
-      const c = document.createElement('canvas');
-      c.width = 1024; c.height = 256;
-      const ctx = c.getContext('2d');
-      ctx.font = 'bold 78px "Cinzel", serif';
-      ctx.fillStyle = '#FFD700';
-      ctx.textAlign = 'center';
-      ctx.shadowColor = '#FF0000';
-      ctx.shadowBlur = 35;
-      ctx.fillText(appState.occasion.toUpperCase(), 512, 115);
-
-      ctx.font = 'bold 58px "Dancing Script", cursive';
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = '#FF3366';
-      ctx.fillText(`${appState.receiver} ❤️ ${appState.sender}`, 512, 195);
-
-      const tex = new THREE.CanvasTexture(c);
-      const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
-      titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(58, 14.5), mat);
-      titleMesh.position.set(0, CONFIG_3D.treeHeight / 2 + 13, 0);
-      scene.add(titleMesh);
     }
 
     function update3DLoveTextMesh() {
@@ -1451,10 +1486,6 @@
       // Xử lý hiển thị theo từng Mode
       if (currentMode === 'TREE') {
         if (loveTextMesh) loveTextMesh.visible = false;
-        if (titleMesh) {
-          titleMesh.visible = true;
-          titleMesh.lookAt(camera.position);
-        }
         if (starMesh) {
           starMesh.visible = true;
           starMesh.rotation.y += 0.02;
@@ -1476,7 +1507,6 @@
         });
 
       } else if (currentMode === 'HEART') {
-        if (titleMesh) titleMesh.visible = false;
         if (starMesh) starMesh.visible = false;
 
         heartRotation += 0.008;
@@ -1490,7 +1520,6 @@
 
       } else if (currentMode === 'EXPLODE') {
         if (loveTextMesh) loveTextMesh.visible = false;
-        if (titleMesh) titleMesh.visible = false;
         if (starMesh) starMesh.visible = false;
 
         const baseAngle = groupGold.rotation.y + timeSec * 0.18;
@@ -1523,7 +1552,6 @@
 
       } else if (currentMode === 'PHOTO') {
         if (loveTextMesh) loveTextMesh.visible = false;
-        if (titleMesh) titleMesh.visible = false;
         if (starMesh) starMesh.visible = false;
 
         photoMeshes.forEach((mesh, idx) => {
@@ -1590,11 +1618,22 @@
 
       window.addEventListener('resize', () => {
         if (camera) {
+          const isMobile = window.innerWidth < 768;
           camera.aspect = window.innerWidth / window.innerHeight;
+          camera.position.set(0, isMobile ? 8 : 6, isMobile ? 122 : 112);
+          camera.lookAt(0, 0, 0);
           camera.updateProjectionMatrix();
           renderer.setSize(window.innerWidth, window.innerHeight);
         }
       });
+
+      // Auto fade hint after interaction or 6s
+      const fadeHint = () => {
+        const hint = document.getElementById('hud-hint');
+        if (hint) hint.style.opacity = '0';
+      };
+      container.addEventListener('pointerdown', fadeHint, { once: true });
+      setTimeout(fadeHint, 6000);
     }
 
     function switchMode(newMode) {
@@ -1725,7 +1764,6 @@
       document.getElementById('letter-content').textContent = appState.message;
       document.getElementById('letter-sign').textContent = `Yêu em, ${appState.sender} ❤️`;
 
-      update3DTitleMesh();
       update3DLoveTextMesh();
       rebuildPhotoFrames();
     }
@@ -2153,3 +2191,4 @@
   </script>
 </body>
 </html>
+

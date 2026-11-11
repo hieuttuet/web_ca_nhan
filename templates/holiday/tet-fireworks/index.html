@@ -549,12 +549,22 @@
       .tet-names {
         font-size: 1.25rem;
       }
-      .nav-btn span:last-child {
-        display: none;
+      .top-right-group {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
       }
       .nav-btn {
-        padding: 0 10px;
+        width: 36px;
         height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .nav-btn span:last-child {
+        display: none;
       }
       .top-hud-bar {
         top: 12px;
@@ -597,11 +607,11 @@
     </a>
     
     <div class="top-right-group">
-      <button type="button" id="btn-toggle-sound" class="nav-btn active" title="Bật/Tắt Âm thanh pháo hoa">
-        <span id="sound-icon">🔊</span><span id="sound-label">Âm Thanh</span>
-      </button>
       <button type="button" id="btn-open-settings" class="nav-btn" title="Cài đặt pháo hoa">
         <span>⚙️</span><span>Cỡ Pháo</span>
+      </button>
+      <button type="button" id="btn-toggle-sound" class="nav-btn active" title="Bật/Tắt Âm thanh pháo hoa">
+        <span id="sound-icon">🔊</span><span id="sound-label">Âm Thanh</span>
       </button>
     </div>
   </header>

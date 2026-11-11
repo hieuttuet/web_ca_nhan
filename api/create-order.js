@@ -57,6 +57,51 @@ export default async function handler(req, res) {
       });
     }
 
+    // Tối ưu ảnh: Nếu payload có ảnh Base64, tự động upload lên Supabase Storage 'gift-photos'
+    // Giúp Database siêu nhẹ, web load nhanh gấp 10 lần qua CDN public URL
+    let finalPayload = { ...payload, templateId };
+    if (finalPayload.photos && Array.isArray(finalPayload.photos)) {
+      const uploadedPhotos = await Promise.all(
+        finalPayload.photos.map(async (photo, idx) => {
+          if (!photo || !photo.url || !photo.url.startsWith('data:image/')) {
+            return photo;
+          }
+          try {
+            const matches = photo.url.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+            if (!matches) return photo;
+
+            const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+            const base64Data = matches[2];
+            const buffer = Buffer.from(base64Data, 'base64');
+            const filePath = `${orderCode}/photo_${idx + 1}.${ext}`;
+
+            // Tải file lên Supabase Storage bucket 'gift-photos'
+            const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/gift-photos/${filePath}`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${supabaseKey}`,
+                'Content-Type': `image/${matches[1]}`,
+                'x-upsert': 'true'
+              },
+              body: buffer
+            });
+
+            if (uploadRes.ok) {
+              const publicUrl = `${supabaseUrl}/storage/v1/object/public/gift-photos/${filePath}`;
+              return {
+                ...photo,
+                url: publicUrl
+              };
+            }
+          } catch (uploadErr) {
+            console.error('Lỗi upload Supabase Storage:', uploadErr);
+          }
+          return photo; // Dự phòng: nếu upload lỗi vẫn giữ Base64
+        })
+      );
+      finalPayload.photos = uploadedPhotos;
+    }
+
     // Lưu đơn hàng vào bảng public.orders trên Supabase với trạng thái PENDING
     const response = await fetch(`${supabaseUrl}/rest/v1/orders`, {
       method: 'POST',
@@ -73,7 +118,7 @@ export default async function handler(req, res) {
         receiver_name: String(receiverName).slice(0, 50),
         occasion: String(occasion).slice(0, 100),
         message: String(message).slice(0, 2000),
-        payload: { ...payload, templateId },
+        payload: finalPayload,
         amount: amount,
         status: 'PENDING'
       })

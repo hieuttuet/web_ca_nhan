@@ -32,3 +32,24 @@ create policy "Allow public read paid orders"
   for select
   using (true);
 
+-- ============================================================================
+-- SUPABASE STORAGE: BUCKET "gift-photos" (LƯU ẢNH KỶ NIỆM TỰ ĐỘNG)
+-- ============================================================================
+-- 1. Tạo bucket công khai 'gift-photos' nếu chưa có
+insert into storage.buckets (id, name, public)
+values ('gift-photos', 'gift-photos', true)
+on conflict (id) do nothing;
+
+-- 2. Cho phép mọi người đọc ảnh công khai từ bucket 'gift-photos'
+create policy "Public Access Gift Photos"
+  on storage.objects
+  for select
+  using (bucket_id = 'gift-photos');
+
+-- 3. Cho phép server / service role tải ảnh lên
+create policy "Allow Upload Gift Photos"
+  on storage.objects
+  for insert
+  with check (bucket_id = 'gift-photos');
+
+

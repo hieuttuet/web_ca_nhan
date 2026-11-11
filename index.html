@@ -364,10 +364,72 @@
       box-shadow: 0 20px 44px rgba(0, 0, 0, 0.55);
     }
 
-    /* Thumbnail Preview */
+    /* ==================== BROWSER WINDOW MOCKUP PREVIEW ==================== */
+    .tpl-window-frame {
+      position: relative;
+      background: rgba(10, 6, 20, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    /* Top Browser Chrome Bar */
+    .tpl-browser-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 28px;
+      padding: 0 12px;
+      background: rgba(18, 10, 32, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+
+    .tpl-browser-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tpl-browser-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .tpl-browser-dots span:nth-child(1) { background: #ef4444; }
+    .tpl-browser-dots span:nth-child(2) { background: #eab308; }
+    .tpl-browser-dots span:nth-child(3) { background: #22c55e; }
+
+    .tpl-browser-url {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 10px;
+      border-radius: 999px;
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tpl-browser-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fde047;
+      background: rgba(253, 224, 71, 0.12);
+      border: 1px solid rgba(253, 224, 71, 0.3);
+      padding: 1px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Thumbnail Preview Stage */
     .tpl-preview {
       position: relative;
-      height: 170px;
+      height: 185px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -375,30 +437,138 @@
       cursor: pointer;
     }
 
-    .tpl-preview-emoji {
-      font-size: 4rem;
-      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
-      animation: floatEmoji 3.4s ease-in-out infinite;
-    }
-
-    @keyframes floatEmoji {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-7px); }
-    }
-
-    /* Chỉ giữ 1 Badge duy nhất góc trên bên trái */
-    .tpl-badge {
+    /* Static Content Layer */
+    .tpl-preview-static {
       position: absolute;
-      top: 12px;
-      left: 12px;
-      padding: 4px 11px;
-      border-radius: 6px;
-      background: rgba(9, 4, 20, 0.76);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fde047;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.35s ease;
+      z-index: 1;
+    }
+
+    .tpl-card.is-previewing .tpl-preview-static {
+      opacity: 0.15;
+    }
+
+    .tpl-preview-emoji {
+      font-size: 3.8rem;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
+      animation: floatEmoji 3.4s ease-in-out infinite;
+      transition: transform 0.25s ease;
+    }
+
+    .tpl-card:hover .tpl-preview-emoji {
+      transform: scale(1.08);
+    }
+
+    .tpl-preview-prompt {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 0.72rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 3px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tpl-card.is-previewing .tpl-preview-prompt {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+
+    /* Live Iframe Stage */
+    .tpl-live-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      background: #000;
+    }
+
+    .tpl-live-iframe.loaded {
+      opacity: 1;
+    }
+
+    /* Live Status Badge on corner */
+    .tpl-live-status-pill {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 5;
+      font-size: 0.68rem;
       font-weight: 700;
-      backdrop-filter: blur(6px);
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #34d399;
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      animation: fadeInStatus 0.3s ease;
+    }
+
+    .tpl-live-status-pill.active {
+      display: inline-flex;
+    }
+
+    .tpl-live-status-pill .live-dot-green {
+      width: 6px;
+      height: 6px;
+    }
+
+    .tpl-btn-stop-preview {
+      display: none;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 6;
+      background: rgba(239, 68, 68, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease;
+    }
+
+    .tpl-card.is-previewing .tpl-btn-stop-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tpl-btn-stop-preview:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeInStatus {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Nội dung Card thoáng đãng (More Whitespace) */
@@ -487,26 +657,36 @@
       gap: 14px;
     }
 
-    /* Secondary CTA: Xem Demo nhẹ nhàng, không tranh chấp thị giác */
+    /* Secondary CTA: Xem Demo / Xem Thử */
     .btn-demo {
-      padding: 10px 6px;
+      padding: 10px 14px;
       font-family: inherit;
       font-size: 0.84rem;
       font-weight: 600;
       color: #cbd5e1;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      text-decoration-color: rgba(203, 213, 225, 0.4);
-      background: transparent;
-      border: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
       cursor: pointer;
       white-space: nowrap;
-      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
     }
 
     .btn-demo:hover {
       color: #ffffff;
-      text-decoration-color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .btn-demo.active {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
     }
 
     /* Primary CTA: Tạo Ngay nổi bật tuyệt đối (Luôn cố định 1 dòng) */
@@ -1362,7 +1542,126 @@
       });
     }
 
+    /* ==================== SMART 3D LIVE PREVIEW CONTROLLER ==================== */
+    let activePreviewCard = null;
+    let previewHoverTimer = null;
+
+    function destroyActiveLivePreview() {
+      if (previewHoverTimer) {
+        clearTimeout(previewHoverTimer);
+        previewHoverTimer = null;
+      }
+      if (!activePreviewCard) return;
+
+      activePreviewCard.classList.remove('is-previewing');
+      const previewBox = activePreviewCard.querySelector('.tpl-preview');
+      if (previewBox) {
+        const iframe = previewBox.querySelector('.tpl-live-iframe');
+        if (iframe) {
+          iframe.src = 'about:blank'; // Giải phóng bộ nhớ WebGL ngay lập tức
+          iframe.remove();
+        }
+        const statusPill = previewBox.querySelector('.tpl-live-status-pill');
+        if (statusPill) statusPill.classList.remove('active');
+      }
+
+      const triggerBtn = activePreviewCard.querySelector('.btn-preview-trigger');
+      if (triggerBtn) {
+        triggerBtn.innerHTML = '<span>▶ Xem Thử</span>';
+        triggerBtn.classList.remove('active');
+      }
+
+      activePreviewCard = null;
+    }
+
+    function activateLivePreview(card, engineUrl, tplId) {
+      if (activePreviewCard === card) return;
+
+      // Hủy mọi iframe đang chạy trước đó (Đảm bảo tối đa 1 iframe WebGL hoạt động)
+      destroyActiveLivePreview();
+
+      activePreviewCard = card;
+      card.classList.add('is-previewing');
+
+      const previewBox = card.querySelector('.tpl-preview');
+      if (!previewBox) return;
+
+      const statusPill = previewBox.querySelector('.tpl-live-status-pill');
+      if (statusPill) {
+        statusPill.innerHTML = '<span class="live-dot-green"></span><span>Đang tải 3D...</span>';
+        statusPill.classList.add('active');
+      }
+
+      const triggerBtn = card.querySelector('.btn-preview-trigger');
+      if (triggerBtn) {
+        triggerBtn.innerHTML = '<span>👁️ Toàn Cảnh</span>';
+        triggerBtn.classList.add('active');
+      }
+
+      // Tạo thẻ iframe nạp template với cờ preview=1 (tắt tiếng & ẩn menu thừa)
+      const iframe = document.createElement('iframe');
+      iframe.className = 'tpl-live-iframe';
+      const sep = engineUrl.includes('?') ? '&' : '?';
+      iframe.src = `${engineUrl}${sep}preview=1`;
+      iframe.setAttribute('loading', 'lazy');
+      iframe.setAttribute('title', '3D Live Preview');
+      iframe.setAttribute('allow', 'autoplay');
+
+      iframe.onload = () => {
+        if (activePreviewCard === card) {
+          iframe.classList.add('loaded');
+          if (statusPill) {
+            statusPill.innerHTML = '<span class="live-dot-green"></span><span>🟢 3D Live</span>';
+          }
+
+          // Khóa âm thanh và ẩn mọi thanh menu/modal để khoe trọn đồ họa 3D chuyển động
+          try {
+            const doc = iframe.contentDocument;
+            if (doc) {
+              const style = doc.createElement('style');
+              style.textContent = `
+                .top-hud-bar, .bottom-dock, .center-hud-header, .hud-hint-bottom, #hud-hint,
+                .intro-overlay, .intro-splash, .modal-backdrop, .ambient-controls, 
+                .top-bar, .hud-occasion-badge, .hud-couple-names, #hud-days,
+                .creator-modal, .form-container, #creator-panel, .ui-panel, .nav-btn,
+                #toast-container, .watermark-btn, .top-right-group {
+                  display: none !important;
+                  opacity: 0 !important;
+                  visibility: hidden !important;
+                  pointer-events: none !important;
+                }
+                body, html {
+                  overflow: hidden !important;
+                  background: transparent !important;
+                }
+              `;
+              doc.head.appendChild(style);
+
+              doc.querySelectorAll('audio, video').forEach((el) => {
+                el.muted = true;
+                el.pause();
+              });
+
+              if (iframe.contentWindow) {
+                if (iframe.contentWindow.soundEnabled !== undefined) {
+                  iframe.contentWindow.soundEnabled = false;
+                }
+                if (iframe.contentWindow.musicBox) {
+                  iframe.contentWindow.musicBox.isMuted = true;
+                }
+              }
+            }
+          } catch (err) {}
+        }
+      };
+
+      previewBox.appendChild(iframe);
+    }
+
     function renderTemplateCards() {
+      // Hủy preview cũ khi đổi danh mục
+      destroyActiveLivePreview();
+
       const grid = document.getElementById('templates-grid');
       grid.innerHTML = '';
 
@@ -1372,9 +1671,12 @@
         return item.category === selectedCategory;
       });
 
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
       list.forEach((tpl) => {
         const card = document.createElement('article');
         card.className = 'tpl-card';
+        card.dataset.id = tpl.id;
 
         const demoUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&demo=1`;
         const createUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&create=1`;
@@ -1387,10 +1689,36 @@
           .join('');
 
         card.innerHTML = `
-          <div class="tpl-preview" style="background: ${tpl.previewGradient};" onclick="window.location.href='${demoUrl}'">
-            <span class="tpl-badge">${tpl.badge}</span>
-            <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
+          <!-- Mockup Cửa sổ Trình duyệt -->
+          <div class="tpl-window-frame">
+            <div class="tpl-browser-bar">
+              <div class="tpl-browser-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="tpl-browser-url">gift-3d.vn/${tpl.id}</div>
+              <span class="tpl-browser-badge">${tpl.badge}</span>
+            </div>
+
+            <!-- Vùng Xem Trước Động / Tĩnh -->
+            <div class="tpl-preview" style="background: ${tpl.previewGradient};" data-demo-url="${demoUrl}">
+              <div class="tpl-preview-static">
+                <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
+                <div class="tpl-preview-prompt">
+                  <span>${isTouchDevice ? '👆 Chạm xem động 3D' : '✨ Rê chuột xem động 3D'}</span>
+                </div>
+              </div>
+
+              <!-- Huy hiệu trạng thái Live khi kích hoạt -->
+              <div class="tpl-live-status-pill">
+                <span class="live-dot-green"></span>
+                <span>3D Live</span>
+              </div>
+
+              <!-- Nút đóng xem thử trên Mobile -->
+              <button type="button" class="tpl-btn-stop-preview" title="Dừng xem thử">✕ Dừng</button>
+            </div>
           </div>
+
           <div class="tpl-body">
             <div class="tpl-header-meta">
               <span class="tpl-rating-compact"><b>★ 4.9</b> (${salesText})</span>
@@ -1402,11 +1730,64 @@
             <h2 class="tpl-title">${tpl.title}</h2>
             <div class="tpl-features">${featuresHtml}</div>
             <div class="tpl-actions">
-              <a href="${demoUrl}" class="btn-demo">Xem Demo</a>
+              <button type="button" class="btn-demo btn-preview-trigger">▶ Xem Thử</button>
               <a href="${createUrl}" class="btn-create">✨ Tạo Ngay</a>
             </div>
           </div>
         `;
+
+        const previewBox = card.querySelector('.tpl-preview');
+        const triggerBtn = card.querySelector('.btn-preview-trigger');
+        const stopBtn = card.querySelector('.tpl-btn-stop-preview');
+
+        // 1. Kích hoạt trên Desktop bằng Hover (có độ trễ 200ms để mượt mà khi cuộn)
+        if (!isTouchDevice) {
+          card.addEventListener('mouseenter', () => {
+            if (card === activePreviewCard) return;
+            if (previewHoverTimer) clearTimeout(previewHoverTimer);
+            previewHoverTimer = setTimeout(() => {
+              activateLivePreview(card, tpl.engineUrl, tpl.id);
+            }, 200);
+          });
+
+          card.addEventListener('mouseleave', () => {
+            if (previewHoverTimer) {
+              clearTimeout(previewHoverTimer);
+              previewHoverTimer = null;
+            }
+            if (card === activePreviewCard) {
+              destroyActiveLivePreview();
+            }
+          });
+        }
+
+        // 2. Chạm vào màn hình Preview
+        previewBox.addEventListener('click', (e) => {
+          if (e.target.closest('.tpl-btn-stop-preview')) return;
+          if (isTouchDevice && card !== activePreviewCard) {
+            // Chạm lần 1: Kích hoạt xem động 3D
+            activateLivePreview(card, tpl.engineUrl, tpl.id);
+          } else {
+            // Chạm lần 2 hoặc trên Desktop: Chuyển trang xem Demo toàn cảnh
+            window.location.href = demoUrl;
+          }
+        });
+
+        // 3. Nút "Xem Thử" / "Toàn Cảnh"
+        triggerBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (card === activePreviewCard) {
+            window.location.href = demoUrl;
+          } else {
+            activateLivePreview(card, tpl.engineUrl, tpl.id);
+          }
+        });
+
+        // 4. Nút Dừng xem thử
+        stopBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          destroyActiveLivePreview();
+        });
 
         grid.appendChild(card);
       });

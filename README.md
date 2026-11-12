@@ -53,13 +53,23 @@ Toàn bộ văn bản mặc định trong template phải dùng **danh xưng tru
 
 ---
 
-## 4. Quy Chuẩn Kỹ Thuật Chung Khi Đăng Ký & Thanh Toán Template
+## 4. Quy Chuẩn Kỹ Thuật Chung Khi Đăng Ký, Âm Thanh & Thanh Toán Template
 
 1. **Dropdown `<select>` trên giao diện tối**: Luôn khai báo `color-scheme: dark;` và đặt `option { background: #0f172a; color: #f8fafc; }` để không bị chữ trắng trên nền trắng khi mở dropdown trên PC Windows/Chrome.
-2. **Đăng ký vào `templates-catalog.js`**:
+2. **Tự động tắt âm thanh khi mở Studio tạo thiệp**:
+   - Khi người dùng bấm nút **Tạo Thiệp** (`#btn-open-creator`), **bắt buộc tự động tắt âm thanh** (`audioEngine.mute(true)` / cập nhật nút loa sang trạng thái tắt `🔇`) để không làm phiền trong lúc nhập lời chúc và tải ảnh.
+   - Khi người dùng bấm bật lại nút loa, nhạc nền có thể phát tiếp bình thường.
+3. **Giữ nguyên trang chờ xác nhận VietQR khi chuyển sang App Ngân Hàng**:
+   - Khi tạo đơn `/api/create-order` thành công, lưu snapshot đơn chờ vào cả `sessionStorage` và `localStorage` (kèm `savedAt`, hiệu lực ~45 phút).
+   - Lắng nghe `visibilitychange` (khi `document.visibilityState === 'visible'`) và `focus` để **gọi kiểm tra ngay `/api/check-order?code=...`** khi người dùng từ app ngân hàng quay lại tab, không để trễ nhịp polling.
+   - Khi tải lại trang (không có `?id=`), nếu còn đơn chờ hợp lệ thì tự động khôi phục lại modal `#modal-payment` ở trạng thái chờ xác nhận tự động (hoặc chuyển thẳng sang màn thành công nếu đã `PAID`); chỉ xóa đơn chờ khi đã thanh toán xong hoặc người dùng tự bấm đóng (`✕`) modal thanh toán.
+4. **Nút tải mã QR chuyển tiền**:
+   - Nhãn nút gọn: **`📥 Tải Mã QR Chuyển Tiền`** (lược bỏ chữ dư thừa `"Quét từ App Ngân Hàng"`).
+   - Hỗ trợ tải trực tiếp về **Thư viện ảnh / Tải xuống**: chuyển ảnh sang `Blob` PNG (có fallback vẽ qua `Canvas` nếu cần); trên điện thoại ưu tiên gọi `navigator.share({ files: [file] })` để người dùng lưu thẳng vào Thư viện ảnh (Photos/Gallery), trên PC tải trực tiếp file `.png`.
+5. **Đăng ký vào `templates-catalog.js` & API Thanh toán**:
    - Khai báo đầy đủ trong mảng danh mục tương ứng (`templates-catalog.js`) với `id` trùng khớp tuyệt đối với `appState.templateId` trong file `index.html` của template để API `/api/create-order` áp đúng mức giá trên server.
-3. **API Thanh toán & Tra cứu đơn**:
    - Đọc mã ảnh QR thanh toán từ `data.qrUrl` (khớp với output của `api/create-order.js`).
    - Hỗ trợ query `?id=<ORDER_CODE>` gọi `/api/check-order?code=...` để nạp tên, dịp, tâm thư, danh sách ảnh đã lưu và ẩn các nút dành riêng cho người tạo (`.creator-only`).
-4. **Kiểm tra trước khi đẩy code**:
+6. **Kiểm tra trước khi đẩy code**:
    - Kiểm tra cú pháp JavaScript (`new Function`) và kiểm tra `templates-catalog.js` load thành công qua Node trước khi commit/push.
+

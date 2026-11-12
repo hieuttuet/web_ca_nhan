@@ -883,7 +883,7 @@
         </div>
 
         <button type="button" id="btn-download-vietqr" class="btn-full btn-secondary" style="margin-bottom: 12px; font-size: 0.85rem;">
-          📥 Tải Mã QR Chuyển Tiền (Quét từ App Ngân Hàng)
+          📥 Tải Mã QR Chuyển Tiền
         </button>
 
         <div class="info-table">
@@ -1051,6 +1051,22 @@
         }
       }
 
+      mute(silent = false) {
+        this.enabled = false;
+        this.clearScheduled();
+        if (this.masterGain && this.ctx) {
+          this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
+        }
+        const btn = document.getElementById('btn-toggle-sound');
+        btn?.classList.remove('active');
+        const icon = document.getElementById('sound-icon');
+        const label = document.getElementById('sound-label');
+        if (icon) icon.textContent = '🔇';
+        if (label) label.textContent = 'Tắt Tiếng';
+        document.getElementById('sound-unlock-pill')?.classList.add('hidden');
+        if (!silent) showToast('🔇 Đã tắt âm thanh');
+      }
+
       toggle() {
         this.enabled = !this.enabled;
         this.initContext();
@@ -1065,7 +1081,13 @@
         document.getElementById('sound-icon').textContent = this.enabled ? '🔊' : '🔇';
         document.getElementById('sound-label').textContent = this.enabled ? 'Âm Thanh' : 'Tắt Tiếng';
         if (this.enabled) {
+          this.unlocked = true;
           document.getElementById('sound-unlock-pill')?.classList.add('hidden');
+          if (!this.bgmTimer && typeof sleighProgress === 'number' && sleighProgress >= 0.85) {
+            this.startChristmasLofiBgm();
+          }
+        } else {
+          this.clearScheduled();
         }
         showToast(this.enabled ? '🔊 Đã bật âm thanh phép màu' : '🔇 Đã tắt âm thanh');
       }
@@ -3340,6 +3362,104 @@
       }
     }
 
+    const PENDING_ORDER_KEY = `pending_order_${appState.templateId}`;
+
+    function savePendingOrder(orderData) {
+      const record = {
+        ...orderData,
+        sender: appState.sender,
+        receiver: appState.receiver,
+        occasion: appState.occasion,
+        message: appState.message,
+        savedAt: Date.now()
+      };
+      try {
+        sessionStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(record));
+        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(record));
+      } catch (e) {}
+    }
+
+    function readPendingOrder() {
+      try {
+        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.orderCode || (Date.now() - (parsed.savedAt || 0)) > 45 * 60 * 1000) {
+          clearPendingOrder();
+          return null;
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearPendingOrder() {
+      try {
+        sessionStorage.removeItem(PENDING_ORDER_KEY);
+        localStorage.removeItem(PENDING_ORDER_KEY);
+      } catch (e) {}
+    }
+
+    function populatePaymentWaitingModal(orderData) {
+      activeOrderCode = orderData.orderCode;
+      document.getElementById('pay-vietqr-img').src = orderData.qrUrl || '';
+      document.getElementById('pay-bank-name').textContent = orderData.bankId || 'MB';
+      document.getElementById('pay-account-name').textContent = orderData.accountName || '---';
+      document.getElementById('pay-account-no').textContent = orderData.accountNo || '---';
+      document.getElementById('pay-amount-text').textContent = `${Number(orderData.amount || 35000).toLocaleString('vi-VN')}đ`;
+      document.getElementById('pay-memo-text').textContent = orderData.orderCode;
+
+      document.getElementById('pay-step-waiting').style.display = 'block';
+      document.getElementById('pay-step-success').style.display = 'none';
+      closeModal('modal-creator');
+      openModal('modal-payment');
+    }
+
+    async function checkActiveOrderOnce() {
+      if (!activeOrderCode) return false;
+      try {
+        const cRes = await fetch(`/api/check-order?code=${encodeURIComponent(activeOrderCode)}`);
+        const cData = await cRes.json();
+        if (cRes.ok && cData.status === 'PAID') {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          onPaymentSuccess(activeOrderCode);
+          return true;
+        }
+      } catch (err) {}
+      return false;
+    }
+
+    function startOrderPolling(orderCode) {
+      activeOrderCode = orderCode;
+      if (pollTimer) clearInterval(pollTimer);
+      checkActiveOrderOnce();
+      pollTimer = setInterval(checkActiveOrderOnce, 2500);
+    }
+
+    // Khi người dùng tab ra app ngân hàng rồi quay lại trình duyệt -> kiểm tra ngay lập tức & giữ nguyên trang chờ
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && activeOrderCode) {
+        const payModal = document.getElementById('modal-payment');
+        const waitBox = document.getElementById('pay-step-waiting');
+        if (payModal && !payModal.classList.contains('hidden') && waitBox && waitBox.style.display !== 'none') {
+          startOrderPolling(activeOrderCode);
+        }
+      }
+    });
+    window.addEventListener('focus', () => {
+      if (activeOrderCode) {
+        const payModal = document.getElementById('modal-payment');
+        const waitBox = document.getElementById('pay-step-waiting');
+        if (payModal && !payModal.classList.contains('hidden') && waitBox && waitBox.style.display !== 'none') {
+          checkActiveOrderOnce();
+        }
+      }
+    });
+
     async function openVietQRPayment() {
       applyCreatorFormChanges();
       const btn = document.getElementById('btn-proceed-pay');
@@ -3364,30 +3484,9 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Lỗi tạo đơn hàng');
 
-        activeOrderCode = data.orderCode;
-        document.getElementById('pay-vietqr-img').src = data.qrUrl;
-        document.getElementById('pay-bank-name').textContent = data.bankId || 'MB';
-        document.getElementById('pay-account-name').textContent = data.accountName || '---';
-        document.getElementById('pay-account-no').textContent = data.accountNo || '---';
-        document.getElementById('pay-amount-text').textContent = `${Number(data.amount || 35000).toLocaleString('vi-VN')}đ`;
-        document.getElementById('pay-memo-text').textContent = data.orderCode;
-
-        document.getElementById('pay-step-waiting').style.display = 'block';
-        document.getElementById('pay-step-success').style.display = 'none';
-        closeModal('modal-creator');
-        openModal('modal-payment');
-
-        if (pollTimer) clearInterval(pollTimer);
-        pollTimer = setInterval(async () => {
-          try {
-            const cRes = await fetch(`/api/check-order?code=${encodeURIComponent(activeOrderCode)}`);
-            const cData = await cRes.json();
-            if (cRes.ok && cData.status === 'PAID') {
-              clearInterval(pollTimer);
-              onPaymentSuccess(activeOrderCode);
-            }
-          } catch (err) {}
-        }, 2500);
+        savePendingOrder(data);
+        populatePaymentWaitingModal(data);
+        startOrderPolling(data.orderCode);
       } catch (err) {
         alert('Không thể kết nối tạo đơn hàng: ' + err.message);
       } finally {
@@ -3397,6 +3496,7 @@
     }
 
     function onPaymentSuccess(orderCode) {
+      clearPendingOrder();
       const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
       document.getElementById('share-url-input').value = shareUrl;
       renderReindeerGiftCard(shareUrl);
@@ -3405,10 +3505,52 @@
       showToast('🎉 Thanh toán thành công! Thiệp Tuần Lộc đã sẵn sàng!');
     }
 
+    async function urlToImageBlob(url) {
+      if (url.startsWith('data:')) {
+        const res = await fetch(url);
+        return await res.blob();
+      }
+      try {
+        const res = await fetch(url, { mode: 'cors' });
+        if (res.ok) return await res.blob();
+      } catch (e) {}
+
+      // Fallback vẽ qua Canvas để xuất Blob PNG nếu fetch bị hạn chế
+      return await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const c = document.createElement('canvas');
+            c.width = img.naturalWidth || 600;
+            c.height = img.naturalHeight || 600;
+            c.getContext('2d').drawImage(img, 0, 0);
+            c.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png');
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
     async function downloadBlobImage(url, filename) {
       try {
-        const res = await fetch(url);
-        const blob = await res.blob();
+        const blob = await urlToImageBlob(url);
+        const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const file = new File([blob], filename, { type: blob.type || 'image/png' });
+
+        // Trên điện thoại (iOS/Android), ưu tiên mở bảng Lưu vào Thư viện ảnh nếu trình duyệt hỗ trợ
+        if (isMobileDevice && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: filename });
+            return;
+          } catch (shareErr) {
+            if (shareErr && shareErr.name === 'AbortError') return;
+          }
+        }
+
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
@@ -3416,13 +3558,15 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 2500);
       } catch (e) {
         const a = document.createElement('a');
         a.href = url;
         a.target = '_blank';
         a.download = filename;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
       }
     }
 
@@ -3431,7 +3575,14 @@
     }
 
     function closeModal(id) {
-      if (id === 'modal-payment' && pollTimer) clearInterval(pollTimer);
+      if (id === 'modal-payment') {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        clearPendingOrder();
+        activeOrderCode = null;
+      }
       document.getElementById(id)?.classList.add('hidden');
     }
 
@@ -3483,6 +3634,18 @@
             replayMagicRide();
           }
         } catch (e) {}
+      } else {
+        // Nếu người dùng vừa chuyển sang App Ngân Hàng và trình duyệt tải lại tab -> khôi phục ngay màn hình chờ xác nhận VietQR
+        const pending = readPendingOrder();
+        if (pending) {
+          appState.sender = pending.sender || appState.sender;
+          appState.receiver = pending.receiver || appState.receiver;
+          appState.occasion = pending.occasion || appState.occasion;
+          appState.message = pending.message || appState.message;
+          audioEngine.mute(true);
+          populatePaymentWaitingModal(pending);
+          startOrderPolling(pending.orderCode);
+        }
       }
 
       syncUIFromState();
@@ -3556,8 +3719,9 @@
       document.getElementById('btn-open-letter').addEventListener('click', () => openModal('modal-letter'));
       document.getElementById('btn-open-memories').addEventListener('click', () => openMemoryBurst(currentBurstIndex));
 
-      // Creator Studio
+      // Creator Studio (tự động tắt âm thanh khi mở giao diện tạo thiệp)
       document.getElementById('btn-open-creator').addEventListener('click', () => {
+        audioEngine.mute(true);
         document.getElementById('in-sender').value = appState.sender;
         document.getElementById('in-receiver').value = appState.receiver;
         document.getElementById('in-occasion').value = appState.occasion;

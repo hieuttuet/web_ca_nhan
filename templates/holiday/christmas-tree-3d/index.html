@@ -1459,8 +1459,13 @@
 
       // 2. CHỮ NỔI "I LOVE YOU + TÊN NGƯỜI NHẬN" TRONG TRÁI TIM 3D
       update3DLoveTextMesh();
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => update3DLoveTextMesh());
+      if (document.fonts) {
+        Promise.all([
+          document.fonts.load('700 68px "Cinzel"'),
+          document.fonts.load('700 120px "Dancing Script"')
+        ]).catch(() => {}).finally(() => {
+          document.fonts.ready.then(() => update3DLoveTextMesh());
+        });
       }
     }
 
@@ -1480,38 +1485,40 @@
       // Dòng 1: I LOVE YOU
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = '800 84px "Cinzel", "Plus Jakarta Sans", serif';
-      ctx.shadowColor = '#ff2e7a';
-      ctx.shadowBlur = 28;
-      ctx.fillStyle = '#ffe4f2';
-      ctx.fillText('I LOVE YOU', c.width / 2, 185);
-      ctx.shadowBlur = 8;
+      ctx.font = '700 68px "Cinzel", serif';
+      ctx.shadowColor = '#ff3b82';
+      ctx.shadowBlur = 24;
+      ctx.fillStyle = '#ffe6f2';
+      ctx.fillText('I LOVE YOU', c.width / 2, 175);
+      ctx.shadowBlur = 6;
       ctx.fillStyle = '#ffffff';
-      ctx.fillText('I LOVE YOU', c.width / 2, 185);
+      ctx.fillText('I LOVE YOU', c.width / 2, 175);
 
-      // Dòng 2: Tên người nhận (tự co kích thước để không bao giờ bị cắt chữ)
-      const receiverName = (appState.receiver || 'YOU').trim().toUpperCase();
-      let nameFontSize = 104;
-      while (nameFontSize > 42) {
-        ctx.font = `800 ${nameFontSize}px "Plus Jakarta Sans", "Cinzel", sans-serif`;
+      // Dòng 2: Tên người nhận bằng font viết tay mềm mại (Dancing Script), tự co theo độ dài tên
+      const receiverName = (appState.receiver || 'You').trim();
+      let nameFontSize = 136;
+      while (nameFontSize > 56) {
+        ctx.font = `700 ${nameFontSize}px "Dancing Script", cursive`;
         if (ctx.measureText(receiverName).width <= c.width - 140) break;
         nameFontSize -= 4;
       }
 
-      const grad = ctx.createLinearGradient(0, 270, 0, 395);
-      grad.addColorStop(0, '#fff7d6');
-      grad.addColorStop(0.5, '#ff85b3');
-      grad.addColorStop(1, '#ff3377');
+      const grad = ctx.createLinearGradient(0, 245, 0, 415);
+      grad.addColorStop(0, '#fffdf2');
+      grad.addColorStop(0.45, '#ffd1e8');
+      grad.addColorStop(1, '#ff77aa');
 
-      ctx.shadowColor = '#ff1e6e';
-      ctx.shadowBlur = 32;
+      // Lớp hào quang hồng ấm mềm mại bao quanh chữ
+      ctx.shadowColor = 'rgba(255, 51, 119, 0.9)';
+      ctx.shadowBlur = 30;
       ctx.fillStyle = grad;
-      ctx.fillText(receiverName, c.width / 2, 330);
+      ctx.fillText(receiverName, c.width / 2, 325);
 
-      ctx.shadowBlur = 0;
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-      ctx.strokeText(receiverName, c.width / 2, 330);
+      // Lớp lõi dịu nhẹ giúp nét viết tay sáng mịn, dễ đọc
+      ctx.shadowColor = 'rgba(255, 215, 0, 0.45)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = grad;
+      ctx.fillText(receiverName, c.width / 2, 325);
 
       const tex = new THREE.CanvasTexture(c);
       tex.needsUpdate = true;

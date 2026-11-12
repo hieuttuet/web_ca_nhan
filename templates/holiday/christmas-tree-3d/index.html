@@ -986,12 +986,39 @@
       photos: [] // Sẽ khởi tạo 6 ảnh mặc định lãng mạn
     };
 
-    const AI_WISH_SAMPLES = [
-      'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất của anh là luôn có em bên cạnh sưởi ấm trái tim. Chúc em một mùa Giáng Sinh an lành, hạnh phúc và ngập tràn nụ cười nhé! ❤️',
-      'Đêm Noel ngoài kia có thể lạnh, nhưng trong lòng anh lúc nào cũng ấm áp vì đã có em. Cảm ơn em vì đã đến và làm cho thanh xuân của anh trở nên rực rỡ nhất! 🎄✨',
-      'Merry Christmas em yêu! Chúc người thương của anh luôn xinh đẹp, rạng rỡ và đạt được mọi ước nguyện. Mãi là cô bé đáng yêu của anh nhé! 🎁💖',
-      'Noel này tuy không có tuyết rơi thật, nhưng anh có cả một cây thông 3D gửi gắm trọn vẹn tình yêu dành cho em. Chúc em Giáng Sinh thật vui và ấm áp! ❄️🌟'
-    ];
+    const AI_WISH_BY_OCCASION = {
+      'Merry Christmas & Happy New Year': [
+        'Giáng Sinh an lành và năm mới rực rỡ nhé {receiver}! Cảm ơn vì đã luôn ở bên tạo nên những khoảnh khắc tuyệt vời nhất. Chúc {receiver} mọi điều tốt đẹp và bình an ❤️',
+        'Noel ấm áp và chào đón năm mới thật nhiều niềm vui nha {receiver} 🎄✨ Mong mọi ước mơ của {receiver} trong năm tới đều sẽ trở thành hiện thực!',
+        'Gửi {receiver} cây thông 3D lung linh này thay cho lời chúc Giáng Sinh & Năm Mới ngọt ngào nhất. Chúc {receiver} luôn mỉm cười rạng rỡ mỗi ngày 🌟💖',
+        'Khép lại một năm thật đẹp bằng mùa Giáng Sinh ấm áp bên {receiver}. Mong sang năm mới chúng ta vẫn sẽ cùng nhau đi qua thật nhiều kỷ niệm đáng nhớ nữa nhé 🎁❤️'
+      ],
+      'Giáng Sinh An Lành Bên Em': [
+        'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất là luôn có {receiver} bên cạnh sưởi ấm trái tim. Chúc {receiver} một mùa Noel an lành và ngập tràn nụ cười! ❤️',
+        'Đêm Noel ngoài kia có thể se lạnh, nhưng trái tim này lúc nào cũng ấm áp vì có {receiver}. Cảm ơn {receiver} đã làm cho thanh xuân trở nên rực rỡ nhất! 🎄✨',
+        'Merry Christmas {receiver}! Chúc người thương luôn xinh đẹp, vui vẻ và bình an. Mong mọi điều dịu dàng nhất sẽ luôn tìm đến bên {receiver} 🎁💖',
+        'Noel này tuy không có tuyết rơi thật, nhưng có cả một cây thông 3D lấp lánh gửi gắm trọn vẹn tình cảm dành cho {receiver}. Chúc {receiver} Giáng Sinh thật hạnh phúc! ❄️🌟'
+      ],
+      'Kỷ Niệm Tình Yêu Mùa Đông': [
+        'Cảm ơn {receiver} vì đã đồng hành cùng nhau qua bao nhiêu ngày nắng gió đến tận mùa đông này. Mỗi khoảnh khắc bên {receiver} đều là kỷ niệm vô giá ❤️❄️',
+        'Mùa đông năm nay trở nên đặc biệt hơn bao giờ hết vì có {receiver} ở đây. Chúc cho tình cảm của hai đứa mình mãi ấm áp và bền chặt theo năm tháng ✨💖',
+        'Giữa tiết trời se lạnh của mùa đông, chỉ cần nắm tay {receiver} là thấy cả thế giới bỗng ấm lại. Yêu thương {receiver} thật nhiều! 🧣❄️',
+        'Lưu giữ lại những bức ảnh kỷ niệm đẹp nhất của chúng ta trong cây thông 3D này. Mong rằng mùa đông nào sau này cũng vẫn có {receiver} bên cạnh 🎄💕'
+      ],
+      'Happy New Year 2027': [
+        'Chúc mừng năm mới 2027, {receiver}! Chúc {receiver} một năm tràn đầy sức khỏe, may mắn, mọi việc hanh thông và luôn hạnh phúc rạng ngời 🧧✨',
+        'Năm mới 2027 đã tới rồi! Chúc {receiver} gạt hết những muộn phiền năm cũ, đón thật nhiều cơ hội mới, niềm vui mới và bình an viên mãn 🎆💖',
+        'Gửi {receiver} ngàn lời chúc tốt đẹp nhất nhân dịp năm mới 2027. Mong mọi dự định của {receiver} đều rực rỡ thành công và lúc nào cũng tươi cười nhé 🌟🎊',
+        'Chào 2027 thật rực rỡ cùng {receiver}! Mong rằng trong hành trình 365 ngày sắp tới, niềm vui sẽ luôn gõ cửa và may mắn luôn mỉm cười với {receiver} ❤️🎆'
+      ]
+    };
+
+    function generateAiWish(occasion, receiver, idx = 0) {
+      const pool = AI_WISH_BY_OCCASION[occasion] || AI_WISH_BY_OCCASION['Merry Christmas & Happy New Year'];
+      const safeIdx = ((idx % pool.length) + pool.length) % pool.length;
+      const targetName = (receiver || '').trim() || 'bạn';
+      return pool[safeIdx].replace(/\{receiver\}/g, targetName);
+    }
 
     let currentMode = 'TREE'; // 'TREE' | 'EXPLODE' | 'HEART' | 'PHOTO'
     let selectedPhotoIdx = 0;
@@ -2131,7 +2158,7 @@
       appState.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
       appState.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
       appState.occasion = document.getElementById('in-occasion').value;
-      appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
+      appState.message = document.getElementById('in-message').value.trim() || generateAiWish(appState.occasion, appState.receiver, 0);
       syncUIFromState();
     }
 
@@ -2259,12 +2286,13 @@
         document.getElementById('modal-creator').classList.remove('hidden');
       });
 
-      let wishIdx = 0;
+      const wishIdxByOccasion = {};
       document.getElementById('btn-ai-wish').addEventListener('click', () => {
-        wishIdx = (wishIdx + 1) % AI_WISH_SAMPLES.length;
-        const receiver = document.getElementById('in-receiver').value.trim() || 'em';
-        document.getElementById('in-message').value = AI_WISH_SAMPLES[wishIdx].replace(/em/g, receiver);
-        showToast('🪄 AI đã viết lời chúc Noel mới!');
+        const occasion = document.getElementById('in-occasion').value;
+        const receiver = document.getElementById('in-receiver').value.trim() || 'bạn';
+        wishIdxByOccasion[occasion] = (wishIdxByOccasion[occasion] ?? -1) + 1;
+        document.getElementById('in-message').value = generateAiWish(occasion, receiver, wishIdxByOccasion[occasion]);
+        showToast('🪄 AI đã viết lời chúc theo dịp kỷ niệm!');
       });
 
       document.getElementById('in-photo-file').addEventListener('change', async (e) => {

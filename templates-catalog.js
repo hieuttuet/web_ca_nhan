@@ -290,6 +290,25 @@ const HOLIDAY_TEMPLATES = [
       occasion: 'Merry Christmas • Giáng Sinh An Lành',
       theme: 'gold'
     }
+  },
+  {
+    id: 'spring_blossom_3d',
+    category: 'holiday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Hoa Đào / Hoa Mai Rơi 3D • Hái Lộc Đầu Xuân',
+    subtitle: 'Camera bay xuyên màn mưa cánh hoa 3D hiệu ứng Bokeh, chạm Nụ Hoa Vàng mở cuốn thư pháp đỏ & tùy chọn Bắc/Nam',
+    badge: '🌸 VIP Tết 2027',
+    price: 50000,
+    oldPrice: 89000,
+    engineUrl: 'templates/holiday/spring-blossom-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #3b0722 0%, #991b1b 52%, #f59e0b 100%)',
+    previewEmoji: '🌸',
+    features: ['Three.js 3D + Bokeh điện ảnh', 'Chạm Nụ Hoa Vàng mở Thư Pháp Đỏ', 'Chuyển đổi Bắc (Sáo) / Nam (Đàn tranh)'],
+    preset: {
+      occasion: 'Chúc Mừng Năm Mới 2027',
+      theme: 'gold'
+    }
   }
 ];
 

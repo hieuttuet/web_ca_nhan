@@ -1290,7 +1290,6 @@
     let rideStartTime = performance.now();
     let sleighProgress = 0; // 0 -> 1 over 6.8s
     const RIDE_DURATION_MS = 6800;
-    const MORPH_START_MS = 6200;
 
     // Winter Landscape Assets (Snow hills, pine trees, twinkling light garland)
     let snowTrees = [];
@@ -1317,12 +1316,19 @@
     let textGlowCanvas = null;
     let textGlowRect = { x: 0, y: 0, w: 0, h: 0 };
 
+    function getMoonSpec() {
+      const isMobile = W < 768;
+      const r = Math.min(W, H) * (isMobile ? 0.195 : 0.185);
+      // Đặt mặt trăng cao lên sát mép trên bầu trời
+      return { x: W * 0.5, y: r + (isMobile ? 12 : 14), r };
+    }
+
     function getSnowGroundY(x) {
       const nx = (x / Math.max(1, W)) - 0.5;
-      const centerBase = H * (W < 768 ? 0.77 : 0.775);
-      // Hai bên sườn hơi nâng lên để đặt cây thông, giữa thoải nhẹ đón hộp quà
-      const hillRise = Math.pow(Math.abs(nx) * 2, 1.45) * (H * 0.045);
-      const gentleRoll = Math.sin(nx * 7.5 + 0.4) * (H * 0.011);
+      const centerBase = H * (W < 768 ? 0.86 : 0.875);
+      // Mặt đất tuyết trắng thấp xuống sát đáy, hai bên nâng nhẹ đặt cây thông
+      const hillRise = Math.pow(Math.abs(nx) * 2, 1.5) * (H * 0.032);
+      const gentleRoll = Math.sin(nx * 7.5 + 0.4) * (H * 0.008);
       return centerBase - hillRise + gentleRoll;
     }
 
@@ -1336,7 +1342,10 @@
 
       initSkyAndSnow();
       giftBox.size = W < 640 ? 36 : 44;
-      giftBox.targetY = getSnowGroundY(W * 0.5) - giftBox.size * 0.48;
+      giftBox.targetY = Math.min(
+        getSnowGroundY(W * 0.5) - giftBox.size * 0.44,
+        H - (W < 768 ? 134 : 114)
+      );
       if (giftBox.landed) {
         giftBox.x = W * 0.5;
         giftBox.y = giftBox.targetY;
@@ -1349,7 +1358,7 @@
       const starCount = isMobile ? 95 : 160;
       stars = Array.from({ length: starCount }, () => ({
         x: Math.random() * W,
-        y: Math.random() * H * 0.78,
+        y: Math.random() * H * 0.86,
         r: Math.random() * 1.5 + 0.4,
         phase: Math.random() * Math.PI * 2,
         speed: Math.random() * 2 + 1
@@ -1367,37 +1376,37 @@
         color: Math.random() > 0.35 ? 'rgba(255, 255, 255, 0.75)' : 'rgba(186, 230, 253, 0.7)'
       }));
 
-      // Cây thông Noel phủ tuyết hai bên nền đất
+      // Cây thông Noel phủ tuyết hai bên nền đất (tỉ lệ gọn để hợp mặt đất thấp)
       const treeSpecs = isMobile
         ? [
-            { nx: 0.06, scale: 0.76, back: true },
-            { nx: 0.18, scale: 0.56, back: true },
-            { nx: 0.82, scale: 0.58, back: true },
-            { nx: 0.94, scale: 0.78, back: true },
-            { nx: 0.09, scale: 0.96, back: false },
-            { nx: 0.23, scale: 0.68, back: false },
-            { nx: 0.77, scale: 0.70, back: false },
-            { nx: 0.91, scale: 0.98, back: false }
+            { nx: 0.06, scale: 0.64, back: true },
+            { nx: 0.18, scale: 0.48, back: true },
+            { nx: 0.82, scale: 0.50, back: true },
+            { nx: 0.94, scale: 0.66, back: true },
+            { nx: 0.09, scale: 0.80, back: false },
+            { nx: 0.23, scale: 0.58, back: false },
+            { nx: 0.77, scale: 0.60, back: false },
+            { nx: 0.91, scale: 0.82, back: false }
           ]
         : [
-            { nx: 0.04, scale: 0.95, back: true },
-            { nx: 0.14, scale: 0.72, back: true },
-            { nx: 0.27, scale: 0.56, back: true },
-            { nx: 0.73, scale: 0.58, back: true },
-            { nx: 0.86, scale: 0.74, back: true },
-            { nx: 0.96, scale: 0.96, back: true },
-            { nx: 0.08, scale: 1.18, back: false },
-            { nx: 0.19, scale: 0.88, back: false },
-            { nx: 0.81, scale: 0.90, back: false },
-            { nx: 0.92, scale: 1.20, back: false }
+            { nx: 0.04, scale: 0.82, back: true },
+            { nx: 0.14, scale: 0.62, back: true },
+            { nx: 0.27, scale: 0.48, back: true },
+            { nx: 0.73, scale: 0.50, back: true },
+            { nx: 0.86, scale: 0.64, back: true },
+            { nx: 0.96, scale: 0.82, back: true },
+            { nx: 0.08, scale: 0.98, back: false },
+            { nx: 0.19, scale: 0.74, back: false },
+            { nx: 0.81, scale: 0.76, back: false },
+            { nx: 0.92, scale: 1.00, back: false }
           ];
 
       const bulbPalette = ['#fde047', '#fb7185', '#38bdf8', '#4ade80', '#fb923c', '#fffbeb'];
       snowTrees = treeSpecs.map((spec, idx) => {
         const x = spec.nx * W;
         const groundY = spec.back
-          ? H * (isMobile ? 0.745 : 0.742) + Math.sin(spec.nx * 8) * 10
-          : getSnowGroundY(x) + 10;
+          ? H * (isMobile ? 0.838 : 0.852) + Math.sin(spec.nx * 8) * 6
+          : getSnowGroundY(x) + 8;
         const lights = [];
         if (!spec.back) {
           const lightPositions = [
@@ -1423,15 +1432,15 @@
       const anchors = [];
       for (let i = 0; i < anchorCount; i++) {
         const ax = (i / (anchorCount - 1)) * W;
-        const postH = (i === 0 || i === anchorCount - 1) ? 46 : (i % 2 === 0 ? 34 : 26);
-        anchors.push({ x: ax, y: getSnowGroundY(ax) - postH + 12, baseY: getSnowGroundY(ax) + 8 });
+        const postH = (i === 0 || i === anchorCount - 1) ? 36 : (i % 2 === 0 ? 28 : 22);
+        anchors.push({ x: ax, y: getSnowGroundY(ax) - postH + 10, baseY: getSnowGroundY(ax) + 8 });
       }
       garlandSegments = [];
       for (let i = 0; i < anchors.length - 1; i++) {
         const p0 = anchors[i];
         const p1 = anchors[i + 1];
         const midX = (p0.x + p1.x) * 0.5;
-        const sag = isMobile ? 22 : 28;
+        const sag = isMobile ? 18 : 22;
         const ctrlY = Math.max(p0.y, p1.y) + sag;
         const bulbsPerSeg = isMobile ? 7 : 9;
         const bulbs = [];
@@ -1452,9 +1461,9 @@
       }
 
       // Hạt ánh trăng lấp lánh trên mặt tuyết trắng
-      snowGlints = Array.from({ length: isMobile ? 28 : 48 }, () => {
+      snowGlints = Array.from({ length: isMobile ? 24 : 42 }, () => {
         const sx = Math.random() * W;
-        const sy = getSnowGroundY(sx) + 6 + Math.random() * (H * 0.14);
+        const sy = getSnowGroundY(sx) + 4 + Math.random() * (H * 0.08);
         return {
           x: sx,
           y: sy,
@@ -1511,7 +1520,7 @@
       // Lưu lớp glow dịu để hỗ trợ đọc tên cực nét khi tụ xong
       textGlowCanvas = off;
       const offsetX = (W - off.width) / 2;
-      const offsetY = (isMobile ? H * 0.34 : H * 0.34);
+      const offsetY = isMobile ? H * 0.36 : H * 0.39;
       textGlowRect = { x: offsetX, y: offsetY, w: off.width, h: off.height };
 
       const imgData = octx.getImageData(0, 0, off.width, off.height).data;
@@ -1545,11 +1554,18 @@
       return points;
     }
 
+    function computeSpawnProgressForX(tx) {
+      const startX = -240;
+      const endX = W + 240;
+      const baseProg = (tx - startX) / Math.max(1, endX - startX);
+      return Math.max(0.03, Math.min(0.96, baseProg + (Math.random() - 0.5) * 0.05));
+    }
+
     function rebuildTextTargets() {
       const targets = sampleTextTargets();
       if (magicDust.length === 0) {
-        // Khi mới khởi tạo, gắn trước đích đến cho các hạt bụi sẽ được xe tuần lộc rải ra
-        magicDust = targets.map((pt, idx) => ({
+        // Khi mới khởi tạo, gắn trước đích đến theo vị trí ngang để xe chạy tới đâu rớt bụi ghép chữ tới đó
+        magicDust = targets.map((pt) => ({
           x: -100,
           y: -100,
           vx: 0,
@@ -1557,7 +1573,8 @@
           tx: pt.x,
           ty: pt.y,
           size: Math.random() * 1.9 + 1.1,
-          spawnProgress: (idx / Math.max(1, targets.length)) * 0.92 + 0.04,
+          spawnProgress: computeSpawnProgressForX(pt.x),
+          spawnTime: 0,
           spawned: false,
           settled: false,
           twinklePhase: Math.random() * Math.PI * 2,
@@ -1576,7 +1593,8 @@
             tx: pt.x,
             ty: pt.y,
             size: Math.random() * 1.9 + 1.1,
-            spawnProgress: existing.spawnProgress,
+            spawnProgress: computeSpawnProgressForX(pt.x),
+            spawnTime: existing.spawnTime || 0,
             spawned: existing.spawned,
             settled: false,
             twinklePhase: existing.twinklePhase,
@@ -1593,14 +1611,14 @@
       const endX = W + 240;
       const x = startX + (endX - startX) * progress;
 
-      const moonY = isMobile ? H * 0.28 : H * 0.29;
-      // Đường bay cong qua mặt trăng + nhấp nhô nhịp phi chậm rãi của tuần lộc
-      const arcLift = Math.sin(progress * Math.PI) * (isMobile ? 42 : 68);
-      const gallopWave = Math.sin(progress * Math.PI * 5) * (isMobile ? 10 : 15);
-      const y = moonY + 18 - arcLift + gallopWave;
+      const moon = getMoonSpec();
+      // Đường bay cong qua mặt trăng trên cao + nhấp nhô nhịp phi chậm rãi của tuần lộc
+      const arcLift = Math.sin(progress * Math.PI) * (isMobile ? 20 : 32);
+      const gallopWave = Math.sin(progress * Math.PI * 5) * (isMobile ? 8 : 13);
+      const y = moon.y + 8 - arcLift + gallopWave;
 
       // Tính góc nghiêng nhẹ theo hướng nhấp nhô
-      const dWave = Math.cos(progress * Math.PI * 5) * 0.11 - Math.cos(progress * Math.PI) * 0.11;
+      const dWave = Math.cos(progress * Math.PI * 5) * 0.11 - Math.cos(progress * Math.PI) * 0.08;
       return { x, y, tilt: dWave };
     }
 
@@ -1730,9 +1748,10 @@
 
     function drawGiantMoonAndSilhouette(sleighPos, sleighVisible, timeSec) {
       const isMobile = W < 768;
-      const moonX = W * 0.5;
-      const moonY = isMobile ? H * 0.28 : H * 0.29;
-      const moonR = Math.min(W, H) * (isMobile ? 0.22 : 0.21);
+      const moon = getMoonSpec();
+      const moonX = moon.x;
+      const moonY = moon.y;
+      const moonR = moon.r;
 
       // 1) Hào quang sáng dịu của Mặt Trăng Khổng Lồ
       const aura = ctx.createRadialGradient(moonX, moonY, moonR * 0.7, moonX, moonY, moonR * 2.5);
@@ -1924,16 +1943,16 @@
     function drawWinterGroundAndTrees(timeSec) {
       const isMobile = W < 768;
 
-      // 1) Đồi tuyết xa mờ ánh trăng phía sau
-      const backBase = H * (isMobile ? 0.745 : 0.742);
+      // 1) Đồi tuyết xa mờ ánh trăng phía sau (thấp xuống sát đáy)
+      const backBase = H * (isMobile ? 0.838 : 0.852);
       ctx.beginPath();
       ctx.moveTo(0, H);
-      ctx.lineTo(0, backBase - 14);
-      ctx.quadraticCurveTo(W * 0.25, backBase - 26, W * 0.5, backBase + 8);
-      ctx.quadraticCurveTo(W * 0.75, backBase - 24, W, backBase - 12);
+      ctx.lineTo(0, backBase - 10);
+      ctx.quadraticCurveTo(W * 0.25, backBase - 20, W * 0.5, backBase + 6);
+      ctx.quadraticCurveTo(W * 0.75, backBase - 18, W, backBase - 10);
       ctx.lineTo(W, H);
       ctx.closePath();
-      const backSnowGrad = ctx.createLinearGradient(0, backBase - 30, 0, H);
+      const backSnowGrad = ctx.createLinearGradient(0, backBase - 22, 0, H);
       backSnowGrad.addColorStop(0, '#dbeafe');
       backSnowGrad.addColorStop(0.55, '#bfdbfe');
       backSnowGrad.addColorStop(1, '#93c5fd');
@@ -1957,7 +1976,7 @@
       ctx.lineTo(W, H);
       ctx.closePath();
 
-      const frontSnowGrad = ctx.createLinearGradient(0, H * 0.74, 0, H);
+      const frontSnowGrad = ctx.createLinearGradient(0, H * 0.83, 0, H);
       frontSnowGrad.addColorStop(0, '#ffffff');
       frontSnowGrad.addColorStop(0.35, '#f0f9ff');
       frontSnowGrad.addColorStop(0.85, '#dbeafe');
@@ -2265,14 +2284,15 @@
         drawGoldenStreakHead(sleighPos);
       }
 
-      // Sinh & cập nhật Lớp 2 (Chữ): Bụi Tiên Vàng Kim
-      const isMorphing = elapsed >= MORPH_START_MS;
-      const morphT = isMorphing ? Math.min(1, (elapsed - MORPH_START_MS) / 2200) : 0;
-
-      // Vẽ lớp ambient glow dịu khi chữ bắt đầu tụ xong để tăng độ nổi bật
-      if (morphT > 0.65 && textGlowCanvas) {
+      // Sinh & cập nhật Lớp 2 (Chữ): Bụi sao rơi từ từ xuống và ghép chữ dần theo đường bay tuần lộc
+      const settleRevealX = Math.max(0, Math.min(textGlowRect.w, (sleighPos.x - 140) - textGlowRect.x));
+      const postRideAlpha = Math.max(0, Math.min(1, (elapsed - RIDE_DURATION_MS * 0.55) / 2600));
+      if (settleRevealX > 20 && textGlowCanvas && postRideAlpha > 0.02) {
         ctx.save();
-        ctx.globalAlpha = ((morphT - 0.65) / 0.35) * 0.24;
+        ctx.beginPath();
+        ctx.rect(textGlowRect.x, textGlowRect.y, settleRevealX, textGlowRect.h);
+        ctx.clip();
+        ctx.globalAlpha = postRideAlpha * 0.22;
         ctx.drawImage(textGlowCanvas, textGlowRect.x, textGlowRect.y, textGlowRect.w, textGlowRect.h);
         ctx.restore();
       }
@@ -2280,22 +2300,29 @@
       magicDust.forEach((p) => {
         if (!p.spawned && sleighProgress >= p.spawnProgress) {
           p.spawned = true;
-          p.x = sleighPos.x + (Math.random() - 0.5) * 40;
-          p.y = sleighPos.y + (Math.random() - 0.5) * 26;
-          p.vx = (Math.random() - 0.5) * 2.4 - 0.8;
-          p.vy = (Math.random() - 0.5) * 2.2;
+          p.spawnTime = now;
+          p.x = sleighPos.x - 18 + (Math.random() - 0.5) * 34;
+          p.y = sleighPos.y + (Math.random() - 0.5) * 18;
+          p.vx = (Math.random() - 0.5) * 1.4 - 0.3;
+          p.vy = 1.1 + Math.random() * 1.5; // Rơi nhẹ xuống phía dưới khi xe lướt qua
         }
         if (!p.spawned) return;
 
-        if (!isMorphing) {
-          // Ma sát cao giữ bụi lơ lửng lung linh trên không trung
-          p.vx *= 0.92;
-          p.vy *= 0.92;
+        const ageSec = Math.max(0, (now - p.spawnTime) * 0.001);
+        if (ageSec < 0.38) {
+          // Rơi từ từ xuống theo trọng lực dịu nhẹ ngay sau khi rớt khỏi vệt sáng
+          p.vy = Math.min(2.6, p.vy + 0.045);
+          p.vx *= 0.96;
           p.x += p.vx;
-          p.y += p.vy + Math.sin(timeSec * 2 + p.twinklePhase) * 0.18;
+          p.y += p.vy + Math.sin(timeSec * 2.5 + p.twinklePhase) * 0.14;
         } else {
-          // Lực hút từ tính kéo các hạt bụi vàng xếp thành chữ
-          const ease = 0.05 + morphT * 0.09;
+          // Hút dần vào vị trí chữ tương ứng ngay phía dưới chỗ tuần lộc vừa chạy qua
+          const pullT = Math.min(1, (ageSec - 0.38) / 1.55);
+          p.vx *= 0.86;
+          p.vy *= 0.86;
+          p.x += p.vx;
+          p.y += p.vy;
+          const ease = 0.024 + pullT * pullT * 0.088;
           p.x += (p.tx - p.x) * ease;
           p.y += (p.ty - p.y) * ease;
         }
@@ -2306,7 +2333,7 @@
         const settledFlicker = dist < 3 ? Math.sin(timeSec * 3.5 + p.twinklePhase) * 0.45 : 0;
         const alpha = dist < 5
           ? 0.72 + 0.28 * Math.sin(timeSec * 3 + p.twinklePhase)
-          : 0.9;
+          : 0.92;
 
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0.25, Math.min(1, alpha));
@@ -2380,6 +2407,7 @@
       document.getElementById('gift-tap-hint')?.classList.remove('visible');
       magicDust.forEach((p) => {
         p.spawned = false;
+        p.spawnTime = 0;
         p.x = -100;
         p.y = -100;
         p.vx = 0;

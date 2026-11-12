@@ -104,13 +104,24 @@
       align-items: center;
     }
 
-    /* Live gesture pill - đặt sát phía trên bottom dock */
-    .gesture-badge {
+    /* Bottom Stack chứa Gesture Status, Hint và Action Dock */
+    .bottom-hud-stack {
       position: fixed;
-      bottom: 82px;
+      bottom: 22px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 26;
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 95%;
+      max-width: 960px;
+      pointer-events: none;
+    }
+
+    /* Live gesture pill - nằm ngay phía trên bottom dock */
+    .gesture-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -227,11 +238,6 @@
     }
 
     .hud-hint-bottom {
-      position: fixed;
-      bottom: 82px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 22;
       font-size: 0.76rem;
       color: #cbd5e1;
       background: rgba(5, 13, 26, 0.65);
@@ -247,20 +253,16 @@
 
     /* ==================== 3. BOTTOM DOCK ACTION BAR ==================== */
     .bottom-dock {
-      position: fixed;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 25;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      width: 95%;
-      max-width: 780px;
+      width: 100%;
+      pointer-events: none;
     }
 
     .dock-pill-btn {
+      pointer-events: auto;
       padding: 10px 17px;
       border-radius: 999px;
       background: var(--glass-bg);
@@ -690,8 +692,11 @@
         left: 10px;
         right: 10px;
       }
-      .bottom-dock {
+      .bottom-hud-stack {
         bottom: 12px;
+        gap: 8px;
+      }
+      .bottom-dock {
         gap: 6px;
       }
       .dock-pill-btn {
@@ -699,12 +704,13 @@
         font-size: 0.74rem;
       }
       .hud-hint-bottom {
-        bottom: 104px;
         font-size: 0.7rem;
         padding: 4px 12px;
+        max-width: 92vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .gesture-badge {
-        bottom: 104px;
         font-size: 0.72rem;
         padding: 5px 12px;
         max-width: 90vw;
@@ -754,35 +760,38 @@
     <div id="hud-names" class="hud-names">Bảo Nam ❤️ Minh Anh</div>
   </div>
 
-  <!-- Live Gesture Status (Đặt sát phía trên Bottom Dock) -->
-  <div id="gesture-status" class="gesture-badge" style="display:none;">
-    <span>🖐</span><span id="gesture-text">Đang nhận diện cử chỉ...</span>
-  </div>
+  <!-- Bottom HUD Stack: Gesture Status / Interaction Hint + Action Dock -->
+  <div class="bottom-hud-stack">
+    <!-- Live Gesture Status (Đặt sát phía trên Bottom Dock) -->
+    <div id="gesture-status" class="gesture-badge" style="display:none;">
+      <span>🖐</span><span id="gesture-text">Đang nhận diện cử chỉ...</span>
+    </div>
 
-  <!-- Bottom Interaction Hint -->
-  <div id="hud-hint" class="hud-hint-bottom">
-    💡 Chạm xoay 360° • Trượt ngang chuyển ảnh • Bấm ảnh xem cận cảnh
-  </div>
+    <!-- Bottom Interaction Hint -->
+    <div id="hud-hint" class="hud-hint-bottom">
+      💡 Chạm xoay 360° • Trượt ngang chuyển ảnh • Bấm ảnh xem cận cảnh
+    </div>
 
-  <!-- Bottom Action Dock -->
-  <nav class="bottom-dock">
-    <button type="button" id="btn-mode-tree" class="dock-pill-btn active">
-      <span>🎄</span><span>Cây Thông</span>
-    </button>
-    <button type="button" id="btn-mode-heart" class="dock-pill-btn">
-      <span>💖</span><span>Trái Tim 3D</span>
-    </button>
-    <button type="button" id="btn-mode-explode" class="dock-pill-btn">
-      <span>🎁</span><span>Bung Quà & Ảnh</span>
-    </button>
-    <button type="button" id="btn-open-letter" class="dock-pill-btn">
-      <span>💌</span><span>Tâm Thư</span>
-    </button>
-    <button type="button" id="btn-open-creator" class="dock-pill-btn primary-cta creator-only">
-      <span>✨ Tạo Cây Thông Riêng</span>
-      <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem;">39.000đ</span>
-    </button>
-  </nav>
+    <!-- Bottom Action Dock -->
+    <nav class="bottom-dock">
+      <button type="button" id="btn-mode-tree" class="dock-pill-btn active">
+        <span>🎄</span><span>Cây Thông</span>
+      </button>
+      <button type="button" id="btn-mode-heart" class="dock-pill-btn">
+        <span>💖</span><span>Trái Tim 3D</span>
+      </button>
+      <button type="button" id="btn-mode-explode" class="dock-pill-btn">
+        <span>🎁</span><span>Bung Quà & Ảnh</span>
+      </button>
+      <button type="button" id="btn-open-letter" class="dock-pill-btn">
+        <span>💌</span><span>Tâm Thư</span>
+      </button>
+      <button type="button" id="btn-open-creator" class="dock-pill-btn primary-cta creator-only">
+        <span>✨ Tạo Cây Thông Riêng</span>
+        <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem;">39.000đ</span>
+      </button>
+    </nav>
+  </div>
 
   <!-- INTRO SPLASH OVERLAY (Dành cho Người nhận quà khi mở link) -->
   <div id="intro-splash" class="intro-splash hidden">
@@ -818,11 +827,11 @@
 
       <div class="form-grid-2">
         <div class="form-group">
-          <label class="form-label">Tên của bạn (Người gửi)</label>
+          <label class="form-label">Tên của bạn</label>
           <input id="in-sender" type="text" class="form-input" placeholder="VD: Bảo Nam" maxlength="30" />
         </div>
         <div class="form-group">
-          <label class="form-label">Tên người ấy (Người nhận)</label>
+          <label class="form-label">Tên người ấy</label>
           <input id="in-receiver" type="text" class="form-input" placeholder="VD: Minh Anh" maxlength="30" />
         </div>
       </div>

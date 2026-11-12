@@ -391,6 +391,17 @@
       box-shadow: 0 0 14px rgba(255, 215, 0, 0.35);
     }
 
+    .form-select {
+      color-scheme: dark;
+      background-color: #111827;
+      cursor: pointer;
+    }
+
+    .form-select option {
+      background-color: #0f172a;
+      color: #ffffff;
+    }
+
     .form-textarea {
       min-height: 85px;
       resize: vertical;
@@ -719,7 +730,7 @@
 
       <div class="form-grid-2">
         <div class="form-group">
-          <label class="form-label">Tên của bạn (Người gửi)</label>
+          <label class="form-label">Tên của bạn</label>
           <input id="in-sender" type="text" class="form-input" placeholder="VD: Minh Quân" maxlength="30" />
         </div>
         <div class="form-group">
@@ -1818,22 +1829,45 @@
       sender: 'Minh Quân',
       receiver: 'Bé Yêu Thúy Quỳnh',
       occasion: 'Chúc Mừng Năm Mới 2027 • Đinh Mùi',
-      message: `Gửi tặng Bé Yêu Thúy Quỳnh màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc em một năm mới Đinh Mùi 2027 luôn xinh đẹp, hạnh phúc, bình an và luôn nở nụ cười rạng rỡ bên anh nhé. Yêu em thật nhiều! 💖🎆`
+      message: `Gửi tặng màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc năm mới Đinh Mùi 2027 luôn tràn ngập niềm vui, hạnh phúc, bình an và luôn giữ mãi nụ cười rạng rỡ nhé. Thương chúc mọi điều tốt đẹp nhất! 💖🎆`
     };
 
-    const AI_WISH_SAMPLES = [
-      `Gửi tặng Bé Yêu Thúy Quỳnh màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc em một năm mới Đinh Mùi 2027 luôn xinh đẹp, hạnh phúc, bình an và luôn nở nụ cười rạng rỡ bên anh nhé. Yêu em thật nhiều! 💖🎆`,
-      `Kính chúc Gia Đình một năm mới Đinh Mùi 2027 vạn sự như ý, sức khỏe dồi dào, an khang thịnh vượng, tiền vào như nước và luôn ngập tràn tiếng cười rộn rã! 🧧✨`,
-      `Chúc bạn thân một năm mới 2027 bứt phá rực rỡ, công danh tấn tới, tiền tài ngập lối, vạn điều may mắn và luôn giữ mãi nụ cười tươi trên môi nhé! 🚀💰`,
-      `Kính chúc Quý Đối Tác một năm mới An Khang Thịnh Vượng, Vạn Sự Hanh Thông, gặt hái thêm nhiều thành công vang dội và vững bền thịnh đạt! 🧧🏆`
-    ];
+    const AI_WISH_BY_OCCASION = {
+      'Chúc Mừng Năm Mới 2027 • Đinh Mùi': [
+        'Gửi tặng {receiver} màn pháo hoa rực rỡ nhất đêm giao thừa! Chúc {receiver} một năm mới Đinh Mùi 2027 luôn tràn ngập niềm vui, hạnh phúc, bình an và thật nhiều may mắn nhé! 💖🎆',
+        'Chúc {receiver} năm mới Đinh Mùi 2027 vạn sự như ý, sức khỏe dồi dào, an khang thịnh vượng, công việc học tập hanh thông và luôn giữ mãi nụ cười rạng rỡ! 🧧✨',
+        'Khép lại năm cũ và chào đón 2027 rực rỡ cùng {receiver}! Mong rằng mọi dự định của {receiver} trong năm mới đều suôn sẻ và gặt hái thật nhiều thành công! 🌟🎆'
+      ],
+      'Đêm Giao Thừa Bình An & Hạnh Phúc': [
+        'Khoảnh khắc giao thừa thiêng liêng đang tới gần, gửi tới {receiver} ngàn lời chúc bình an và ấm áp nhất. Mong chúng ta sẽ có thật nhiều kỷ niệm đáng nhớ trong năm 2027! 🎆💖',
+        'Dưới bầu trời pháo hoa rực rỡ đêm giao thừa, chúc {receiver} gạt hết những âu lo năm cũ, đón thật nhiều điều ngọt ngào, bình an và hạnh phúc trong năm mới! ✨🧨',
+        'Cảm ơn {receiver} vì đã đồng hành cùng nhau suốt thời gian qua. Chúc {receiver} một đêm giao thừa thật ấm áp và một năm mới luôn ngập tràn tiếng cười! ❤️🎆'
+      ],
+      'Happy New Year 2027': [
+        'Happy New Year 2027, {receiver}! Chúc {receiver} một năm mới bứt phá rực rỡ, tài lộc ngập lối, vạn điều may mắn và lúc nào cũng thật rạng ngời! 🚀💰',
+        'Gửi {receiver} bức thiệp pháo hoa 2027 lung linh này thay cho lời chúc năm mới chân thành nhất. Chúc {receiver} 365 ngày sắp tới ngày nào cũng vui vẻ và trọn vẹn! 🎉✨',
+        'Chào năm mới 2027 thật rực rỡ nhé {receiver}! Mong mọi ước nguyện của {receiver} đều sẽ sớm thành hiện thực và hạnh phúc luôn gõ cửa mỗi ngày! 💖🎇'
+      ],
+      'Xuân An Khang • Vạn Sự Như Ý': [
+        'Xuân sang rộn ràng, chúc {receiver} và gia đình một năm mới An Khang Thịnh Vượng, Vạn Sự Như Ý, Sức Khỏe Dồi Dào và Ngập Tràn Niềm Vui! 🌸🧧',
+        'Đầu xuân năm mới, gửi tới {receiver} lời chúc ấm áp nhất: Tâm an, trí sáng, gia đạo bình an, tiền tài đủ đầy và tình cảm luôn viên mãn! 🏮✨',
+        'Chúc {receiver} một mùa xuân thật nhiều hoa nở, nhiều nụ cười, nhiều cơ hội mới và luôn được bao bọc bởi sự yêu thương! 🌸💖'
+      ]
+    };
+
+    function generateTetAiWish(occasion, receiver, idx = 0) {
+      const pool = AI_WISH_BY_OCCASION[occasion] || AI_WISH_BY_OCCASION['Chúc Mừng Năm Mới 2027 • Đinh Mùi'];
+      const safeIdx = ((idx % pool.length) + pool.length) % pool.length;
+      const targetName = (receiver || '').trim() || 'bạn';
+      return pool[safeIdx].replace(/\{receiver\}/g, targetName);
+    }
 
     function syncUIFromState() {
       document.getElementById('hud-names').textContent = `${appState.receiver} ❤️`;
       document.getElementById('hud-occasion').textContent = `🧧 ${appState.occasion.toUpperCase()} 🧧`;
-      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver}`;
+      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver} Yêu Thương`;
       document.getElementById('letter-content').textContent = appState.message;
-      document.getElementById('letter-sign').textContent = `Thân gửi, ${appState.sender} 🧧`;
+      document.getElementById('letter-sign').textContent = `Thương gửi, ${appState.sender} 🧧`;
     }
 
     function openModal(id) {
@@ -1945,18 +1979,20 @@
         openModal('modal-creator');
       });
 
-      let aiIndex = 0;
+      const wishIdxByOccasion = {};
       document.getElementById('btn-ai-wish').addEventListener('click', () => {
-        aiIndex = (aiIndex + 1) % AI_WISH_SAMPLES.length;
-        document.getElementById('in-message').value = AI_WISH_SAMPLES[aiIndex];
-        showToast('🪄 Đã tạo mẫu lời chúc Tết mới!');
+        const occasion = document.getElementById('in-occasion').value;
+        const receiver = document.getElementById('in-receiver').value.trim() || 'bạn';
+        wishIdxByOccasion[occasion] = (wishIdxByOccasion[occasion] ?? -1) + 1;
+        document.getElementById('in-message').value = generateTetAiWish(occasion, receiver, wishIdxByOccasion[occasion]);
+        showToast('🪄 AI đã tạo lời chúc Tết theo dịp kỷ niệm!');
       });
 
       document.getElementById('btn-preview-tet').addEventListener('click', () => {
         appState.sender = document.getElementById('in-sender').value.trim() || 'Minh Quân';
         appState.receiver = document.getElementById('in-receiver').value.trim() || 'Bé Yêu Thúy Quỳnh';
         appState.occasion = document.getElementById('in-occasion').value;
-        appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
+        appState.message = document.getElementById('in-message').value.trim() || generateTetAiWish(appState.occasion, appState.receiver, 0);
         syncUIFromState();
         closeModal('modal-creator');
         showToast('✨ Đã cập nhật bản xem thử pháo hoa!');
@@ -1967,7 +2003,7 @@
         appState.sender = document.getElementById('in-sender').value.trim() || 'Minh Quân';
         appState.receiver = document.getElementById('in-receiver').value.trim() || 'Bé Yêu Thúy Quỳnh';
         appState.occasion = document.getElementById('in-occasion').value;
-        appState.message = document.getElementById('in-message').value.trim() || AI_WISH_SAMPLES[0];
+        appState.message = document.getElementById('in-message').value.trim() || generateTetAiWish(appState.occasion, appState.receiver, 0);
         syncUIFromState();
 
         const btn = document.getElementById('btn-proceed-pay');

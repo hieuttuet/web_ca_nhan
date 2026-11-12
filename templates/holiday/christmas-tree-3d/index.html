@@ -1457,29 +1457,79 @@
       starMesh.position.set(0, CONFIG_3D.treeHeight / 2 + 3.5, 0);
       scene.add(starMesh);
 
-      // 2. CHỮ NỔI "I LOVE YOU" TRONG TRÁI TIM 3D
+      // 2. CHỮ NỔI "I LOVE YOU + TÊN NGƯỜI NHẬN" TRONG TRÁI TIM 3D
       update3DLoveTextMesh();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => update3DLoveTextMesh());
+      }
     }
 
     function update3DLoveTextMesh() {
-      if (loveTextMesh) scene.remove(loveTextMesh);
+      if (loveTextMesh) {
+        scene.remove(loveTextMesh);
+        loveTextMesh.geometry?.dispose();
+        loveTextMesh.material?.map?.dispose();
+        loveTextMesh.material?.dispose();
+      }
       const c = document.createElement('canvas');
-      c.width = 1024; c.height = 256;
+      c.width = 1400;
+      c.height = 520;
       const ctx = c.getContext('2d');
-      ctx.font = 'bold 100px "Dancing Script", cursive';
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      // Dòng 1: I LOVE YOU
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#FF3366';
-      ctx.shadowColor = '#FFAAAA';
-      ctx.shadowBlur = 40;
-      ctx.fillText(`I LOVE YOU ${appState.receiver.toUpperCase()}`, 512, 155);
+      ctx.textBaseline = 'middle';
+      ctx.font = '800 84px "Cinzel", "Plus Jakarta Sans", serif';
+      ctx.shadowColor = '#ff2e7a';
+      ctx.shadowBlur = 28;
+      ctx.fillStyle = '#ffe4f2';
+      ctx.fillText('I LOVE YOU', c.width / 2, 185);
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('I LOVE YOU', c.width / 2, 185);
+
+      // Dòng 2: Tên người nhận (tự co kích thước để không bao giờ bị cắt chữ)
+      const receiverName = (appState.receiver || 'YOU').trim().toUpperCase();
+      let nameFontSize = 104;
+      while (nameFontSize > 42) {
+        ctx.font = `800 ${nameFontSize}px "Plus Jakarta Sans", "Cinzel", sans-serif`;
+        if (ctx.measureText(receiverName).width <= c.width - 140) break;
+        nameFontSize -= 4;
+      }
+
+      const grad = ctx.createLinearGradient(0, 270, 0, 395);
+      grad.addColorStop(0, '#fff7d6');
+      grad.addColorStop(0.5, '#ff85b3');
+      grad.addColorStop(1, '#ff3377');
+
+      ctx.shadowColor = '#ff1e6e';
+      ctx.shadowBlur = 32;
+      ctx.fillStyle = grad;
+      ctx.fillText(receiverName, c.width / 2, 330);
+
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.strokeText(receiverName, c.width / 2, 330);
 
       const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
       const mat = new THREE.MeshBasicMaterial({
-        map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+        map: tex,
+        transparent: true,
+        blending: THREE.NormalBlending,
+        depthTest: false,
+        depthWrite: false
       });
-      loveTextMesh = new THREE.Mesh(new THREE.PlaneGeometry(42, 10.5), mat);
-      loveTextMesh.position.set(0, 0, 0);
-      loveTextMesh.visible = false;
+
+      const isMobile = window.innerWidth < 768;
+      const planeW = isMobile ? 48 : 56;
+      const planeH = planeW * (c.height / c.width);
+      loveTextMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+      loveTextMesh.position.set(0, 2, 0);
+      loveTextMesh.renderOrder = 20;
+      loveTextMesh.visible = (currentMode === 'HEART');
       scene.add(loveTextMesh);
     }
 

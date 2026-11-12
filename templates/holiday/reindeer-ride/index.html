@@ -702,6 +702,12 @@
         top: 10px;
         left: 10px;
         right: 10px;
+        align-items: flex-start;
+      }
+      .top-right-group {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
       }
       .bottom-hud-stack {
         bottom: 12px;
@@ -716,7 +722,7 @@
         padding: 5px 12px;
       }
       .sound-prompt-pill {
-        top: 52px;
+        top: 94px;
         right: 10px;
         font-size: 0.72rem;
       }
@@ -1069,11 +1075,11 @@
         showToast(this.enabled ? '🔊 Đã bật âm thanh phép màu' : '🔇 Đã tắt âm thanh');
       }
 
-      // 1) Tiếng gió mùa đông rít lạnh lẽo (0s -> 3.4s)
+      // 1) Tiếng gió mùa đông rít lạnh lẽo (0s -> 6.2s)
       playWinterWind() {
         if (!this.ctx || !this.enabled) return;
         const now = this.ctx.currentTime;
-        const duration = 3.6;
+        const duration = 6.2;
         const bufferSize = Math.floor(this.ctx.sampleRate * duration);
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -1091,12 +1097,12 @@
         filter.type = 'bandpass';
         filter.Q.setValueAtTime(3.2, now);
         filter.frequency.setValueAtTime(240, now);
-        filter.frequency.exponentialRampToValueAtTime(880, now + 1.4);
-        filter.frequency.exponentialRampToValueAtTime(320, now + 3.4);
+        filter.frequency.exponentialRampToValueAtTime(840, now + 2.6);
+        filter.frequency.exponentialRampToValueAtTime(300, now + duration);
 
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.26, now + 0.8);
+        gain.gain.linearRampToValueAtTime(0.24, now + 1.1);
         gain.gain.linearRampToValueAtTime(0.001, now + duration);
 
         noise.connect(filter);
@@ -1145,12 +1151,12 @@
           this.playWinterWind();
         }
 
-        // Nhịp chuông lắc xe tuần lộc trong suốt ~3.6s bay ngang
-        const totalSteps = 16;
+        // Nhịp chuông lắc xe tuần lộc trong suốt ~6.4s bay ngang
+        const totalSteps = 22;
         for (let i = 0; i < totalSteps; i++) {
           const prog = i / (totalSteps - 1);
           if (prog < startAtProgress) continue;
-          const delayMs = (prog - startAtProgress) * 3500;
+          const delayMs = (prog - startAtProgress) * 6400;
           const timerId = setTimeout(() => {
             const pan = -0.9 + prog * 1.8; // Quét stereo trái -> phải
             const env = Math.sin(prog * Math.PI); // To dần ở giữa, nhỏ dần khi bay khuất
@@ -1159,8 +1165,8 @@
           this.rideTimers.push(timerId);
         }
 
-        // Bắt đầu nhạc Giáng Sinh Lofi êm dịu sau khi tuần lộc rải xong bụi (~3.9s)
-        const bgmDelay = Math.max(200, (1 - startAtProgress) * 3800);
+        // Bắt đầu nhạc Giáng Sinh Lofi êm dịu sau khi tuần lộc rải xong bụi (~6.6s)
+        const bgmDelay = Math.max(200, (1 - startAtProgress) * 6600);
         const bgmStartId = setTimeout(() => {
           this.startChristmasLofiBgm();
         }, bgmDelay);
@@ -1280,11 +1286,16 @@
     // Celebration bursts when tapping the dropped gift box
     let burstSparks = [];
 
-    // Animation Timeline State
+    // Animation Timeline State (Chậm rãi, mượt mà & điện ảnh hơn)
     let rideStartTime = performance.now();
-    let sleighProgress = 0; // 0 -> 1 over 3.9s
-    const RIDE_DURATION_MS = 3900;
-    const MORPH_START_MS = 3650;
+    let sleighProgress = 0; // 0 -> 1 over 6.8s
+    const RIDE_DURATION_MS = 6800;
+    const MORPH_START_MS = 6200;
+
+    // Winter Landscape Assets (Snow hills, pine trees, twinkling light garland)
+    let snowTrees = [];
+    let garlandSegments = [];
+    let snowGlints = [];
 
     // Dropped Gift Box Physics
     const giftBox = {
@@ -1306,6 +1317,15 @@
     let textGlowCanvas = null;
     let textGlowRect = { x: 0, y: 0, w: 0, h: 0 };
 
+    function getSnowGroundY(x) {
+      const nx = (x / Math.max(1, W)) - 0.5;
+      const centerBase = H * (W < 768 ? 0.77 : 0.775);
+      // Hai bên sườn hơi nâng lên để đặt cây thông, giữa thoải nhẹ đón hộp quà
+      const hillRise = Math.pow(Math.abs(nx) * 2, 1.45) * (H * 0.045);
+      const gentleRoll = Math.sin(nx * 7.5 + 0.4) * (H * 0.011);
+      return centerBase - hillRise + gentleRoll;
+    }
+
     function resizeCanvas() {
       W = window.innerWidth;
       H = window.innerHeight;
@@ -1315,27 +1335,28 @@
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
       initSkyAndSnow();
-      giftBox.targetY = H < 700 ? H * 0.72 : H * 0.73;
+      giftBox.size = W < 640 ? 36 : 44;
+      giftBox.targetY = getSnowGroundY(W * 0.5) - giftBox.size * 0.48;
       if (giftBox.landed) {
         giftBox.x = W * 0.5;
         giftBox.y = giftBox.targetY;
       }
-      giftBox.size = W < 640 ? 34 : 42;
       rebuildTextTargets();
     }
 
     function initSkyAndSnow() {
-      const starCount = W < 768 ? 95 : 160;
+      const isMobile = W < 768;
+      const starCount = isMobile ? 95 : 160;
       stars = Array.from({ length: starCount }, () => ({
         x: Math.random() * W,
-        y: Math.random() * H * 0.85,
+        y: Math.random() * H * 0.78,
         r: Math.random() * 1.5 + 0.4,
         phase: Math.random() * Math.PI * 2,
         speed: Math.random() * 2 + 1
       }));
 
       // Lớp 1: Tuyết rơi liên tục trắng / xanh lơ nhạt
-      const snowCount = W < 768 ? 130 : 210;
+      const snowCount = isMobile ? 130 : 210;
       snowflakes = Array.from({ length: snowCount }, () => ({
         x: Math.random() * W,
         y: Math.random() * H,
@@ -1345,6 +1366,103 @@
         swayPhase: Math.random() * Math.PI * 2,
         color: Math.random() > 0.35 ? 'rgba(255, 255, 255, 0.75)' : 'rgba(186, 230, 253, 0.7)'
       }));
+
+      // Cây thông Noel phủ tuyết hai bên nền đất
+      const treeSpecs = isMobile
+        ? [
+            { nx: 0.06, scale: 0.76, back: true },
+            { nx: 0.18, scale: 0.56, back: true },
+            { nx: 0.82, scale: 0.58, back: true },
+            { nx: 0.94, scale: 0.78, back: true },
+            { nx: 0.09, scale: 0.96, back: false },
+            { nx: 0.23, scale: 0.68, back: false },
+            { nx: 0.77, scale: 0.70, back: false },
+            { nx: 0.91, scale: 0.98, back: false }
+          ]
+        : [
+            { nx: 0.04, scale: 0.95, back: true },
+            { nx: 0.14, scale: 0.72, back: true },
+            { nx: 0.27, scale: 0.56, back: true },
+            { nx: 0.73, scale: 0.58, back: true },
+            { nx: 0.86, scale: 0.74, back: true },
+            { nx: 0.96, scale: 0.96, back: true },
+            { nx: 0.08, scale: 1.18, back: false },
+            { nx: 0.19, scale: 0.88, back: false },
+            { nx: 0.81, scale: 0.90, back: false },
+            { nx: 0.92, scale: 1.20, back: false }
+          ];
+
+      const bulbPalette = ['#fde047', '#fb7185', '#38bdf8', '#4ade80', '#fb923c', '#fffbeb'];
+      snowTrees = treeSpecs.map((spec, idx) => {
+        const x = spec.nx * W;
+        const groundY = spec.back
+          ? H * (isMobile ? 0.745 : 0.742) + Math.sin(spec.nx * 8) * 10
+          : getSnowGroundY(x) + 10;
+        const lights = [];
+        if (!spec.back) {
+          const lightPositions = [
+            { rx: -0.22, ry: -0.26 }, { rx: 0.16, ry: -0.32 },
+            { rx: -0.14, ry: -0.48 }, { rx: 0.20, ry: -0.54 },
+            { rx: -0.08, ry: -0.70 }, { rx: 0.11, ry: -0.78 }
+          ];
+          lightPositions.forEach((lp, li) => {
+            lights.push({
+              rx: lp.rx,
+              ry: lp.ry,
+              color: bulbPalette[(idx + li) % bulbPalette.length],
+              phase: Math.random() * Math.PI * 2,
+              speed: 2.2 + Math.random() * 2.2
+            });
+          });
+        }
+        return { x, y: groundY, scale: spec.scale, back: spec.back, lights };
+      });
+
+      // Dải đèn lấp lánh giăng ngang qua nền tuyết & gốc cây thông ở dưới
+      const anchorCount = isMobile ? 5 : 7;
+      const anchors = [];
+      for (let i = 0; i < anchorCount; i++) {
+        const ax = (i / (anchorCount - 1)) * W;
+        const postH = (i === 0 || i === anchorCount - 1) ? 46 : (i % 2 === 0 ? 34 : 26);
+        anchors.push({ x: ax, y: getSnowGroundY(ax) - postH + 12, baseY: getSnowGroundY(ax) + 8 });
+      }
+      garlandSegments = [];
+      for (let i = 0; i < anchors.length - 1; i++) {
+        const p0 = anchors[i];
+        const p1 = anchors[i + 1];
+        const midX = (p0.x + p1.x) * 0.5;
+        const sag = isMobile ? 22 : 28;
+        const ctrlY = Math.max(p0.y, p1.y) + sag;
+        const bulbsPerSeg = isMobile ? 7 : 9;
+        const bulbs = [];
+        for (let b = 1; b < bulbsPerSeg; b++) {
+          const t = b / bulbsPerSeg;
+          const inv = 1 - t;
+          const bx = inv * inv * p0.x + 2 * inv * t * midX + t * t * p1.x;
+          const by = inv * inv * p0.y + 2 * inv * t * ctrlY + t * t * p1.y;
+          bulbs.push({
+            x: bx,
+            y: by,
+            color: bulbPalette[(i * 3 + b) % bulbPalette.length],
+            phase: i * 1.1 + b * 0.65,
+            speed: 2.4 + (b % 3) * 0.7
+          });
+        }
+        garlandSegments.push({ p0, p1, midX, ctrlY, bulbs });
+      }
+
+      // Hạt ánh trăng lấp lánh trên mặt tuyết trắng
+      snowGlints = Array.from({ length: isMobile ? 28 : 48 }, () => {
+        const sx = Math.random() * W;
+        const sy = getSnowGroundY(sx) + 6 + Math.random() * (H * 0.14);
+        return {
+          x: sx,
+          y: sy,
+          r: Math.random() * 1.6 + 0.8,
+          phase: Math.random() * Math.PI * 2,
+          speed: 1.8 + Math.random() * 2.5
+        };
+      });
     }
 
     function sampleTextTargets() {
@@ -1476,13 +1594,13 @@
       const x = startX + (endX - startX) * progress;
 
       const moonY = isMobile ? H * 0.28 : H * 0.29;
-      // Đường bay cong qua mặt trăng + nhấp nhô nhịp phi của tuần lộc
+      // Đường bay cong qua mặt trăng + nhấp nhô nhịp phi chậm rãi của tuần lộc
       const arcLift = Math.sin(progress * Math.PI) * (isMobile ? 42 : 68);
-      const gallopWave = Math.sin(progress * Math.PI * 6) * (isMobile ? 12 : 18);
+      const gallopWave = Math.sin(progress * Math.PI * 5) * (isMobile ? 10 : 15);
       const y = moonY + 18 - arcLift + gallopWave;
 
       // Tính góc nghiêng nhẹ theo hướng nhấp nhô
-      const dWave = Math.cos(progress * Math.PI * 6) * 0.14 - Math.cos(progress * Math.PI) * 0.12;
+      const dWave = Math.cos(progress * Math.PI * 5) * 0.11 - Math.cos(progress * Math.PI) * 0.11;
       return { x, y, tilt: dWave };
     }
 
@@ -1555,7 +1673,7 @@
 
       offsets.forEach((r) => {
         ctx.save();
-        const bounce = Math.sin(timeSec * 12 + r.phase) * 3.5;
+        const bounce = Math.sin(timeSec * 7.5 + r.phase) * 3.0;
         ctx.translate(r.dx, r.dy + bounce);
 
         // Thân tuần lộc
@@ -1588,8 +1706,8 @@
         ctx.lineTo(12, -33);
         ctx.stroke();
 
-        // 4 chân phi nhịp nhàng
-        const kick = Math.sin(timeSec * 14 + r.phase);
+        // 4 chân phi nhịp nhàng khoan thai
+        const kick = Math.sin(timeSec * 8.5 + r.phase);
         ctx.lineWidth = 2.6;
         ctx.beginPath();
         // Hai chân trước
@@ -1695,89 +1813,381 @@
       ctx.restore();
     }
 
-    // Vẽ Hộp Quà 3D Rơi Bất Ngờ (Cải tiến 4)
+    function drawRoundedRectPath(x, y, w, h, r) {
+      const rr = Math.min(r, w * 0.5, h * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+    }
+
+    // Vẽ từng Cây Thông Noel phủ tuyết + đèn nháy trên nền đất trắng
+    function drawSnowPineTree(tree, timeSec) {
+      const s = tree.scale;
+      const trunkW = 8 * s;
+      const trunkH = 16 * s;
+      const totalH = 74 * s;
+      const maxW = 48 * s;
+
+      ctx.save();
+      ctx.translate(tree.x, tree.y);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Thân cây nhỏ
+      ctx.fillStyle = tree.back ? '#1e293b' : '#451a03';
+      drawRoundedRectPath(-trunkW * 0.5, -trunkH, trunkW, trunkH + 4, 3 * s);
+      ctx.fill();
+
+      // 4 tầng tán lá thông mềm mại + tuyết trắng phủ đỉnh
+      const tiers = 4;
+      for (let i = 0; i < tiers; i++) {
+        const t = i / (tiers - 1);
+        const tierW = maxW * (1 - t * 0.55);
+        const tierBottom = -trunkH - i * (totalH * 0.19);
+        const tierTop = tierBottom - totalH * (0.34 - t * 0.06);
+
+        const pineGrad = ctx.createLinearGradient(0, tierTop, 0, tierBottom);
+        if (tree.back) {
+          pineGrad.addColorStop(0, '#1e3a5f');
+          pineGrad.addColorStop(1, '#0f2544');
+        } else {
+          pineGrad.addColorStop(0, '#15803d');
+          pineGrad.addColorStop(1, '#064e3b');
+        }
+        ctx.fillStyle = pineGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, tierTop);
+        ctx.quadraticCurveTo(tierW * 0.35, (tierTop + tierBottom) * 0.52, tierW * 0.52, tierBottom);
+        ctx.quadraticCurveTo(0, tierBottom + 5 * s, -tierW * 0.52, tierBottom);
+        ctx.quadraticCurveTo(-tierW * 0.35, (tierTop + tierBottom) * 0.52, 0, tierTop);
+        ctx.closePath();
+        ctx.fill();
+
+        // Lớp tuyết trắng mềm phủ trên cành
+        ctx.fillStyle = tree.back ? 'rgba(219, 234, 254, 0.72)' : 'rgba(255, 255, 255, 0.92)';
+        ctx.beginPath();
+        ctx.moveTo(0, tierTop);
+        ctx.quadraticCurveTo(tierW * 0.24, tierTop + (tierBottom - tierTop) * 0.36, tierW * 0.38, tierTop + (tierBottom - tierTop) * 0.48);
+        ctx.quadraticCurveTo(tierW * 0.15, tierTop + (tierBottom - tierTop) * 0.42, 0, tierTop + (tierBottom - tierTop) * 0.50);
+        ctx.quadraticCurveTo(-tierW * 0.15, tierTop + (tierBottom - tierTop) * 0.42, -tierW * 0.38, tierTop + (tierBottom - tierTop) * 0.48);
+        ctx.quadraticCurveTo(-tierW * 0.24, tierTop + (tierBottom - tierTop) * 0.36, 0, tierTop);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Ngôi sao vàng đỉnh cây + đèn lấp lánh trên tán cây tiền cảnh
+      if (!tree.back) {
+        const starY = -trunkH - totalH * 0.93;
+        const starGlow = ctx.createRadialGradient(0, starY, 0.5, 0, starY, 10 * s);
+        starGlow.addColorStop(0, 'rgba(254, 249, 195, 0.95)');
+        starGlow.addColorStop(0.5, 'rgba(251, 191, 36, 0.45)');
+        starGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+        ctx.fillStyle = starGlow;
+        ctx.beginPath();
+        ctx.arc(0, starY, 10 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(0, starY, 2.8 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        tree.lights.forEach((b) => {
+          const lx = b.rx * maxW;
+          const ly = -trunkH + b.ry * totalH;
+          const pulse = 0.5 + 0.5 * Math.sin(timeSec * b.speed + b.phase);
+          ctx.globalAlpha = 0.4 + pulse * 0.6;
+          const bGlow = ctx.createRadialGradient(lx, ly, 0.5, lx, ly, 7 * s);
+          bGlow.addColorStop(0, '#ffffff');
+          bGlow.addColorStop(0.35, b.color);
+          bGlow.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = bGlow;
+          ctx.beginPath();
+          ctx.arc(lx, ly, 7 * s, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.restore();
+    }
+
+    // Nền đất tuyết trắng, hàng cây thông và dải đèn lấp lánh ở dưới
+    function drawWinterGroundAndTrees(timeSec) {
+      const isMobile = W < 768;
+
+      // 1) Đồi tuyết xa mờ ánh trăng phía sau
+      const backBase = H * (isMobile ? 0.745 : 0.742);
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      ctx.lineTo(0, backBase - 14);
+      ctx.quadraticCurveTo(W * 0.25, backBase - 26, W * 0.5, backBase + 8);
+      ctx.quadraticCurveTo(W * 0.75, backBase - 24, W, backBase - 12);
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      const backSnowGrad = ctx.createLinearGradient(0, backBase - 30, 0, H);
+      backSnowGrad.addColorStop(0, '#dbeafe');
+      backSnowGrad.addColorStop(0.55, '#bfdbfe');
+      backSnowGrad.addColorStop(1, '#93c5fd');
+      ctx.fillStyle = backSnowGrad;
+      ctx.fill();
+
+      // Cây thông lớp nền xa
+      snowTrees.forEach((t) => {
+        if (t.back) drawSnowPineTree(t, timeSec);
+      });
+
+      // 2) Nền đất tuyết trắng bồng bềnh phía trước
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      const step = 28;
+      ctx.lineTo(0, getSnowGroundY(0));
+      for (let x = step; x <= W; x += step) {
+        ctx.lineTo(x, getSnowGroundY(x));
+      }
+      ctx.lineTo(W, getSnowGroundY(W));
+      ctx.lineTo(W, H);
+      ctx.closePath();
+
+      const frontSnowGrad = ctx.createLinearGradient(0, H * 0.74, 0, H);
+      frontSnowGrad.addColorStop(0, '#ffffff');
+      frontSnowGrad.addColorStop(0.35, '#f0f9ff');
+      frontSnowGrad.addColorStop(0.85, '#dbeafe');
+      frontSnowGrad.addColorStop(1, '#cbd5e1');
+      ctx.fillStyle = frontSnowGrad;
+      ctx.fill();
+
+      // Viền sáng ánh trăng dọc sống đồi tuyết trắng
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, getSnowGroundY(0));
+      for (let x = step; x <= W; x += step) {
+        ctx.lineTo(x, getSnowGroundY(x));
+      }
+      ctx.lineTo(W, getSnowGroundY(W));
+      ctx.stroke();
+
+      // Tinh thể tuyết lấp lánh trên mặt đất trắng
+      snowGlints.forEach((g) => {
+        const alpha = 0.2 + 0.75 * (0.5 + 0.5 * Math.sin(timeSec * g.speed + g.phase));
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3) Cây thông Noel phủ tuyết lớp tiền cảnh
+      snowTrees.forEach((t) => {
+        if (!t.back) drawSnowPineTree(t, timeSec);
+      });
+
+      // 4) Dải đèn lấp lánh giăng ngang phía dưới
+      ctx.save();
+      ctx.lineCap = 'round';
+      garlandSegments.forEach((seg, segIdx) => {
+        // Cọc gỗ nhỏ giữ dây đèn (bỏ qua 2 mép ngoài cùng màn hình)
+        if (segIdx > 0) {
+          ctx.strokeStyle = 'rgba(71, 85, 105, 0.75)';
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(seg.p0.x, seg.p0.baseY);
+          ctx.lineTo(seg.p0.x, seg.p0.y);
+          ctx.stroke();
+        }
+
+        // Dây đèn cong mềm
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(seg.p0.x, seg.p0.y);
+        ctx.quadraticCurveTo(seg.midX, seg.ctrlY, seg.p1.x, seg.p1.y);
+        ctx.stroke();
+
+        // Bóng đèn nhấp nháy tỏa sáng lên tuyết trắng
+        seg.bulbs.forEach((b) => {
+          const pulse = 0.45 + 0.55 * Math.sin(timeSec * b.speed + b.phase);
+          const haloR = (isMobile ? 10 : 13) * (0.8 + pulse * 0.4);
+          const bulbGlow = ctx.createRadialGradient(b.x, b.y, 0.5, b.x, b.y, haloR);
+          bulbGlow.addColorStop(0, '#ffffff');
+          bulbGlow.addColorStop(0.32, b.color);
+          bulbGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.globalAlpha = 0.42 + pulse * 0.58;
+          ctx.fillStyle = bulbGlow;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, haloR, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.globalAlpha = 0.85 + pulse * 0.15;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, isMobile ? 2.1 : 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      });
+      ctx.restore();
+    }
+
+    // Vẽ Hộp Quà 3D Rơi Bất Ngờ — bo tròn, nét vẽ mềm mại tự nhiên
     function drawDroppedGiftBox(timeSec) {
       if (!giftBox.spawned) return;
 
-      const hoverOffset = giftBox.landed ? Math.sin(timeSec * 2.8) * 5 : 0;
+      const hoverOffset = giftBox.landed ? Math.sin(timeSec * 2.5) * 4.2 : 0;
       const gx = giftBox.x;
       const gy = giftBox.y + hoverOffset;
       const s = giftBox.size * giftBox.scaleBounce;
 
+      // Bóng đổ mềm trên nền tuyết trắng bên dưới hộp quà
+      if (giftBox.landed) {
+        const shadowScale = 1 - (hoverOffset + 4.2) * 0.025;
+        ctx.save();
+        ctx.fillStyle = 'rgba(30, 58, 138, 0.20)';
+        ctx.beginPath();
+        ctx.ellipse(gx + 5, giftBox.targetY + s * 0.45, s * 0.62 * shadowScale, s * 0.18 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       ctx.save();
       ctx.translate(gx, gy);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
       if (!giftBox.landed) {
         ctx.rotate(giftBox.rot);
       } else {
-        ctx.rotate(Math.sin(timeSec * 2.1) * 0.04);
+        ctx.rotate(Math.sin(timeSec * 2.0) * 0.035);
       }
 
       // Vòng hào quang mời chạm phía sau hộp quà
-      const pulseR = s * (1.35 + Math.sin(timeSec * 3.5) * 0.18);
+      const pulseR = s * (1.35 + Math.sin(timeSec * 3.2) * 0.16);
       const glow = ctx.createRadialGradient(0, 0, s * 0.2, 0, 0, pulseR * 1.4);
       glow.addColorStop(0, 'rgba(251, 191, 36, 0.55)');
-      glow.addColorStop(0.6, 'rgba(225, 29, 72, 0.28)');
+      glow.addColorStop(0.6, 'rgba(244, 63, 94, 0.26)');
       glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
       ctx.arc(0, 0, pulseR * 1.4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Mặt trước trái hộp quà (3D isometric effect)
-      const w = s * 0.9;
+      const w = s * 0.92;
       const h = s * 0.78;
-      const depthX = s * 0.34;
-      const depthY = -s * 0.24;
+      const rCorner = s * 0.14;
+      const depthX = s * 0.30;
+      const depthY = -s * 0.20;
 
-      // Mặt hông bên phải (tối hơn tạo chiều sâu 3D)
-      ctx.fillStyle = '#9f1239';
+      // Mặt hông bên phải bo mềm tạo khối 3D dịu mắt
+      const sideGrad = ctx.createLinearGradient(w / 2, -h / 2, w / 2 + depthX, h / 2);
+      sideGrad.addColorStop(0, '#be123c');
+      sideGrad.addColorStop(1, '#881337');
+      ctx.fillStyle = sideGrad;
       ctx.beginPath();
-      ctx.moveTo(w / 2, -h / 2);
-      ctx.lineTo(w / 2 + depthX, -h / 2 + depthY);
-      ctx.lineTo(w / 2 + depthX, h / 2 + depthY);
-      ctx.lineTo(w / 2, h / 2);
+      ctx.moveTo(w / 2 - 2, -h / 2 + rCorner * 0.3);
+      ctx.quadraticCurveTo(w / 2 + depthX * 0.55, -h / 2 + depthY * 0.55, w / 2 + depthX - 2, -h / 2 + depthY + rCorner * 0.45);
+      ctx.quadraticCurveTo(w / 2 + depthX + 2, depthY * 0.2, w / 2 + depthX - 2, h / 2 + depthY - rCorner * 0.45);
+      ctx.quadraticCurveTo(w / 2 + depthX * 0.55, h / 2 + depthY * 0.55, w / 2 - 2, h / 2 - rCorner * 0.3);
       ctx.closePath();
       ctx.fill();
 
-      // Mặt chính phía trước
+      // Mặt chính phía trước bo tròn mềm
       const frontGrad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-      frontGrad.addColorStop(0, '#f43f5e');
+      frontGrad.addColorStop(0, '#fb7185');
+      frontGrad.addColorStop(0.55, '#f43f5e');
       frontGrad.addColorStop(1, '#be123c');
       ctx.fillStyle = frontGrad;
-      ctx.fillRect(-w / 2, -h / 2, w, h);
+      drawRoundedRectPath(-w / 2, -h / 2, w, h, rCorner);
+      ctx.fill();
 
-      // Nắp hộp quà (nổi lên 3D)
-      ctx.fillStyle = '#fda4af';
+      // Viền sáng lụa nhẹ mặt hộp
+      ctx.strokeStyle = 'rgba(255, 228, 230, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Bóng đổ mềm ngay dưới nắp hộp
+      ctx.fillStyle = 'rgba(136, 19, 55, 0.28)';
+      drawRoundedRectPath(-w / 2 + 1, -h / 2 + 1, w - 2, h * 0.16, rCorner * 0.5);
+      ctx.fill();
+
+      // Dải ruy băng vàng óng bo mềm theo thân hộp
+      const ribGradV = ctx.createLinearGradient(-w * 0.13, 0, w * 0.13, 0);
+      ribGradV.addColorStop(0, '#f59e0b');
+      ribGradV.addColorStop(0.5, '#fef08a');
+      ribGradV.addColorStop(1, '#d97706');
+      ctx.fillStyle = ribGradV;
+      drawRoundedRectPath(-w * 0.12, -h / 2 + 1, w * 0.24, h - 2, 4);
+      ctx.fill();
+
+      const ribGradH = ctx.createLinearGradient(0, -h * 0.11, 0, h * 0.11);
+      ribGradH.addColorStop(0, '#fef08a');
+      ribGradH.addColorStop(0.5, '#fbbf24');
+      ribGradH.addColorStop(1, '#d97706');
+      ctx.fillStyle = ribGradH;
+      drawRoundedRectPath(-w / 2 + 1, -h * 0.11, w - 2, h * 0.22, 4);
+      ctx.fill();
+
+      // Nắp hộp quà phồng nhẹ, bo tròn góc (đỡ cứng)
+      const lidGrad = ctx.createLinearGradient(-w / 2, -h / 2 + depthY, w / 2 + depthX, -h / 2 + 4);
+      lidGrad.addColorStop(0, '#ffe4e6');
+      lidGrad.addColorStop(0.5, '#fda4af');
+      lidGrad.addColorStop(1, '#fb7185');
+      ctx.fillStyle = lidGrad;
       ctx.beginPath();
-      ctx.moveTo(-w / 2 - 3, -h / 2);
-      ctx.lineTo(w / 2 + 3, -h / 2);
-      ctx.lineTo(w / 2 + depthX + 3, -h / 2 + depthY);
-      ctx.lineTo(-w / 2 + depthX - 3, -h / 2 + depthY);
+      ctx.moveTo(-w / 2 - 2, -h / 2 + 2);
+      ctx.quadraticCurveTo(0, -h / 2 + 5, w / 2 + 2, -h / 2 + 2);
+      ctx.quadraticCurveTo(w / 2 + depthX + 3, -h / 2 + depthY * 0.45, w / 2 + depthX, -h / 2 + depthY + 1);
+      ctx.quadraticCurveTo(depthX * 0.5, -h / 2 + depthY - 3, -w / 2 + depthX, -h / 2 + depthY + 1);
+      ctx.quadraticCurveTo(-w / 2 - 3, -h / 2 + depthY * 0.55, -w / 2 - 2, -h / 2 + 2);
       ctx.closePath();
       ctx.fill();
 
-      // Dải ruy băng vàng kim mặt trước & mặt bên
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(-w * 0.13, -h / 2, w * 0.26, h);
-      ctx.fillRect(-w / 2, -h * 0.12, w, h * 0.24);
-
-      // Ruy băng trên nắp
-      ctx.beginPath();
-      ctx.moveTo(-w * 0.13, -h / 2);
-      ctx.lineTo(w * 0.13, -h / 2);
-      ctx.lineTo(w * 0.13 + depthX, -h / 2 + depthY);
-      ctx.lineTo(-w * 0.13 + depthX, -h / 2 + depthY);
-      ctx.closePath();
-      ctx.fill();
-
-      // Nơ vàng trên đỉnh hộp
+      // Dải ruy băng lượn trên nắp hộp
       ctx.fillStyle = '#fde047';
       ctx.beginPath();
-      ctx.ellipse(depthX * 0.45 - 8, -h / 2 + depthY * 0.5 - 6, 9, 5, -0.45, 0, Math.PI * 2);
-      ctx.ellipse(depthX * 0.45 + 8, -h / 2 + depthY * 0.5 - 6, 9, 5, 0.45, 0, Math.PI * 2);
+      ctx.moveTo(-w * 0.12, -h / 2 + 3);
+      ctx.quadraticCurveTo(w * 0.0, -h / 2 + 4, w * 0.12, -h / 2 + 3);
+      ctx.quadraticCurveTo(w * 0.12 + depthX * 0.6, -h / 2 + depthY * 0.5, w * 0.12 + depthX * 0.96, -h / 2 + depthY);
+      ctx.lineTo(-w * 0.12 + depthX * 0.96, -h / 2 + depthY);
+      ctx.quadraticCurveTo(-w * 0.12 + depthX * 0.5, -h / 2 + depthY * 0.5, -w * 0.12, -h / 2 + 3);
+      ctx.closePath();
       ctx.fill();
+
+      // Nơ lụa mềm 2 cánh + đuôi ruy băng cong dịu trên đỉnh nắp
+      const bowX = depthX * 0.48;
+      const bowY = -h / 2 + depthY * 0.5 - 3;
+
+      // Hai đuôi nơ rủ nhẹ
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3.2;
       ctx.beginPath();
-      ctx.arc(depthX * 0.45, -h / 2 + depthY * 0.5 - 5, 4.5, 0, Math.PI * 2);
+      ctx.moveTo(bowX - 1, bowY + 1);
+      ctx.quadraticCurveTo(bowX - 10, bowY + 4, bowX - 13, bowY + 11);
+      ctx.moveTo(bowX + 1, bowY + 1);
+      ctx.quadraticCurveTo(bowX + 10, bowY + 4, bowX + 13, bowY + 11);
+      ctx.stroke();
+
+      // Hai tai nơ phồng
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.moveTo(bowX, bowY);
+      ctx.bezierCurveTo(bowX - 6, bowY - 12, bowX - 18, bowY - 6, bowX - 11, bowY + 2);
+      ctx.bezierCurveTo(bowX - 6, bowY + 5, bowX - 2, bowY + 2, bowX, bowY);
+      ctx.moveTo(bowX, bowY);
+      ctx.bezierCurveTo(bowX + 6, bowY - 12, bowX + 18, bowY - 6, bowX + 11, bowY + 2);
+      ctx.bezierCurveTo(bowX + 6, bowY + 5, bowX + 2, bowY + 2, bowX, bowY);
+      ctx.fill();
+
+      // Nút thắt tròn giữa nơ
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(bowX, bowY, 4.2, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
@@ -1829,6 +2239,9 @@
 
       // 2. Mặt Trăng Khổng Lồ + Silhouette Cỗ Xe Tuần Lộc in bóng đen
       drawGiantMoonAndSilhouette(sleighPos, sleighVisible, timeSec);
+
+      // 2.5 Nền đất tuyết trắng, cây thông Noel & dải đèn lấp lánh ở dưới
+      drawWinterGroundAndTrees(timeSec);
 
       // 3. Lớp 1 (Nền): Tuyết rơi liên tục trắng / xanh lơ nhạt
       snowflakes.forEach((sf) => {
@@ -2519,3 +2932,4 @@
   </script>
 </body>
 </html>
+

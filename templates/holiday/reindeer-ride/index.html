@@ -1044,6 +1044,11 @@
           clearInterval(this.bgmTimer);
           this.bgmTimer = null;
         }
+        if (this.activeFlyby) {
+          try { this.activeFlyby.gain.gain.setTargetAtTime(0.0001, this.ctx.currentTime, 0.03); } catch (e) {}
+          try { this.activeFlyby.sources.forEach((s) => s.stop()); } catch (e) {}
+          this.activeFlyby = null;
+        }
       }
 
       toggle() {
@@ -1102,34 +1107,115 @@
         noise.stop(now + duration);
       }
 
-      // 2) Tiếng chuông tuần lộc (Jingle Bells) quét Stereo từ Trái -> Giữa (To) -> Phải (Nhỏ)
-      playSleighBellPulse(panValue, volume) {
-        if (!this.ctx || !this.enabled) return;
+      // 2) Âm thanh Không Gian (Spatial / Panning + Fade-in/out + Doppler):
+      // Tiếng chuông & luồng gió cỗ xe quét liên tục từ Loa Trái (nhỏ) -> Giữa mặt (rất rõ) -> Loa Phải (nhỏ dần)
+      createSpatialFlybyBus(startAtProgress, durationSec) {
         const now = this.ctx.currentTime;
-        const partials = [2180, 3260, 4420, 5680];
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.Q.setValueAtTime(0.75, now);
 
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        const gain = this.ctx.createGain();
+
         if (panner) {
-          panner.pan.setValueAtTime(Math.max(-1, Math.min(1, panValue)), now);
-          panner.connect(this.masterGain);
+          filter.connect(panner);
+          panner.connect(gain);
+        } else {
+          filter.connect(gain);
         }
-        const dest = panner || this.masterGain;
+        gain.connect(this.masterGain);
 
-        partials.forEach((freq, idx) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-          osc.frequency.setValueAtTime(freq + (Math.random() - 0.5) * 45, now);
+        const curveSteps = 24;
+        for (let i = 0; i <= curveSteps; i++) {
+          const u = i / curveSteps;
+          const prog = startAtProgress + (1 - startAtProgress) * u;
+          const t = now + durationSec * u;
 
-          const amp = (volume * 0.065) / (idx + 1);
-          gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.exponentialRampToValueAtTime(Math.max(0.001, amp), now + 0.015);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+          // Quét liên tục từ Trái (-0.98) -> Giữa (0.0) -> Phải (+0.98)
+          const pan = -0.98 + prog * 1.96;
+          if (panner) {
+            if (i === 0) panner.pan.setValueAtTime(pan, t);
+            else panner.pan.linearRampToValueAtTime(pan, t);
+          }
 
-          osc.connect(gain);
-          gain.connect(dest);
-          osc.start(now);
-          osc.stop(now + 0.26);
+          // Fade-in mượt từ xa, bùng nổ rõ ngay trước mặt ở giữa (prog=0.5), rồi nhỏ dần khi bay khuất
+          const proximity = Math.pow(Math.max(0.05, Math.sin(prog * Math.PI)), 1.35);
+          const vol = 0.06 + proximity * 0.94;
+          if (i === 0) gain.gain.setValueAtTime(vol, t);
+          else gain.gain.linearRampToValueAtTime(vol, t);
+
+          // Mô phỏng không khí hấp thụ âm cao ở xa & sáng rực khi lướt ngay trước mặt
+          const cutoff = 1400 + proximity * 8400;
+          if (i === 0) filter.frequency.setValueAtTime(cutoff, t);
+          else filter.frequency.linearRampToValueAtTime(cutoff, t);
+        }
+
+        const flyby = { input: filter, gain, sources: [] };
+        this.activeFlyby = flyby;
+        return flyby;
+      }
+
+      playSpatialAirWhoosh(dest, durationSec) {
+        if (!this.ctx || !this.enabled) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = Math.max(1024, Math.floor(this.ctx.sampleRate * durationSec));
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          lastOut = (lastOut + 0.06 * white) / 1.06;
+          data[i] = lastOut * 2.8;
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const bp = this.ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.Q.setValueAtTime(1.6, now);
+        bp.frequency.setValueAtTime(340, now);
+        bp.frequency.exponentialRampToValueAtTime(1250, now + durationSec * 0.48);
+        bp.frequency.exponentialRampToValueAtTime(280, now + durationSec);
+
+        const whooshGain = this.ctx.createGain();
+        whooshGain.gain.setValueAtTime(0.28, now);
+
+        noise.connect(bp);
+        bp.connect(whooshGain);
+        whooshGain.connect(dest);
+        noise.start(now);
+        noise.stop(now + durationSec);
+        if (this.activeFlyby) this.activeFlyby.sources.push(noise);
+      }
+
+      playSleighBellCluster(dest, atTime, dopplerRatio, intensity) {
+        if (!this.ctx || !this.enabled) return;
+        // Tạo 2 nhịp rung chuông sát nhau mô phỏng chùm lục lạc cổ tuần lộc khi phi nước đại
+        const microHits = [0, 0.048];
+        const basePartials = [2160, 2980, 3890, 5240, 6480];
+
+        microHits.forEach((offset, hIdx) => {
+          const t0 = atTime + offset;
+          const hitScale = hIdx === 0 ? 1.0 : 0.62;
+          basePartials.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+            const f = freq * dopplerRatio + (Math.random() - 0.5) * 38;
+            osc.frequency.setValueAtTime(f, t0);
+
+            const amp = (intensity * hitScale * 0.075) / (idx + 1);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(Math.max(0.0008, amp), t0 + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.23);
+
+            osc.connect(g);
+            g.connect(dest);
+            osc.start(t0);
+            osc.stop(t0 + 0.25);
+          });
         });
       }
 
@@ -1141,18 +1227,24 @@
           this.playWinterWind();
         }
 
-        // Nhịp chuông lắc xe tuần lộc trong suốt ~6.4s bay ngang
-        const totalSteps = 22;
+        const totalRideSec = 6.6;
+        const remainingSec = Math.max(0.4, (1 - startAtProgress) * totalRideSec);
+        const now = this.ctx.currentTime;
+
+        // Kênh âm thanh không gian quét mượt Trái -> Giữa -> Phải
+        const flyby = this.createSpatialFlybyBus(startAtProgress, remainingSec);
+        this.playSpatialAirWhoosh(flyby.input, remainingSec);
+
+        // Lên lịch chùm chuông tuần lộc chuẩn xác theo timeline Web Audio (không giật lag)
+        const totalSteps = 26;
         for (let i = 0; i < totalSteps; i++) {
           const prog = i / (totalSteps - 1);
           if (prog < startAtProgress) continue;
-          const delayMs = (prog - startAtProgress) * 6400;
-          const timerId = setTimeout(() => {
-            const pan = -0.9 + prog * 1.8; // Quét stereo trái -> phải
-            const env = Math.sin(prog * Math.PI); // To dần ở giữa, nhỏ dần khi bay khuất
-            this.playSleighBellPulse(pan, 0.2 + env * 0.95);
-          }, Math.max(0, delayMs));
-          this.rideTimers.push(timerId);
+          const relTime = ((prog - startAtProgress) / Math.max(0.01, 1 - startAtProgress)) * remainingSec;
+          // Hiệu ứng Doppler nhẹ: tiến tới hơi cao hơn (+3%), bay xa hơi trầm xuống (-4%)
+          const dopplerRatio = 1.03 - prog * 0.07;
+          const intensity = 0.72 + Math.sin(prog * Math.PI) * 0.48;
+          this.playSleighBellCluster(flyby.input, now + relTime, dopplerRatio, intensity);
         }
 
         // Bắt đầu nhạc Giáng Sinh Lofi êm dịu sau khi tuần lộc rải xong bụi (~6.6s)

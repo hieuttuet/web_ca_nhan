@@ -873,10 +873,13 @@
       }
       .sound-prompt-pill {
         top: auto;
-        bottom: 72px;
-        right: 50%;
-        transform: translateX(50%);
+        bottom: 68px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
         white-space: nowrap;
+        max-width: calc(100vw - 24px);
+        text-align: center;
       }
     }
 
@@ -922,14 +925,14 @@
   </div>
 
   <!-- SOUND UNLOCK PILL -->
-  <div id="sound-unlock-pill" class="sound-prompt-pill">🎵 Chạm để bật Sáo trúc / Đàn tranh</div>
+  <div id="sound-unlock-pill" class="sound-prompt-pill">🎵 Chạm để bật nhạc Xuân</div>
 
   <!-- BOTTOM HUD -->
   <div class="bottom-hud">
-    <button type="button" id="btn-open-scroll-direct" class="hud-btn" style="display:none;">📜 Mở Cuốn Thư Pháp</button>
-    <button type="button" id="btn-open-photos-direct" class="hud-btn" style="display:none;">📸 Ảnh Kỷ Niệm</button>
-    <button type="button" id="btn-open-creator" class="hud-btn creator-only" style="background: linear-gradient(135deg, rgba(220,38,38,0.9), rgba(217,119,6,0.9)); border-color: #fde047; padding: 0 18px;">
-      ✏️ Tạo Thiệp & Lấy Mã (50k)
+    <button type="button" id="btn-open-scroll-direct" class="hud-btn" style="display:none; white-space:nowrap;">📜 Mở Cuốn Thư Pháp</button>
+    <button type="button" id="btn-open-photos-direct" class="hud-btn" style="display:none; white-space:nowrap;">📸 Ảnh Kỷ Niệm</button>
+    <button type="button" id="btn-open-creator" class="hud-btn creator-only" style="background: linear-gradient(135deg, rgba(220,38,38,0.9), rgba(217,119,6,0.9)); border-color: #fde047; padding: 0 18px; white-space: nowrap;">
+      ✏️ Tạo Thiệp (50k)
     </button>
   </div>
 
@@ -1755,22 +1758,59 @@
       return flower;
     }
 
+    let leafTexture = null;
+    function createLeafTexture() {
+      if (leafTexture) return leafTexture;
+      const c = document.createElement('canvas');
+      c.width = 128;
+      c.height = 256;
+      const g = c.getContext('2d');
+      g.clearRect(0, 0, 128, 256);
+      g.save();
+      g.translate(64, 128);
+      g.beginPath();
+      g.moveTo(0, 110);
+      g.bezierCurveTo(-48, 52, -46, -42, 0, -112);
+      g.bezierCurveTo(46, -42, 48, 52, 0, 110);
+      g.closePath();
+
+      const grad = g.createLinearGradient(0, 110, 0, -112);
+      grad.addColorStop(0, '#15803d');
+      grad.addColorStop(0.55, '#4ade80');
+      grad.addColorStop(1, '#bef264');
+      g.fillStyle = grad;
+      g.fill();
+
+      // Gân lá giữa mảnh
+      g.strokeStyle = 'rgba(236, 253, 245, 0.45)';
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(0, 102);
+      g.lineTo(0, -96);
+      g.stroke();
+      g.restore();
+
+      leafTexture = new THREE.CanvasTexture(c);
+      leafTexture.needsUpdate = true;
+      return leafTexture;
+    }
+
     function createSpringLeaf(scale = 1) {
       if (!leafGeo) {
-        leafGeo = new THREE.PlaneGeometry(0.16, 0.34, 2, 3);
+        leafGeo = new THREE.PlaneGeometry(0.18, 0.36, 2, 3);
         const pos = leafGeo.attributes.position;
         for (let i = 0; i < pos.count; i++) {
           const y = pos.getY(i);
-          const taper = 1 - Math.pow(Math.abs(y) / 0.17, 1.5) * 0.85;
-          pos.setX(i, pos.getX(i) * taper);
-          pos.setZ(i, Math.sin(y * 8) * 0.03);
+          pos.setZ(i, Math.sin(y * 7) * 0.035);
         }
         leafGeo.computeVertexNormals();
       }
       const mat = new THREE.MeshStandardMaterial({
-        color: 0x4ade80,
+        map: createLeafTexture(),
+        transparent: true,
+        alphaTest: 0.08,
         emissive: 0x14532d,
-        emissiveIntensity: 0.35,
+        emissiveIntensity: 0.25,
         side: THREE.DoubleSide,
         roughness: 0.55
       });
@@ -2356,14 +2396,19 @@
         if (sp.position.x < -13) sp.position.x = 13;
       }
 
-      // 2. Camera Fly-through 3D (dolly in nhẹ nhàng + parallax)
+      // 2. Camera Fly-through 3D (dolly in nhẹ nhàng + tự lùi trên màn hình dọc điện thoại để toàn bộ nụ hái lộc nằm gọn trong khung)
+      const aspect = window.innerWidth / Math.max(1, window.innerHeight);
+      const isPortrait = aspect < 1;
+      const baseZ = isPortrait ? 6.2 + (1 - aspect) * 5.8 : 6.2;
+      const baseLookX = isPortrait ? -0.35 : 0.15;
+
       cameraDragX += (targetDragX - cameraDragX) * 0.06;
       cameraDragY += (targetDragY - cameraDragY) * 0.06;
-      const dollyWave = Math.sin(elapsed * 0.25) * 0.45;
-      camera.position.x = Math.sin(elapsed * 0.35) * 0.25 - cameraDragX * 1.4;
+      const dollyWave = Math.sin(elapsed * 0.25) * 0.42;
+      camera.position.x = (isPortrait ? -0.45 : 0) + Math.sin(elapsed * 0.35) * 0.22 - cameraDragX * 1.4;
       camera.position.y = 0.15 + Math.cos(elapsed * 0.28) * 0.14 + cameraDragY * 1.1;
-      camera.position.z = 6.2 - dollyWave;
-      camera.lookAt(0.15 - cameraDragX * 0.4, 0.08 + cameraDragY * 0.3, 0);
+      camera.position.z = baseZ - dollyWave;
+      camera.lookAt(baseLookX - cameraDragX * 0.4, 0.08 + cameraDragY * 0.3, 0);
 
       // 3. Cánh hoa 3D rơi & xoay vòng quanh 3 trục + xuyên qua camera (Bokeh DOF)
       for (let i = 0; i < petalMeshes.length; i++) {
@@ -2411,10 +2456,13 @@
         if (branchGrowProgress > 0.62 && !budBloomed) {
           const worldPos = new THREE.Vector3();
           budGroup.getWorldPosition(worldPos);
-          worldPos.y += 0.42;
+          worldPos.y += 0.48;
           worldPos.project(camera);
-          const sx = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
-          const sy = (-worldPos.y * 0.5 + 0.5) * window.innerHeight;
+          const rawSx = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
+          const rawSy = (-worldPos.y * 0.5 + 0.5) * window.innerHeight;
+          const padX = Math.min(105, window.innerWidth * 0.26);
+          const sx = Math.max(padX, Math.min(window.innerWidth - padX, rawSx));
+          const sy = Math.max(92, Math.min(window.innerHeight - 130, rawSy));
           budHintEl.style.left = `${sx}px`;
           budHintEl.style.top = `${sy}px`;
           budHintEl.classList.remove('hidden');

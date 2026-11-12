@@ -271,6 +271,25 @@ const HOLIDAY_TEMPLATES = [
       occasion: 'Chúc Mừng Năm Mới 2027 • Tết Đinh Mùi',
       theme: 'gold'
     }
+  },
+  {
+    id: 'reindeer_sleigh_magic',
+    category: 'holiday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Tuần Lộc Chạy Qua • Bụi Tiên Tụ Chữ',
+    subtitle: 'Cỗ xe tuần lộc lướt ngang mặt trăng khổng lồ, rải bụi tiên tụ thành lời chúc & đánh rơi hộp quà kỷ niệm',
+    badge: '🦌 Noel Điện Ảnh',
+    price: 35000,
+    oldPrice: 59000,
+    engineUrl: 'templates/holiday/reindeer-ride/index.html',
+    previewGradient: 'linear-gradient(135deg, #040814 0%, #172554 55%, #312e81 100%)',
+    previewEmoji: '🛷',
+    features: ['Bóng xe tuần lộc qua mặt trăng', 'Bụi tiên tụ chữ & Tuyết rơi 2 lớp', 'Chạm hộp quà rơi bung ảnh kỷ niệm'],
+    preset: {
+      occasion: 'Merry Christmas • Giáng Sinh An Lành',
+      theme: 'gold'
+    }
   }
 ];
 

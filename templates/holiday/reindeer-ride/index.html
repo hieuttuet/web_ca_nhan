@@ -339,6 +339,17 @@
       transition: all 0.2s;
     }
 
+    .mem-arrow-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
     .mem-nav-btn:hover {
       background: rgba(251, 191, 36, 0.24);
     }
@@ -709,6 +720,15 @@
         align-items: flex-end;
         gap: 6px;
       }
+      .top-right-group .hud-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        justify-content: center;
+      }
+      .top-right-group .hud-btn-label {
+        display: none;
+      }
       .bottom-hud-stack {
         bottom: 12px;
         gap: 6px;
@@ -722,7 +742,7 @@
         padding: 5px 12px;
       }
       .sound-prompt-pill {
-        top: 94px;
+        top: 98px;
         right: 10px;
         font-size: 0.72rem;
       }
@@ -744,10 +764,10 @@
     </a>
     <div class="top-right-group">
       <button type="button" id="btn-replay" class="hud-btn" title="Xem lại màn Tuần Lộc chạy qua">
-        <span>🔄</span><span>Xem Lại</span>
+        <span>🔄</span><span class="hud-btn-label">Xem Lại</span>
       </button>
       <button type="button" id="btn-toggle-sound" class="hud-btn active" title="Bật/Tắt Âm Thanh">
-        <span id="sound-icon">🔊</span><span id="sound-label">Âm Thanh</span>
+        <span id="sound-icon">🔊</span><span id="sound-label" class="hud-btn-label">Âm Thanh</span>
       </button>
     </div>
   </header>
@@ -792,15 +812,15 @@
           <img id="memory-photo-img" src="" alt="Kỷ niệm ngọt ngào" />
         </div>
         <div id="memory-photo-caption" class="polaroid-caption">Khoảnh khắc Giáng Sinh ✨</div>
-        <div id="memory-photo-counter" class="polaroid-counter">Ảnh 1 / 6 • Vuốt ngang để lướt ảnh</div>
+        <div id="memory-photo-counter" class="polaroid-counter">Ảnh 1 / 6</div>
       </div>
 
       <div id="memory-dots" class="mem-dots"></div>
 
       <div class="memory-nav-row">
-        <button type="button" id="btn-prev-photo" class="mem-nav-btn">◀ Ảnh Trước</button>
+        <button type="button" id="btn-prev-photo" class="mem-nav-btn mem-arrow-btn" aria-label="Ảnh trước" title="Ảnh trước">‹</button>
         <button type="button" id="btn-burst-read-letter" class="mem-nav-btn" style="background: rgba(225, 29, 72, 0.35); border-color: #fb7185; color: #ffe4e6;">💌 Đọc Tâm Thư</button>
-        <button type="button" id="btn-next-photo" class="mem-nav-btn">Ảnh Sau ▶</button>
+        <button type="button" id="btn-next-photo" class="mem-nav-btn mem-arrow-btn" aria-label="Ảnh sau" title="Ảnh sau">›</button>
       </div>
     </div>
   </div>
@@ -1939,6 +1959,139 @@
       ctx.restore();
     }
 
+    // Bóng ngôi nhà màu đen trên nền đất tuyết trắng
+    function drawBlackHouseSilhouette(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Khói bếp bay nhẹ lên từ ống khói
+      for (let i = 0; i < 3; i++) {
+        const drift = Math.sin(timeSec * 1.4 + i * 1.5) * 3;
+        const puffY = -58 - i * 10 - ((timeSec * 8 + i * 7) % 14);
+        const alpha = Math.max(0.06, 0.28 - i * 0.08);
+        ctx.fillStyle = `rgba(226, 232, 240, ${alpha.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(16 + drift + i * 2, puffY, 3.2 + i * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = '#070b16';
+      // Ống khói
+      drawRoundedRectPath(12, -52, 8, 22, 2);
+      ctx.fill();
+
+      // Thân nhà màu đen (ngôi nhà chính + hiên nhỏ bên cạnh)
+      drawRoundedRectPath(-24, -28, 48, 30, 3);
+      ctx.fill();
+      drawRoundedRectPath(20, -18, 16, 20, 2);
+      ctx.fill();
+
+      // Mái nhà tam giác vát nhọn màu đen
+      ctx.beginPath();
+      ctx.moveTo(-31, -26);
+      ctx.lineTo(0, -52);
+      ctx.lineTo(31, -26);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mái hiên nhỏ
+      ctx.beginPath();
+      ctx.moveTo(19, -17);
+      ctx.lineTo(29, -27);
+      ctx.lineTo(40, -17);
+      ctx.closePath();
+      ctx.fill();
+
+      // Viền tuyết trắng mỏng đọng trên đỉnh mái nhà đen
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-30, -27);
+      ctx.lineTo(0, -52);
+      ctx.lineTo(30, -27);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Bóng cặp đôi màu đen đứng ngắm bầu trời đêm trên nền tuyết trắng
+    function drawBlackPeopleSilhouette(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#070b16';
+      ctx.strokeStyle = '#070b16';
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // --- Người 1 (cao hơn bên trái, ngước nhìn lên) ---
+      // Hai chân
+      ctx.lineWidth = 4.2;
+      ctx.beginPath();
+      ctx.moveTo(-11, -13);
+      ctx.lineTo(-13, 1);
+      ctx.moveTo(-6, -13);
+      ctx.lineTo(-5, 1);
+      ctx.stroke();
+      // Thân áo khoác
+      ctx.beginPath();
+      ctx.moveTo(-15, -12);
+      ctx.quadraticCurveTo(-15, -31, -11, -34);
+      ctx.lineTo(-5, -34);
+      ctx.quadraticCurveTo(-2, -26, -3, -12);
+      ctx.closePath();
+      ctx.fill();
+      // Đầu & mũ len quả bông
+      ctx.beginPath();
+      ctx.arc(-8.5, -39.5, 4.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-9.5, -45.2, 2.0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người 2 (bên phải, nắm tay đứng sát cạnh) ---
+      // Hai chân
+      ctx.lineWidth = 3.8;
+      ctx.beginPath();
+      ctx.moveTo(6, -12);
+      ctx.lineTo(5, 1);
+      ctx.moveTo(11, -12);
+      ctx.lineTo(13, 1);
+      ctx.stroke();
+      // Áo khoác dáng xòe nhẹ
+      ctx.beginPath();
+      ctx.moveTo(2, -10);
+      ctx.quadraticCurveTo(3, -27, 6, -30);
+      ctx.lineTo(11, -30);
+      ctx.quadraticCurveTo(15, -21, 16, -10);
+      ctx.closePath();
+      ctx.fill();
+      // Đầu hướng nhẹ về phía trăng & xe tuần lộc
+      ctx.beginPath();
+      ctx.arc(8.5, -35.5, 4.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Khăn choàng bay nhẹ trong gió đông
+      const scarfWave = Math.sin(timeSec * 2.8) * 2.2;
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(11, -29);
+      ctx.quadraticCurveTo(17, -28 + scarfWave * 0.4, 21, -24 + scarfWave);
+      ctx.stroke();
+
+      // Cánh tay nắm lấy nhau
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(-4, -28);
+      ctx.quadraticCurveTo(0, -21, 5, -26);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
     // Nền đất tuyết trắng, hàng cây thông và dải đèn lấp lánh ở dưới
     function drawWinterGroundAndTrees(timeSec) {
       const isMobile = W < 768;
@@ -2008,6 +2161,15 @@
       snowTrees.forEach((t) => {
         if (!t.back) drawSnowPineTree(t, timeSec);
       });
+
+      // 3.5) Bóng nhà & Bóng người màu đen đứng trên nền tuyết trắng
+      const houseX = W * (isMobile ? 0.25 : 0.27);
+      const houseY = getSnowGroundY(houseX) + 12;
+      drawBlackHouseSilhouette(houseX, houseY, isMobile ? 0.72 : 0.96, timeSec);
+
+      const peopleX = W * (isMobile ? 0.75 : 0.73);
+      const peopleY = getSnowGroundY(peopleX) + 10;
+      drawBlackPeopleSilhouette(peopleX, peopleY, isMobile ? 0.76 : 0.98, timeSec);
 
       // 4) Dải đèn lấp lánh giăng ngang phía dưới
       ctx.save();
@@ -2510,7 +2672,7 @@
       document.getElementById('memory-gallery-title').textContent = `Kỷ Niệm Của ${appState.receiver} & ${appState.sender}`;
       document.getElementById('memory-photo-img').src = photo.url;
       document.getElementById('memory-photo-caption').textContent = photo.caption || `Khoảnh khắc ngọt ngào ${currentBurstIndex + 1}`;
-      document.getElementById('memory-photo-counter').textContent = `Ảnh ${currentBurstIndex + 1} / ${total} • Vuốt ngang để lướt ảnh`;
+      document.getElementById('memory-photo-counter').textContent = `Ảnh ${currentBurstIndex + 1} / ${total}`;
 
       const dotsWrap = document.getElementById('memory-dots');
       dotsWrap.innerHTML = '';

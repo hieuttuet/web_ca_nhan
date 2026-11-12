@@ -1532,7 +1532,7 @@
 
       // Vẽ Line 2 với độ dày vừa phải để hạt bụi tụ chữ rõ cả dấu tiếng Việt
       octx.font = `700 ${nameSize}px "Dancing Script", "Plus Jakarta Sans", cursive`;
-      octx.lineWidth = isMobile ? 1.8 : 2.2;
+      octx.lineWidth = isMobile ? 1.3 : 1.6;
       octx.strokeStyle = '#ffd700';
       octx.strokeText(receiverLine, off.width / 2, off.height * 0.70);
       octx.fillText(receiverLine, off.width / 2, off.height * 0.70);
@@ -1544,12 +1544,12 @@
       textGlowRect = { x: offsetX, y: offsetY, w: off.width, h: off.height };
 
       const imgData = octx.getImageData(0, 0, off.width, off.height).data;
-      const step = isMobile ? 3 : 3;
+      const step = 2;
       const points = [];
       for (let y = 0; y < off.height; y += step) {
         for (let x = 0; x < off.width; x += step) {
           const alpha = imgData[(y * off.width + x) * 4 + 3];
-          if (alpha > 110) {
+          if (alpha > 90) {
             points.push({ x: offsetX + x, y: offsetY + y });
           }
         }
@@ -1561,7 +1561,7 @@
         [points[i], points[j]] = [points[j], points[i]];
       }
 
-      const maxParticles = isMobile ? 1550 : 2200;
+      const maxParticles = isMobile ? 3800 : 5600;
       if (points.length > maxParticles) {
         // Lấy mẫu đều để giữ đủ hình dáng toàn bộ chữ
         const stride = points.length / maxParticles;
@@ -1592,7 +1592,7 @@
           vy: 0,
           tx: pt.x,
           ty: pt.y,
-          size: Math.random() * 1.9 + 1.1,
+          size: Math.random() * 0.85 + 0.4,
           spawnProgress: computeSpawnProgressForX(pt.x),
           spawnTime: 0,
           spawned: false,
@@ -1612,7 +1612,7 @@
             vy: existing.vy,
             tx: pt.x,
             ty: pt.y,
-            size: Math.random() * 1.9 + 1.1,
+            size: Math.random() * 0.85 + 0.4,
             spawnProgress: computeSpawnProgressForX(pt.x),
             spawnTime: existing.spawnTime || 0,
             spawned: existing.spawned,
@@ -1818,37 +1818,79 @@
       ctx.restore();
     }
 
-    function drawGoldenStreakHead(sleighPos) {
-      const isMobile = W < 768;
-      const headX = sleighPos.x + (isMobile ? 55 : 90);
-      const headY = sleighPos.y;
-
-      // Vệt đuôi sáng vàng kim rực rỡ bay sau xe tuần lộc
-      const tailLen = isMobile ? 160 : 240;
-      const tailGrad = ctx.createLinearGradient(headX - tailLen, headY, headX + 16, headY);
-      tailGrad.addColorStop(0, 'rgba(251, 191, 36, 0)');
-      tailGrad.addColorStop(0.55, 'rgba(253, 224, 71, 0.35)');
-      tailGrad.addColorStop(0.88, 'rgba(254, 249, 195, 0.85)');
-      tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.95)');
-
-      ctx.save();
-      ctx.strokeStyle = tailGrad;
-      ctx.lineWidth = isMobile ? 7 : 10;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(headX - tailLen, headY + Math.sin(sleighProgress * 12) * 8);
-      ctx.quadraticCurveTo(headX - tailLen * 0.4, headY - 4, headX, headY);
-      ctx.stroke();
-
-      // Đầu tia sáng ngôi sao lấp lánh
-      const starGlow = ctx.createRadialGradient(headX, headY, 1, headX, headY, isMobile ? 28 : 42);
+    function drawSparkleStarHead(cx, cy, outerR, glowR, rot = 0) {
+      // Quầng sáng tỏa dịu quanh ngôi sao
+      const starGlow = ctx.createRadialGradient(cx, cy, 1, cx, cy, glowR);
       starGlow.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      starGlow.addColorStop(0.35, 'rgba(254, 240, 138, 0.85)');
+      starGlow.addColorStop(0.32, 'rgba(254, 240, 138, 0.85)');
       starGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
       ctx.fillStyle = starGlow;
       ctx.beginPath();
-      ctx.arc(headX, headY, isMobile ? 28 : 42, 0, Math.PI * 2);
+      ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
       ctx.fill();
+
+      // Hình ngôi sao 4 cánh lấp lánh sắc nét
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.fillStyle = '#fffef2';
+      ctx.beginPath();
+      const innerR = outerR * 0.28;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const r = i % 2 === 0 ? outerR : innerR;
+        const px = Math.cos(angle) * r;
+        const py = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Tâm sao rực sáng
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, outerR * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawGoldenStreakHead(sleighPos) {
+      const isMobile = W < 768;
+      const baseX = sleighPos.x + (isMobile ? 55 : 90);
+      const baseY = sleighPos.y;
+      const spreadY = isMobile ? 14 : 22;
+      const leadOffset = isMobile ? 18 : 28;
+
+      // 3 vệt sáng đầu ngôi sao: ngôi sao ở giữa tiến lên trước 1 xíu so với 2 ngôi sao bên cạnh
+      const streaks = [
+        { dx: -leadOffset, dy: -spreadY, scale: 0.72, tailLen: isMobile ? 125 : 190, waveAmp: 5, phase: 0.9 },
+        { dx: -leadOffset, dy: spreadY, scale: 0.72, tailLen: isMobile ? 125 : 190, waveAmp: -5, phase: 2.1 },
+        { dx: 0, dy: 0, scale: 1.0, tailLen: isMobile ? 170 : 255, waveAmp: 7, phase: 0 }
+      ];
+
+      ctx.save();
+      ctx.lineCap = 'round';
+      streaks.forEach((st) => {
+        const hx = baseX + st.dx;
+        const hy = baseY + st.dy;
+        const tailGrad = ctx.createLinearGradient(hx - st.tailLen, hy, hx + 12, hy);
+        tailGrad.addColorStop(0, 'rgba(251, 191, 36, 0)');
+        tailGrad.addColorStop(0.55, `rgba(253, 224, 71, ${(0.36 * st.scale).toFixed(2)})`);
+        tailGrad.addColorStop(0.88, `rgba(254, 249, 195, ${(0.88 * st.scale).toFixed(2)})`);
+        tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.96)');
+
+        ctx.strokeStyle = tailGrad;
+        ctx.lineWidth = (isMobile ? 5.5 : 8) * st.scale;
+        ctx.beginPath();
+        ctx.moveTo(hx - st.tailLen, hy + Math.sin(sleighProgress * 11 + st.phase) * st.waveAmp);
+        ctx.quadraticCurveTo(hx - st.tailLen * 0.42, hy - st.waveAmp * 0.45, hx, hy);
+        ctx.stroke();
+
+        const outerR = (isMobile ? 11 : 15) * st.scale;
+        const glowR = (isMobile ? 24 : 36) * st.scale;
+        drawSparkleStarHead(hx, hy, outerR, glowR, sleighProgress * 3 + st.phase);
+      });
       ctx.restore();
     }
 
@@ -2446,45 +2488,47 @@
         drawGoldenStreakHead(sleighPos);
       }
 
-      // Sinh & cập nhật Lớp 2 (Chữ): Bụi sao rơi từ từ xuống và ghép chữ dần theo đường bay tuần lộc
-      const settleRevealX = Math.max(0, Math.min(textGlowRect.w, (sleighPos.x - 140) - textGlowRect.x));
-      const postRideAlpha = Math.max(0, Math.min(1, (elapsed - RIDE_DURATION_MS * 0.55) / 2600));
+      // Sinh & cập nhật Lớp 2 (Chữ): Bụi sao nhỏ li ti rơi từ từ xuống và ghép chữ sắc nét theo đường bay
+      const settleRevealX = Math.max(0, Math.min(textGlowRect.w, (sleighPos.x - 130) - textGlowRect.x));
+      const postRideAlpha = Math.max(0, Math.min(1, (elapsed - RIDE_DURATION_MS * 0.5) / 2400));
       if (settleRevealX > 20 && textGlowCanvas && postRideAlpha > 0.02) {
         ctx.save();
         ctx.beginPath();
         ctx.rect(textGlowRect.x, textGlowRect.y, settleRevealX, textGlowRect.h);
         ctx.clip();
-        ctx.globalAlpha = postRideAlpha * 0.22;
+        ctx.globalAlpha = postRideAlpha * 0.42;
         ctx.drawImage(textGlowCanvas, textGlowRect.x, textGlowRect.y, textGlowRect.w, textGlowRect.h);
         ctx.restore();
       }
 
-      magicDust.forEach((p) => {
+      const streakSpreadY = W < 768 ? 14 : 22;
+      magicDust.forEach((p, idx) => {
         if (!p.spawned && sleighProgress >= p.spawnProgress) {
           p.spawned = true;
           p.spawnTime = now;
-          p.x = sleighPos.x - 18 + (Math.random() - 0.5) * 34;
-          p.y = sleighPos.y + (Math.random() - 0.5) * 18;
-          p.vx = (Math.random() - 0.5) * 1.4 - 0.3;
-          p.vy = 1.1 + Math.random() * 1.5; // Rơi nhẹ xuống phía dưới khi xe lướt qua
+          const laneOffset = (idx % 3 - 1) * streakSpreadY;
+          p.x = sleighPos.x + (laneOffset === 0 ? 12 : -14) + (Math.random() - 0.5) * 30;
+          p.y = sleighPos.y + laneOffset + (Math.random() - 0.5) * 10;
+          p.vx = (Math.random() - 0.5) * 1.3 - 0.25;
+          p.vy = 0.9 + Math.random() * 1.4; // Rơi nhẹ xuống phía dưới khi 3 vệt sao lướt qua
         }
         if (!p.spawned) return;
 
         const ageSec = Math.max(0, (now - p.spawnTime) * 0.001);
-        if (ageSec < 0.38) {
+        if (ageSec < 0.36) {
           // Rơi từ từ xuống theo trọng lực dịu nhẹ ngay sau khi rớt khỏi vệt sáng
-          p.vy = Math.min(2.6, p.vy + 0.045);
+          p.vy = Math.min(2.4, p.vy + 0.042);
           p.vx *= 0.96;
           p.x += p.vx;
           p.y += p.vy + Math.sin(timeSec * 2.5 + p.twinklePhase) * 0.14;
         } else {
-          // Hút dần vào vị trí chữ tương ứng ngay phía dưới chỗ tuần lộc vừa chạy qua
-          const pullT = Math.min(1, (ageSec - 0.38) / 1.55);
-          p.vx *= 0.86;
-          p.vy *= 0.86;
+          // Hút chính xác vào vị trí chữ tương ứng để chữ ghép rõ nét
+          const pullT = Math.min(1, (ageSec - 0.36) / 1.45);
+          p.vx *= 0.84;
+          p.vy *= 0.84;
           p.x += p.vx;
           p.y += p.vy;
-          const ease = 0.024 + pullT * pullT * 0.088;
+          const ease = 0.03 + pullT * pullT * 0.11;
           p.x += (p.tx - p.x) * ease;
           p.y += (p.ty - p.y) * ease;
         }
@@ -2492,44 +2536,56 @@
         const dx = p.tx - p.x;
         const dy = p.ty - p.y;
         const dist = Math.hypot(dx, dy);
-        const settledFlicker = dist < 3 ? Math.sin(timeSec * 3.5 + p.twinklePhase) * 0.45 : 0;
-        const alpha = dist < 5
-          ? 0.72 + 0.28 * Math.sin(timeSec * 3 + p.twinklePhase)
-          : 0.92;
+        const alpha = dist < 3
+          ? 0.78 + 0.22 * Math.sin(timeSec * 3.2 + p.twinklePhase)
+          : 0.94;
 
         ctx.fillStyle = p.color;
-        ctx.globalAlpha = Math.max(0.25, Math.min(1, alpha));
-        ctx.beginPath();
-        ctx.arc(p.x + settledFlicker * 0.5, p.y + settledFlicker * 0.5, p.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.globalAlpha = Math.max(0.3, Math.min(1, alpha));
+        if (p.size <= 0.9) {
+          const d = p.size * 2;
+          ctx.fillRect(p.x - p.size, p.y - p.size, d, d);
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
       ctx.globalAlpha = 1;
 
-      // 5. Cải tiến 4: Hộp quà rơi bất ngờ khi xe bay tới giữa màn hình
+      // 5. Cải tiến 4: Hộp quà thả rơi lơ lửng từ từ khi xe bay tới giữa màn hình
       if (!giftBox.spawned && sleighProgress >= 0.48) {
         giftBox.spawned = true;
         giftBox.landed = false;
         giftBox.x = W * 0.5;
-        giftBox.y = sleighPos.y + 10;
-        giftBox.vy = 1.5;
+        giftBox.y = sleighPos.y + 12;
+        giftBox.vy = 0.55;
         giftBox.vx = 0;
-        giftBox.rot = -0.35;
+        giftBox.rot = 0;
         giftBox.bounceCount = 0;
         giftBox.scaleBounce = 1;
       }
 
       if (giftBox.spawned && !giftBox.landed) {
-        giftBox.vy += 0.34;
+        // Rơi chậm rãi bồng bềnh như dù lượn kèm đung đưa nhẹ
+        giftBox.vy = Math.min(2.05, giftBox.vy + 0.032);
         giftBox.y += giftBox.vy;
-        giftBox.rot *= 0.96;
+
+        const distLeft = Math.max(0, giftBox.targetY - giftBox.y);
+        const swayFade = Math.min(1, distLeft / 120);
+        const swayAmp = W < 768 ? 16 : 24;
+        giftBox.x = W * 0.5 + Math.sin(timeSec * 2.3) * swayAmp * swayFade;
+        giftBox.rot = Math.sin(timeSec * 2.3) * 0.14 * swayFade;
 
         if (giftBox.y >= giftBox.targetY) {
           giftBox.y = giftBox.targetY;
-          if (giftBox.bounceCount < 2) {
-            giftBox.vy = -giftBox.vy * (giftBox.bounceCount === 0 ? 0.38 : 0.22);
+          giftBox.x = W * 0.5;
+          if (giftBox.bounceCount < 1) {
+            giftBox.vy = -giftBox.vy * 0.22;
             giftBox.bounceCount++;
           } else {
             giftBox.vy = 0;
+            giftBox.rot = 0;
             giftBox.landed = true;
             document.getElementById('gift-tap-hint')?.classList.add('visible');
           }

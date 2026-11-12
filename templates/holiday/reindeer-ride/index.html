@@ -1362,10 +1362,9 @@
 
       initSkyAndSnow();
       giftBox.size = W < 640 ? 36 : 44;
-      giftBox.targetY = Math.min(
-        getSnowGroundY(W * 0.5) - giftBox.size * 0.44,
-        H - (W < 768 ? 134 : 114)
-      );
+      giftBox.targetY = W < 768
+        ? Math.min(getSnowGroundY(W * 0.5) - giftBox.size * 1.15, H - 178)
+        : Math.min(getSnowGroundY(W * 0.5) - giftBox.size * 0.44, H - 114);
       if (giftBox.landed) {
         giftBox.x = W * 0.5;
         giftBox.y = giftBox.targetY;
@@ -1540,7 +1539,7 @@
       // Lưu lớp glow dịu để hỗ trợ đọc tên cực nét khi tụ xong
       textGlowCanvas = off;
       const offsetX = (W - off.width) / 2;
-      const offsetY = isMobile ? H * 0.36 : H * 0.39;
+      const offsetY = isMobile ? H * 0.27 : H * 0.37;
       textGlowRect = { x: offsetX, y: offsetY, w: off.width, h: off.height };
 
       const imgData = octx.getImageData(0, 0, off.width, off.height).data;
@@ -2001,37 +2000,90 @@
       ctx.restore();
     }
 
-    // Bóng ngôi nhà màu đen trên nền đất tuyết trắng
-    function drawBlackHouseSilhouette(x, y, scale, timeSec) {
+    // Ngôi nhà mùa đông có màu sắc, cửa sổ sáng ấm & ống khói bếp sưởi
+    function drawColorfulCozyHouse(x, y, scale, timeSec, palette = {}) {
+      const wall = palette.wall || '#fef3c7';
+      const wallSide = palette.wallSide || '#fde68a';
+      const roof = palette.roof || '#b91c1c';
+      const door = palette.door || '#78350f';
+
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(scale, scale);
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
 
-      // Khói bếp bay nhẹ lên từ ống khói
-      for (let i = 0; i < 3; i++) {
-        const drift = Math.sin(timeSec * 1.4 + i * 1.5) * 3;
-        const puffY = -58 - i * 10 - ((timeSec * 8 + i * 7) % 14);
-        const alpha = Math.max(0.06, 0.28 - i * 0.08);
-        ctx.fillStyle = `rgba(226, 232, 240, ${alpha.toFixed(2)})`;
+      // Ánh sáng ấm áp tỏa ra tuyết trước cửa & cửa sổ
+      const warmHalo = ctx.createRadialGradient(0, -14, 4, 0, -14, 44);
+      warmHalo.addColorStop(0, 'rgba(251, 191, 36, 0.28)');
+      warmHalo.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = warmHalo;
+      ctx.beginPath();
+      ctx.arc(0, -14, 44, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Khói ấm bay lên từ ống khói bếp sưởi
+      for (let i = 0; i < 4; i++) {
+        const drift = Math.sin(timeSec * 1.5 + i * 1.3) * 3.5;
+        const puffY = -60 - i * 9 - ((timeSec * 9 + i * 6) % 15);
+        const alpha = Math.max(0.08, 0.36 - i * 0.08);
+        ctx.fillStyle = i === 0
+          ? `rgba(254, 240, 138, ${(alpha * 0.9).toFixed(2)})`
+          : `rgba(241, 245, 249, ${alpha.toFixed(2)})`;
         ctx.beginPath();
-        ctx.arc(16 + drift + i * 2, puffY, 3.2 + i * 1.6, 0, Math.PI * 2);
+        ctx.arc(16 + drift + i * 2, puffY, 3.0 + i * 1.6, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      ctx.fillStyle = '#070b16';
-      // Ống khói
-      drawRoundedRectPath(12, -52, 8, 22, 2);
+      // Ống khói gạch nâu đỏ có miệng sáng ấm
+      ctx.fillStyle = '#9a3412';
+      drawRoundedRectPath(12, -54, 9, 24, 2);
+      ctx.fill();
+      ctx.fillStyle = '#7c2d12';
+      drawRoundedRectPath(10.5, -56, 12, 4, 1.5);
       ctx.fill();
 
-      // Thân nhà màu đen (ngôi nhà chính + hiên nhỏ bên cạnh)
+      // Thân nhà chính & hiên phụ có màu sắc
+      ctx.fillStyle = wall;
       drawRoundedRectPath(-24, -28, 48, 30, 3);
       ctx.fill();
+      ctx.fillStyle = wallSide;
       drawRoundedRectPath(20, -18, 16, 20, 2);
       ctx.fill();
 
-      // Mái nhà tam giác vát nhọn màu đen
+      // Cửa gỗ ấm & tay nắm vàng
+      ctx.fillStyle = door;
+      drawRoundedRectPath(-5, -17, 10, 19, 3);
+      ctx.fill();
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(2.5, -7.5, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cửa sổ phát sáng vàng cam ấm áp (cửa chính + hiên)
+      const flicker = 0.88 + 0.12 * Math.sin(timeSec * 4.5 + x);
+      ctx.fillStyle = `rgba(253, 224, 71, ${flicker.toFixed(2)})`;
+      drawRoundedRectPath(-19, -21, 9, 9, 2);
+      ctx.fill();
+      drawRoundedRectPath(10, -21, 9, 9, 2);
+      ctx.fill();
+      drawRoundedRectPath(24, -13, 8, 8, 2);
+      ctx.fill();
+
+      // Khung chia ô cửa sổ
+      ctx.strokeStyle = '#92400e';
+      ctx.lineWidth = 1;
+      [[-19, -21, 9, 9], [10, -21, 9, 9], [24, -13, 8, 8]].forEach(([wx, wy, ww, wh]) => {
+        ctx.beginPath();
+        ctx.moveTo(wx + ww / 2, wy);
+        ctx.lineTo(wx + ww / 2, wy + wh);
+        ctx.moveTo(wx, wy + wh / 2);
+        ctx.lineTo(wx + ww, wy + wh / 2);
+        ctx.stroke();
+      });
+
+      // Mái nhà dốc nhiều màu + hiên nhỏ
+      ctx.fillStyle = roof;
       ctx.beginPath();
       ctx.moveTo(-31, -26);
       ctx.lineTo(0, -52);
@@ -2039,7 +2091,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Mái hiên nhỏ
       ctx.beginPath();
       ctx.moveTo(19, -17);
       ctx.lineTo(29, -27);
@@ -2047,38 +2098,290 @@
       ctx.closePath();
       ctx.fill();
 
-      // Viền tuyết trắng mỏng đọng trên đỉnh mái nhà đen
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.lineWidth = 3;
+      // Lớp tuyết trắng mềm phủ trên mái nhà
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.moveTo(-30, -27);
       ctx.lineTo(0, -52);
       ctx.lineTo(30, -27);
       ctx.stroke();
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(20, -18);
+      ctx.lineTo(29, -27);
+      ctx.lineTo(39, -18);
+      ctx.stroke();
 
       ctx.restore();
     }
 
-    // Bóng cặp đôi màu đen đứng ngắm bầu trời đêm trên nền tuyết trắng
-    function drawBlackPeopleSilhouette(x, y, scale, timeSec) {
+    // Bếp sưởi ngoài trời lửa bập bùng & người ngồi sưởi ấm bên bếp
+    function drawHearthFireAndSitters(x, y, scale, timeSec) {
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(scale, scale);
-      ctx.fillStyle = '#070b16';
-      ctx.strokeStyle = '#070b16';
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
 
-      // --- Người 1 (cao hơn bên trái, ngước nhìn lên) ---
-      // Hai chân
-      ctx.lineWidth = 4.2;
+      // Quầng sáng ấm của bếp lửa hắt xuống nền tuyết trắng
+      const firePulse = 0.85 + 0.15 * Math.sin(timeSec * 8);
+      const fireGlow = ctx.createRadialGradient(0, -8, 2, 0, -8, 38 * firePulse);
+      fireGlow.addColorStop(0, 'rgba(254, 240, 138, 0.55)');
+      fireGlow.addColorStop(0.45, 'rgba(249, 115, 22, 0.25)');
+      fireGlow.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.beginPath();
+      ctx.arc(0, -8, 38 * firePulse, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bếp đá & củi cháy
+      ctx.fillStyle = '#475569';
+      [-9, -3, 3, 9].forEach((sx) => {
+        ctx.beginPath();
+        ctx.arc(sx, 0, 3.3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-7, -1);
+      ctx.lineTo(6, -6);
+      ctx.moveTo(7, -1);
+      ctx.lineTo(-6, -6);
+      ctx.stroke();
+
+      // Ngọn lửa bếp sưởi bập bùng (cam -> vàng -> trắng)
+      const sway = Math.sin(timeSec * 9) * 2.2;
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(-7, -3);
+      ctx.quadraticCurveTo(-8, -14, sway, -21 - Math.sin(timeSec * 11) * 2.5);
+      ctx.quadraticCurveTo(8, -14, 7, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(-4.5, -3);
+      ctx.quadraticCurveTo(-4.5, -11, sway * 0.7, -15.5);
+      ctx.quadraticCurveTo(4.5, -11, 4.5, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(sway * 0.3, -6.5, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người ngồi bên trái sưởi tay bên bếp (áo đỏ, mũ vàng) ---
+      ctx.fillStyle = '#78350f'; // Khúc gỗ ngồi
+      drawRoundedRectPath(-28, -8, 12, 8, 2);
+      ctx.fill();
+      // Chân co ngồi sưởi
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-21, -8);
+      ctx.lineTo(-14, -7);
+      ctx.lineTo(-13, 0);
+      ctx.stroke();
+      // Thân áo khoác đỏ
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.moveTo(-27, -7);
+      ctx.quadraticCurveTo(-26, -21, -20, -23);
+      ctx.lineTo(-16, -22);
+      ctx.quadraticCurveTo(-15, -14, -18, -7);
+      ctx.closePath();
+      ctx.fill();
+      // Tay đưa ra hơ ấm bên bếp
+      ctx.strokeStyle = '#e11d48';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(-18, -19);
+      ctx.lineTo(-10, -14);
+      ctx.stroke();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-9.5, -14, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      // Đầu & mũ len vàng
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-19, -27, 4.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(-19.5, -28.8, 4.1, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người ngồi bên phải sưởi bên bếp (áo xanh dương, khăn đỏ) ---
+      ctx.fillStyle = '#78350f';
+      drawRoundedRectPath(16, -8, 12, 8, 2);
+      ctx.fill();
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(21, -8);
+      ctx.lineTo(14, -7);
+      ctx.lineTo(13, 0);
+      ctx.stroke();
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.moveTo(27, -7);
+      ctx.quadraticCurveTo(26, -21, 20, -23);
+      ctx.lineTo(16, -22);
+      ctx.quadraticCurveTo(15, -14, 18, -7);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(18, -19);
+      ctx.lineTo(10, -14);
+      ctx.stroke();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(9.5, -14, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(19, -27, 4.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.arc(19.5, -28.8, 4.1, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Cô bé bán diêm cầm khay diêm & que diêm cháy sáng rực giữa trời đông
+    function drawLittleMatchGirl(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Ánh sáng diệu kỳ từ que diêm đang cháy
+      const matchFlicker = 0.88 + 0.12 * Math.sin(timeSec * 12);
+      const matchX = -11;
+      const matchY = -28;
+      const matchGlow = ctx.createRadialGradient(matchX, matchY, 1, matchX, matchY, 22 * matchFlicker);
+      matchGlow.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      matchGlow.addColorStop(0.35, 'rgba(253, 224, 71, 0.72)');
+      matchGlow.addColorStop(0.7, 'rgba(251, 146, 60, 0.28)');
+      matchGlow.addColorStop(1, 'rgba(251, 146, 60, 0)');
+      ctx.fillStyle = matchGlow;
+      ctx.beginPath();
+      ctx.arc(matchX, matchY, 22 * matchFlicker, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ủng nâu nhỏ
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 3.2;
+      ctx.beginPath();
+      ctx.moveTo(-2.5, -10);
+      ctx.lineTo(-3, 0);
+      ctx.moveTo(2.5, -10);
+      ctx.lineTo(3, 0);
+      ctx.stroke();
+
+      // Váy xanh tím & khăn choàng đỏ tía
+      ctx.fillStyle = '#312e81';
+      ctx.beginPath();
+      ctx.moveTo(-8, -9);
+      ctx.quadraticCurveTo(-6, -23, -3, -26);
+      ctx.lineTo(3, -26);
+      ctx.quadraticCurveTo(6, -23, 8, -9);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#be185d';
+      ctx.beginPath();
+      ctx.moveTo(-6, -20);
+      ctx.quadraticCurveTo(0, -17, 6, -20);
+      ctx.lineTo(3, -27);
+      ctx.lineTo(-3, -27);
+      ctx.closePath();
+      ctx.fill();
+
+      // Đầu, tóc vàng hạt dẻ & khăn trùm đầu ấm
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.arc(0, -31.5, 4.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath();
+      ctx.arc(-0.5, -31.2, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#be185d';
+      ctx.beginPath();
+      ctx.arc(0.8, -32.2, 4.4, Math.PI * 0.85, Math.PI * 2.15);
+      ctx.fill();
+
+      // Tay phải cầm khay gỗ đựng hộp diêm
+      ctx.strokeStyle = '#be185d';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(4, -22);
+      ctx.lineTo(10, -18);
+      ctx.stroke();
+      ctx.fillStyle = '#92400e';
+      drawRoundedRectPath(6, -19, 10, 3.2, 1);
+      ctx.fill();
+      ctx.fillStyle = '#f43f5e';
+      drawRoundedRectPath(8, -21.5, 5, 2.8, 0.8);
+      ctx.fill();
+
+      // Tay trái giơ que diêm cháy sáng rực
+      ctx.strokeStyle = '#be185d';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(-3.5, -22);
+      ctx.lineTo(-10, -25);
+      ctx.stroke();
+      ctx.strokeStyle = '#fde68a';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(-10, -25);
+      ctx.lineTo(matchX, matchY + 2.5);
+      ctx.stroke();
+
+      // Ngọn lửa đầu que diêm
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.ellipse(matchX, matchY, 2.2, 3.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(matchX, matchY + 0.8, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Cặp đôi mặc đồ mùa đông nhiều màu đứng nắm tay nhau ngắm trăng & tuần lộc
+    function drawColorfulCouple(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // --- Người 1 (áo khoác xanh navy, mũ len đỏ) ---
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 4.0;
       ctx.beginPath();
       ctx.moveTo(-11, -13);
       ctx.lineTo(-13, 1);
       ctx.moveTo(-6, -13);
       ctx.lineTo(-5, 1);
       ctx.stroke();
-      // Thân áo khoác
+
+      ctx.fillStyle = '#1d4ed8';
       ctx.beginPath();
       ctx.moveTo(-15, -12);
       ctx.quadraticCurveTo(-15, -31, -11, -34);
@@ -2086,16 +2389,22 @@
       ctx.quadraticCurveTo(-2, -26, -3, -12);
       ctx.closePath();
       ctx.fill();
-      // Đầu & mũ len quả bông
+
+      ctx.fillStyle = '#fed7aa';
       ctx.beginPath();
-      ctx.arc(-8.5, -39.5, 4.6, 0, Math.PI * 2);
+      ctx.arc(-8.5, -39.5, 4.4, 0, Math.PI * 2);
       ctx.fill();
+      ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.arc(-9.5, -45.2, 2.0, 0, Math.PI * 2);
+      ctx.arc(-8.5, -40.8, 4.6, Math.PI, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-9.5, -45.4, 2.1, 0, Math.PI * 2);
       ctx.fill();
 
-      // --- Người 2 (bên phải, nắm tay đứng sát cạnh) ---
-      // Hai chân
+      // --- Người 2 (áo khoác đỏ hồng ấm, khăn choàng vàng bay nhẹ) ---
+      ctx.strokeStyle = '#334155';
       ctx.lineWidth = 3.8;
       ctx.beginPath();
       ctx.moveTo(6, -12);
@@ -2103,7 +2412,8 @@
       ctx.moveTo(11, -12);
       ctx.lineTo(13, 1);
       ctx.stroke();
-      // Áo khoác dáng xòe nhẹ
+
+      ctx.fillStyle = '#e11d48';
       ctx.beginPath();
       ctx.moveTo(2, -10);
       ctx.quadraticCurveTo(3, -27, 6, -30);
@@ -2111,21 +2421,28 @@
       ctx.quadraticCurveTo(15, -21, 16, -10);
       ctx.closePath();
       ctx.fill();
-      // Đầu hướng nhẹ về phía trăng & xe tuần lộc
+
+      ctx.fillStyle = '#fed7aa';
       ctx.beginPath();
-      ctx.arc(8.5, -35.5, 4.3, 0, Math.PI * 2);
+      ctx.arc(8.5, -35.5, 4.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.arc(9.2, -36.5, 4.4, Math.PI * 0.85, Math.PI * 2.1);
       ctx.fill();
 
-      // Khăn choàng bay nhẹ trong gió đông
+      // Khăn choàng vàng bay nhẹ trong gió đông
       const scarfWave = Math.sin(timeSec * 2.8) * 2.2;
-      ctx.lineWidth = 2.4;
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2.6;
       ctx.beginPath();
-      ctx.moveTo(11, -29);
-      ctx.quadraticCurveTo(17, -28 + scarfWave * 0.4, 21, -24 + scarfWave);
+      ctx.moveTo(10, -29);
+      ctx.quadraticCurveTo(16, -28 + scarfWave * 0.4, 21, -24 + scarfWave);
       ctx.stroke();
 
       // Cánh tay nắm lấy nhau
-      ctx.lineWidth = 2.6;
+      ctx.strokeStyle = '#1e3a8a';
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(-4, -28);
       ctx.quadraticCurveTo(0, -21, 5, -26);
@@ -2204,14 +2521,31 @@
         if (!t.back) drawSnowPineTree(t, timeSec);
       });
 
-      // 3.5) Bóng nhà & Bóng người màu đen đứng trên nền tuyết trắng
-      const houseX = W * (isMobile ? 0.25 : 0.27);
-      const houseY = getSnowGroundY(houseX) + 12;
-      drawBlackHouseSilhouette(houseX, houseY, isMobile ? 0.72 : 0.96, timeSec);
+      // 3.5) Nhiều ngôi nhà có màu sắc, ống khói bếp sưởi, người ngồi sưởi bên bếp, cô bé bán diêm & cặp đôi
+      const houseConfigs = isMobile
+        ? [
+            { nx: 0.17, sc: 0.62, palette: { wall: '#fef3c7', wallSide: '#fde68a', roof: '#b91c1c', door: '#78350f' } },
+            { nx: 0.85, sc: 0.60, palette: { wall: '#fed7aa', wallSide: '#fdba74', roof: '#15803d', door: '#7c2d12' } }
+          ]
+        : [
+            { nx: 0.14, sc: 0.90, palette: { wall: '#fef3c7', wallSide: '#fde68a', roof: '#b91c1c', door: '#78350f' } },
+            { nx: 0.25, sc: 0.72, palette: { wall: '#e0f2fe', wallSide: '#bae6fd', roof: '#9a3412', door: '#78350f' } },
+            { nx: 0.85, sc: 0.88, palette: { wall: '#fed7aa', wallSide: '#fdba74', roof: '#15803d', door: '#7c2d12' } }
+          ];
+      houseConfigs.forEach((hCfg) => {
+        const hx = W * hCfg.nx;
+        const hy = getSnowGroundY(hx) + 12;
+        drawColorfulCozyHouse(hx, hy, hCfg.sc, timeSec, hCfg.palette);
+      });
 
-      const peopleX = W * (isMobile ? 0.75 : 0.73);
-      const peopleY = getSnowGroundY(peopleX) + 10;
-      drawBlackPeopleSilhouette(peopleX, peopleY, isMobile ? 0.76 : 0.98, timeSec);
+      const fireX = W * (isMobile ? 0.32 : 0.35);
+      drawHearthFireAndSitters(fireX, getSnowGroundY(fireX) + 10, isMobile ? 0.68 : 0.92, timeSec);
+
+      const matchGirlX = W * (isMobile ? 0.62 : 0.61);
+      drawLittleMatchGirl(matchGirlX, getSnowGroundY(matchGirlX) + 10, isMobile ? 0.72 : 0.94, timeSec);
+
+      const peopleX = W * (isMobile ? 0.74 : 0.73);
+      drawColorfulCouple(peopleX, getSnowGroundY(peopleX) + 10, isMobile ? 0.72 : 0.96, timeSec);
 
       // 4) Dải đèn lấp lánh giăng ngang phía dưới
       ctx.save();

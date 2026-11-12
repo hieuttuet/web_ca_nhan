@@ -68,7 +68,7 @@ Toàn bộ văn bản mặc định trong template phải dùng **danh xưng tru
    - Khi tải lại trang (không có `?id=`), nếu còn đơn chờ hợp lệ thì tự động khôi phục lại modal `#modal-payment` ở trạng thái chờ xác nhận tự động (hoặc chuyển thẳng sang màn thành công nếu đã `PAID`); chỉ xóa đơn chờ khi đã thanh toán xong hoặc người dùng tự bấm đóng (`✕`) modal thanh toán.
 5. **Nút tải mã QR chuyển tiền**:
    - Nhãn nút gọn: **`📥 Tải Mã QR Chuyển Tiền`** (lược bỏ chữ dư thừa `"Quét từ App Ngân Hàng"`).
-   - Hỗ trợ tải trực tiếp về **Thư viện ảnh / Tải xuống** trên cả PC, Android và iOS (không bật bảng chia sẻ `navigator.share`): chuyển ảnh sang `Blob` PNG local (có fallback vẽ qua `Canvas` nếu cần) rồi kích hoạt tải trực tiếp qua `<a href=blobUrl download=filename>`.
+   - Hỗ trợ tải trực tiếp về **Thư viện ảnh / Tải xuống** trên cả PC, Android và iOS (không bật bảng chia sẻ `navigator.share` và không mở tab ngoài): với ảnh từ `img.vietqr.io` / `api.qrserver.com` đi qua proxy same-origin `/api/download-qr?url=...&filename=...` để tránh chặn CORS rồi kích hoạt tải trực tiếp qua `<a href=blobUrl download=filename>`.
 6. **Đăng ký vào `templates-catalog.js` & API Thanh toán**:
    - Khai báo đầy đủ trong mảng danh mục tương ứng (`templates-catalog.js`) với `id` trùng khớp tuyệt đối với `appState.templateId` trong file `index.html` của template để API `/api/create-order` áp đúng mức giá trên server.
    - Đọc mã ảnh QR thanh toán từ `data.qrUrl` (khớp với output của `api/create-order.js`).

@@ -3505,11 +3505,22 @@
       showToast('🎉 Thanh toán thành công! Thiệp Tuần Lộc đã sẵn sàng!');
     }
 
-    async function urlToImageBlob(url) {
-      if (url.startsWith('data:')) {
+    async function urlToImageBlob(url, filename = 'QR.png') {
+      if (url.startsWith('data:') || url.startsWith('blob:')) {
         const res = await fetch(url);
         return await res.blob();
       }
+
+      // Nếu là URL QR bên thứ 3 (img.vietqr.io / api.qrserver.com) -> đi qua proxy same-origin /api/download-qr để tránh lỗi CORS
+      try {
+        const parsed = new URL(url, window.location.href);
+        if (parsed.hostname === 'img.vietqr.io' || parsed.hostname === 'api.qrserver.com') {
+          const proxyUrl = `/api/download-qr?url=${encodeURIComponent(parsed.toString())}&filename=${encodeURIComponent(filename)}`;
+          const pRes = await fetch(proxyUrl);
+          if (pRes.ok) return await pRes.blob();
+        }
+      } catch (e) {}
+
       try {
         const res = await fetch(url, { mode: 'cors' });
         if (res.ok) return await res.blob();
@@ -3537,7 +3548,7 @@
 
     async function downloadBlobImage(url, filename) {
       try {
-        const blob = await urlToImageBlob(url);
+        const blob = await urlToImageBlob(url, filename);
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;

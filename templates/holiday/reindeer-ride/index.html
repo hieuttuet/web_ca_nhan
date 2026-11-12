@@ -3538,19 +3538,6 @@
     async function downloadBlobImage(url, filename) {
       try {
         const blob = await urlToImageBlob(url);
-        const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const file = new File([blob], filename, { type: blob.type || 'image/png' });
-
-        // Trên điện thoại (iOS/Android), ưu tiên mở bảng Lưu vào Thư viện ảnh nếu trình duyệt hỗ trợ
-        if (isMobileDevice && navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file], title: filename });
-            return;
-          } catch (shareErr) {
-            if (shareErr && shareErr.name === 'AbortError') return;
-          }
-        }
-
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;

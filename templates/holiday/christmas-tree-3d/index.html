@@ -829,7 +829,7 @@
     <div class="modal-card letter-card">
       <div class="modal-close-corner" onclick="closeModal('modal-letter')">✕</div>
       <div style="font-size: 2.4rem; margin-bottom: 4px;">💌</div>
-      <h3 id="letter-title" class="modal-title" style="color: #ff9ec6;">Gửi Người Thương Của Anh</h3>
+      <h3 id="letter-title" class="modal-title" style="color: #ff9ec6;">Gửi Người Thương</h3>
       <div id="letter-content" class="letter-body"></div>
       <div id="letter-sign" style="text-align: right; font-weight: 700; color: #ffd700; font-size: 1.1rem;"></div>
     </div>
@@ -859,7 +859,7 @@
         <label class="form-label">Dịp kỷ niệm</label>
         <select id="in-occasion" class="form-select">
           <option value="Merry Christmas & Happy New Year">🎄 Merry Christmas & Happy New Year</option>
-          <option value="Giáng Sinh An Lành Bên Em">❤️ Giáng Sinh An Lành Bên Em</option>
+          <option value="Giáng Sinh An Lành Bên Nhau">❤️ Giáng Sinh An Lành Bên Nhau</option>
           <option value="Kỷ Niệm Tình Yêu Mùa Đông">❄️ Kỷ Niệm Tình Yêu Mùa Đông</option>
           <option value="Happy New Year 2027">🧧 Chúc Mừng Năm Mới 2027</option>
         </select>
@@ -981,7 +981,7 @@
       sender: 'Bảo Nam',
       receiver: 'Minh Anh',
       occasion: 'Merry Christmas & Happy New Year',
-      message: 'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất của anh là luôn có em bên cạnh sưởi ấm trái tim. Chúc công chúa nhỏ của anh một mùa Giáng Sinh an lành, hạnh phúc và luôn ngập tràn nụ cười nhé! Yêu em rất nhiều ❤️',
+      message: 'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất là luôn có nhau bên cạnh sưởi ấm trái tim. Chúc hai đứa mình một mùa Giáng Sinh thật an lành, hạnh phúc và luôn ngập tràn nụ cười nhé! Thương nhiều ❤️',
       price: 39000,
       photos: [] // Sẽ khởi tạo 6 ảnh mặc định lãng mạn
     };
@@ -993,10 +993,10 @@
         'Gửi {receiver} cây thông 3D lung linh này thay cho lời chúc Giáng Sinh & Năm Mới ngọt ngào nhất. Chúc {receiver} luôn mỉm cười rạng rỡ mỗi ngày 🌟💖',
         'Khép lại một năm thật đẹp bằng mùa Giáng Sinh ấm áp bên {receiver}. Mong sang năm mới chúng ta vẫn sẽ cùng nhau đi qua thật nhiều kỷ niệm đáng nhớ nữa nhé 🎁❤️'
       ],
-      'Giáng Sinh An Lành Bên Em': [
+      'Giáng Sinh An Lành Bên Nhau': [
         'Giáng Sinh này và muôn vàn mùa đông sau, điều ước duy nhất là luôn có {receiver} bên cạnh sưởi ấm trái tim. Chúc {receiver} một mùa Noel an lành và ngập tràn nụ cười! ❤️',
         'Đêm Noel ngoài kia có thể se lạnh, nhưng trái tim này lúc nào cũng ấm áp vì có {receiver}. Cảm ơn {receiver} đã làm cho thanh xuân trở nên rực rỡ nhất! 🎄✨',
-        'Merry Christmas {receiver}! Chúc người thương luôn xinh đẹp, vui vẻ và bình an. Mong mọi điều dịu dàng nhất sẽ luôn tìm đến bên {receiver} 🎁💖',
+        'Merry Christmas {receiver}! Chúc người thương luôn rạng rỡ, vui vẻ và bình an. Mong mọi điều dịu dàng nhất sẽ luôn tìm đến bên {receiver} 🎁💖',
         'Noel này tuy không có tuyết rơi thật, nhưng có cả một cây thông 3D lấp lánh gửi gắm trọn vẹn tình cảm dành cho {receiver}. Chúc {receiver} Giáng Sinh thật hạnh phúc! ❄️🌟'
       ],
       'Kỷ Niệm Tình Yêu Mùa Đông': [
@@ -1014,7 +1014,8 @@
     };
 
     function generateAiWish(occasion, receiver, idx = 0) {
-      const pool = AI_WISH_BY_OCCASION[occasion] || AI_WISH_BY_OCCASION['Merry Christmas & Happy New Year'];
+      const normalizedOccasion = occasion === 'Giáng Sinh An Lành Bên Em' ? 'Giáng Sinh An Lành Bên Nhau' : occasion;
+      const pool = AI_WISH_BY_OCCASION[normalizedOccasion] || AI_WISH_BY_OCCASION['Merry Christmas & Happy New Year'];
       const safeIdx = ((idx % pool.length) + pool.length) % pool.length;
       const targetName = (receiver || '').trim() || 'bạn';
       return pool[safeIdx].replace(/\{receiver\}/g, targetName);
@@ -1196,10 +1197,10 @@
 
     function initDefaultPhotos() {
       const presets = [
-        { t: 'Kỷ Niệm Ngọt Ngào', s: 'Khoảnh khắc bên em ✨', icon: '🎄' },
+        { t: 'Kỷ Niệm Ngọt Ngào', s: 'Khoảnh khắc bên nhau ✨', icon: '🎄' },
         { t: 'Đêm Giáng Sinh', s: 'Ấm áp & Bình yên ❤️', icon: '🎁' },
-        { t: 'Trái Tim Mùa Đông', s: 'Mãi dành riêng cho em 💖', icon: '✨' },
-        { t: 'Nụ Cười Rạng Rỡ', s: 'Điều tuyệt vời nhất của anh 🌸', icon: '❄️' },
+        { t: 'Trái Tim Mùa Đông', s: 'Mãi dành riêng cho nhau 💖', icon: '✨' },
+        { t: 'Nụ Cười Rạng Rỡ', s: 'Điều tuyệt vời nhất ❤️', icon: '❄️' },
         { t: 'Nắm Chặt Tay Nhau', s: 'Đi qua mọi mùa đông 👫', icon: '🌟' },
         { t: 'Hạnh Phúc Trọn Vẹn', s: 'Merry Christmas My Love 🥂', icon: '🎅' }
       ];
@@ -1929,9 +1930,9 @@
       document.getElementById('hud-names').textContent = `${appState.receiver} ❤️ ${appState.sender}`;
       document.getElementById('hud-occasion').textContent = `🎄 ${appState.occasion.toUpperCase()} 🎄`;
 
-      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver} Của Anh`;
+      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver} Yêu Thương`;
       document.getElementById('letter-content').textContent = appState.message;
-      document.getElementById('letter-sign').textContent = `Yêu em, ${appState.sender} ❤️`;
+      document.getElementById('letter-sign').textContent = `Thương gửi, ${appState.sender} ❤️`;
 
       update3DLoveTextMesh();
       rebuildPhotoFrames();

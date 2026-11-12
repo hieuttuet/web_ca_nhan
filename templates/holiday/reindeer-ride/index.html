@@ -151,28 +151,6 @@
       pointer-events: none;
     }
 
-    .gift-tap-badge {
-      padding: 6px 16px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(251, 191, 36, 0.55);
-      color: #fde047;
-      font-size: 0.8rem;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: all 0.4s ease;
-      white-space: nowrap;
-    }
-
-    .gift-tap-badge.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
     .bottom-dock {
       display: flex;
       flex-wrap: wrap;
@@ -737,10 +715,6 @@
         padding: 8px 12px;
         font-size: 0.74rem;
       }
-      .gift-tap-badge {
-        font-size: 0.72rem;
-        padding: 5px 12px;
-      }
       .sound-prompt-pill {
         top: 98px;
         right: 10px;
@@ -779,10 +753,6 @@
 
   <!-- Bottom HUD Stack -->
   <div class="bottom-hud-stack">
-    <div id="gift-tap-hint" class="gift-tap-badge">
-      🎁 Hộp quà rơi kìa! Chạm vào hộp quà để mở kỷ niệm bất ngờ ✨
-    </div>
-
     <nav class="bottom-dock">
       <button type="button" id="btn-open-letter" class="dock-btn">
         <span>💌</span><span>Tâm Thư</span>
@@ -1641,26 +1611,42 @@
       return { x, y, tilt: dWave };
     }
 
-    // Vẽ bóng đen (Silhouette) Cỗ xe Tuần Lộc & Ông già Noel sắc nét khi đi qua Mặt Trăng
+    // Vẽ Cỗ xe Tuần Lộc & Ông già Noel đầy màu sắc rực rỡ khi bay ngang Mặt Trăng
     function drawSleighSilhouette(x, y, tilt, timeSec, scale) {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(tilt);
       ctx.scale(scale, scale);
-      ctx.fillStyle = '#050817';
-      ctx.strokeStyle = '#050817';
-
-      // --- 1. Cỗ Xe Trượt Tuyết (Sleigh) ở phía trái ---
-      ctx.beginPath();
-      // Càng trượt cong
-      ctx.lineWidth = 4.5;
+      ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
+
+      // --- 1. Cỗ Xe Trượt Tuyết (Sleigh) nhiều màu ở phía trái ---
+      // Càng trượt vàng óng
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 4.6;
+      ctx.beginPath();
       ctx.moveTo(-115, 22);
       ctx.quadraticCurveTo(-75, 28, -42, 22);
       ctx.quadraticCurveTo(-28, 18, -26, 8);
       ctx.stroke();
 
-      // Thân xe trượt uốn lượn
+      // Bao quà xanh lá phía sau xe
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.arc(-88, -14, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-95, -21);
+      ctx.lineTo(-81, -18);
+      ctx.stroke();
+
+      // Thân xe trượt đỏ thắm viền vàng kim
+      const sleighGrad = ctx.createLinearGradient(-110, -14, -34, 16);
+      sleighGrad.addColorStop(0, '#ef4444');
+      sleighGrad.addColorStop(1, '#991b1b');
+      ctx.fillStyle = sleighGrad;
       ctx.beginPath();
       ctx.moveTo(-110, 14);
       ctx.quadraticCurveTo(-118, -8, -96, -12);
@@ -1669,43 +1655,60 @@
       ctx.lineTo(-34, 14);
       ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
 
-      // Bao quà sau xe
+      // Ông già Noel ngồi trên xe (áo đỏ, râu trắng, mặt hồng, mũ Noel viền trắng)
+      ctx.fillStyle = '#dc2626';
       ctx.beginPath();
-      ctx.arc(-88, -14, 13, 0, Math.PI * 2);
+      ctx.ellipse(-66, -12, 11, 13, 0, 0, Math.PI * 2); // thân áo đỏ
+      ctx.fill();
+      // Thắt lưng đen khóa vàng
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-76, -10);
+      ctx.lineTo(-56, -10);
+      ctx.stroke();
+
+      // Mặt hồng & râu trắng
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-64, -28, 7.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-62, -23, 6.2, 0, Math.PI);
       ctx.fill();
 
-      // Ông già Noel ngồi trên xe (đầu, mũ chóp, tay vẫy)
-      ctx.beginPath();
-      ctx.ellipse(-66, -12, 11, 13, 0, 0, Math.PI * 2); // thân
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(-64, -28, 7.5, 0, Math.PI * 2); // đầu
-      ctx.fill();
-      // Mũ Noel chóp nhọn bay về sau
+      // Mũ Noel đỏ chóp nhọn bay về sau + viền trắng & chóp bông trắng
+      ctx.fillStyle = '#dc2626';
       ctx.beginPath();
       ctx.moveTo(-71, -31);
       ctx.lineTo(-57, -31);
       ctx.lineTo(-76, -42);
       ctx.closePath();
       ctx.fill();
-      // Chóp bông
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-72, -33, 16, 4);
       ctx.beginPath();
-      ctx.arc(-78, -42, 3, 0, Math.PI * 2);
+      ctx.arc(-78, -42, 3.2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Dây cương nối tới đàn tuần lộc
-      ctx.lineWidth = 1.6;
+      // Dây cương vàng nối tới đàn tuần lộc
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.moveTo(-46, -8);
       ctx.lineTo(135, -8);
       ctx.stroke();
 
-      // --- 2. Đàn 3 chú Tuần Lộc phi nước đại ---
+      // --- 2. Đàn 3 chú Tuần Lộc màu nâu hạt dẻ phi nước đại ---
       const offsets = [
-        { dx: 18, dy: 4, phase: 0 },
-        { dx: 72, dy: -4, phase: 1.4 },
-        { dx: 128, dy: -10, phase: 2.8 }
+        { dx: 18, dy: 4, phase: 0, lead: false },
+        { dx: 72, dy: -4, phase: 1.4, lead: false },
+        { dx: 128, dy: -10, phase: 2.8, lead: true }
       ];
 
       offsets.forEach((r) => {
@@ -1713,12 +1716,34 @@
         const bounce = Math.sin(timeSec * 7.5 + r.phase) * 3.0;
         ctx.translate(r.dx, r.dy + bounce);
 
-        // Thân tuần lộc
+        // 4 chân nâu sẫm phi nhịp nhàng khoan thai
+        const kick = Math.sin(timeSec * 8.5 + r.phase);
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 2.8;
+        ctx.beginPath();
+        ctx.moveTo(11, 4);
+        ctx.lineTo(19 + kick * 6, 15 - kick * 4);
+        ctx.moveTo(8, 5);
+        ctx.lineTo(14 - kick * 5, 17);
+        ctx.moveTo(-12, 3);
+        ctx.lineTo(-22 - kick * 7, 14 + kick * 3);
+        ctx.moveTo(-10, 4);
+        ctx.lineTo(-17 + kick * 5, 17);
+        ctx.stroke();
+
+        // Thân tuần lộc nâu hạt dẻ
+        ctx.fillStyle = '#92400e';
         ctx.beginPath();
         ctx.ellipse(0, 0, 18, 7.5, -0.1, 0, Math.PI * 2);
         ctx.fill();
+        // Bụng sáng kem nhẹ
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.ellipse(0, 3, 12, 3.2, -0.1, 0, Math.PI);
+        ctx.fill();
 
         // Cổ & Đầu ngẩng cao
+        ctx.fillStyle = '#b45309';
         ctx.beginPath();
         ctx.moveTo(10, -2);
         ctx.lineTo(22, -16);
@@ -1727,12 +1752,34 @@
         ctx.closePath();
         ctx.fill();
 
+        // Vòng cổ lục lạc đỏ vàng
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(12, -3);
+        ctx.lineTo(18, 1);
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(16, 1, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
         // Đầu & Mõm
+        ctx.fillStyle = '#b45309';
         ctx.beginPath();
         ctx.ellipse(26, -16, 7.5, 4.2, 0.25, 0, Math.PI * 2);
         ctx.fill();
 
-        // Gạc sừng nhánh
+        // Mũi đỏ phát sáng cho chú tuần lộc dẫn đầu (Rudolph)
+        if (r.lead) {
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(33, -15, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Gạc sừng nhánh nâu gỗ
+        ctx.strokeStyle = '#78350f';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(22, -19);
@@ -1741,22 +1788,6 @@
         ctx.lineTo(25, -31);
         ctx.moveTo(18, -30);
         ctx.lineTo(12, -33);
-        ctx.stroke();
-
-        // 4 chân phi nhịp nhàng khoan thai
-        const kick = Math.sin(timeSec * 8.5 + r.phase);
-        ctx.lineWidth = 2.6;
-        ctx.beginPath();
-        // Hai chân trước
-        ctx.moveTo(11, 4);
-        ctx.lineTo(19 + kick * 6, 15 - kick * 4);
-        ctx.moveTo(8, 5);
-        ctx.lineTo(14 - kick * 5, 17);
-        // Hai chân sau
-        ctx.moveTo(-12, 3);
-        ctx.lineTo(-22 - kick * 7, 14 + kick * 3);
-        ctx.moveTo(-10, 4);
-        ctx.lineTo(-17 + kick * 5, 17);
         ctx.stroke();
 
         ctx.restore();
@@ -2921,7 +2952,6 @@
             giftBox.vy = 0;
             giftBox.rot = 0;
             giftBox.landed = true;
-            document.getElementById('gift-tap-hint')?.classList.add('visible');
           }
         }
       }
@@ -2956,7 +2986,6 @@
       giftBox.spawned = false;
       giftBox.landed = false;
       giftBox.opened = false;
-      document.getElementById('gift-tap-hint')?.classList.remove('visible');
       magicDust.forEach((p) => {
         p.spawned = false;
         p.spawnTime = 0;
@@ -3038,7 +3067,6 @@
       audioEngine.playGiftExplosionSound();
       spawnGiftBurstParticles(giftBox.x, giftBox.y);
       document.getElementById('btn-open-memories').style.display = 'inline-flex';
-      document.getElementById('gift-tap-hint')?.classList.remove('visible');
 
       setTimeout(() => {
         openMemoryBurst(0);

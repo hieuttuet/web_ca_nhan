@@ -175,75 +175,52 @@
     }
 
     /* ==================== SOUND PROMPT ==================== */
-    .sound-prompt-pill {
-      position: fixed;
-      top: 60px;
-      right: 16px;
-      z-index: 24;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(251, 191, 36, 0.18);
-      border: 1px solid rgba(251, 191, 36, 0.52);
-      color: #fef08a;
-      font-size: 0.76rem;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-      animation: pulseGlow 1.8s infinite;
-      transition: opacity 0.35s ease;
-    }
 
-    .sound-prompt-pill.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.25); }
-      50% { transform: scale(1.04); box-shadow: 0 0 22px rgba(251, 191, 36, 0.65); }
-    }
-
-    /* ==================== FLOATING "CHẠM ĐỂ HÁI LỘC" HINT ==================== */
+    /* ==================== FLOATING HAND POINTER ("CHẠM HÁI LỘC") ==================== */
     #bud-hint-tag {
       position: fixed;
       z-index: 15;
-      transform: translate(-50%, -100%);
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(185, 28, 28, 0.92), rgba(217, 119, 6, 0.92));
-      border: 1.5px solid #fef08a;
-      color: #fef9c3;
-      font-size: 0.84rem;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-      box-shadow: 0 0 24px rgba(251, 191, 36, 0.7), 0 8px 20px rgba(0, 0, 0, 0.5);
+      transform: translate(-15%, -10%);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.95rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 12px rgba(254, 240, 138, 0.75));
       cursor: pointer;
       pointer-events: auto;
-      animation: budTagBlink 1.4s ease-in-out infinite;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      animation: handTapPoke 1.25s ease-in-out infinite;
+      transition: opacity 0.35s ease;
     }
 
-    #bud-hint-tag::after {
+    #bud-hint-tag::before {
       content: '';
       position: absolute;
-      left: 50%;
-      bottom: -7px;
-      transform: translateX(-50%);
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 7px solid #fef08a;
+      top: 0;
+      left: 6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(254, 240, 138, 0.85);
+      animation: tapRing 1.25s ease-out infinite;
+      pointer-events: none;
     }
 
     #bud-hint-tag.hidden {
       opacity: 0;
       pointer-events: none;
-      transform: translate(-50%, -120%) scale(0.85);
     }
 
-    @keyframes budTagBlink {
-      0%, 100% { filter: brightness(1); box-shadow: 0 0 18px rgba(251, 191, 36, 0.55); }
-      50% { filter: brightness(1.18); box-shadow: 0 0 32px rgba(254, 240, 138, 0.95); }
+    @keyframes handTapPoke {
+      0%, 100% { transform: translate(-10%, 0%) rotate(-24deg) scale(1); }
+      50% { transform: translate(-24%, -18%) rotate(-24deg) scale(0.92); }
+    }
+
+    @keyframes tapRing {
+      0% { transform: scale(0.5); opacity: 0.9; }
+      100% { transform: scale(2.0); opacity: 0; }
     }
 
     /* ==================== CALLIGRAPHY SCROLL 3D UNFURL ==================== */
@@ -473,6 +450,7 @@
     }
 
     .polaroid-card {
+      position: relative;
       width: 100%;
       max-width: 340px;
       background: #fffdf7;
@@ -514,9 +492,36 @@
 
     .mem-nav-row {
       display: flex;
-      gap: 10px;
+      gap: 14px;
       margin-top: 16px;
       align-items: center;
+    }
+
+    .mem-close-corner {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      z-index: 3;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(15, 10, 24, 0.9);
+      border: 1.5px solid rgba(251, 191, 36, 0.7);
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+    }
+
+    .mem-close-corner:hover {
+      background: rgba(244, 63, 94, 0.45);
+      border-color: #fda4af;
     }
 
     /* ==================== MODALS (CREATOR & PAYMENT) ==================== */
@@ -871,16 +876,6 @@
         padding: 0 9px;
         font-size: 0.72rem;
       }
-      .sound-prompt-pill {
-        top: auto;
-        bottom: 68px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        white-space: nowrap;
-        max-width: calc(100vw - 24px);
-        text-align: center;
-      }
     }
 
     @media (max-width: 520px) {
@@ -895,8 +890,8 @@
   <!-- THREE.JS 3D STAGE -->
   <div id="three-stage"></div>
 
-  <!-- FLOATING GOLDEN BUD HINT -->
-  <div id="bud-hint-tag" class="hidden">✨ Chạm để hái lộc ✨</div>
+  <!-- FLOATING HAND POINTER FOR GOLDEN BUD -->
+  <div id="bud-hint-tag" class="hidden" aria-label="Chạm vào nụ hoa để hái lộc" title="Chạm vào nụ hoa">👆</div>
 
   <!-- TOP HUD -->
   <div class="top-hud">
@@ -923,9 +918,6 @@
       </button>
     </div>
   </div>
-
-  <!-- SOUND UNLOCK PILL -->
-  <div id="sound-unlock-pill" class="sound-prompt-pill">🎵 Chạm để bật nhạc Xuân</div>
 
   <!-- BOTTOM HUD -->
   <div class="bottom-hud">
@@ -959,6 +951,7 @@
   <!-- MEMORY POLAROID OVERLAY -->
   <div id="memory-overlay" class="memory-overlay" style="touch-action: none;">
     <div class="polaroid-card">
+      <button type="button" id="btn-close-photos" class="mem-close-corner" aria-label="Đóng" title="Đóng">✕</button>
       <div class="polaroid-img-wrap">
         <img id="memory-photo-img" src="" alt="Kỷ niệm mùa xuân" />
       </div>
@@ -967,7 +960,6 @@
     </div>
     <div class="mem-nav-row">
       <button type="button" id="btn-prev-photo" class="hud-btn" aria-label="Ảnh trước" title="Ảnh trước" style="width:42px; height:42px; padding:0; justify-content:center; font-size:1.3rem;">‹</button>
-      <button type="button" id="btn-close-photos" class="hud-btn" style="border-color: #fb7185; color: #ffe4e6;">✕ Đóng</button>
       <button type="button" id="btn-next-photo" class="hud-btn" aria-label="Ảnh sau" title="Ảnh sau" style="width:42px; height:42px; padding:0; justify-content:center; font-size:1.3rem;">›</button>
     </div>
   </div>
@@ -1192,18 +1184,64 @@
     const folkAudio = {
       ctx: null,
       masterGain: null,
+      dryBus: null,
+      wetBus: null,
       enabled: true,
       unlocked: false,
-      loopTimer: null,
+      schedTimer: null,
+      nextNoteTime: 0,
       stepIdx: 0,
+      lastFluteFreq: 0,
+
+      createReverbImpulse(ctx, seconds = 2.4, decay = 2.6) {
+        const rate = ctx.sampleRate;
+        const length = Math.floor(rate * seconds);
+        const impulse = ctx.createBuffer(2, length, rate);
+        for (let ch = 0; ch < 2; ch++) {
+          const data = impulse.getChannelData(ch);
+          let lp = 0;
+          for (let i = 0; i < length; i++) {
+            const env = Math.pow(1 - i / length, decay);
+            const white = (Math.random() * 2 - 1) * env;
+            lp = lp * 0.65 + white * 0.35; // warm lowpass tail
+            data[i] = lp;
+          }
+        }
+        return impulse;
+      },
 
       initCtx() {
         if (!this.ctx) {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           if (!AudioCtx) return null;
           this.ctx = new AudioCtx();
+
+          const comp = this.ctx.createDynamicsCompressor();
+          comp.threshold.value = -16;
+          comp.knee.value = 18;
+          comp.ratio.value = 3;
+
+          const masterFilter = this.ctx.createBiquadFilter();
+          masterFilter.type = 'lowpass';
+          masterFilter.frequency.value = 4600;
+
           this.masterGain = this.ctx.createGain();
-          this.masterGain.gain.value = this.enabled ? 0.82 : 0;
+          this.masterGain.gain.value = this.enabled ? 0.85 : 0;
+
+          this.dryBus = this.ctx.createGain();
+          this.dryBus.gain.value = 0.72;
+
+          this.wetBus = this.ctx.createGain();
+          this.wetBus.gain.value = 0.48;
+
+          const convolver = this.ctx.createConvolver();
+          convolver.buffer = this.createReverbImpulse(this.ctx, 2.5, 2.5);
+
+          this.dryBus.connect(masterFilter);
+          this.wetBus.connect(convolver);
+          convolver.connect(masterFilter);
+          masterFilter.connect(comp);
+          comp.connect(this.masterGain);
           this.masterGain.connect(this.ctx.destination);
         }
         return this.ctx;
@@ -1214,8 +1252,9 @@
         if (!ctx) return;
         const onReady = () => {
           this.unlocked = true;
-          document.getElementById('sound-unlock-pill').classList.add('hidden');
-          if (this.enabled && !this.loopTimer) {
+          const hint = document.getElementById('sound-unlock-pill');
+          if (hint) hint.classList.add('hidden');
+          if (this.enabled && !this.schedTimer) {
             this.startLoop();
           }
         };
@@ -1229,7 +1268,7 @@
       mute(shouldMute) {
         this.enabled = !shouldMute;
         if (this.masterGain && this.ctx) {
-          this.masterGain.gain.setTargetAtTime(this.enabled ? 0.82 : 0, this.ctx.currentTime, 0.08);
+          this.masterGain.gain.setTargetAtTime(this.enabled ? 0.85 : 0, this.ctx.currentTime, 0.1);
         }
         const btn = document.getElementById('btn-toggle-sound');
         if (btn) {
@@ -1248,147 +1287,255 @@
         }
       },
 
-      // Sáo trúc êm ái (Miền Bắc): warm sine + breath noise + vibrato
-      playBambooFlute(freq, duration = 0.9, vol = 0.14) {
-        if (!this.enabled || !this.ctx || !this.masterGain) return;
-        const now = this.ctx.currentTime;
+      // Hợp âm Pad nền ấm áp (tạo không gian mùa xuân sâu lắng)
+      playWarmPadChord(freqs, when, duration = 3.6, vol = 0.048) {
+        if (!this.ctx || !this.dryBus) return;
+        freqs.forEach((f, idx) => {
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const filter = this.ctx.createBiquadFilter();
+          const gain = this.ctx.createGain();
+
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(f, when);
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(f * 1.0025, when);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(420, when);
+          filter.frequency.linearRampToValueAtTime(760, when + duration * 0.45);
+          filter.frequency.linearRampToValueAtTime(380, when + duration);
+
+          const v = vol / Math.sqrt(freqs.length);
+          gain.gain.setValueAtTime(0.0001, when);
+          gain.gain.linearRampToValueAtTime(v, when + 0.95 + idx * 0.08);
+          gain.gain.setValueAtTime(v * 0.8, when + duration * 0.65);
+          gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.dryBus);
+          gain.connect(this.wetBus);
+
+          osc1.start(when);
+          osc2.start(when);
+          osc1.stop(when + duration + 0.1);
+          osc2.stop(when + duration + 0.1);
+        });
+      },
+
+      // Sáo trúc thật hơn: tiếng hơi gió + luyến láy mượt + rung hơi trễ (delayed vibrato)
+      playBambooFlute(freq, when, duration = 1.1, vol = 0.13) {
+        if (!this.ctx || !this.dryBus || !freq) return;
 
         const osc = this.ctx.createOscillator();
-        const overtone = this.ctx.createOscillator();
+        const over = this.ctx.createOscillator();
+        const overGain = this.ctx.createGain();
         const lfo = this.ctx.createOscillator();
         const lfoGain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
         const gain = this.ctx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq * 0.985, now);
-        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.08);
+        const startF = this.lastFluteFreq && Math.abs(this.lastFluteFreq - freq) < freq * 0.5
+          ? this.lastFluteFreq * 0.96 + freq * 0.04
+          : freq * 0.97;
+        osc.frequency.setValueAtTime(startF, when);
+        osc.frequency.exponentialRampToValueAtTime(freq, when + 0.11);
+        this.lastFluteFreq = freq;
 
-        overtone.type = 'triangle';
-        overtone.frequency.setValueAtTime(freq * 2, now);
+        over.type = 'sine';
+        over.frequency.setValueAtTime(freq * 2, when);
+        overGain.gain.value = 0.09;
 
-        const overGain = this.ctx.createGain();
-        overGain.gain.value = 0.14;
-
-        lfo.frequency.value = 5.4;
-        lfoGain.gain.value = freq * 0.012;
+        // Rung hơi xuất hiện tự nhiên sau 0.25s
+        lfo.frequency.value = 4.9;
+        lfoGain.gain.setValueAtTime(0.0001, when);
+        lfoGain.gain.linearRampToValueAtTime(freq * 0.011, when + 0.28);
         lfo.connect(lfoGain);
         lfoGain.connect(osc.frequency);
 
-        filter.type = 'lowpass';
-        filter.frequency.value = 2400;
+        // Tiếng hơi sáo nhẹ nhàng (breath noise)
+        const noiseLen = Math.floor(this.ctx.sampleRate * Math.min(duration, 1.4));
+        const noiseBuf = this.ctx.createBuffer(1, noiseLen, this.ctx.sampleRate);
+        const nd = noiseBuf.getChannelData(0);
+        for (let i = 0; i < noiseLen; i++) nd[i] = (Math.random() * 2 - 1) * 0.35;
+        const noiseSrc = this.ctx.createBufferSource();
+        noiseSrc.buffer = noiseBuf;
+        const noiseBp = this.ctx.createBiquadFilter();
+        noiseBp.type = 'bandpass';
+        noiseBp.frequency.value = freq * 1.15;
+        noiseBp.Q.value = 3.5;
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.0001, when);
+        noiseGain.gain.linearRampToValueAtTime(vol * 0.18, when + 0.12);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + Math.min(duration, 1.4));
 
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(vol, now + 0.14);
-        gain.gain.setValueAtTime(vol * 0.86, now + duration * 0.65);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        filter.type = 'lowpass';
+        filter.frequency.value = 2600;
+
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.linearRampToValueAtTime(vol, when + 0.18);
+        gain.gain.setValueAtTime(vol * 0.82, when + duration * 0.65);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
 
         osc.connect(filter);
-        overtone.connect(overGain);
+        over.connect(overGain);
         overGain.connect(filter);
         filter.connect(gain);
-        gain.connect(this.masterGain);
+        gain.connect(this.dryBus);
+        gain.connect(this.wetBus);
 
-        osc.start(now);
-        overtone.start(now);
-        lfo.start(now);
-        osc.stop(now + duration + 0.05);
-        overtone.stop(now + duration + 0.05);
-        lfo.stop(now + duration + 0.05);
+        noiseSrc.connect(noiseBp);
+        noiseBp.connect(noiseGain);
+        noiseGain.connect(this.wetBus);
+
+        osc.start(when);
+        over.start(when);
+        lfo.start(when);
+        noiseSrc.start(when);
+        osc.stop(when + duration + 0.08);
+        over.stop(when + duration + 0.08);
+        lfo.stop(when + duration + 0.08);
+        noiseSrc.stop(when + Math.min(duration, 1.4) + 0.02);
       },
 
-      // Đàn tranh / Đàn nguyệt rộn ràng (Miền Nam): bright plucked string + resonant decay
-      playDanTranh(freq, duration = 0.75, vol = 0.16) {
-        if (!this.enabled || !this.ctx || !this.masterGain) return;
-        const now = this.ctx.currentTime;
+      // Đàn tranh / Đàn nguyệt đa hòa âm: gảy giòn nhưng ngân ấm, tắt dần tự nhiên theo tần số
+      playDanTranh(freq, when, duration = 1.4, vol = 0.12, hasGrace = false) {
+        if (!this.ctx || !this.dryBus || !freq) return;
 
-        const osc1 = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
-        const filter = this.ctx.createBiquadFilter();
-        const gain = this.ctx.createGain();
+        if (hasGrace) {
+          this.playDanTranh(freq * 0.89, when - 0.055, 0.25, vol * 0.45, false);
+        }
 
-        osc1.type = 'triangle';
-        osc1.frequency.setValueAtTime(freq, now);
+        const partials = [
+          { mult: 1, amp: 1.0, dec: duration },
+          { mult: 2, amp: 0.42, dec: duration * 0.55 },
+          { mult: 3, amp: 0.18, dec: duration * 0.28 },
+          { mult: 4, amp: 0.08, dec: duration * 0.14 }
+        ];
 
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(freq * 2, now);
+        const bodyFilter = this.ctx.createBiquadFilter();
+        bodyFilter.type = 'lowpass';
+        bodyFilter.frequency.setValueAtTime(Math.min(4400, freq * 5.2), when);
+        bodyFilter.frequency.exponentialRampToValueAtTime(Math.max(500, freq * 1.4), when + duration * 0.7);
+        bodyFilter.connect(this.dryBus);
+        bodyFilter.connect(this.wetBus);
 
-        const g2 = this.ctx.createGain();
-        g2.gain.value = 0.25;
+        partials.forEach((pt) => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = pt.mult === 1 ? 'triangle' : 'sine';
+          osc.frequency.setValueAtTime(freq * pt.mult, when);
 
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(freq * 2.3, now);
-        filter.Q.value = 1.6;
+          const pv = vol * pt.amp * 0.58;
+          g.gain.setValueAtTime(0.0001, when);
+          g.gain.linearRampToValueAtTime(pv, when + 0.012);
+          g.gain.exponentialRampToValueAtTime(0.0001, when + Math.max(0.12, pt.dec));
 
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(vol, now + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-        osc1.connect(gain);
-        osc2.connect(g2);
-        g2.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.masterGain);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + duration + 0.05);
-        osc2.stop(now + duration + 0.05);
+          osc.connect(g);
+          g.connect(bodyFilter);
+          osc.start(when);
+          osc.stop(when + pt.dec + 0.06);
+        });
       },
 
       playHaiLocChime() {
         if (!this.enabled) return;
         this.tryUnlock();
-        const notes = [587.33, 698.46, 783.99, 880.00, 1046.50, 1174.66];
+        const now = this.ctx ? this.ctx.currentTime + 0.02 : 0;
+        const notes = [587.33, 698.46, 783.99, 880.00, 1046.50, 1174.66, 1396.91];
         notes.forEach((f, idx) => {
-          setTimeout(() => {
-            this.playDanTranh(f, 0.9, 0.17);
-          }, idx * 75);
+          if (this.ctx) this.playDanTranh(f, now + idx * 0.07, 1.8, 0.14, false);
         });
       },
 
       startLoop() {
-        if (this.loopTimer) clearInterval(this.loopTimer);
-        // Ngũ cung Việt Nam (D - F - G - A - C - D)
-        const northMelody = [
-          { f: 587.33, d: 1.1 }, { f: 698.46, d: 0.7 }, { f: 783.99, d: 0.95 },
-          { f: 880.00, d: 1.2 }, { f: 783.99, d: 0.65 }, { f: 698.46, d: 0.9 },
-          { f: 587.33, d: 1.1 }, { f: 523.25, d: 0.8 }, { f: 587.33, d: 1.3 },
-          { f: 880.00, d: 0.9 }, { f: 1046.5, d: 1.2 }, { f: 880.00, d: 0.8 }
+        if (this.schedTimer) clearInterval(this.schedTimer);
+        if (!this.ctx) return;
+
+        // Bản phối Miền Bắc (Hoa Đào): Ngũ cung Rê thứ (D-F-G-A-C) chậm rãi, có khoảng lặng thở, hòa âm Pad + Đàn rải + Sáo trúc
+        const northBarChords = [
+          [146.83, 220.00, 261.63, 349.23], // Dm7
+          [116.54, 174.61, 220.00, 293.66], // BbMaj7
+          [196.00, 293.66, 349.23, 440.00], // Gm9
+          [130.81, 196.00, 261.63, 329.63]  // C6/C
         ];
-        const southMelody = [
-          { f: 587.33, d: 0.5 }, { f: 783.99, d: 0.5 }, { f: 880.00, d: 0.55 },
-          { f: 1046.5, d: 0.65 }, { f: 880.00, d: 0.45 }, { f: 783.99, d: 0.5 },
-          { f: 698.46, d: 0.5 }, { f: 880.00, d: 0.55 }, { f: 1174.66, d: 0.8 },
-          { f: 1046.5, d: 0.5 }, { f: 880.00, d: 0.5 }, { f: 783.99, d: 0.7 }
+        // 32 bước (mỗi bước = 1 phách đơn 0.44s)
+        const northScore = [
+          { f: 587.33, d: 1.3, harp: 293.66 }, { f: 0 }, { f: 698.46, d: 0.7 }, { f: 783.99, d: 0.85, harp: 440.00 },
+          { f: 880.00, d: 1.5, harp: 349.23 }, { f: 0 }, { f: 783.99, d: 0.65 }, { f: 698.46, d: 0.9, harp: 523.25 },
+          { f: 587.33, d: 1.2, harp: 233.08 }, { f: 0 }, { f: 523.25, d: 0.75 }, { f: 587.33, d: 1.1, harp: 349.23 },
+          { f: 440.00, d: 1.7, harp: 293.66 }, { f: 0 }, { f: 0 }, { f: 587.33, d: 0.75, harp: 440.00 },
+
+          { f: 880.00, d: 1.2, harp: 196.00 }, { f: 0 }, { f: 1046.50, d: 0.85 }, { f: 880.00, d: 0.8, harp: 392.00 },
+          { f: 783.99, d: 1.3, harp: 349.23 }, { f: 0 }, { f: 698.46, d: 0.75 }, { f: 783.99, d: 0.95, harp: 587.33 },
+          { f: 698.46, d: 1.1, harp: 261.63 }, { f: 0 }, { f: 587.33, d: 0.8 }, { f: 523.25, d: 0.85, harp: 392.00 },
+          { f: 587.33, d: 1.9, harp: 293.66 }, { f: 0 }, { f: 0 }, { f: 0 }
         ];
 
-        const tick = () => {
-          if (!this.enabled || !this.unlocked) return;
-          if (appState.region === 'north') {
-            const note = northMelody[this.stepIdx % northMelody.length];
-            this.playBambooFlute(note.f, note.d, 0.13);
-            if (this.stepIdx % 3 === 0) {
-              this.playDanTranh(note.f * 0.5, 1.1, 0.055);
+        // Bản phối Miền Nam (Hoa Mai): Tươi sáng, rộn ràng, Đàn tranh gảy rải dây + luyến láy + bass nhẹ
+        const southBarChords = [
+          [146.83, 220.00, 293.66, 349.23], // Dm
+          [174.61, 261.63, 349.23, 440.00], // Fmaj7
+          [196.00, 293.66, 392.00, 440.00], // Gsus2
+          [130.81, 196.00, 261.63, 329.63]  // C
+        ];
+        const southScore = [
+          { f: 587.33, g: true, bass: 146.83 }, { f: 783.99 }, { f: 880.00, arp: 440.00 }, { f: 1046.50, g: true },
+          { f: 880.00, bass: 220.00 }, { f: 783.99 }, { f: 698.46, arp: 349.23 }, { f: 880.00 },
+          { f: 1046.50, g: true, bass: 174.61 }, { f: 1174.66 }, { f: 1046.50, arp: 523.25 }, { f: 880.00 },
+          { f: 783.99, bass: 261.63 }, { f: 698.46 }, { f: 587.33, arp: 349.23 }, { f: 0 },
+
+          { f: 698.46, bass: 196.00 }, { f: 880.00 }, { f: 1046.50, g: true, arp: 392.00 }, { f: 1174.66 },
+          { f: 1046.50, bass: 293.66 }, { f: 880.00 }, { f: 783.99, arp: 440.00 }, { f: 880.00 },
+          { f: 783.99, g: true, bass: 130.81 }, { f: 698.46 }, { f: 587.33, arp: 329.63 }, { f: 698.46 },
+          { f: 587.33, bass: 146.83 }, { f: 0 }, { f: 440.00, arp: 293.66 }, { f: 0 }
+        ];
+
+        this.nextNoteTime = this.ctx.currentTime + 0.05;
+        const scheduleAhead = 0.18;
+
+        const scheduler = () => {
+          if (!this.enabled || !this.unlocked || !this.ctx) return;
+          const isNorth = appState.region === 'north';
+          const stepDur = isNorth ? 0.44 : 0.30;
+          const score = isNorth ? northScore : southScore;
+          const chords = isNorth ? northBarChords : southBarChords;
+
+          while (this.nextNoteTime < this.ctx.currentTime + scheduleAhead) {
+            const idx = this.stepIdx % score.length;
+            const t = this.nextNoteTime;
+
+            // Pad hợp âm nền mỗi 8 bước (1 ô nhịp)
+            if (idx % 8 === 0) {
+              const chord = chords[Math.floor(idx / 8) % chords.length];
+              this.playWarmPadChord(chord, t, stepDur * 8.2, isNorth ? 0.052 : 0.042);
             }
-          } else {
-            const note = southMelody[this.stepIdx % southMelody.length];
-            this.playDanTranh(note.f, note.d + 0.25, 0.15);
-            if (this.stepIdx % 2 === 0) {
-              this.playDanTranh(note.f * 0.5, 0.7, 0.08);
+
+            const item = score[idx];
+            if (isNorth) {
+              if (item.f) this.playBambooFlute(item.f, t, item.d || 0.9, 0.125);
+              if (item.harp) this.playDanTranh(item.harp, t, 1.8, 0.068, false);
+            } else {
+              if (item.f) this.playDanTranh(item.f, t, 1.35, 0.135, !!item.g);
+              if (item.bass) this.playDanTranh(item.bass, t, 1.9, 0.085, false);
+              if (item.arp) this.playDanTranh(item.arp, t + 0.04, 1.4, 0.06, false);
             }
+
+            this.nextNoteTime += stepDur;
+            this.stepIdx++;
           }
-          this.stepIdx++;
         };
 
-        tick();
-        this.loopTimer = setInterval(() => {
-          tick();
-        }, appState.region === 'north' ? 680 : 390);
+        scheduler();
+        this.schedTimer = setInterval(scheduler, 60);
       },
 
       refreshStyle() {
         if (this.unlocked && this.enabled) {
+          this.stepIdx = 0;
           this.startLoop();
         }
       }
@@ -2456,13 +2603,13 @@
         if (branchGrowProgress > 0.62 && !budBloomed) {
           const worldPos = new THREE.Vector3();
           budGroup.getWorldPosition(worldPos);
-          worldPos.y += 0.48;
+          worldPos.x += 0.14;
+          worldPos.y -= 0.14;
           worldPos.project(camera);
           const rawSx = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
           const rawSy = (-worldPos.y * 0.5 + 0.5) * window.innerHeight;
-          const padX = Math.min(105, window.innerWidth * 0.26);
-          const sx = Math.max(padX, Math.min(window.innerWidth - padX, rawSx));
-          const sy = Math.max(92, Math.min(window.innerHeight - 130, rawSy));
+          const sx = Math.max(28, Math.min(window.innerWidth - 46, rawSx));
+          const sy = Math.max(70, Math.min(window.innerHeight - 95, rawSy));
           budHintEl.style.left = `${sx}px`;
           budHintEl.style.top = `${sy}px`;
           budHintEl.classList.remove('hidden');
@@ -2902,7 +3049,6 @@
 
       // Mở âm thanh ngay khi chạm lần đầu
       window.addEventListener('pointerdown', () => folkAudio.tryUnlock(), { once: true });
-      document.getElementById('sound-unlock-pill').addEventListener('click', () => folkAudio.tryUnlock());
       document.getElementById('btn-toggle-sound').addEventListener('click', () => folkAudio.toggle());
       document.getElementById('btn-replay').addEventListener('click', replaySpringScene);
 

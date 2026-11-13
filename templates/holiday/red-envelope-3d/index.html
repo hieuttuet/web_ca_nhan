@@ -1,0 +1,3061 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lì Xì Đỏ 3D • Tài Lộc Bình An</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg-deep: #1a0307;
+      --glass-bg: rgba(20, 6, 10, 0.72);
+      --glass-border: rgba(251, 191, 36, 0.34);
+      --gold: #fbbf24;
+      --gold-light: #fef08a;
+      --red-primary: #dc2626;
+      --text-main: #fffbeb;
+      --text-muted: #fde68a;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-script: 'Dancing Script', cursive;
+      --font-serif: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 42%, #4a0812 0%, #240308 55%, #0e0103 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      user-select: none;
+    }
+
+    body.skin-pink {
+      background: radial-gradient(circle at 50% 42%, #500724 0%, #270518 55%, #0f020a 100%);
+    }
+
+    body.skin-blackgold {
+      background: radial-gradient(circle at 50% 42%, #201a10 0%, #0d0b09 58%, #040302 100%);
+    }
+
+    #stage-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      touch-action: none;
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: max(14px, env(safe-area-inset-top)) 16px 12px;
+      pointer-events: none;
+    }
+
+    .top-hud > * {
+      pointer-events: auto;
+    }
+
+    .top-left-group,
+    .top-right-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      transition: all 0.22s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .hud-btn:hover {
+      background: rgba(185, 28, 28, 0.55);
+      border-color: rgba(251, 191, 36, 0.72);
+      transform: translateY(-1px);
+    }
+
+    .hud-btn.active {
+      background: rgba(245, 158, 11, 0.24);
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    .sound-unlock-pill {
+      position: fixed;
+      top: 62px;
+      right: 16px;
+      z-index: 22;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(20, 6, 10, 0.85);
+      border: 1px solid rgba(251, 191, 36, 0.6);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      animation: pulseGlow 1.8s infinite;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .sound-unlock-pill.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+      50% { box-shadow: 0 0 0 7px rgba(251, 191, 36, 0); }
+    }
+
+    /* ==================== INTERACTION HINTS ==================== */
+    .swipe-hint-wrap {
+      position: fixed;
+      left: 50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .swipe-hint-wrap.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+    }
+
+    .swipe-hand-icon {
+      font-size: 1.45rem;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
+      animation: swipeUpMotion 1.45s ease-in-out infinite;
+    }
+
+    @keyframes swipeUpMotion {
+      0% { transform: translateY(8px) scale(0.95); opacity: 0.4; }
+      45% { transform: translateY(-6px) scale(1.06); opacity: 1; }
+      80% { transform: translateY(-9px) scale(1); opacity: 0.9; }
+      100% { transform: translateY(8px) scale(0.95); opacity: 0.4; }
+    }
+
+    .swipe-hint-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15, 4, 8, 0.78);
+      border: 1px solid rgba(251, 191, 36, 0.48);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .ingot-pointer {
+      position: fixed;
+      left: 50%;
+      top: 80%;
+      transform: translate(-50%, -50%);
+      z-index: 16;
+      font-size: 1.85rem;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.75));
+      animation: tapBounce 1.1s ease-in-out infinite;
+      transition: opacity 0.3s ease;
+    }
+
+    .ingot-pointer.hidden {
+      opacity: 0;
+    }
+
+    @keyframes tapBounce {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+      50% { transform: translate(-50%, -50%) translateY(-8px) scale(1.08); }
+    }
+
+    /* ==================== BOTTOM DOCK ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .btn-primary-dock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 52%, #d97706 100%);
+      border: 1.5px solid rgba(253, 224, 71, 0.75);
+      color: #fffbeb;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(185, 28, 28, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary-dock:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 34px rgba(245, 158, 11, 0.45);
+    }
+
+    .btn-secondary-dock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--gold-light);
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .btn-secondary-dock.hidden {
+      display: none;
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(10, 2, 5, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      background: linear-gradient(165deg, rgba(38, 9, 15, 0.97) 0%, rgba(18, 4, 8, 0.98) 100%);
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      padding: 24px 22px;
+      color: var(--text-main);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-card::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-card::-webkit-scrollbar-thumb {
+      background: rgba(251, 191, 36, 0.35);
+      border-radius: 999px;
+    }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-corner:hover {
+      background: rgba(220, 38, 38, 0.45);
+    }
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      padding-right: 36px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.84rem;
+      color: rgba(255, 241, 242, 0.78);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    /* Secret Gift / Voucher Card (CSS 3D Flip-Open + SVG Stroke) */
+    #modal-gift {
+      perspective: 1200px;
+    }
+
+    .gift-card-shell {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      background: linear-gradient(160deg, #5c0916 0%, #31040b 55%, #190205 100%);
+      border: 2px solid rgba(251, 191, 36, 0.78);
+      padding: 24px 22px 22px;
+      text-align: center;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85), 0 0 42px rgba(251, 191, 36, 0.25);
+      transform-style: preserve-3d;
+      transform: rotateX(-38deg) rotateY(10deg) scale(0.86);
+      opacity: 0;
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+    }
+
+    #modal-gift:not(.hidden) .gift-card-shell {
+      transform: rotateX(0deg) rotateY(0deg) scale(1);
+      opacity: 1;
+    }
+
+    .gift-svg-flourish {
+      width: 220px;
+      height: 28px;
+      margin: 2px auto 6px;
+      display: block;
+    }
+
+    .gift-svg-flourish path {
+      fill: none;
+      stroke: #fde047;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 420;
+      stroke-dashoffset: 420;
+    }
+
+    #modal-gift:not(.hidden) .gift-svg-flourish path {
+      animation: drawGoldStroke 1.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+    }
+
+    @keyframes drawGoldStroke {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .gift-action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .gift-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .gift-heading {
+      font-family: var(--font-script);
+      font-size: 1.95rem;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .gift-voucher-box {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(217, 119, 6, 0.1));
+      border: 1.5px dashed rgba(253, 224, 71, 0.8);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 12px 0 14px;
+    }
+
+    .gift-voucher-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .gift-voucher-text {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .gift-wish-text {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #ffe4e6;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    .gift-sign {
+      font-family: var(--font-script);
+      font-size: 1.45rem;
+      color: var(--gold-light);
+      text-align: right;
+      margin-bottom: 14px;
+    }
+
+    .gift-photo-box {
+      margin: 10px 0 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid rgba(251, 191, 36, 0.5);
+      background: #ffffff;
+      padding: 8px;
+    }
+
+    .gift-photo-box.hidden {
+      display: none;
+    }
+
+    .gift-photo-box img {
+      width: 100%;
+      max-height: 230px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .gift-photo-caption {
+      font-size: 0.76rem;
+      color: #7f1d1d;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.32);
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s ease;
+      color-scheme: dark;
+    }
+
+    .form-select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--gold);
+    }
+
+    .form-textarea {
+      min-height: 82px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .skin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .skin-option {
+      border-radius: 12px;
+      padding: 10px 8px;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.28);
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .skin-option.active {
+      border-color: var(--gold);
+      background: rgba(251, 191, 36, 0.16);
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.45);
+    }
+
+    .skin-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      margin: 0 auto 6px;
+      border: 1.5px solid rgba(253, 224, 71, 0.7);
+    }
+
+    .skin-name {
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .skin-desc {
+      font-size: 0.66rem;
+      opacity: 0.75;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .mini-chip {
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--gold-light);
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .mini-chip:hover {
+      background: rgba(251, 191, 36, 0.25);
+    }
+
+    .upload-zone {
+      border: 1.5px dashed rgba(251, 191, 36, 0.42);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.22);
+      font-size: 0.82rem;
+      color: var(--gold-light);
+    }
+
+    .upload-preview-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .upload-preview-wrap.hidden {
+      display: none;
+    }
+
+    .upload-thumb-item {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+    }
+
+    .upload-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .upload-thumb-del {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.78);
+      color: #fff;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gift-photo-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .gift-photo-arrow {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(153, 27, 27, 0.35);
+      background: #fef2f2;
+      color: #991b1b;
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gift-photo-counter {
+      font-size: 0.76rem;
+      color: #7f1d1d;
+      font-weight: 700;
+    }
+
+    .btn-submit-order {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(253, 224, 71, 0.7);
+      background: linear-gradient(135deg, #b91c1c, #ea580c);
+      color: #ffffff;
+      font-size: 0.96rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 6px;
+      box-shadow: 0 10px 26px rgba(185, 28, 28, 0.45);
+    }
+
+    .btn-submit-order:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Payment & Success Modal */
+    .qr-box {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px;
+      display: inline-block;
+      margin: 10px auto 12px;
+    }
+
+    .qr-box img {
+      width: 210px;
+      height: 210px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .payment-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .btn-download-qr {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(251, 191, 36, 0.6);
+      background: rgba(251, 191, 36, 0.16);
+      color: var(--gold-light);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .share-link-box {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 14px;
+    }
+
+    .share-link-box input {
+      flex: 1;
+      border-radius: 10px;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      padding: 9px 10px;
+      font-size: 0.82rem;
+    }
+
+    .share-actions-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==================== MOBILE RESPONSIVE (README.md) ==================== */
+    @media (max-width: 768px) {
+      .top-hud {
+        align-items: flex-start;
+        padding: max(12px, env(safe-area-inset-top)) 12px 10px;
+      }
+
+      .top-right-group {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+
+      .top-right-group .hud-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        justify-content: center;
+      }
+
+      .hud-btn-label {
+        display: none;
+      }
+
+      .sound-unlock-pill {
+        top: 108px;
+        right: 12px;
+        font-size: 0.72rem;
+        padding: 6px 11px;
+      }
+
+      .form-row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .skin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .swipe-hint-wrap {
+        bottom: 72px;
+      }
+
+      .ingot-pointer {
+        left: 50%;
+        top: 79%;
+      }
+    }
+  </style>
+</head>
+<body class="skin-royal">
+  <canvas id="stage-canvas"></canvas>
+
+  <!-- TOP HUD -->
+  <div class="top-hud">
+    <div class="top-left-group">
+      <a href="../../../index.html" id="btn-back-home" class="hud-btn creator-only" aria-label="Trang chủ" title="Trang chủ">
+        <span>←</span><span>Trang chủ</span>
+      </a>
+    </div>
+    <div class="top-right-group">
+      <button type="button" id="btn-replay" class="hud-btn" aria-label="Xem lại" title="Xem lại">
+        <span>🔄</span><span class="hud-btn-label">Xem Lại</span>
+      </button>
+      <button type="button" id="btn-sound" class="hud-btn active" aria-label="Âm thanh" title="Âm thanh">
+        <span id="sound-icon">🔊</span><span class="hud-btn-label" id="sound-label">Âm Thanh</span>
+      </button>
+    </div>
+  </div>
+
+  <button type="button" id="sound-unlock-pill" class="sound-unlock-pill hidden">
+    🔊 Chạm để bật nhạc Xuân
+  </button>
+
+  <!-- SWIPE-TO-OPEN HINT -->
+  <div id="swipe-hint-wrap" class="swipe-hint-wrap">
+    <div class="swipe-hand-icon">👆</div>
+    <div class="swipe-hint-pill">Vuốt lên mở Lì Xì</div>
+  </div>
+
+  <!-- TAP GOLD INGOT POINTER -->
+  <div id="ingot-pointer" class="ingot-pointer hidden">👆</div>
+
+  <!-- BOTTOM DOCK -->
+  <div class="bottom-dock">
+    <button type="button" id="btn-open-gift" class="btn-secondary-dock hidden">
+      🪙 Mở Quà Thỏi Vàng
+    </button>
+    <button type="button" id="btn-open-creator" class="btn-primary-dock creator-only">
+      🧧 Tạo Lì Xì & Lấy Mã (39k)
+    </button>
+  </div>
+
+  <!-- SECRET GIFT / VOUCHER MODAL -->
+  <div id="modal-gift" class="modal-backdrop hidden">
+    <div class="gift-card-shell">
+      <button type="button" class="modal-close-corner" id="btn-close-gift" aria-label="Đóng">✕</button>
+      <div class="gift-badge">✨ Lộc Vàng Đầu Xuân ✨</div>
+      <svg class="gift-svg-flourish" viewBox="0 0 220 28" aria-hidden="true">
+        <path d="M10,16 Q55,4 110,14 T210,12 M40,22 Q110,12 180,22" />
+      </svg>
+      <div id="gift-card-title" class="gift-heading">Gửi Bạn Yêu Thương</div>
+
+      <div class="gift-voucher-box">
+        <div class="gift-voucher-label">🎁 Quà Bí Mật / Voucher Quy Đổi</div>
+        <div id="gift-voucher-display" class="gift-voucher-text">Chụp màn hình này gửi mình để nhận lì xì may mắn đầu năm!</div>
+      </div>
+
+      <div id="gift-wish-display" class="gift-wish-text">Chúc bạn một năm mới Tài Lộc dồi dào, Bình An trọn vẹn, mọi dự định đều hanh thông rực rỡ!</div>
+      <div id="gift-sign-display" class="gift-sign">Thương gửi, Người Bạn Thân ♥</div>
+
+      <div id="gift-photo-box" class="gift-photo-box hidden" style="touch-action: pan-y;">
+        <img id="gift-photo-img" src="" alt="Ảnh / Mã QR quà tặng" />
+        <div id="gift-photo-nav" class="gift-photo-nav hidden">
+          <button type="button" id="btn-gift-prev" class="gift-photo-arrow" aria-label="Ảnh trước" title="Ảnh trước">‹</button>
+          <span id="gift-photo-counter" class="gift-photo-counter">Ảnh 1 / 1</span>
+          <button type="button" id="btn-gift-next" class="gift-photo-arrow" aria-label="Ảnh sau" title="Ảnh sau">›</button>
+        </div>
+      </div>
+
+      <div class="gift-action-row">
+        <button type="button" id="btn-download-voucher" class="btn-download-qr" style="margin-bottom:0; padding:11px 10px; font-size:0.84rem;">
+          📥 Lưu Ảnh Voucher
+        </button>
+        <button type="button" class="btn-primary-dock" style="width: 100%; padding:11px 10px; font-size:0.84rem;" onclick="closeModal('modal-gift')">
+          ✨ Ngắm Lì Xì 3D
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATOR STUDIO MODAL -->
+  <div id="modal-creator" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <button type="button" class="modal-close-corner" onclick="closeModal('modal-creator')" aria-label="Đóng">✕</button>
+      <h3 class="modal-title">🧧 Thiết Kế Lì Xì Đỏ 3D VIP</h3>
+      <p class="modal-subtitle">Tùy chỉnh skin phong bao, tên người nhận xếp bằng xu vàng & gài quà bí mật / mã QR bên trong Thỏi Vàng.</p>
+
+      <div class="form-group">
+        <div class="form-label">Chọn 3 Skin Vỏ Bao Lì Xì</div>
+        <div class="skin-grid">
+          <button type="button" class="skin-option active" data-skin="royal">
+            <span class="skin-swatch" style="background: linear-gradient(135deg, #991b1b, #dc2626);"></span>
+            <span class="skin-name">Đỏ Hoàng Kim</span>
+            <span class="skin-desc">Hoa mai ép kim</span>
+          </button>
+          <button type="button" class="skin-option" data-skin="pink">
+            <span class="skin-swatch" style="background: linear-gradient(135deg, #be185d, #f472b6);"></span>
+            <span class="skin-name">Hồng Thần Tài</span>
+            <span class="skin-desc">Chibi Neon Gen Z</span>
+          </button>
+          <button type="button" class="skin-option" data-skin="blackgold">
+            <span class="skin-swatch" style="background: linear-gradient(135deg, #171717, #404040);"></span>
+            <span class="skin-name">Đen Quyền Lực</span>
+            <span class="skin-desc">Black Gold VIP 24K</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="input-sender">Tên của bạn</label>
+          <input id="input-sender" class="form-input" type="text" maxlength="40" placeholder="VD: Minh Khang" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-receiver">Tên người ấy</label>
+          <input id="input-receiver" class="form-input" type="text" maxlength="32" placeholder="VD: Ngọc Mai" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-occasion">Dịp / Tiêu đề thiệp</label>
+        <input id="input-occasion" class="form-input" type="text" maxlength="60" value="Chúc Mừng Năm Mới • Tài Lộc Bình An" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-voucher">Quà Bí Mật / Voucher Quy Đổi</label>
+        <input id="input-voucher" class="form-input" type="text" maxlength="160" placeholder="VD: Chụp màn hình gửi mình nhận lì xì 500K!" />
+        <div class="chip-row">
+          <button type="button" class="mini-chip" data-voucher="Chụp màn hình này gửi mình để nhận lì xì 500K!">🧧 Lì xì 500K</button>
+          <button type="button" class="mini-chip" data-voucher="Voucher 1 chầu trà sữa full topping miễn phí!">🧋 1 chầu trà sữa</button>
+          <button type="button" class="mini-chip" data-voucher="1 buổi đi ăn / cà phê tùy chọn, mình bao trọn!">☕ Bao đi ăn / cafe</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">
+          <span>Lời chúc gửi gắm</span>
+          <button type="button" class="mini-chip" id="btn-suggest-wish">✨ Gợi ý lời chúc</button>
+        </label>
+        <textarea id="input-wish" class="form-textarea" maxlength="500" placeholder="Nhập lời chúc Tết hoặc lời nhắn gửi..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ảnh kỷ niệm / Mã QR nhận tiền</label>
+        <label class="upload-zone" for="input-photo">
+          📷 Chọn ảnh hoặc mã QR từ máy
+          <input id="input-photo" type="file" accept="image/*" multiple style="display:none;" />
+        </label>
+        <div id="upload-preview-wrap" class="upload-preview-wrap hidden"></div>
+      </div>
+
+      <button type="button" id="btn-create-order" class="btn-submit-order">
+        💳 Tạo Link Lì Xì 3D Ngay (39.000đ)
+      </button>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL -->
+  <div id="modal-payment" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 420px; text-align: center;">
+      <button type="button" class="modal-close-corner" id="btn-close-payment" aria-label="Đóng">✕</button>
+      <h3 class="modal-title" style="padding-right: 0;">Thanh Toán VietQR Tự Động</h3>
+      <p class="modal-subtitle">Quét mã bên dưới để kích hoạt link Lì Xì Đỏ 3D vĩnh viễn.</p>
+
+      <div class="payment-status-pill" id="payment-status-pill">
+        <span>⏳</span><span id="payment-status-text">Đang chờ xác nhận chuyển khoản...</span>
+      </div>
+
+      <div class="qr-box">
+        <img id="payment-qr-img" src="" alt="Mã VietQR thanh toán" />
+      </div>
+
+      <div style="font-size: 0.82rem; color: #fde68a; margin-bottom: 12px;">
+        Mã đơn: <strong id="payment-order-code">--</strong> • Số tiền: <strong>39.000đ</strong>
+      </div>
+
+      <button type="button" id="btn-download-pay-qr" class="btn-download-qr">
+        📥 Tải Mã QR Chuyển Tiền
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="modal-success" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 440px; text-align: center;">
+      <button type="button" class="modal-close-corner" onclick="closeModal('modal-success')" aria-label="Đóng">✕</button>
+      <h3 class="modal-title" style="padding-right: 0;">🎉 Tạo Lì Xì Đỏ 3D Thành Công!</h3>
+      <p class="modal-subtitle">Gửi link hoặc mã QR này cho người nhận để họ tự tay vuốt mở bao lì xì 3D nhé.</p>
+
+      <div class="qr-box">
+        <img id="success-share-qr" src="" alt="QR Link Lì Xì" />
+      </div>
+
+      <div class="share-link-box">
+        <input id="success-share-url" type="text" readonly />
+        <button type="button" id="btn-copy-link" class="mini-chip" style="padding: 0 14px;">Sao chép</button>
+      </div>
+
+      <div class="share-actions-3">
+        <button type="button" id="btn-download-share-qr" class="btn-download-qr" style="margin-bottom:0;">📥 Tải Mã QR</button>
+        <button type="button" id="btn-preview-created" class="btn-primary-dock" style="padding: 10px 12px; font-size:0.84rem;">✨ Mở Xem Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. APP STATE & CONSTANTS
+      // =========================================================================
+      const PENDING_ORDER_KEY = 'pending_order_red_envelope_3d';
+      const ORDER_TTL_MS = 45 * 60 * 1000;
+
+      const appState = {
+        templateId: 'red_envelope_3d',
+        skin: 'royal', // 'royal' | 'pink' | 'blackgold'
+        sender: 'Minh Khang',
+        receiver: 'Vạn Sự Như Ý',
+        occasion: 'Chúc Mừng Năm Mới • Tài Lộc Bình An',
+        voucher: 'Chụp màn hình này gửi mình để nhận lì xì 500K!',
+        wish: 'Chúc bạn một năm mới Tài Lộc dồi dào, Bình An trọn vẹn, vạn sự hanh thông và luôn rạng rỡ nụ cười!',
+        photos: [],
+        currentGiftPhotoIdx: 0,
+        isViewerMode: false,
+        orderCode: '',
+        pollTimer: null
+      };
+
+      const NEUTRAL_WISHES = [
+        'Chúc {{receiver}} năm mới Tài Lộc dồi dào, Bình An trọn vẹn, mọi dự định đều hanh thông rực rỡ!',
+        'Khai xuân rạng rỡ! Chúc {{receiver}} sức khỏe dẻo dai, công việc thuận buồm xuôi gió và tiền vào như nước!',
+        'Gửi {{receiver}} chiếc lì xì may mắn đầu năm: chúc mỗi ngày đều tràn ngập niềm vui, bình an và thật nhiều điều bất ngờ dễ thương!',
+        'Năm mới chúc {{receiver}} vạn sự như ý, tài lộc gõ cửa, bình an luôn đồng hành trên mọi chặng đường!'
+      ];
+      let wishCursor = 0;
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // =========================================================================
+      // 2. WEB AUDIO ENGINE (SFX + SPRING MELODY, ENABLED BY DEFAULT)
+      // =========================================================================
+      class SpringCoinAudio {
+        constructor() {
+          this.ctx = null;
+          this.master = null;
+          this.enabled = true;
+          this.musicTimer = null;
+          this.stepIdx = 0;
+          this.melodyNotes = [
+            523.25, 659.25, 783.99, 659.25,
+            880.00, 783.99, 659.25, 587.33,
+            523.25, 587.33, 659.25, 783.99,
+            880.00, 1046.50, 880.00, 783.99,
+            659.25, 783.99, 880.00, 659.25,
+            587.33, 523.25, 587.33, 523.25
+          ];
+        }
+
+        ensureContext() {
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            this.ctx = new AC();
+            this.master = this.ctx.createGain();
+            this.master.gain.value = this.enabled ? 0.65 : 0;
+            this.master.connect(this.ctx.destination);
+          }
+          if (this.ctx.state === 'suspended') {
+            return this.ctx.resume().then(() => true).catch(() => false);
+          }
+          return Promise.resolve(true);
+        }
+
+        async tryAutoStart() {
+          const ok = await this.ensureContext();
+          if (ok && this.ctx && this.ctx.state === 'running') {
+            this.startMusicLoop();
+            document.getElementById('sound-unlock-pill').classList.add('hidden');
+            return true;
+          }
+          if (this.enabled) {
+            document.getElementById('sound-unlock-pill').classList.remove('hidden');
+          }
+          return false;
+        }
+
+        setEnabled(flag) {
+          this.enabled = !!flag;
+          const icon = document.getElementById('sound-icon');
+          const btn = document.getElementById('btn-sound');
+          if (icon) icon.textContent = this.enabled ? '🔊' : '🔇';
+          if (btn) btn.classList.toggle('active', this.enabled);
+          if (this.master && this.ctx) {
+            this.master.gain.setTargetAtTime(this.enabled ? 0.65 : 0, this.ctx.currentTime, 0.05);
+          }
+          if (this.enabled) {
+            this.tryAutoStart();
+          } else {
+            document.getElementById('sound-unlock-pill').classList.add('hidden');
+          }
+        }
+
+        startMusicLoop() {
+          if (this.musicTimer) return;
+          const playBeat = () => {
+            if (this.enabled && this.ctx && this.ctx.state === 'running') {
+              const freq = this.melodyNotes[this.stepIdx % this.melodyNotes.length];
+              this.playPluck(freq, 0.11, 0.42);
+              if (this.stepIdx % 4 === 0) {
+                this.playPluck(freq * 0.5, 0.06, 0.65);
+              }
+              this.stepIdx++;
+            }
+            this.musicTimer = setTimeout(playBeat, 340);
+          };
+          playBeat();
+        }
+
+        playPluck(freq, vol, dur) {
+          if (!this.ctx || !this.master || !this.enabled) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc2.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(vol, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+
+          osc.connect(gain);
+          osc2.connect(gain);
+          gain.connect(this.master);
+          osc.start(now);
+          osc2.start(now);
+          osc.stop(now + dur + 0.02);
+          osc2.stop(now + dur + 0.02);
+        }
+
+        playRipOpen() {
+          if (!this.ctx || !this.master || !this.enabled) return;
+          const now = this.ctx.currentTime;
+          // Crisp paper snap + warm pop
+          const bufSize = Math.floor(this.ctx.sampleRate * 0.18);
+          const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < bufSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.25));
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buf;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(1400, now);
+          filter.frequency.exponentialRampToValueAtTime(3400, now + 0.14);
+          const g = this.ctx.createGain();
+          g.gain.setValueAtTime(0.45, now);
+          g.gain.exponentialRampToValueAtTime(0.001, now + 0.17);
+          noise.connect(filter);
+          filter.connect(g);
+          g.connect(this.master);
+          noise.start(now);
+
+          const thump = this.ctx.createOscillator();
+          const tg = this.ctx.createGain();
+          thump.type = 'sine';
+          thump.frequency.setValueAtTime(190, now);
+          thump.frequency.exponentialRampToValueAtTime(65, now + 0.14);
+          tg.gain.setValueAtTime(0.35, now);
+          tg.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          thump.connect(tg);
+          tg.connect(this.master);
+          thump.start(now);
+          thump.stop(now + 0.16);
+        }
+
+        playCoinClink(delaySec, volScale) {
+          if (!this.ctx || !this.master || !this.enabled) return;
+          const t = this.ctx.currentTime + (delaySec || 0);
+          const base = 2000 + Math.random() * 1100; // 2000Hz - 3100Hz base
+          const v = (0.05 + Math.random() * 0.04) * (volScale || 1);
+
+          [
+            { ratio: 1, type: 'sine', decay: 0.12 },
+            { ratio: 1.38, type: 'triangle', decay: 0.1 },
+            { ratio: 1.45, type: 'sine', decay: 0.09 }
+          ].forEach(({ ratio, type, decay }, idx) => {
+            const freq = Math.min(4500, base * ratio); // 2000Hz - 4500Hz metallic band
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, t);
+            g.gain.setValueAtTime(0.0005, t);
+            g.gain.linearRampToValueAtTime(v / (idx + 1), t + 0.002);
+            g.gain.exponentialRampToValueAtTime(0.0005, t + decay);
+            osc.connect(g);
+            g.connect(this.master);
+            osc.start(t);
+            osc.stop(t + decay + 0.02);
+          });
+        }
+
+        playCoinShower() {
+          for (let i = 0; i < 24; i++) {
+            const delay = 0.05 + i * 0.055 + Math.random() * 0.04;
+            this.playCoinClink(delay, i < 12 ? 1.15 : 0.75);
+          }
+        }
+
+        playIngotChime() {
+          if (!this.ctx || !this.master || !this.enabled) return;
+          [880, 1174.66, 1567.98].forEach((f, idx) => {
+            setTimeout(() => this.playPluck(f, 0.14, 0.7), idx * 75);
+          });
+        }
+      }
+
+      const audio = new SpringCoinAudio();
+
+      // Unlock audio on first pointerdown anywhere
+      window.addEventListener('pointerdown', () => {
+        if (audio.enabled) audio.tryAutoStart();
+      }, { once: false });
+
+      // =========================================================================
+      // 3. TEXTURE & 3D GEOMETRY BUILDERS
+      // =========================================================================
+      const SKIN_THEMES = {
+        royal: {
+          bg1: '#b91c1c',
+          bg2: '#7f1d1d',
+          flap: '#991b1b',
+          accent: '#fbbf24',
+          emblemText: 'Tài Lộc',
+          subText: 'VẠN SỰ NHƯ Ý',
+          pattern: 'plum'
+        },
+        pink: {
+          bg1: '#ec4899',
+          bg2: '#9d174d',
+          flap: '#be185d',
+          accent: '#fde047',
+          emblemText: 'Thần Tài',
+          subText: 'TIỀN VÀO NHƯ NƯỚC',
+          pattern: 'chibi'
+        },
+        blackgold: {
+          bg1: '#18181b',
+          bg2: '#09090b',
+          flap: '#121215',
+          accent: '#f59e0b',
+          emblemText: 'VIP 2027',
+          subText: 'TÀI LỘC • BÌNH AN',
+          pattern: 'vip'
+        }
+      };
+
+      function svgToTexture(svgStr, w, h, wrapRepeat) {
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const tex = new THREE.CanvasTexture(c);
+        if (wrapRepeat) tex.wrapS = THREE.RepeatWrapping;
+        tex.anisotropy = 4;
+
+        const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          tex.needsUpdate = true;
+          URL.revokeObjectURL(url);
+        };
+        img.src = url;
+        return tex;
+      }
+
+      function createEnvelopeTexturesSvg(skinKey) {
+        const theme = SKIN_THEMES[skinKey] || SKIN_THEMES.royal;
+        const petalCol = skinKey === 'pink' ? '#fbcfe8' : '#fef08a';
+
+        function buildSvg(isBump) {
+          const bgTop = isBump ? '#4a4a4a' : theme.bg1;
+          const bgMid = isBump ? '#3a3a3a' : theme.bg2;
+          const foil = isBump ? '#ffffff' : theme.accent;
+          const foilSoft = isBump ? '#9a9a9a' : 'rgba(253,224,71,0.16)';
+          const textCol = isBump ? '#ffffff' : '#fef08a';
+          const petal = isBump ? '#e5e5e5' : petalCol;
+          const centerDot = isBump ? '#ffffff' : '#f59e0b';
+
+          const scallops = Array.from({ length: 24 }, (_, i) => {
+            const a = (i * Math.PI * 2) / 24;
+            const cx = (512 + Math.cos(a) * 212).toFixed(1);
+            const cy = (795 + Math.sin(a) * 212).toFixed(1);
+            return `<circle cx="${cx}" cy="${cy}" r="26" fill="${foil}"/>`;
+          }).join('');
+
+          const fret = (tx, ty, sx, sy) => `
+            <g transform="translate(${tx},${ty}) scale(${sx},${sy})" fill="none" stroke="${foil}" stroke-width="5">
+              <polyline points="0,72 0,0 72,0"/>
+              <polyline points="22,72 22,22 72,22"/>
+              <polyline points="44,52 44,44 52,44"/>
+            </g>`;
+
+          const blossom = (bx, by, br) => {
+            const petals = Array.from({ length: 5 }, (_, k) => {
+              const deg = k * 72;
+              return `<ellipse cx="0" cy="${-br}" rx="${(br * 0.44).toFixed(1)}" ry="${(br * 0.58).toFixed(1)}" fill="${petal}" transform="rotate(${deg})"/>`;
+            }).join('');
+            return `<g transform="translate(${bx},${by})">${petals}<circle cx="0" cy="0" r="${(br * 0.3).toFixed(1)}" fill="${centerDot}"/></g>`;
+          };
+
+          return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+            <defs>
+              <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="${bgTop}"/>
+                <stop offset="50%" stop-color="${bgMid}"/>
+                <stop offset="100%" stop-color="${bgTop}"/>
+              </linearGradient>
+              <pattern id="brocade" width="96" height="96" patternUnits="userSpaceOnUse">
+                <circle cx="0" cy="0" r="48" fill="none" stroke="${foilSoft}" stroke-width="2.5"/>
+                <circle cx="96" cy="0" r="48" fill="none" stroke="${foilSoft}" stroke-width="2.5"/>
+                <circle cx="48" cy="48" r="48" fill="none" stroke="${foilSoft}" stroke-width="2.5"/>
+                <circle cx="0" cy="96" r="48" fill="none" stroke="${foilSoft}" stroke-width="2.5"/>
+                <circle cx="96" cy="96" r="48" fill="none" stroke="${foilSoft}" stroke-width="2.5"/>
+              </pattern>
+            </defs>
+            <rect width="1024" height="1536" fill="url(#bg)"/>
+            <rect width="1024" height="1536" fill="url(#brocade)"/>
+            <rect x="38" y="38" width="948" height="1460" fill="none" stroke="${foil}" stroke-width="14"/>
+            <rect x="62" y="62" width="900" height="1412" fill="none" stroke="${foil}" stroke-width="4"/>
+            ${fret(62, 62, 1, 1)}${fret(962, 62, -1, 1)}${fret(62, 1474, 1, -1)}${fret(962, 1474, -1, -1)}
+            <path d="M68,1380 Q210,1220 320,1080" fill="none" stroke="${textCol}" stroke-width="7" stroke-linecap="round"/>
+            ${blossom(150, 1275, 22)}${blossom(235, 1185, 26)}${blossom(308, 1100, 19)}${blossom(185, 1150, 16)}
+            <path d="M956,540 Q810,620 720,730" fill="none" stroke="${textCol}" stroke-width="7" stroke-linecap="round"/>
+            ${blossom(870, 585, 22)}${blossom(790, 645, 25)}${blossom(735, 715, 18)}${blossom(845, 675, 15)}
+            ${scallops}
+            <circle cx="512" cy="795" r="214" fill="${foil}"/>
+            <circle cx="512" cy="795" r="192" fill="${bgMid}"/>
+            <circle cx="512" cy="795" r="174" fill="none" stroke="${foil}" stroke-width="6"/>
+            <circle cx="512" cy="795" r="160" fill="none" stroke="${foil}" stroke-width="3" stroke-dasharray="10 10"/>
+            <text x="512" y="805" text-anchor="middle" dominant-baseline="middle" fill="${textCol}" font-family="Dancing Script, Georgia, serif" font-weight="700" font-size="104">${theme.emblemText}</text>
+            <rect x="212" y="1175" width="600" height="68" fill="${isBump ? '#666666' : 'rgba(251,191,36,0.16)'}" stroke="${foil}" stroke-width="3"/>
+            <text x="512" y="1212" text-anchor="middle" dominant-baseline="middle" fill="${textCol}" font-family="Cinzel, serif" font-weight="700" font-size="34">${theme.subText}</text>
+          </svg>`;
+        }
+
+        return {
+          diffTex: svgToTexture(buildSvg(false), 1024, 1536, false),
+          bumpTex: svgToTexture(buildSvg(true), 1024, 1536, false)
+        };
+      }
+
+      function createEnvelopeTexture(skinKey) {
+        return createEnvelopeTexturesSvg(skinKey).diffTex;
+      }
+
+      function createSealTexture() {
+        const c = document.createElement('canvas');
+        c.width = 256;
+        c.height = 256;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(128, 128, 12, 128, 128, 120);
+        g.addColorStop(0, '#fde047');
+        g.addColorStop(0.7, '#eab308');
+        g.addColorStop(1, '#b45309');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(128, 128, 122, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#7f1d1d';
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.arc(128, 128, 98, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#7f1d1d';
+        ctx.font = 'bold 92px "Dancing Script", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Phúc', 128, 132);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      // Create Thin & Crisp Ancient Square-Hole Gold Coin Geometry
+      function createSquareHoleCoinGeometry() {
+        const shape = new THREE.Shape();
+        const outerR = 0.108;
+        shape.absarc(0, 0, outerR, 0, Math.PI * 2, false);
+
+        const hole = new THREE.Path();
+        const hs = 0.036;
+        hole.moveTo(-hs, -hs);
+        hole.lineTo(hs, -hs);
+        hole.lineTo(hs, hs);
+        hole.lineTo(-hs, hs);
+        hole.closePath();
+        shape.holes.push(hole);
+
+        const geo = new THREE.ExtrudeGeometry(shape, {
+          depth: 0.008,
+          bevelEnabled: true,
+          bevelSegments: 1,
+          steps: 1,
+          bevelSize: 0.003,
+          bevelThickness: 0.003,
+          curveSegments: 16
+        });
+        geo.center();
+        return geo;
+      }
+
+      // Sample 3D target points for coins + matching soft golden aura texture
+      function drawCoinTextCanvas(receiverName) {
+        const c = document.createElement('canvas');
+        c.width = 1200;
+        c.height = 480;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.font = '700 94px "Plus Jakarta Sans", Arial, sans-serif';
+        ctx.fillText('TÀI LỘC - BÌNH AN', 600, 145);
+
+        const cleanName = (receiverName || 'Bạn Yêu Thương').trim();
+        let nameFontSize = 86;
+        do {
+          ctx.font = `700 ${nameFontSize}px "Plus Jakarta Sans", Arial, sans-serif`;
+          if (ctx.measureText(cleanName).width <= 1040 || nameFontSize <= 38) break;
+          nameFontSize -= 4;
+        } while (nameFontSize > 38);
+
+        ctx.fillText(cleanName, 600, 325);
+        return c;
+      }
+
+      function createTextGlowTexture(receiverName) {
+        const src = drawCoinTextCanvas(receiverName);
+        const c = document.createElement('canvas');
+        c.width = 1200;
+        c.height = 480;
+        const ctx = c.getContext('2d');
+        ctx.shadowColor = 'rgba(251, 191, 36, 0.95)';
+        ctx.shadowBlur = 24;
+        ctx.drawImage(src, 0, 0);
+        ctx.shadowBlur = 0;
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.52)';
+        ctx.fillRect(0, 0, c.width, c.height);
+        const tex = new THREE.CanvasTexture(c);
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      function sampleCoinTextTargets(receiverName, maxPoints, spreadWidth) {
+        const c = drawCoinTextCanvas(receiverName);
+        const ctx = c.getContext('2d');
+        const imgData = ctx.getImageData(0, 0, c.width, c.height).data;
+        const candidates = [];
+        const step = 6;
+        for (let y = 0; y < c.height; y += step) {
+          for (let x = 0; x < c.width; x += step) {
+            const alpha = imgData[(y * c.width + x) * 4 + 3];
+            if (alpha > 150) {
+              candidates.push({
+                x: ((x / c.width) - 0.5) * spreadWidth,
+                y: (0.5 - (y / c.height)) * (spreadWidth * (c.height / c.width)) + 0.85,
+                z: 0
+              });
+            }
+          }
+        }
+
+        const out = [];
+        if (candidates.length === 0) {
+          for (let i = 0; i < maxPoints; i++) {
+            out.push(new THREE.Vector3((Math.random() - 0.5) * 3, 1 + (Math.random() - 0.5) * 1.2, 0));
+          }
+          return out;
+        }
+
+        const stride = candidates.length / maxPoints;
+        for (let i = 0; i < maxPoints; i++) {
+          const idx = Math.min(candidates.length - 1, Math.floor(i * stride));
+          const p = candidates[idx];
+          out.push(new THREE.Vector3(p.x, p.y, p.z));
+        }
+        return out;
+      }
+
+      function createStudioEnvTexture(rendererObj) {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 256;
+        const ctx = c.getContext('2d');
+        const bg = ctx.createLinearGradient(0, 0, 0, 256);
+        bg.addColorStop(0, '#fff7ed');
+        bg.addColorStop(0.35, '#fbbf24');
+        bg.addColorStop(0.65, '#991b1b');
+        bg.addColorStop(1, '#450a0a');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 512, 256);
+
+        // Bright studio softboxes for crisp 24K gold reflections
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(60, 28, 120, 48);
+        ctx.fillRect(320, 34, 140, 42);
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(190, 95, 130, 35);
+
+        const rawTex = new THREE.CanvasTexture(c);
+        rawTex.mapping = THREE.EquirectangularReflectionMapping;
+        const pmrem = new THREE.PMREMGenerator(rendererObj);
+        const envRT = pmrem.fromEquirectangular(rawTex);
+        rawTex.dispose();
+        pmrem.dispose();
+        return envRT.texture;
+      }
+
+      function createIngotTextures() {
+        function buildHullSvg(isBump) {
+          const baseA = isBump ? '#505050' : '#f59e0b';
+          const baseB = isBump ? '#585858' : '#fde047';
+          const baseC = isBump ? '#505050' : '#d97706';
+          const lineDark = isBump ? '#ffffff' : '#78350f';
+          const bandCol = isBump ? '#d4d4d4' : '#92400e';
+          const pearlCol = isBump ? '#ffffff' : '#fef08a';
+          const cloudCol = isBump ? '#e5e5e5' : '#b45309';
+
+          const halfScene = (ox) => {
+            const cx = ox + 512;
+            const cy = 256;
+            const rays = Array.from({ length: 8 }, (_, i) => {
+              const a = (i * Math.PI * 2) / 8;
+              const x1 = (cx + Math.cos(a) * 40).toFixed(1);
+              const y1 = (cy + Math.sin(a) * 40).toFixed(1);
+              const x2 = (cx + Math.cos(a + 0.14) * 66).toFixed(1);
+              const y2 = (cy + Math.sin(a + 0.14) * 66).toFixed(1);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${pearlCol}" stroke-width="5" stroke-linecap="round"/>`;
+            }).join('');
+
+            const scales = Array.from({ length: 10 }, (_, s) => {
+              const sx = ox + 100 + s * 33;
+              const sy = cy + Math.sin(s * 0.9) * 38;
+              return `<polyline points="${sx},${sy - 14} ${sx + 10},${sy - 32} ${sx + 20},${sy - 12}" fill="none" stroke="${lineDark}" stroke-width="6" stroke-linejoin="round"/>`;
+            }).join('');
+
+            const feathers = Array.from({ length: 5 }, (_, f) => {
+              const fy = 256 + f * 25;
+              return `
+                <path d="M${cx + 124},${cy + 18} C${cx + 210},${fy + 24} ${ox + 830},${fy - 44} ${ox + 954},${fy + 10}" fill="none" stroke="${lineDark}" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="${ox + 960}" cy="${fy + 10}" r="9" fill="${lineDark}"/>`;
+            }).join('');
+
+            return `
+              <rect x="${ox + 18}" y="92" width="988" height="328" fill="none" stroke="${bandCol}" stroke-width="6"/>
+              <rect x="${ox + 28}" y="104" width="968" height="304" fill="none" stroke="${bandCol}" stroke-width="3"/>
+              <circle cx="${cx}" cy="${cy}" r="34" fill="${pearlCol}"/>
+              ${rays}
+              <!-- Rồng Vàng (Long) -->
+              <path d="M${ox + 70},310 C${ox + 140},140 ${ox + 240},370 ${ox + 320},210 C${ox + 365},130 ${ox + 410},270 ${cx - 78},${cy - 12}" fill="none" stroke="${lineDark}" stroke-width="15" stroke-linecap="round"/>
+              ${scales}
+              <circle cx="${cx - 86}" cy="${cy - 16}" r="22" fill="${lineDark}"/>
+              <path d="M${cx - 96},${cy - 32} L${cx - 122},${cy - 68} M${cx - 82},${cy - 34} L${cx - 98},${cy - 72} M${cx - 66},${cy - 12} Q${cx - 42},${cy - 26} ${cx - 38},${cy - 42}" fill="none" stroke="${lineDark}" stroke-width="8" stroke-linecap="round"/>
+              <!-- Phụng Hoàng (Phụng) -->
+              <circle cx="${cx + 86}" cy="${cy - 20}" r="18" fill="${lineDark}"/>
+              <path d="M${cx + 96},${cy - 34} Q${cx + 125},${cy - 66} ${cx + 150},${cy - 54} M${cx + 102},${cy - 28} Q${cx + 135},${cy - 52} ${cx + 162},${cy - 36}" fill="none" stroke="${lineDark}" stroke-width="7" stroke-linecap="round"/>
+              <path d="M${cx + 104},${cy - 8} C${cx + 170},110 ${ox + 770},115 ${ox + 860},175 M${cx + 115},${cy + 6} C${cx + 185},165 ${ox + 760},175 ${ox + 835},225" fill="none" stroke="${lineDark}" stroke-width="11" stroke-linecap="round"/>
+              ${feathers}
+              <!-- Mây cát tường -->
+              <g fill="${cloudCol}">
+                <circle cx="${ox + 156}" cy="372" r="16"/><circle cx="${ox + 180}" cy="362" r="22"/><circle cx="${ox + 204}" cy="372" r="16"/>
+                <circle cx="${ox + 816}" cy="372" r="16"/><circle cx="${ox + 840}" cy="362" r="22"/><circle cx="${ox + 864}" cy="372" r="16"/>
+              </g>`;
+          };
+
+          return `<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="512" viewBox="0 0 2048 512">
+            <defs>
+              <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="${baseA}"/>
+                <stop offset="50%" stop-color="${baseB}"/>
+                <stop offset="100%" stop-color="${baseC}"/>
+              </linearGradient>
+            </defs>
+            <rect width="2048" height="512" fill="url(#hg)"/>
+            ${halfScene(0)}${halfScene(1024)}
+          </svg>`;
+        }
+
+        function buildDomeSvg(isBump) {
+          const bg = isBump ? '#585858' : '#fde047';
+          const fg = isBump ? '#ffffff' : '#78350f';
+          return `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+            <rect width="512" height="512" fill="${bg}"/>
+            <circle cx="256" cy="256" r="178" fill="none" stroke="${fg}" stroke-width="10"/>
+            <circle cx="256" cy="256" r="160" fill="none" stroke="${fg}" stroke-width="4" stroke-dasharray="10 8"/>
+            <text x="256" y="222" text-anchor="middle" dominant-baseline="middle" fill="${fg}" font-family="Dancing Script, Georgia, serif" font-weight="700" font-size="68">Long Phụng</text>
+            <text x="256" y="294" text-anchor="middle" dominant-baseline="middle" fill="${fg}" font-family="Dancing Script, Georgia, serif" font-weight="700" font-size="62">Sum Vầy</text>
+          </svg>`;
+        }
+
+        return {
+          diffTex: svgToTexture(buildHullSvg(false), 2048, 512, true),
+          hullBumpTex: svgToTexture(buildHullSvg(true), 2048, 512, true),
+          domeTex: svgToTexture(buildDomeSvg(false), 512, 512, false),
+          domeBumpTex: svgToTexture(buildDomeSvg(true), 512, 512, false)
+        };
+      }
+
+      function createSunburstTexture() {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 512;
+        const ctx = c.getContext('2d');
+        const cx = 256, cy = 256;
+        const rg = ctx.createRadialGradient(cx, cy, 10, cx, cy, 240);
+        rg.addColorStop(0, 'rgba(254, 240, 138, 0.85)');
+        rg.addColorStop(0.45, 'rgba(251, 191, 36, 0.28)');
+        rg.addColorStop(1, 'rgba(251, 191, 36, 0)');
+        ctx.fillStyle = rg;
+        ctx.fillRect(0, 0, 512, 512);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        for (let i = 0; i < 16; i++) {
+          ctx.rotate(Math.PI / 8);
+          ctx.fillStyle = 'rgba(254, 240, 138, 0.16)';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-14, -230);
+          ctx.lineTo(14, -230);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+        const tex = new THREE.CanvasTexture(c);
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      // =========================================================================
+      // 4. THREE.JS 3D SCENE SETUP
+      // =========================================================================
+      const canvas = document.getElementById('stage-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+
+      const scene = new THREE.Scene();
+      scene.environment = createStudioEnvTexture(renderer);
+      const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+      function updateCameraForAspect() {
+        const aspect = window.innerWidth / window.innerHeight;
+        camera.aspect = aspect;
+        camera.position.set(0, 0.25, aspect < 0.8 ? 10.6 : 7.8);
+        camera.lookAt(0, 0.15, 0);
+        camera.updateProjectionMatrix();
+      }
+      updateCameraForAspect();
+
+      // Lighting (balanced warm studio lighting without blowing out seal)
+      scene.add(new THREE.AmbientLight(0xfff1d6, 1.0));
+
+      const keyLight = new THREE.DirectionalLight(0xffe082, 1.5);
+      keyLight.position.set(4.5, 6.5, 5.5);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0xff5252, 0.95);
+      rimLight.position.set(-5, 3, -4);
+      scene.add(rimLight);
+
+      const frontWarmFill = new THREE.PointLight(0xfde047, 1.1, 14);
+      frontWarmFill.position.set(-2.2, -1.2, 4.8);
+      scene.add(frontWarmFill);
+
+      // Festive 3D Hanging Lanterns in Background Corners (deep crimson SVG silk + gold motifs)
+      function createLanternTextureSvg() {
+        const ribs = Array.from({ length: 12 }, (_, i) => {
+          const x = (i * 1024) / 12;
+          return `<line x1="${x}" y1="0" x2="${x}" y2="512" stroke="#f59e0b" stroke-width="5" stroke-opacity="0.7"/>`;
+        }).join('');
+        const medallions = [256, 768].map((cx) => `
+          <circle cx="${cx}" cy="256" r="76" fill="#5c0000" stroke="#fbbf24" stroke-width="6"/>
+          <circle cx="${cx}" cy="256" r="64" fill="none" stroke="#fde047" stroke-width="2" stroke-dasharray="8 6"/>
+          <text x="${cx}" y="264" text-anchor="middle" dominant-baseline="middle" fill="#fde047" font-family="Dancing Script, Georgia, serif" font-weight="700" font-size="68">Phúc</text>
+        `).join('');
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#5c0000"/>
+              <stop offset="50%" stop-color="#990000"/>
+              <stop offset="100%" stop-color="#4d0000"/>
+            </linearGradient>
+          </defs>
+          <rect width="1024" height="512" fill="url(#lg)"/>
+          ${ribs}
+          <rect x="0" y="34" width="1024" height="16" fill="#d97706" fill-opacity="0.75"/>
+          <rect x="0" y="462" width="1024" height="16" fill="#d97706" fill-opacity="0.75"/>
+          ${medallions}
+        </svg>`;
+        return svgToTexture(svg, 1024, 512, true);
+      }
+
+      const sharedLanternTex = createLanternTextureSvg();
+
+      function createLantern(x, y, z) {
+        const g = new THREE.Group();
+        g.position.set(x, y, z);
+        const lRedMat = new THREE.MeshBasicMaterial({
+          map: sharedLanternTex
+        });
+        const lTasselMat = new THREE.MeshBasicMaterial({
+          color: 0x990000
+        });
+        const lGoldMat = new THREE.MeshStandardMaterial({
+          color: 0xfbbf24,
+          roughness: 0.25,
+          metalness: 0.85
+        });
+        // Cord
+        const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.8, 8), lGoldMat);
+        cord.position.y = 1.2;
+        g.add(cord);
+        // Body
+        const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 18), lRedMat);
+        body.scale.set(1.05, 0.85, 1.05);
+        body.rotation.y = -Math.PI / 2;
+        g.add(body);
+        // Caps
+        const topCap = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.09, 18), lGoldMat);
+        topCap.position.y = 0.35;
+        g.add(topCap);
+        const botCap = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.09, 18), lGoldMat);
+        botCap.position.y = -0.35;
+        g.add(botCap);
+        // Tassel
+        const tas = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.42, 12), lTasselMat);
+        tas.position.y = -0.6;
+        g.add(tas);
+        scene.add(g);
+        return g;
+      }
+      const leftLantern = createLantern(-4.85, 3.0, -3.2);
+      const rightLantern = createLantern(4.85, 3.0, -3.2);
+
+      function positionLanternsForAspect() {
+        const aspect = window.innerWidth / window.innerHeight;
+        if (aspect < 0.8) {
+          leftLantern.position.set(-2.45, 3.65, -3.2);
+          rightLantern.position.set(2.45, 3.65, -3.2);
+        } else {
+          leftLantern.position.set(-4.85, 3.0, -3.2);
+          rightLantern.position.set(4.85, 3.0, -3.2);
+        }
+      }
+      positionLanternsForAspect();
+
+      // Envelope 3D Group
+      const envelopeGroup = new THREE.Group();
+      envelopeGroup.position.y = 0.42;
+      scene.add(envelopeGroup);
+
+      const initialEnvTex = createEnvelopeTexturesSvg(appState.skin);
+      let frontMat = new THREE.MeshStandardMaterial({
+        map: initialEnvTex.diffTex,
+        bumpMap: initialEnvTex.bumpTex,
+        bumpScale: 0.032,
+        roughness: 0.42,
+        metalness: 0.22
+      });
+      const trimGoldMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        roughness: 0.28,
+        metalness: 0.82
+      });
+      const backRedMat = new THREE.MeshStandardMaterial({
+        color: 0x7f1d1d,
+        roughness: 0.5,
+        metalness: 0.2
+      });
+
+      const envBodyGeo = new THREE.BoxGeometry(2.36, 3.52, 0.14);
+      const envBodyMesh = new THREE.Mesh(envBodyGeo, [
+        trimGoldMat, trimGoldMat, trimGoldMat, trimGoldMat, frontMat, backRedMat
+      ]);
+      envelopeGroup.add(envBodyMesh);
+
+      // Flap Pivot at top edge (y = +1.76)
+      const flapPivot = new THREE.Group();
+      flapPivot.position.set(0, 1.76, 0.08);
+      envelopeGroup.add(flapPivot);
+
+      const flapShape = new THREE.Shape();
+      flapShape.moveTo(-1.16, 0);
+      flapShape.lineTo(1.16, 0);
+      flapShape.lineTo(0, -1.04);
+      flapShape.closePath();
+
+      const flapGeo = new THREE.ExtrudeGeometry(flapShape, {
+        depth: 0.025,
+        bevelEnabled: true,
+        bevelThickness: 0.012,
+        bevelSize: 0.012,
+        bevelSegments: 2
+      });
+      const flapMat = new THREE.MeshStandardMaterial({
+        color: 0x991b1b,
+        roughness: 0.42,
+        metalness: 0.22
+      });
+      const flapMesh = new THREE.Mesh(flapGeo, flapMat);
+      flapPivot.add(flapMesh);
+
+      // Gold trim line along V-flap edges
+      const flapEdgePts = [
+        new THREE.Vector3(-1.16, 0, 0.036),
+        new THREE.Vector3(0, -1.04, 0.036),
+        new THREE.Vector3(1.16, 0, 0.036)
+      ];
+      const flapEdgeGeo = new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(flapEdgePts),
+        16,
+        0.018,
+        8,
+        false
+      );
+      flapPivot.add(new THREE.Mesh(flapEdgeGeo, trimGoldMat));
+
+      // Engraved gold wax seal ("Phúc") on flap tip
+      const sealTex = createSealTexture();
+      const sealFaceMat = new THREE.MeshStandardMaterial({
+        map: sealTex,
+        roughness: 0.35,
+        metalness: 0.45
+      });
+      const sealGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.045, 28);
+      sealGeo.rotateX(Math.PI / 2);
+      const sealMesh = new THREE.Mesh(sealGeo, [trimGoldMat, sealFaceMat, trimGoldMat]);
+      sealMesh.position.set(0, -0.84, 0.038);
+      flapPivot.add(sealMesh);
+
+      // Hanging Red-Gold Tassel under envelope
+      const tasselGroup = new THREE.Group();
+      tasselGroup.position.set(0, -1.78, 0);
+      envelopeGroup.add(tasselGroup);
+      const knotMesh = new THREE.Mesh(new THREE.SphereGeometry(0.08, 14, 12), trimGoldMat);
+      knotMesh.position.y = -0.06;
+      tasselGroup.add(knotMesh);
+      const cordMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.6 });
+      const tasselBody = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.45, 16), cordMat);
+      tasselBody.position.y = -0.34;
+      tasselGroup.add(tasselBody);
+
+      function applyEnvelopeSkin(skinKey) {
+        appState.skin = skinKey;
+        document.body.classList.remove('skin-royal', 'skin-pink', 'skin-blackgold');
+        document.body.classList.add('skin-' + skinKey);
+
+        const theme = SKIN_THEMES[skinKey] || SKIN_THEMES.royal;
+        if (frontMat.map) frontMat.map.dispose();
+        if (frontMat.bumpMap) frontMat.bumpMap.dispose();
+        const svgEnvTex = createEnvelopeTexturesSvg(skinKey);
+        frontMat.map = svgEnvTex.diffTex;
+        frontMat.bumpMap = svgEnvTex.bumpTex;
+        frontMat.needsUpdate = true;
+
+        backRedMat.color.set(theme.bg2);
+        flapMat.color.set(theme.flap);
+      }
+
+      // Shared GLSL Shader Uniforms + Fresnel Gold Rim Injection
+      const sharedShaderUniforms = { uTime: { value: 0 } };
+      function injectFresnelGoldShader(mat, strength) {
+        mat.onBeforeCompile = (shader) => {
+          shader.uniforms.uTime = sharedShaderUniforms.uTime;
+          shader.uniforms.uFresnelStrength = { value: strength };
+          shader.fragmentShader =
+            'uniform float uTime;\nuniform float uFresnelStrength;\n' +
+            shader.fragmentShader.replace(
+              '#include <dithering_fragment>',
+              `
+              vec3 viewDirF = normalize(vViewPosition);
+              float fresnelF = pow(1.0 - clamp(abs(dot(normalize(normal), viewDirF)), 0.0, 1.0), 2.4);
+              float shimmerF = 0.72 + 0.28 * sin(uTime * 3.0 + vViewPosition.x * 2.5 + vViewPosition.y * 2.0);
+              vec3 goldRimF = mix(vec3(1.0, 0.84, 0.28), vec3(1.0, 0.96, 0.75), shimmerF);
+              gl_FragColor.rgb += goldRimF * fresnelF * uFresnelStrength * shimmerF;
+              #include <dithering_fragment>
+              `
+            );
+        };
+      }
+
+      // Instanced Thin Ancient Gold Coins (760 coins = optimal 60FPS on mid-range phones)
+      const COIN_COUNT = 760;
+      const coinGeo = createSquareHoleCoinGeometry();
+      const coinMat = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.42,
+        roughness: 0.2,
+        metalness: 0.9
+      });
+      injectFresnelGoldShader(coinMat, 0.45);
+      const coinMesh = new THREE.InstancedMesh(coinGeo, coinMat, COIN_COUNT);
+      coinMesh.visible = false;
+      scene.add(coinMesh);
+
+      // Subtle glowing golden text core behind the coins so every letter reads clearly
+      const textGlowMat = new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const textGlowMesh = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 3.04), textGlowMat);
+      textGlowMesh.position.set(0, 0.85, -0.08);
+      textGlowMesh.visible = false;
+      scene.add(textGlowMesh);
+
+      const coinStates = [];
+      const dummy = new THREE.Object3D();
+      for (let i = 0; i < COIN_COUNT; i++) {
+        coinStates.push({
+          pos: new THREE.Vector3(0, 1.4, 0),
+          vel: new THREE.Vector3(),
+          rot: new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6),
+          rotVel: new THREE.Vector3(Math.random() * 8 - 4, Math.random() * 8 - 4, Math.random() * 8 - 4),
+          target: new THREE.Vector3(),
+          scale: 0.65 + Math.random() * 0.25
+        });
+      }
+
+      // 3D Confetti (130 red & gold pieces)
+      const CONFETTI_COUNT = 130;
+      const confettiGeo = new THREE.PlaneGeometry(0.16, 0.09);
+      const confettiMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide
+      });
+      const confettiMesh = new THREE.InstancedMesh(confettiGeo, confettiMat, CONFETTI_COUNT);
+      confettiMesh.visible = false;
+      scene.add(confettiMesh);
+
+      const confettiStates = [];
+      const cColor = new THREE.Color();
+      for (let i = 0; i < CONFETTI_COUNT; i++) {
+        confettiStates.push({
+          pos: new THREE.Vector3(),
+          vel: new THREE.Vector3(),
+          rot: new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6),
+          swayPhase: Math.random() * Math.PI * 2
+        });
+        cColor.set(i % 3 === 0 ? 0xfacc15 : (i % 3 === 1 ? 0xef4444 : 0xfb7185));
+        confettiMesh.setColorAt(i, cColor);
+      }
+      if (confettiMesh.instanceColor) confettiMesh.instanceColor.needsUpdate = true;
+
+      // Custom GLSL Bokeh & Twinkling Gold Dust Shader (replaces flat square PointsMaterial)
+      const DUST_COUNT = 220;
+      const dustGeo = new THREE.BufferGeometry();
+      const dustPos = new Float32Array(DUST_COUNT * 3);
+      const dustSizes = new Float32Array(DUST_COUNT);
+      const dustPhases = new Float32Array(DUST_COUNT);
+      for (let i = 0; i < DUST_COUNT; i++) {
+        dustPos[i * 3] = (Math.random() - 0.5) * 14;
+        dustPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+        dustPos[i * 3 + 2] = (Math.random() - 0.5) * 7 - 1;
+        dustSizes[i] = 16.0 + Math.random() * 26.0;
+        dustPhases[i] = Math.random() * Math.PI * 2;
+      }
+      dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+      dustGeo.setAttribute('aSize', new THREE.BufferAttribute(dustSizes, 1));
+      dustGeo.setAttribute('aPhase', new THREE.BufferAttribute(dustPhases, 1));
+
+      const dustMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: sharedShaderUniforms.uTime,
+          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) }
+        },
+        vertexShader: `
+          attribute float aSize;
+          attribute float aPhase;
+          varying float vPhase;
+          varying float vDepth;
+          uniform float uTime;
+          uniform float uPixelRatio;
+          void main() {
+            vPhase = aPhase;
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vDepth = clamp((-mvPosition.z - 2.0) / 10.0, 0.0, 1.0);
+            float pulse = 0.78 + 0.22 * sin(uTime * 2.2 + aPhase);
+            gl_PointSize = aSize * uPixelRatio * pulse * (8.0 / max(1.0, -mvPosition.z));
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying float vPhase;
+          varying float vDepth;
+          uniform float uTime;
+          void main() {
+            vec2 uv = gl_PointCoord - vec2(0.5);
+            float d = length(uv);
+            if (d > 0.5) discard;
+            float core = smoothstep(0.22, 0.0, d);
+            float bokeh = smoothstep(0.5, 0.12, d) * 0.65;
+            float twinkle = 0.55 + 0.45 * sin(uTime * 2.8 + vPhase);
+            vec3 col = mix(vec3(1.0, 0.78, 0.2), vec3(1.0, 0.96, 0.78), core);
+            float alpha = (core + bokeh * (0.4 + 0.6 * vDepth)) * twinkle * 0.85;
+            gl_FragColor = vec4(col, alpha);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const dustPoints = new THREE.Points(dustGeo, dustMat);
+      scene.add(dustPoints);
+
+      // Authentic Engraved Kim Nguyen Bao (Boat-Shaped Gold Sycee Ingot)
+      const ingotGroup = new THREE.Group();
+      ingotGroup.visible = false;
+      scene.add(ingotGroup);
+
+      const { diffTex: ingotDiffTex, hullBumpTex, domeTex: ingotDomeTex, domeBumpTex } = createIngotTextures();
+
+      const ingotBodyMat = new THREE.MeshStandardMaterial({
+        map: ingotDiffTex,
+        bumpMap: hullBumpTex,
+        bumpScale: 0.095,
+        color: 0xfde047,
+        emissive: 0xb45309,
+        emissiveIntensity: 0.24,
+        roughness: 0.22,
+        metalness: 0.88
+      });
+      injectFresnelGoldShader(ingotBodyMat, 0.5);
+
+      const ingotRimMat = new THREE.MeshStandardMaterial({
+        color: 0xfef08a,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.28,
+        roughness: 0.16,
+        metalness: 0.92
+      });
+      injectFresnelGoldShader(ingotRimMat, 0.55);
+
+      const ingotDomeMat = new THREE.MeshStandardMaterial({
+        map: ingotDomeTex,
+        bumpMap: domeBumpTex,
+        bumpScale: 0.085,
+        color: 0xfef08a,
+        emissive: 0xb45309,
+        emissiveIntensity: 0.26,
+        roughness: 0.18,
+        metalness: 0.9
+      });
+      injectFresnelGoldShader(ingotDomeMat, 0.5);
+
+      // Custom flared & upturned boat-shaped hull
+      const syceeGeo = new THREE.CylinderGeometry(1.18, 0.62, 0.56, 40, 12, false);
+      syceeGeo.scale(1.22, 1, 0.64);
+      const posAttr = syceeGeo.attributes.position;
+      for (let i = 0; i < posAttr.count; i++) {
+        const vx = posAttr.getX(i);
+        const vy = posAttr.getY(i);
+        const normX = vx / 1.44;
+        const lift = 0.38 * Math.pow(normX, 2);
+        posAttr.setY(i, vy + lift);
+      }
+      syceeGeo.computeVertexNormals();
+      const syceeBody = new THREE.Mesh(syceeGeo, ingotBodyMat);
+      ingotGroup.add(syceeBody);
+
+      // Raised golden rim along top boat edge
+      const rimPts = [];
+      for (let k = 0; k <= 36; k++) {
+        const ang = (k / 36) * Math.PI * 2;
+        const rx = Math.cos(ang) * 1.42;
+        const rz = Math.sin(ang) * 0.74;
+        const ry = 0.28 + 0.38 * Math.pow(rx / 1.44, 2);
+        rimPts.push(new THREE.Vector3(rx, ry, rz));
+      }
+      const rimCurve = new THREE.CatmullRomCurve3(rimPts, true);
+      const rimMesh = new THREE.Mesh(new THREE.TubeGeometry(rimCurve, 48, 0.058, 10, true), ingotRimMat);
+      ingotGroup.add(rimMesh);
+
+      // Single smooth central oval gold dome with "Tài Lộc" engraving
+      const domeGeo = new THREE.SphereGeometry(0.54, 28, 20);
+      domeGeo.scale(1.12, 0.58, 0.68);
+      const domeMesh = new THREE.Mesh(domeGeo, ingotDomeMat);
+      domeMesh.position.set(0, 0.24, 0);
+      domeMesh.rotation.y = -Math.PI / 2;
+      ingotGroup.add(domeMesh);
+
+      // Rotating Sunburst Halo attached to scene behind Ingot so it always faces camera
+      const sunburstMat = new THREE.MeshBasicMaterial({
+        map: createSunburstTexture(),
+        transparent: true,
+        opacity: 0.72,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const sunburstMesh = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 3.8), sunburstMat);
+      sunburstMesh.position.set(0, -1.1, -0.55);
+      sunburstMesh.visible = false;
+      scene.add(sunburstMesh);
+
+      // =========================================================================
+      // 5. ANIMATION & INTERACTION STATE MACHINE
+      // =========================================================================
+      // Phases: 'idle' | 'opening' | 'fountain' | 'forming' | 'ingot'
+      let phase = 'idle';
+      let phaseTime = 0;
+      let swipeDragRatio = 0; // 0..1 while swiping up
+      let ingotBaseY = -1.35;
+      let ingotDropY = 6.5;
+
+      function triggerOpenEnvelope() {
+        if (phase !== 'idle') return;
+        phase = 'opening';
+        phaseTime = 0;
+        document.getElementById('swipe-hint-wrap').classList.add('hidden');
+
+        audio.tryAutoStart();
+        audio.playRipOpen();
+        setTimeout(() => audio.playCoinShower(), 220);
+
+        const aspect = window.innerWidth / window.innerHeight;
+        const spreadW = aspect < 0.8 ? 5.6 : 7.6;
+        const targets = sampleCoinTextTargets(appState.receiver, COIN_COUNT, spreadW);
+
+        if (textGlowMat.map) textGlowMat.map.dispose();
+        textGlowMat.map = createTextGlowTexture(appState.receiver);
+        textGlowMat.needsUpdate = true;
+        textGlowMat.opacity = 0;
+        textGlowMesh.scale.set(spreadW / 7.6, spreadW / 7.6, 1);
+        textGlowMesh.visible = true;
+
+        coinMesh.visible = true;
+        for (let i = 0; i < COIN_COUNT; i++) {
+          const s = coinStates[i];
+          s.pos.set((Math.random() - 0.5) * 1.1, 1.35, 0.1);
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1.6 + Math.random() * 3.8;
+          s.vel.set(
+            Math.cos(angle) * speed * 0.9,
+            3.6 + Math.random() * 4.4,
+            Math.sin(angle) * speed * 0.55 + 0.6
+          );
+          s.target.copy(targets[i]);
+        }
+
+        confettiMesh.visible = true;
+        for (let i = 0; i < CONFETTI_COUNT; i++) {
+          const cf = confettiStates[i];
+          cf.pos.set((Math.random() - 0.5) * 1.5, 1.5, (Math.random() - 0.5) * 0.6);
+          cf.vel.set(
+            (Math.random() - 0.5) * 5.2,
+            2.6 + Math.random() * 4.2,
+            (Math.random() - 0.5) * 3.2
+          );
+        }
+      }
+
+      function resetExperience() {
+        phase = 'idle';
+        phaseTime = 0;
+        swipeDragRatio = 0;
+
+        envelopeGroup.visible = true;
+        envelopeGroup.position.set(0, 0.42, 0);
+        envelopeGroup.scale.set(1, 1, 1);
+        envelopeGroup.rotation.set(0, 0, 0);
+        flapPivot.rotation.x = 0;
+
+        coinMesh.visible = false;
+        textGlowMesh.visible = false;
+        textGlowMat.opacity = 0;
+        confettiMesh.visible = false;
+        ingotGroup.visible = false;
+        sunburstMesh.visible = false;
+        ingotDropY = 6.5;
+        ingotRotY = 0;
+        ingotRotX = 0.24;
+        ingotVelY = 0;
+        ingotVelX = 0;
+
+        document.getElementById('swipe-hint-wrap').classList.remove('hidden');
+        document.getElementById('ingot-pointer').classList.add('hidden');
+        document.getElementById('btn-open-gift').classList.add('hidden');
+      }
+
+      // Swipe-to-Open Gesture + Ingot 360° Rotate & Tap Raycaster
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let dragActive = false;
+      let dragStartY = 0;
+      let dragStartX = 0;
+
+      let ingotDragActive = false;
+      let ingotDragLastX = 0;
+      let ingotDragLastY = 0;
+      let ingotDragMoved = 0;
+      let ingotRotY = 0;
+      let ingotRotX = 0.24;
+      let ingotVelY = 0;
+      let ingotVelX = 0;
+
+      // DeviceOrientation Gyroscope Parallax + Desktop Pointer Fallback
+      let targetTiltX = 0;
+      let targetTiltY = 0;
+      let smoothTiltX = 0;
+      let smoothTiltY = 0;
+      let gyroPermissionAsked = false;
+
+      function enableGyroListener() {
+        window.addEventListener('deviceorientation', (e) => {
+          if (e.gamma == null || e.beta == null) return;
+          targetTiltX = Math.max(-1, Math.min(1, e.gamma / 32));
+          targetTiltY = Math.max(-1, Math.min(1, (e.beta - 42) / 32));
+        });
+      }
+      enableGyroListener();
+
+      function requestGyroIfNeeded() {
+        if (gyroPermissionAsked) return;
+        gyroPermissionAsked = true;
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().then((state) => {
+            if (state === 'granted') enableGyroListener();
+          }).catch(() => {});
+        }
+      }
+
+      window.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'mouse' && !dragActive && !ingotDragActive) {
+          targetTiltX = ((e.clientX / window.innerWidth) - 0.5) * 0.7;
+          targetTiltY = -((e.clientY / window.innerHeight) - 0.5) * 0.5;
+        }
+      });
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (audio.enabled) audio.tryAutoStart();
+        requestGyroIfNeeded();
+
+        if (phase === 'idle') {
+          dragActive = true;
+          dragStartY = e.clientY;
+          dragStartX = e.clientX;
+        } else if (phase === 'ingot') {
+          ingotDragActive = true;
+          ingotDragLastX = e.clientX;
+          ingotDragLastY = e.clientY;
+          ingotDragMoved = 0;
+          ingotVelY = 0;
+          ingotVelX = 0;
+        }
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (dragActive && phase === 'idle') {
+          const dy = dragStartY - e.clientY; // positive when swiping UP
+          swipeDragRatio = Math.max(0, Math.min(1, dy / 90));
+          flapPivot.rotation.x = -swipeDragRatio * 1.45;
+          if (dy > 52) {
+            dragActive = false;
+            triggerOpenEnvelope();
+          }
+          return;
+        }
+
+        if (ingotDragActive && phase === 'ingot') {
+          const dx = e.clientX - ingotDragLastX;
+          const dy = e.clientY - ingotDragLastY;
+          ingotDragMoved += Math.abs(dx) + Math.abs(dy);
+          ingotDragLastX = e.clientX;
+          ingotDragLastY = e.clientY;
+
+          ingotVelY = dx * 0.012;
+          ingotVelX = dy * 0.008;
+          ingotRotY += ingotVelY;
+          ingotRotX = Math.max(-0.55, Math.min(0.95, ingotRotX + ingotVelX));
+        }
+      });
+
+      canvas.addEventListener('pointerup', (e) => {
+        if (ingotDragActive) {
+          ingotDragActive = false;
+          if (ingotDragMoved < 10 && phase === 'ingot') {
+            pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+            pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(pointerNDC, camera);
+            const hits = raycaster.intersectObjects(ingotGroup.children, true);
+            if (hits.length > 0) {
+              openSecretGiftModal();
+            }
+          }
+          return;
+        }
+
+        if (!dragActive) return;
+        dragActive = false;
+        const dy = dragStartY - e.clientY;
+        const dx = Math.abs(e.clientX - dragStartX);
+        if (dy > 42) {
+          triggerOpenEnvelope();
+        } else {
+          swipeDragRatio = 0;
+          // If user tapped directly on the center envelope on desktop, allow gentle tap-to-open fallback
+          if (Math.abs(dy) < 10 && dx < 10) {
+            pointerNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+            pointerNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(pointerNDC, camera);
+            if (raycaster.intersectObject(envBodyMesh).length > 0) {
+              triggerOpenEnvelope();
+            }
+          }
+        }
+      });
+
+      // Optional Shake-to-Open on mobile
+      let lastShake = 0;
+      window.addEventListener('devicemotion', (e) => {
+        if (phase !== 'idle' || !e.accelerationIncludingGravity) return;
+        const { x, y, z } = e.accelerationIncludingGravity;
+        const mag = Math.sqrt((x || 0) ** 2 + (y || 0) ** 2 + (z || 0) ** 2);
+        if (mag > 22 && Date.now() - lastShake > 1000) {
+          lastShake = Date.now();
+          triggerOpenEnvelope();
+        }
+      });
+
+      // Render Loop
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const t = clock.elapsedTime;
+        phaseTime += dt;
+        sharedShaderUniforms.uTime.value = t;
+
+        // Ambient Gold Dust
+        const dArr = dustGeo.attributes.position.array;
+        for (let i = 0; i < DUST_COUNT; i++) {
+          dArr[i * 3 + 1] += dt * 0.25;
+          if (dArr[i * 3 + 1] > 5) dArr[i * 3 + 1] = -5;
+        }
+        dustGeo.attributes.position.needsUpdate = true;
+
+        // Sway background 3D lanterns gently
+        leftLantern.rotation.z = Math.sin(t * 1.1) * 0.08;
+        rightLantern.rotation.z = Math.sin(t * 1.1 + 1.4) * 0.08;
+
+        if (phase === 'idle') {
+          envelopeGroup.rotation.y = Math.sin(t * 0.9) * 0.28;
+          envelopeGroup.position.y = 0.42 + Math.sin(t * 1.6) * 0.08;
+          tasselGroup.rotation.z = Math.sin(t * 2.1) * 0.14;
+          if (!dragActive) {
+            flapPivot.rotation.x += (0 - flapPivot.rotation.x) * 0.14;
+          }
+        } else if (phase === 'opening') {
+          flapPivot.rotation.x += (-2.35 - flapPivot.rotation.x) * 0.18;
+          if (phaseTime > 0.28) {
+            phase = 'fountain';
+            phaseTime = 0;
+          }
+        } else if (phase === 'fountain') {
+          envelopeGroup.position.y -= dt * 2.2;
+          envelopeGroup.scale.multiplyScalar(0.96);
+          if (envelopeGroup.scale.x < 0.05) envelopeGroup.visible = false;
+
+          for (let i = 0; i < COIN_COUNT; i++) {
+            const s = coinStates[i];
+            s.vel.y -= 9.8 * dt;
+            s.pos.addScaledVector(s.vel, dt);
+            if (s.pos.y < -2.4) {
+              s.pos.y = -2.4;
+              s.vel.y = Math.abs(s.vel.y) * 0.56;
+              s.vel.x *= 0.85;
+              s.vel.z *= 0.85;
+            }
+            s.rot.x += s.rotVel.x * dt;
+            s.rot.y += s.rotVel.y * dt;
+            dummy.position.copy(s.pos);
+            dummy.rotation.copy(s.rot);
+            dummy.scale.setScalar(s.scale);
+            dummy.updateMatrix();
+            coinMesh.setMatrixAt(i, dummy.matrix);
+          }
+          coinMesh.instanceMatrix.needsUpdate = true;
+
+          if (phaseTime > 1.45) {
+            phase = 'forming';
+            phaseTime = 0;
+            audio.playIngotChime();
+          }
+        } else if (phase === 'forming' || phase === 'ingot') {
+          envelopeGroup.visible = false;
+          textGlowMat.opacity += (0.88 - textGlowMat.opacity) * 0.06;
+          for (let i = 0; i < COIN_COUNT; i++) {
+            const s = coinStates[i];
+            s.pos.lerp(s.target, 0.095);
+            // Keep thin coins facing forward so every letter is crisp and readable
+            s.rot.x += (0 - s.rot.x) * 0.12;
+            s.rot.y += (Math.sin(t * 1.8 + i * 0.12) * 0.12 - s.rot.y) * 0.12;
+            s.rot.z += (0 - s.rot.z) * 0.12;
+            dummy.position.copy(s.pos);
+            dummy.rotation.copy(s.rot);
+            dummy.scale.setScalar(0.36);
+            dummy.updateMatrix();
+            coinMesh.setMatrixAt(i, dummy.matrix);
+          }
+          coinMesh.instanceMatrix.needsUpdate = true;
+
+          if (phase === 'forming' && phaseTime > 1.05) {
+            phase = 'ingot';
+            phaseTime = 0;
+            ingotGroup.visible = true;
+            sunburstMesh.visible = true;
+            ingotDropY = 5.8;
+            audio.playIngotChime();
+            document.getElementById('ingot-pointer').classList.remove('hidden');
+            document.getElementById('btn-open-gift').classList.remove('hidden');
+          }
+
+          if (phase === 'ingot') {
+            ingotDropY += (-1.25 - ingotDropY) * 0.1;
+            const curY = ingotDropY + Math.sin(t * 2.2) * 0.07;
+            ingotGroup.position.set(0, curY, 0.4);
+            if (!ingotDragActive) {
+              ingotRotY += ingotVelY + dt * 0.38;
+              ingotRotX = Math.max(-0.55, Math.min(0.95, ingotRotX + ingotVelX));
+              ingotVelY *= 0.92;
+              ingotVelX *= 0.92;
+            }
+            ingotGroup.rotation.x = ingotRotX;
+            ingotGroup.rotation.y = ingotRotY;
+            sunburstMesh.position.set(0, curY + 0.15, -0.55);
+            sunburstMesh.rotation.z = t * 0.35;
+          }
+        }
+
+        // 3D Confetti update during & after explosion
+        if (confettiMesh.visible) {
+          for (let i = 0; i < CONFETTI_COUNT; i++) {
+            const cf = confettiStates[i];
+            cf.vel.y -= 2.1 * dt;
+            if (cf.vel.y < -1.35) cf.vel.y = -1.35;
+            cf.pos.x += (cf.vel.x * 0.35 + Math.sin(t * 2.4 + cf.swayPhase) * 0.55) * dt;
+            cf.pos.y += cf.vel.y * dt;
+            cf.pos.z += cf.vel.z * 0.35 * dt;
+            cf.vel.x *= 0.985;
+            cf.vel.z *= 0.985;
+            if (cf.pos.y < -4.2) {
+              cf.pos.y = 4.6;
+              cf.pos.x = (Math.random() - 0.5) * 9;
+            }
+            cf.rot.x += dt * 3.1;
+            cf.rot.y += dt * 2.4;
+            dummy.position.copy(cf.pos);
+            dummy.rotation.copy(cf.rot);
+            dummy.scale.setScalar(1);
+            dummy.updateMatrix();
+            confettiMesh.setMatrixAt(i, dummy.matrix);
+          }
+          confettiMesh.instanceMatrix.needsUpdate = true;
+        }
+
+        // DeviceOrientation / Parallax Camera + Dynamic Gold Specular Light Sweep
+        smoothTiltX += (targetTiltX - smoothTiltX) * 0.08;
+        smoothTiltY += (targetTiltY - smoothTiltY) * 0.08;
+        camera.position.x = smoothTiltX * 0.65;
+        camera.position.y = 0.25 + smoothTiltY * 0.35;
+        camera.lookAt(0, 0.15, 0);
+        frontWarmFill.position.set(-2.2 + smoothTiltX * 4.5, -1.2 + smoothTiltY * 3.5, 4.8);
+        keyLight.position.set(4.5 + smoothTiltX * 3.0, 6.5 + smoothTiltY * 2.5, 5.5);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        updateCameraForAspect();
+        positionLanternsForAspect();
+      });
+
+      // =========================================================================
+      // 6. UI MODALS, GIFT CARD, CREATOR STUDIO & VIETQR PAYMENT
+      // =========================================================================
+      window.closeModal = function (id) {
+        document.getElementById(id).classList.add('hidden');
+      };
+
+      function renderGiftPhoto() {
+        const photoBox = document.getElementById('gift-photo-box');
+        const photoImg = document.getElementById('gift-photo-img');
+        const photoNav = document.getElementById('gift-photo-nav');
+        const counter = document.getElementById('gift-photo-counter');
+        if (!appState.photos || appState.photos.length === 0) {
+          photoBox.classList.add('hidden');
+          return;
+        }
+        const total = appState.photos.length;
+        appState.currentGiftPhotoIdx = ((appState.currentGiftPhotoIdx % total) + total) % total;
+        const item = appState.photos[appState.currentGiftPhotoIdx];
+        photoImg.src = typeof item === 'string' ? item : item.url;
+        photoBox.classList.remove('hidden');
+        if (total > 1) {
+          photoNav.classList.remove('hidden');
+          counter.textContent = `Ảnh ${appState.currentGiftPhotoIdx + 1} / ${total}`;
+        } else {
+          photoNav.classList.add('hidden');
+        }
+      }
+
+      function openSecretGiftModal() {
+        audio.playIngotChime();
+        document.getElementById('ingot-pointer').classList.add('hidden');
+        document.getElementById('gift-card-title').textContent = `Gửi ${appState.receiver || 'Bạn Yêu Thương'} Yêu Thương`;
+        document.getElementById('gift-voucher-display').textContent = appState.voucher || 'Chúc mừng năm mới Bình An & Tài Lộc!';
+        document.getElementById('gift-wish-display').textContent = appState.wish || '';
+        document.getElementById('gift-sign-display').textContent = `Thương gửi, ${appState.sender || 'Người Bạn Thân'} ♥`;
+
+        appState.currentGiftPhotoIdx = 0;
+        renderGiftPhoto();
+        document.getElementById('modal-gift').classList.remove('hidden');
+      }
+
+      document.getElementById('btn-gift-prev').addEventListener('click', () => {
+        appState.currentGiftPhotoIdx--;
+        renderGiftPhoto();
+      });
+      document.getElementById('btn-gift-next').addEventListener('click', () => {
+        appState.currentGiftPhotoIdx++;
+        renderGiftPhoto();
+      });
+
+      let giftSwipeX = null;
+      const giftPhotoBox = document.getElementById('gift-photo-box');
+      giftPhotoBox.addEventListener('pointerdown', (e) => { giftSwipeX = e.clientX; });
+      giftPhotoBox.addEventListener('pointerup', (e) => {
+        if (giftSwipeX === null || appState.photos.length < 2) { giftSwipeX = null; return; }
+        const dx = e.clientX - giftSwipeX;
+        giftSwipeX = null;
+        if (Math.abs(dx) > 36) {
+          appState.currentGiftPhotoIdx += dx < 0 ? 1 : -1;
+          renderGiftPhoto();
+        }
+      });
+
+      document.getElementById('btn-open-gift').addEventListener('click', openSecretGiftModal);
+      document.getElementById('btn-close-gift').addEventListener('click', () => closeModal('modal-gift'));
+
+      // Canvas 2D Export: Save personalized Voucher / Lì Xì Card as PNG
+      function drawWrappedText(ctx, text, cx, startY, maxWidth, lineHeight) {
+        const words = String(text || '').split(/\s+/);
+        let line = '';
+        let y = startY;
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line ? `${line} ${words[i]}` : words[i];
+          if (ctx.measureText(testLine).width > maxWidth && line) {
+            ctx.fillText(line, cx, y);
+            line = words[i];
+            y += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        if (line) {
+          ctx.fillText(line, cx, y);
+          y += lineHeight;
+        }
+        return y;
+      }
+
+      document.getElementById('btn-download-voucher').addEventListener('click', () => {
+        const cv = document.createElement('canvas');
+        cv.width = 1080;
+        cv.height = 1350;
+        const ctx = cv.getContext('2d');
+
+        const theme = SKIN_THEMES[appState.skin] || SKIN_THEMES.royal;
+        const bg = ctx.createLinearGradient(0, 0, 1080, 1350);
+        bg.addColorStop(0, theme.bg1);
+        bg.addColorStop(0.55, theme.bg2);
+        bg.addColorStop(1, '#140205');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 1080, 1350);
+
+        // Gold Foil Double Frame
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 12;
+        ctx.strokeRect(42, 42, 996, 1266);
+        ctx.lineWidth = 3;
+        ctx.strokeRect(64, 64, 952, 1222);
+
+        // Header Badge
+        ctx.fillStyle = '#fde047';
+        ctx.font = '700 32px "Cinzel", serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ LỘC VÀNG ĐẦU XUÂN • TÀI LỘC BÌNH AN ✨', 540, 150);
+
+        // Receiver Heading
+        ctx.fillStyle = '#fffbeb';
+        ctx.font = 'bold 74px "Dancing Script", Georgia, serif';
+        ctx.fillText(`Gửi ${appState.receiver || 'Bạn Yêu Thương'} Yêu Thương`, 540, 265);
+
+        // Dashed Voucher Box
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.14)';
+        ctx.fillRect(110, 355, 860, 310);
+        ctx.setLineDash([14, 10]);
+        ctx.strokeStyle = '#fde047';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(110, 355, 860, 310);
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('🎁 QUÀ BÍ MẬT / VOUCHER QUY ĐỔI', 540, 420);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 42px "Plus Jakarta Sans", sans-serif';
+        drawWrappedText(ctx, appState.voucher || 'Chúc mừng năm mới Bình An & Tài Lộc!', 540, 500, 780, 58);
+
+        // Wish text
+        ctx.fillStyle = '#ffe4e6';
+        ctx.font = '500 34px "Plus Jakarta Sans", sans-serif';
+        drawWrappedText(ctx, appState.wish || '', 540, 770, 820, 52);
+
+        // Signature
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 58px "Dancing Script", Georgia, serif';
+        ctx.fillText(`Thương gửi, ${appState.sender || 'Người Bạn Thân'} ♥`, 540, 1185);
+
+        const triggerSave = (href) => {
+          const a = document.createElement('a');
+          a.href = href;
+          a.download = 'lixi-voucher-3d.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        };
+
+        if (cv.toBlob) {
+          cv.toBlob((blob) => {
+            if (!blob) return triggerSave(cv.toDataURL('image/png'));
+            const u = URL.createObjectURL(blob);
+            triggerSave(u);
+            setTimeout(() => URL.revokeObjectURL(u), 1500);
+          }, 'image/png');
+        } else {
+          triggerSave(cv.toDataURL('image/png'));
+        }
+      });
+      document.getElementById('btn-replay').addEventListener('click', resetExperience);
+
+      document.getElementById('btn-sound').addEventListener('click', () => {
+        audio.setEnabled(!audio.enabled);
+      });
+      document.getElementById('sound-unlock-pill').addEventListener('click', () => {
+        audio.setEnabled(true);
+      });
+
+      // Open Creator Studio (README: auto mute sound on open)
+      document.getElementById('btn-open-creator').addEventListener('click', () => {
+        audio.setEnabled(false);
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-occasion').value = appState.occasion;
+        document.getElementById('input-voucher').value = appState.voucher;
+        document.getElementById('input-wish').value = appState.wish;
+        document.getElementById('modal-creator').classList.remove('hidden');
+      });
+
+      // Skin Selector
+      document.querySelectorAll('.skin-option').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.skin-option').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyEnvelopeSkin(btn.dataset.skin);
+        });
+      });
+
+      // Quick Voucher Chips
+      document.querySelectorAll('[data-voucher]').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          document.getElementById('input-voucher').value = chip.dataset.voucher;
+        });
+      });
+
+      // Neutral Wish Generator
+      document.getElementById('btn-suggest-wish').addEventListener('click', () => {
+        const rec = document.getElementById('input-receiver').value.trim() || 'bạn';
+        const tpl = NEUTRAL_WISHES[wishCursor % NEUTRAL_WISHES.length];
+        wishCursor++;
+        document.getElementById('input-wish').value = tpl.replace(/\{\{receiver\}\}/g, rec);
+      });
+
+      function renderUploadThumbs() {
+        const wrap = document.getElementById('upload-preview-wrap');
+        wrap.innerHTML = '';
+        if (!appState.photos.length) {
+          wrap.classList.add('hidden');
+          return;
+        }
+        wrap.classList.remove('hidden');
+        appState.photos.forEach((p, idx) => {
+          const item = document.createElement('div');
+          item.className = 'upload-thumb-item';
+          const img = document.createElement('img');
+          img.src = p.url;
+          img.alt = 'Ảnh ' + (idx + 1);
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'upload-thumb-del';
+          del.textContent = '✕';
+          del.addEventListener('click', () => {
+            appState.photos.splice(idx, 1);
+            renderUploadThumbs();
+          });
+          item.appendChild(img);
+          item.appendChild(del);
+          wrap.appendChild(item);
+        });
+      }
+
+      // Photo / QR Upload with client-side compression (max 6)
+      document.getElementById('input-photo').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const remain = Math.max(0, 6 - appState.photos.length);
+        files.slice(0, remain).forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = 900;
+              let w = img.width;
+              let h = img.height;
+              if (w > maxDim || h > maxDim) {
+                const r = Math.min(maxDim / w, maxDim / h);
+                w = Math.round(w * r);
+                h = Math.round(h * r);
+              }
+              const cv = document.createElement('canvas');
+              cv.width = w;
+              cv.height = h;
+              cv.getContext('2d').drawImage(img, 0, 0, w, h);
+              appState.photos.push({
+                url: cv.toDataURL('image/jpeg', 0.82),
+                caption: 'Lộc Xuân 2027'
+              });
+              renderUploadThumbs();
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        e.target.value = '';
+      });
+
+      // Direct QR Download Helper (README compliant)
+      async function downloadQrDirectly(url, filename) {
+        try {
+          const proxyUrl = `/api/download-qr?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+          const res = await fetch(proxyUrl);
+          if (!res.ok) throw new Error('Proxy failed');
+          const blob = await res.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+        } catch (err) {
+          alert('Không thể tải mã QR lúc này, vui lòng thử lại.');
+        }
+      }
+
+      // Pending Order Persistence
+      function savePendingOrder(snap) {
+        const payload = JSON.stringify({ ...snap, savedAt: Date.now() });
+        try { sessionStorage.setItem(PENDING_ORDER_KEY, payload); } catch (_) {}
+        try { localStorage.setItem(PENDING_ORDER_KEY, payload); } catch (_) {}
+      }
+
+      function loadPendingOrder() {
+        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
+        if (!raw) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          if (!parsed.savedAt || Date.now() - parsed.savedAt > ORDER_TTL_MS) {
+            clearPendingOrder();
+            return null;
+          }
+          return parsed;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function clearPendingOrder() {
+        try { sessionStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
+        try { localStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
+      }
+
+      function showSuccessModal(orderCode) {
+        clearPendingOrder();
+        if (appState.pollTimer) {
+          clearInterval(appState.pollTimer);
+          appState.pollTimer = null;
+        }
+        closeModal('modal-payment');
+
+        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
+        document.getElementById('success-share-url').value = shareUrl;
+        document.getElementById('success-share-qr').src = qrImgUrl;
+        document.getElementById('modal-success').classList.remove('hidden');
+
+        document.getElementById('btn-download-share-qr').onclick = () => {
+          downloadQrDirectly(qrImgUrl, `lixi-3d-${orderCode}.png`);
+        };
+        document.getElementById('btn-preview-created').onclick = () => {
+          window.location.href = shareUrl;
+        };
+      }
+
+      async function checkOrderStatusOnce(code) {
+        if (!code) return;
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
+          const data = await res.json();
+          if (data && data.status === 'PAID') {
+            showSuccessModal(code);
+          }
+        } catch (_) {}
+      }
+
+      function openPaymentModal(snap) {
+        appState.orderCode = snap.orderCode;
+        document.getElementById('payment-order-code').textContent = snap.orderCode;
+        document.getElementById('payment-qr-img').src = snap.qrUrl;
+        document.getElementById('btn-download-pay-qr').onclick = () => {
+          downloadQrDirectly(snap.qrUrl, `vietqr-${snap.orderCode}.png`);
+        };
+        document.getElementById('modal-payment').classList.remove('hidden');
+
+        if (appState.pollTimer) clearInterval(appState.pollTimer);
+        appState.pollTimer = setInterval(() => checkOrderStatusOnce(snap.orderCode), 3500);
+        checkOrderStatusOnce(snap.orderCode);
+      }
+
+      document.getElementById('btn-close-payment').addEventListener('click', () => {
+        clearPendingOrder();
+        if (appState.pollTimer) clearInterval(appState.pollTimer);
+        closeModal('modal-payment');
+      });
+
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && appState.orderCode) {
+          checkOrderStatusOnce(appState.orderCode);
+        }
+      });
+      window.addEventListener('focus', () => {
+        if (appState.orderCode) checkOrderStatusOnce(appState.orderCode);
+      });
+
+      document.getElementById('btn-copy-link').addEventListener('click', async () => {
+        const val = document.getElementById('success-share-url').value;
+        try {
+          await navigator.clipboard.writeText(val);
+          document.getElementById('btn-copy-link').textContent = 'Đã chép ✓';
+        } catch (_) {}
+      });
+
+      // Create Order Submit
+      document.getElementById('btn-create-order').addEventListener('click', async () => {
+        const sender = document.getElementById('input-sender').value.trim() || 'Người Bạn Thân';
+        const receiver = document.getElementById('input-receiver').value.trim() || 'Bạn Yêu Thương';
+        const occasion = document.getElementById('input-occasion').value.trim() || 'Chúc Mừng Năm Mới • Tài Lộc Bình An';
+        const voucher = document.getElementById('input-voucher').value.trim() || 'Chúc mừng năm mới Bình An & Tài Lộc!';
+        const wish = document.getElementById('input-wish').value.trim() || NEUTRAL_WISHES[0].replace(/\{\{receiver\}\}/g, receiver);
+
+        appState.sender = sender;
+        appState.receiver = receiver;
+        appState.occasion = occasion;
+        appState.voucher = voucher;
+        appState.wish = wish;
+
+        const btn = document.getElementById('btn-create-order');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang tạo mã VietQR...';
+
+        try {
+          const res = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              templateId: appState.templateId,
+              templateType: 'red_envelope',
+              senderName: sender,
+              receiverName: receiver,
+              occasion,
+              message: wish,
+              payload: {
+                skin: appState.skin,
+                voucher: appState.voucher,
+                photos: appState.photos
+              }
+            })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.orderCode || !data.qrUrl) {
+            throw new Error(data.error || 'Tạo đơn thất bại');
+          }
+          const snap = { orderCode: data.orderCode, qrUrl: data.qrUrl };
+          savePendingOrder(snap);
+          closeModal('modal-creator');
+          openPaymentModal(snap);
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '💳 Tạo Link Lì Xì 3D Ngay (39.000đ)';
+        }
+      });
+
+      // =========================================================================
+      // 7. INITIALIZATION (VIEWER MODE VS DEMO + RESTORE PENDING ORDER)
+      // =========================================================================
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('id');
+
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.occasion = o.occasion || appState.occasion;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (Array.isArray(p.photos) && p.photos.length > 0) {
+                appState.photos = p.photos.map((item) =>
+                  typeof item === 'string' ? { url: item, caption: '' } : item
+                );
+              }
+              if (p.skin || o.theme) {
+                applyEnvelopeSkin(p.skin || o.theme);
+              }
+              if (p.voucher) {
+                appState.voucher = p.voucher;
+              }
+            }
+          } catch (_) {}
+        } else {
+          const pending = loadPendingOrder();
+          if (pending && pending.orderCode && pending.qrUrl) {
+            openPaymentModal(pending);
+          }
+        }
+
+        // Start audio automatically if browser permits (README requirement)
+        audio.tryAutoStart();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

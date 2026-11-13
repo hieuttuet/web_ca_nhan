@@ -309,6 +309,25 @@ const HOLIDAY_TEMPLATES = [
       occasion: 'Chúc Mừng Năm Mới 2027',
       theme: 'gold'
     }
+  },
+  {
+    id: 'red_envelope_3d',
+    category: 'holiday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Lì Xì Đỏ 3D • Thỏi Vàng Tài Lộc',
+    subtitle: 'Vuốt mở bao lì xì 3D (3 skin tùy chọn), hàng trăm đồng xu vàng phun trào xếp chữ "Tài Lộc - Bình An" & chạm Thỏi Vàng mở Quà Bí Mật / Voucher',
+    badge: '🧧 Hot Trend Tết',
+    price: 39000,
+    oldPrice: 79000,
+    engineUrl: 'templates/holiday/red-envelope-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #450a0a 0%, #b91c1c 55%, #f59e0b 100%)',
+    previewEmoji: '🧧',
+    features: ['Vuốt mở bao lì xì 3D + 3 Skin', 'Xu vàng phun trào xếp chữ Tài Lộc', 'Thỏi Vàng mở Quà Bí Mật / QR'],
+    preset: {
+      occasion: 'Chúc Mừng Năm Mới • Tài Lộc Bình An',
+      theme: 'gold'
+    }
   }
 ];
 

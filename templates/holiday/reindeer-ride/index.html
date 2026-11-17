@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
 
   <style>
     :root {
@@ -3365,40 +3366,22 @@
     const PENDING_ORDER_KEY = `pending_order_${appState.templateId}`;
 
     function savePendingOrder(orderData) {
-      const record = {
+      PaymentQrKit.savePendingOrder(appState.templateId, {
         ...orderData,
         sender: appState.sender,
         receiver: appState.receiver,
         occasion: appState.occasion,
-        message: appState.message,
-        savedAt: Date.now()
-      };
-      try {
-        sessionStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(record));
-        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(record));
-      } catch (e) {}
+        message: appState.message
+      });
     }
 
     function readPendingOrder() {
-      try {
-        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.orderCode || (Date.now() - (parsed.savedAt || 0)) > 45 * 60 * 1000) {
-          clearPendingOrder();
-          return null;
-        }
-        return parsed;
-      } catch (e) {
-        return null;
-      }
+      const p = PaymentQrKit.loadPendingOrder(appState.templateId);
+      return p && p.orderCode ? p : null;
     }
 
     function clearPendingOrder() {
-      try {
-        sessionStorage.removeItem(PENDING_ORDER_KEY);
-        localStorage.removeItem(PENDING_ORDER_KEY);
-      } catch (e) {}
+      PaymentQrKit.clearPendingOrder(appState.templateId);
     }
 
     function populatePaymentWaitingModal(orderData) {
@@ -3536,72 +3519,11 @@
     }
 
     async function urlToImageBlob(url, filename = 'QR.png') {
-      if (url.startsWith('data:') || url.startsWith('blob:')) {
-        const res = await fetch(url);
-        return await res.blob();
-      }
-
-      // Nếu là URL QR bên thứ 3 (img.vietqr.io / api.qrserver.com) -> đi qua proxy same-origin /api/download-qr rồi chuẩn hóa về PNG chuẩn qua Canvas
-      try {
-        const parsed = new URL(url, window.location.href);
-        if (parsed.hostname === 'img.vietqr.io' || parsed.hostname === 'api.qrserver.com') {
-          const proxyUrl = `/api/download-qr?url=${encodeURIComponent(parsed.toString())}&filename=${encodeURIComponent(filename)}`;
-          const pRes = await fetch(proxyUrl);
-          if (pRes.ok) {
-            const rawBlob = await pRes.blob();
-            return await rasterizeBlobToPng(rawBlob);
-          }
-        }
-      } catch (e) {}
-
-      try {
-        const res = await fetch(url, { mode: 'cors' });
-        if (res.ok) {
-          const rawBlob = await res.blob();
-          return await rasterizeBlobToPng(rawBlob);
-        }
-      } catch (e) {}
-
-      // Fallback vẽ qua Canvas để xuất Blob PNG nếu fetch bị hạn chế
-      return await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          try {
-            const c = document.createElement('canvas');
-            c.width = img.naturalWidth || 600;
-            c.height = img.naturalHeight || 600;
-            c.getContext('2d').drawImage(img, 0, 0);
-            c.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png');
-          } catch (err) {
-            reject(err);
-          }
-        };
-        img.onerror = reject;
-        img.src = url;
-      });
+      return PaymentQrKit.urlToImageBlob(url, filename);
     }
 
     async function downloadBlobImage(url, filename) {
-      try {
-        const blob = await urlToImageBlob(url, filename);
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 2500);
-      } catch (e) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+      return PaymentQrKit.downloadBlobImage(url, filename);
     }
 
     function openModal(id) {

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+  <script src="../../../shared/payment-qr-kit.js"></script>
 
   <style>
     :root {
@@ -2011,51 +2012,26 @@
         btn.textContent = '⏳ Đang khởi tạo đơn...';
 
         try {
-          const res = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              templateId: 'holiday_fireworks',
-              templateType: 'fireworks',
-              senderName: appState.sender,
-              receiverName: appState.receiver,
-              occasion: appState.occasion,
-              message: appState.message,
-              payload: {}
-            })
+          closeModal('modal-creator');
+          await PaymentQrKit.createOrderAndPay({
+            templateId: 'holiday_fireworks',
+            templateType: 'fireworks',
+            emoji: '🎆',
+            defaultAmount: 25000,
+            waitTitle: 'Quét Mã Mở Khóa Thiệp Pháo Hoa 2027',
+            successTitle: 'Thiệp Pháo Hoa 2027 Đã Sẵn Sàng!',
+            cardTitle: '🎆 PHÁO HOA GIAO THỪA 2027 🧧',
+            scanLabel: 'Quét QR để Ngắm Pháo Hoa & Lời Chúc',
+            footerHint: 'Chạm màn hình để bắn pháo hoa & mở lời chúc Tết',
+            gradientStops: ['#450a0a', '#b91c1c', '#1a0404'],
+            senderName: appState.sender,
+            receiverName: appState.receiver,
+            occasion: appState.occasion,
+            message: appState.message,
+            payload: {}
           });
-
-          const data = await res.json();
-          if (res.ok && data.orderCode) {
-            closeModal('modal-creator');
-            document.getElementById('pay-qr-img').src = data.qrImageUrl;
-            document.getElementById('pay-amount').textContent = Number(data.amount).toLocaleString('vi-VN') + 'đ';
-            document.getElementById('pay-memo').textContent = data.orderCode;
-            document.getElementById('pay-step-waiting').style.display = 'block';
-            document.getElementById('pay-step-success').style.display = 'none';
-            openModal('modal-payment');
-
-            // Polling checking payment
-            const pollTimer = setInterval(async () => {
-              try {
-                const cRes = await fetch(`/api/check-order?code=${encodeURIComponent(data.orderCode)}`);
-                const cData = await cRes.json();
-                if (cRes.ok && cData.status === 'PAID') {
-                  clearInterval(pollTimer);
-                  const fullUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(data.orderCode)}`;
-                  document.getElementById('pay-step-waiting').style.display = 'none';
-                  document.getElementById('pay-step-success').style.display = 'block';
-                  document.getElementById('pay-link-input').value = fullUrl;
-                  document.getElementById('pay-open-link').href = fullUrl;
-                }
-              } catch (e) {}
-            }, 2500);
-
-          } else {
-            alert(data.error || 'Không thể tạo đơn hàng lúc này.');
-          }
         } catch (e) {
-          alert('Lỗi kết nối máy chủ. Vui lòng kiểm tra lại!');
+          alert(e.message || 'Lỗi kết nối máy chủ. Vui lòng kiểm tra lại!');
         } finally {
           btn.disabled = false;
           btn.textContent = '💳 Lấy Link & Thiệp QR (25k)';

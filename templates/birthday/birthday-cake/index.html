@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
   <style>
     :root {
       --glass-bg: rgba(22, 10, 42, 0.78);
@@ -490,24 +491,7 @@
     });
 
     async function downloadBlobImage(url, filename) {
-      try {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
-      } catch (e) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.download = filename;
-        a.click();
-      }
+      return PaymentQrKit.downloadBlobImage(url, filename);
     }
 
     function closePayModal() {

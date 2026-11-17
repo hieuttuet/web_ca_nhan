@@ -328,6 +328,25 @@ const HOLIDAY_TEMPLATES = [
       occasion: 'Chúc Mừng Năm Mới • Tài Lộc Bình An',
       theme: 'gold'
     }
+  },
+  {
+    id: 'snow_globe_magic',
+    category: 'holiday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Quả Cầu Tuyết Ma Thuật • Tuyết Tụ Chữ 3D',
+    subtitle: 'Quả cầu thủy tinh 3D trên bệ gỗ sồi ấm áp, lắc hoặc chạm để bão tuyết cuộn trào tụ thành lời chúc & mở quà kỷ niệm 3D',
+    badge: '🔮 Noel Ma Thuật',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/holiday/snow-globe-magic/index.html',
+    previewGradient: 'linear-gradient(135deg, #1b0f0a 0%, #3b1c12 48%, #0f2942 100%)',
+    previewEmoji: '🔮',
+    features: ['Quả cầu tuyết 3D + Nhà gỗ khói bay', 'Tuyết cuộn trào tụ chữ + Lắc điện thoại', 'Mở quà 3D xem thư & ảnh + Nhạc Lofi'],
+    preset: {
+      occasion: 'Merry Christmas',
+      theme: 'warm_gold'
+    }
   }
 ];
 

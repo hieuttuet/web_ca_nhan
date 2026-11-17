@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Quả Cầu Tuyết Ma Thuật ❄️ Magical Snow Globe 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <style>
+    :root {
+      --bg-cabin: #130907;
+      --gold-primary: #fbbf24;
+      --gold-light: #fef08a;
+      --ice-blue: #93c5fd;
+      --crimson-warm: #991b1b;
+      --glass-bg: rgba(24, 12, 10, 0.78);
+      --glass-border: rgba(251, 191, 36, 0.42);
+      --text-main: #fffbeb;
+      --text-muted: #fde68a;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-title: 'Cinzel', serif;
+      --font-script: 'Dancing Script', cursive;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 22%, rgba(217, 119, 6, 0.18), transparent 46%),
+        radial-gradient(circle at 82% 28%, rgba(56, 189, 248, 0.14), transparent 45%),
+        radial-gradient(circle at 50% 62%, #2b130d 0%, #150907 58%, #090404 100%);
+      font-family: var(--font-sans);
+      color: var(--text-main);
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.6s ease;
+    }
+
+    body.vibe-cyber_ice {
+      background:
+        radial-gradient(circle at 18% 20%, rgba(56, 189, 248, 0.24), transparent 46%),
+        radial-gradient(circle at 84% 26%, rgba(217, 70, 239, 0.22), transparent 46%),
+        radial-gradient(circle at 50% 60%, #10193a 0%, #070b1e 60%, #03040c 100%);
+    }
+
+    body.vibe-golden_star {
+      background:
+        radial-gradient(circle at 22% 20%, rgba(251, 191, 36, 0.26), transparent 48%),
+        radial-gradient(circle at 80% 25%, rgba(245, 158, 11, 0.22), transparent 46%),
+        radial-gradient(circle at 50% 62%, #362108 0%, #1b0f04 60%, #0b0602 100%);
+    }
+
+    /* Cozy frosted window & bokeh backdrop behind Three.js canvas */
+    .cabin-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .window-pane {
+      position: absolute;
+      top: 7%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(680px, 86vw);
+      height: min(460px, 56vh);
+      border-radius: 220px 220px 18px 18px;
+      border: 6px solid rgba(74, 38, 22, 0.55);
+      background: radial-gradient(circle at 50% 35%, rgba(30, 58, 95, 0.35), rgba(8, 17, 36, 0.65));
+      box-shadow:
+        inset 0 0 80px rgba(147, 197, 253, 0.12),
+        0 0 90px rgba(251, 191, 36, 0.08);
+      opacity: 0.72;
+    }
+
+    .window-pane::before,
+    .window-pane::after {
+      content: '';
+      position: absolute;
+      background: rgba(74, 38, 22, 0.45);
+    }
+    .window-pane::before { left: 50%; top: 0; bottom: 0; width: 4px; transform: translateX(-50%); }
+    .window-pane::after { top: 48%; left: 0; right: 0; height: 4px; transform: translateY(-50%); }
+
+    .oak-table-glow {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28vh;
+      background: linear-gradient(180deg, transparent 0%, rgba(45, 22, 12, 0.78) 42%, rgba(22, 10, 6, 0.96) 100%);
+    }
+
+    .bokeh-light {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(18px);
+      animation: bokehPulse 5.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes bokehPulse {
+      0% { opacity: 0.25; transform: scale(0.92); }
+      100% { opacity: 0.65; transform: scale(1.12); }
+    }
+
+    #globe-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+      touch-action: none;
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: 14px;
+      left: 16px;
+      right: 16px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .top-hud-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--gold-light);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+      transition: all 0.2s ease;
+    }
+
+    .hud-btn:hover {
+      border-color: var(--gold-primary);
+      background: rgba(58, 26, 16, 0.9);
+      transform: translateY(-1px);
+    }
+
+    /* ==================== FLOATING MAGIC PROMPT ==================== */
+    .magic-hint-wrap {
+      position: fixed;
+      top: max(68px, 9.5vh);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 22;
+      pointer-events: none;
+      text-align: center;
+      width: min(92vw, 520px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .magic-hint-wrap.hidden {
+      opacity: 0;
+      transform: translate(-50%, -10px);
+    }
+
+    .magic-hint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      background: rgba(26, 13, 10, 0.76);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: #fef08a;
+      font-size: 0.86rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 26px rgba(251, 191, 36, 0.22);
+      animation: floatHint 2.6s ease-in-out infinite;
+    }
+
+    @keyframes floatHint {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .gift-tap-banner {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 24;
+      pointer-events: auto;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(153, 27, 27, 0.92), rgba(180, 83, 9, 0.92));
+      border: 1.5px solid #fde047;
+      color: #fffbeb;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: 0 0 28px rgba(251, 191, 36, 0.48);
+      animation: pulseGift 1.5s ease-in-out infinite;
+      white-space: nowrap;
+      transition: opacity 0.3s ease;
+    }
+
+    .gift-tap-banner.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes pulseGift {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* ==================== BOTTOM DOCK ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      max-width: calc(100vw - 16px);
+      pointer-events: auto;
+    }
+
+    .dock-btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      width: max-content;
+      max-width: calc(100vw - 16px);
+    }
+
+    .btn-primary-dock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 52%, #d97706 100%);
+      border: 1.5px solid rgba(253, 224, 71, 0.78);
+      color: #fffbeb;
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(185, 28, 28, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary-dock:hover { transform: translateY(-2px) scale(1.02); }
+
+    .btn-secondary-dock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--gold-light);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-secondary-dock:hover { border-color: var(--gold-primary); transform: translateY(-1px); }
+
+    @media (max-width: 520px) {
+      .dock-btn-row .btn-primary-dock,
+      .dock-btn-row .btn-secondary-dock {
+        padding: 10px 13px;
+        font-size: 0.78rem;
+        gap: 5px;
+      }
+      .hud-btn { padding: 8px 11px; font-size: 0.78rem; }
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(12, 6, 5, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.hidden { opacity: 0; pointer-events: none; }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      background: linear-gradient(165deg, rgba(38, 16, 12, 0.97) 0%, rgba(18, 8, 7, 0.99) 100%);
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      padding: 24px 22px;
+      color: var(--text-main);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
+    }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--gold-light);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-title {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      padding-right: 34px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.84rem;
+      color: #fde68a;
+      opacity: 0.86;
+      margin-bottom: 18px;
+      line-height: 1.45;
+    }
+
+    /* Gift Letter Modal */
+    .gift-card-shell {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 26px 22px 22px;
+      background:
+        radial-gradient(circle at top center, rgba(251, 191, 36, 0.16), transparent 60%),
+        linear-gradient(170deg, #3b100e 0%, #220808 55%, #120405 100%);
+      border: 2px solid rgba(251, 191, 36, 0.62);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.88), 0 0 40px rgba(251, 191, 36, 0.16);
+      text-align: center;
+      color: #fffbeb;
+    }
+
+    .gift-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      color: #fde047;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .gift-heading {
+      font-family: var(--font-script);
+      font-size: 2rem;
+      color: #fef08a;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 14px rgba(251, 191, 36, 0.35);
+    }
+
+    .gift-wish-box {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 251, 235, 0.06);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      margin-bottom: 14px;
+    }
+
+    .gift-wish-text {
+      font-size: 0.94rem;
+      line-height: 1.62;
+      color: #fffbeb;
+      white-space: pre-line;
+    }
+
+    .gift-sign {
+      margin-top: 10px;
+      font-family: var(--font-script);
+      font-size: 1.35rem;
+      color: #fcd34d;
+    }
+
+    .gift-photo-box {
+      margin-bottom: 14px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      background: rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .gift-photo-box img {
+      display: block;
+      width: 100%;
+      max-height: 270px;
+      object-fit: cover;
+    }
+
+    .gift-photo-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(20, 8, 7, 0.85);
+      font-size: 0.8rem;
+      color: #fde68a;
+    }
+
+    .gift-photo-arrow {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      background: rgba(251, 191, 36, 0.14);
+      color: #fef08a;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    /* Form Controls */
+    .form-group { margin-bottom: 13px; text-align: left; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fde68a;
+      margin-bottom: 5px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(15, 6, 6, 0.72);
+      color: #fffbeb;
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus { border-color: #fbbf24; }
+    .form-textarea { min-height: 78px; resize: vertical; }
+
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip-btn {
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, 0.38);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fde68a;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chip-btn.active {
+      background: linear-gradient(135deg, #b45309, #d97706);
+      border-color: #fde047;
+      color: #fffbeb;
+    }
+
+    .photo-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-thumb button {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- Cozy Room & Frosty Window Backdrop -->
+  <div class="cabin-backdrop" aria-hidden="true">
+    <div class="window-pane"></div>
+    <div class="bokeh-light" style="width:240px;height:240px;left:6%;top:18%;background:rgba(245,158,11,0.22);"></div>
+    <div class="bokeh-light" style="width:200px;height:200px;right:8%;top:22%;background:rgba(56,189,248,0.18);animation-delay:1.8s;"></div>
+    <div class="bokeh-light" style="width:160px;height:160px;left:18%;bottom:24%;background:rgba(239,68,68,0.16);animation-delay:3.1s;"></div>
+    <div class="oak-table-glow"></div>
+  </div>
+
+  <canvas id="globe-canvas"></canvas>
+
+  <!-- TOP HUD -->
+  <div class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" id="btn-vibe-cycle" class="hud-btn">🔥 Ấm Áp</button>
+      <button type="button" id="btn-replay" class="hud-btn">🔄 Xem Lại</button>
+      <button type="button" id="btn-audio" class="hud-btn">🔇 Âm Thanh</button>
+    </div>
+  </div>
+
+  <!-- FLOATING MAGIC PROMPT -->
+  <div id="magic-hint-wrap" class="magic-hint-wrap">
+    <div id="magic-hint-pill" class="magic-hint-pill">
+      ❄️ Chạm quả cầu hoặc lắc điện thoại để khởi động phép thuật...
+    </div>
+  </div>
+
+  <!-- FLOATING GIFT UNVEIL PROMPT -->
+  <button type="button" id="gift-tap-banner" class="gift-tap-banner hidden">
+    🎁 Chạm phong bì / hộp quà phát sáng để mở thư!
+  </button>
+
+  <!-- BOTTOM DOCK -->
+  <div class="bottom-dock">
+    <div class="dock-btn-row">
+      <button type="button" id="btn-shake-globe" class="btn-secondary-dock">
+        🔮 Lắc Quả Cầu
+      </button>
+      <button type="button" id="btn-open-creator" class="btn-primary-dock creator-only">
+        ✨ Tạo Quả Cầu (39k)
+      </button>
+    </div>
+  </div>
+
+  <!-- GIFT LETTER & MEMORY PHOTO MODAL -->
+  <div id="modal-gift" class="modal-backdrop hidden">
+    <div class="gift-card-shell">
+      <button type="button" class="modal-close-corner" id="btn-close-gift" aria-label="Đóng">✕</button>
+      <div class="gift-badge">✨ Phép Thuật Đêm Giáng Sinh ✨</div>
+      <div id="gift-card-title" class="gift-heading">Gửi Minh Khuê Yêu Thương</div>
+
+      <div class="gift-wish-box">
+        <div id="gift-wish-display" class="gift-wish-text">
+          Chúc bạn một mùa Giáng Sinh ấm áp, an lành và một năm mới ngập tràn niềm vui, hạnh phúc bên những người thân yêu!
+        </div>
+        <div id="gift-sign-display" class="gift-sign">Thương gửi, Minh Khang ♥</div>
+      </div>
+
+      <div id="gift-photo-box" class="gift-photo-box hidden">
+        <img id="gift-photo-img" src="" alt="Ảnh kỷ niệm Giáng Sinh" />
+        <div id="gift-photo-nav" class="gift-photo-nav hidden">
+          <button type="button" id="btn-gift-prev" class="gift-photo-arrow" aria-label="Ảnh trước">‹</button>
+          <span id="gift-photo-counter">Ảnh 1 / 1</span>
+          <button type="button" id="btn-gift-next" class="gift-photo-arrow" aria-label="Ảnh sau">›</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary-dock" style="width:100%;" id="btn-back-to-globe">
+        🔮 Ngắm Quả Cầu Tuyết 3D
+      </button>
+    </div>
+  </div>
+
+  <!-- CREATOR STUDIO MODAL -->
+  <div id="modal-creator" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <button type="button" class="modal-close-corner" id="btn-close-creator" aria-label="Đóng">✕</button>
+      <h3 class="modal-title">🔮 Tạo Quả Cầu Tuyết Ma Thuật</h3>
+      <p class="modal-subtitle">Thiết lập lời chúc tụ tuyết 3D, ánh sáng phép thuật & tải ảnh kỷ niệm giấu trong hộp quà dưới chân quả cầu.</p>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="input-sender">Tên của bạn</label>
+          <input id="input-sender" class="form-input" type="text" maxlength="40" placeholder="VD: Minh Khang" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-receiver">Tên người nhận</label>
+          <input id="input-receiver" class="form-input" type="text" maxlength="40" placeholder="VD: Minh Khuê" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-globe-text">Dòng chữ tuyết tụ trong quả cầu (ngắn gọn 1-2 dòng)</label>
+        <input id="input-globe-text" class="form-input" type="text" maxlength="48" placeholder="Merry Christmas Minh Khuê" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Không khí & Thời tiết (Dynamic Atmosphere)</label>
+        <div class="chip-row" id="vibe-chips">
+          <button type="button" class="chip-btn active" data-vibe="classic_warm">🔥 Classic Warm (Đêm ấm áp)</button>
+          <button type="button" class="chip-btn" data-vibe="cyber_ice">❄️ Cyber Ice (Đêm băng giá)</button>
+          <button type="button" class="chip-btn" data-vibe="golden_star">✨ Golden Star (Hoàng kim)</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-frame-photo">Ảnh đặt trong khung gỗ bên cạnh ngôi nhà 3D (độc bản)</label>
+        <input id="input-frame-photo" class="form-input" type="file" accept="image/*" />
+        <div id="frame-photo-preview" style="margin-top:8px; display:none; align-items:center; gap:10px;">
+          <img id="frame-photo-preview-img" src="" alt="Ảnh khung gỗ 3D" style="width:52px;height:62px;object-fit:cover;border-radius:8px;border:1.5px solid #fbbf24;" />
+          <span style="font-size:0.78rem;color:#fde68a;">Đã gắn vào khung ảnh gỗ bên trong quả cầu 3D ✓</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Bức thư chúc mừng trong hộp quà 3D</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="500" placeholder="Nhập lời chúc Giáng Sinh & Năm Mới ngọt ngào..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-photos">Ảnh kỷ niệm mở trong hộp quà (tối đa 6 ảnh)</label>
+        <input id="input-photos" class="form-input" type="file" accept="image/*" multiple />
+        <div id="photo-preview-grid" class="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" id="btn-create-order" class="btn-primary-dock" style="width:100%; margin-top:6px;">
+        💳 Tạo Link Quả Cầu Tuyết Ngay (39.000đ)
+      </button>
+    </div>
+  </div>
+
+  <!-- VIETQR PAYMENT MODAL -->
+  <div id="modal-payment" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width:410px; text-align:center;">
+      <button type="button" class="modal-close-corner" id="btn-close-payment" aria-label="Đóng">✕</button>
+      <h3 class="modal-title">💳 Quét Mã VietQR Để Kích Hoạt</h3>
+      <p class="modal-subtitle">Mã đơn: <strong id="payment-order-code">---</strong> • Tự động mở link sau khi chuyển khoản.</p>
+      <img id="payment-qr-img" src="" alt="Mã VietQR" style="width:240px;max-width:100%;border-radius:14px;background:#fff;padding:8px;margin:0 auto 14px;display:block;" />
+      <p style="font-size:0.8rem;color:#fde68a;opacity:0.85;">Hệ thống đang tự động kiểm tra thanh toán...</p>
+    </div>
+  </div>
+
+  <!-- SUCCESS LINK MODAL -->
+  <div id="modal-success" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width:430px; text-align:center;">
+      <button type="button" class="modal-close-corner" id="btn-close-success" aria-label="Đóng">✕</button>
+      <h3 class="modal-title">🎉 Tạo Quả Cầu Tuyết Thành Công!</h3>
+      <p class="modal-subtitle">Gửi đường link dưới đây cho người thương để mở quả cầu tuyết ma thuật nhé.</p>
+      <input id="success-share-url" class="form-input" type="text" readonly style="margin-bottom:10px; text-align:center;" />
+      <div class="dock-btn-row" style="width:100%;">
+        <button type="button" id="btn-copy-link" class="btn-secondary-dock" style="flex:1;">📋 Sao chép link</button>
+        <button type="button" id="btn-open-share" class="btn-primary-dock" style="flex:1;">🔮 Mở xem ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // =========================================================================
+      // 1. STATE & CONFIGURATION
+      // =========================================================================
+      const appState = {
+        templateId: 'snow_globe_magic',
+        sender: 'Minh Khang',
+        receiver: 'Minh Khuê',
+        globeText: 'Merry Christmas Minh Khuê',
+        vibe: 'classic_warm', // 'classic_warm' | 'cyber_ice' | 'golden_star'
+        glowTheme: 'warm_gold', // derived or synced with vibe
+        framePhoto: '',
+        wish: 'Chúc bạn một mùa Giáng Sinh an lành, ấm áp và một năm mới ngập tràn tiếng cười, luôn rạng rỡ hạnh phúc bên những người thương yêu!',
+        photos: [],
+        currentGiftPhotoIdx: 0,
+        isViewerMode: false,
+        orderCode: '',
+        pollTimer: null
+      };
+
+      // =========================================================================
+      // 2. PROCEDURAL WINTER & CHRISTMAS LOFI AUDIO ENGINE (WEB AUDIO API)
+      // =========================================================================
+      class SnowGlobeAudio {
+        constructor() {
+          this.ctx = null;
+          this.masterGain = null;
+          this.enabled = false;
+          this.windNode = null;
+          this.windGain = null;
+          this.lofiTimer = null;
+          this.melodyStep = 0;
+        }
+
+        ensureCtx() {
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AC();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.value = 0.0;
+            this.masterGain.connect(this.ctx.destination);
+          }
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        }
+
+        setEnabled(on) {
+          this.ensureCtx();
+          this.enabled = on;
+          const now = this.ctx.currentTime;
+          this.masterGain.gain.cancelScheduledValues(now);
+          this.masterGain.gain.linearRampToValueAtTime(on ? 0.65 : 0.0, now + 0.25);
+          if (on && !this.windNode) {
+            this.startWinterWind();
+          }
+          document.getElementById('btn-audio').textContent = on ? '🔊 Âm Thanh' : '🔇 Âm Thanh';
+        }
+
+        tryAutoStart() {
+          if (!this.enabled) this.setEnabled(true);
+        }
+
+        startWinterWind() {
+          if (!this.ctx || this.windNode) return;
+          const bufSize = this.ctx.sampleRate * 2;
+          const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          let lastOut = 0;
+          for (let i = 0; i < bufSize; i++) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (lastOut + 0.02 * white) / 1.02;
+            lastOut = data[i];
+            data[i] *= 2.5;
+          }
+          const src = this.ctx.createBufferSource();
+          src.buffer = buf;
+          src.loop = true;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 340;
+          filter.Q.value = 2.4;
+
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          lfo.frequency.value = 0.22;
+          lfoGain.gain.value = 140;
+          lfo.connect(lfoGain);
+          lfoGain.connect(filter.frequency);
+          lfo.start();
+
+          this.windGain = this.ctx.createGain();
+          this.windGain.gain.value = 0.14;
+          src.connect(filter);
+          filter.connect(this.windGain);
+          this.windGain.connect(this.masterGain);
+          src.start();
+          this.windNode = src;
+        }
+
+        playSleighBells() {
+          if (!this.enabled) return;
+          this.ensureCtx();
+          const now = this.ctx.currentTime;
+          for (let i = 0; i < 8; i++) {
+            const t = now + i * 0.11;
+            [2400, 3150, 4200].forEach((freq, idx) => {
+              const osc = this.ctx.createOscillator();
+              const g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq + (Math.random() - 0.5) * 80, t);
+              g.gain.setValueAtTime(0.055 / (idx + 1), t);
+              g.gain.exponentialRampToValueAtTime(0.0005, t + 0.18);
+              osc.connect(g);
+              g.connect(this.masterGain);
+              osc.start(t);
+              osc.stop(t + 0.2);
+            });
+          }
+        }
+
+        playMagicChime() {
+          if (!this.enabled) return;
+          this.ensureCtx();
+          const now = this.ctx.currentTime;
+          const notes = [1046.5, 1318.5, 1567.98, 2093.0];
+          notes.forEach((freq, i) => {
+            const t = now + i * 0.09;
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, t);
+            g.gain.setValueAtTime(0.14, t);
+            g.gain.exponentialRampToValueAtTime(0.0008, t + 0.85);
+            osc.connect(g);
+            g.connect(this.masterGain);
+            osc.start(t);
+            osc.stop(t + 0.9);
+          });
+        }
+
+        startChristmasLofi() {
+          if (this.lofiTimer) return;
+          // Warm lo-fi progression: "We Wish You a Merry Christmas" gentle music-box / Rhodes chords
+          const melody = [
+            { f: 392.00, c: [261.63, 329.63, 392.00] }, // G4 + Cmaj
+            { f: 523.25, c: [261.63, 329.63, 392.00] },
+            { f: 523.25, c: null },
+            { f: 587.33, c: null },
+            { f: 523.25, c: [220.00, 261.63, 329.63] }, // Am
+            { f: 493.88, c: null },
+            { f: 440.00, c: [174.61, 220.00, 261.63] }, // Fmaj
+            { f: 440.00, c: null },
+            { f: 440.00, c: [196.00, 246.94, 293.66] }, // G
+            { f: 587.33, c: null },
+            { f: 587.33, c: null },
+            { f: 659.25, c: [261.63, 329.63, 392.00] }, // Cmaj
+            { f: 587.33, c: null },
+            { f: 523.25, c: null },
+            { f: 493.88, c: [196.00, 246.94, 293.66] }, // G
+            { f: 392.00, c: null }
+          ];
+          const playStep = () => {
+            if (this.enabled && this.ctx) {
+              const now = this.ctx.currentTime;
+              const step = melody[this.melodyStep % melody.length];
+              // Soft lo-fi note
+              const osc = this.ctx.createOscillator();
+              const lp = this.ctx.createBiquadFilter();
+              const g = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(step.f, now);
+              lp.type = 'lowpass';
+              lp.frequency.value = 1450;
+              g.gain.setValueAtTime(0.001, now);
+              g.gain.linearRampToValueAtTime(0.085, now + 0.03);
+              g.gain.exponentialRampToValueAtTime(0.0008, now + 0.85);
+              osc.connect(lp);
+              lp.connect(g);
+              g.connect(this.masterGain);
+              osc.start(now);
+              osc.stop(now + 0.9);
+
+              if (step.c) {
+                step.c.forEach((cf) => {
+                  const co = this.ctx.createOscillator();
+                  const cg = this.ctx.createGain();
+                  co.type = 'sine';
+                  co.frequency.setValueAtTime(cf, now);
+                  cg.gain.setValueAtTime(0.001, now);
+                  cg.gain.linearRampToValueAtTime(0.03, now + 0.08);
+                  cg.gain.exponentialRampToValueAtTime(0.0006, now + 1.6);
+                  co.connect(cg);
+                  cg.connect(this.masterGain);
+                  co.start(now);
+                  co.stop(now + 1.65);
+                });
+              }
+              this.melodyStep++;
+            }
+          };
+          playStep();
+          this.lofiTimer = setInterval(playStep, 520);
+        }
+
+        stopChristmasLofi() {
+          if (this.lofiTimer) {
+            clearInterval(this.lofiTimer);
+            this.lofiTimer = null;
+          }
+          this.melodyStep = 0;
+        }
+      }
+
+      const audio = new SnowGlobeAudio();
+      document.getElementById('btn-audio').addEventListener('click', () => {
+        audio.setEnabled(!audio.enabled);
+      });
+
+      // =========================================================================
+      // 3. THREE.JS 3D MAGICAL SNOW GLOBE SCENE
+      // =========================================================================
+      const canvas = document.getElementById('globe-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 60);
+      camera.position.set(0, 0.85, 8.6);
+      camera.lookAt(0, 0.15, 0);
+
+      // Warm Christmas Room Lighting
+      const ambientLight = new THREE.AmbientLight(0xffedd5, 0.72);
+      scene.add(ambientLight);
+
+      const warmFireLight = new THREE.PointLight(0xff9e2c, 1.85, 18);
+      warmFireLight.position.set(-4.5, 2.2, 4.5);
+      scene.add(warmFireLight);
+
+      const iceRimLight = new THREE.DirectionalLight(0x93c5fd, 1.15);
+      iceRimLight.position.set(4.5, 5.0, 2.5);
+      scene.add(iceRimLight);
+
+      const cabinWindowLight = new THREE.PointLight(0xfbbf24, 1.2, 5.0);
+      cabinWindowLight.position.set(0, 0.25, 0.85);
+      scene.add(cabinWindowLight);
+
+      // Procedural Textures
+      function createOakWoodTexture() {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 256;
+        const ctx = c.getContext('2d');
+        const g = ctx.createLinearGradient(0, 0, 0, 256);
+        g.addColorStop(0, '#5c2d16');
+        g.addColorStop(0.5, '#431f0e');
+        g.addColorStop(1, '#2b1207');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 256);
+        for (let i = 0; i < 60; i++) {
+          ctx.strokeStyle = i % 2 === 0 ? 'rgba(25,10,4,0.28)' : 'rgba(160,96,48,0.14)';
+          ctx.lineWidth = 1 + Math.random() * 2.2;
+          ctx.beginPath();
+          const y = Math.random() * 256;
+          ctx.moveTo(0, y);
+          ctx.bezierCurveTo(170, y + (Math.random() - 0.5) * 14, 340, y + (Math.random() - 0.5) * 14, 512, y);
+          ctx.stroke();
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        tex.wrapS = THREE.RepeatWrapping;
+        return tex;
+      }
+
+      function createSnowSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(32, 32, 2, 32, 32, 32);
+        g.addColorStop(0, 'rgba(255,255,255,1)');
+        g.addColorStop(0.35, 'rgba(240,249,255,0.85)');
+        g.addColorStop(0.7, 'rgba(186,230,253,0.3)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(c);
+      }
+
+      function createBrassPlaqueTexture(label) {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 128;
+        const ctx = c.getContext('2d');
+        const g = ctx.createLinearGradient(0, 0, 512, 128);
+        g.addColorStop(0, '#92400e');
+        g.addColorStop(0.5, '#fbbf24');
+        g.addColorStop(1, '#92400e');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 128);
+        ctx.strokeStyle = '#fef3c7';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(8, 8, 496, 112);
+        ctx.fillStyle = '#3b1506';
+        ctx.font = 'bold 34px "Cinzel", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label || 'MAGICAL SNOW GLOBE', 256, 66);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Main Snow Globe Group
+      const snowGlobeGroup = new THREE.Group();
+      scene.add(snowGlobeGroup);
+
+      const oakMat = new THREE.MeshStandardMaterial({
+        map: createOakWoodTexture(),
+        roughness: 0.48,
+        metalness: 0.12
+      });
+      const brassMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        roughness: 0.28,
+        metalness: 0.82
+      });
+
+      // Antique Oak Pedestal Base
+      const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.96, 0.34, 48), oakMat);
+      baseTop.position.y = -1.52;
+      snowGlobeGroup.add(baseTop);
+
+      const baseMid = new THREE.Mesh(new THREE.CylinderGeometry(1.94, 2.16, 0.42, 48), oakMat);
+      baseMid.position.y = -1.88;
+      snowGlobeGroup.add(baseMid);
+
+      const baseFoot = new THREE.Mesh(new THREE.CylinderGeometry(2.16, 2.28, 0.22, 48), oakMat);
+      baseFoot.position.y = -2.18;
+      snowGlobeGroup.add(baseFoot);
+
+      const goldCollar = new THREE.Mesh(new THREE.TorusGeometry(1.80, 0.055, 16, 48), brassMat);
+      goldCollar.rotation.x = Math.PI / 2;
+      goldCollar.position.y = -1.36;
+      snowGlobeGroup.add(goldCollar);
+
+      const plaqueMat = new THREE.MeshStandardMaterial({
+        map: createBrassPlaqueTexture(appState.receiver),
+        roughness: 0.3,
+        metalness: 0.65
+      });
+      const plaqueMesh = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.30, 0.08), plaqueMat);
+      plaqueMesh.position.set(0, -1.86, 2.02);
+      snowGlobeGroup.add(plaqueMesh);
+
+      // Snow Ground Mound inside Globe
+      const snowGroundMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.72,
+        metalness: 0.05
+      });
+      const snowMound = new THREE.Mesh(new THREE.SphereGeometry(1.84, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.48), snowGroundMat);
+      snowMound.scale.set(1, 0.38, 1);
+      snowMound.position.y = -1.38;
+      snowGlobeGroup.add(snowMound);
+
+      // Cozy Wooden Cabin inside Globe
+      const cabinGroup = new THREE.Group();
+      cabinGroup.position.set(-0.22, -0.78, -0.15);
+      cabinGroup.rotation.y = 0.28;
+      snowGlobeGroup.add(cabinGroup);
+
+      const cabinWallMat = new THREE.MeshStandardMaterial({ color: 0x6b3518, roughness: 0.75 });
+      const cabinBody = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.52, 0.68), cabinWallMat);
+      cabinGroup.add(cabinBody);
+
+      // Snow-covered Pitched Roof
+      const roofWood = new THREE.Mesh(
+        new THREE.ConeGeometry(0.66, 0.46, 4),
+        new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.7 })
+      );
+      roofWood.rotation.y = Math.PI / 4;
+      roofWood.position.y = 0.46;
+      cabinGroup.add(roofWood);
+
+      const roofSnow = new THREE.Mesh(
+        new THREE.ConeGeometry(0.68, 0.42, 4),
+        snowGroundMat
+      );
+      roofSnow.rotation.y = Math.PI / 4;
+      roofSnow.position.y = 0.50;
+      cabinGroup.add(roofSnow);
+
+      // Glowing Cabin Windows & Door
+      const glowWinMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
+      const winFront = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
+      winFront.position.set(-0.18, 0.04, 0.345);
+      cabinGroup.add(winFront);
+
+      const winSide = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
+      winSide.rotation.y = Math.PI / 2;
+      winSide.position.set(0.395, 0.04, 0.06);
+      cabinGroup.add(winSide);
+
+      const doorMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.16, 0.28),
+        new THREE.MeshStandardMaterial({ color: 0x451a03 })
+      );
+      doorMesh.position.set(0.14, -0.11, 0.345);
+      cabinGroup.add(doorMesh);
+
+      // Stone Chimney
+      const chimney = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 0.36, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.85 })
+      );
+      chimney.position.set(0.22, 0.58, -0.10);
+      cabinGroup.add(chimney);
+
+      // Nâng cấp 1: Antique Wooden Photo Frame next to Cabin inside the 3D Snow Globe
+      const photoFrameGroup = new THREE.Group();
+      photoFrameGroup.position.set(0.62, -0.74, 0.30);
+      photoFrameGroup.rotation.y = -0.32;
+      snowGlobeGroup.add(photoFrameGroup);
+
+      const frameOuterWood = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.74, 0.055), oakMat);
+      photoFrameGroup.add(frameOuterWood);
+
+      const frameInnerBrass = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.64, 0.062), brassMat);
+      photoFrameGroup.add(frameInnerBrass);
+
+      const frameStand = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.52, 0.04), oakMat);
+      frameStand.position.set(0, -0.08, -0.14);
+      frameStand.rotation.x = 0.45;
+      photoFrameGroup.add(frameStand);
+
+      function buildDefaultFrameTexture() {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 600;
+        const ctx = c.getContext('2d');
+        const g = ctx.createLinearGradient(0, 0, 0, 600);
+        g.addColorStop(0, '#450a0a');
+        g.addColorStop(0.6, '#7f1d1d');
+        g.addColorStop(1, '#2d0808');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 600);
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.55)';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(22, 22, 468, 556);
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 120px Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('♥', 256, 265);
+        ctx.fillStyle = '#fef3c7';
+        ctx.font = 'bold 46px "Dancing Script", Georgia, serif';
+        ctx.fillText('Our Memory', 256, 375);
+        ctx.font = '600 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fde68a';
+        ctx.fillText('Giáng Sinh An Lành', 256, 438);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const framePhotoMat = new THREE.MeshBasicMaterial({ map: buildDefaultFrameTexture() });
+      const framePhotoPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.56), framePhotoMat);
+      framePhotoPlane.position.z = 0.036;
+      photoFrameGroup.add(framePhotoPlane);
+
+      function updateFramePhotoTexture(imgUrl) {
+        if (!imgUrl) {
+          framePhotoMat.map = buildDefaultFrameTexture();
+          framePhotoMat.needsUpdate = true;
+          return;
+        }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 512;
+          c.height = 600;
+          const ctx = c.getContext('2d');
+          const imgRatio = img.width / img.height;
+          const targetRatio = c.width / c.height;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+          if (imgRatio > targetRatio) {
+            sw = img.height * targetRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / targetRatio;
+            sy = (img.height - sh) / 2;
+          }
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+          // Warm vintage vignette
+          const vg = ctx.createRadialGradient(256, 300, 140, 256, 300, 360);
+          vg.addColorStop(0, 'rgba(0,0,0,0)');
+          vg.addColorStop(1, 'rgba(30,10,5,0.38)');
+          ctx.fillStyle = vg;
+          ctx.fillRect(0, 0, 512, 600);
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          framePhotoMat.map = tex;
+          framePhotoMat.needsUpdate = true;
+        };
+        img.src = imgUrl;
+      }
+
+      // Snow-Dusted Pine Trees
+      function createPineTree(x, y, z, scale) {
+        const tg = new THREE.Group();
+        const trunk = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.06, 0.24, 8),
+          new THREE.MeshStandardMaterial({ color: 0x451a03 })
+        );
+        trunk.position.y = 0.12;
+        tg.add(trunk);
+
+        const greenMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.78 });
+        [
+          { r: 0.30, h: 0.40, y: 0.34 },
+          { r: 0.23, h: 0.34, y: 0.56 },
+          { r: 0.16, h: 0.28, y: 0.75 }
+        ].forEach((tier) => {
+          const cone = new THREE.Mesh(new THREE.ConeGeometry(tier.r, tier.h, 10), greenMat);
+          cone.position.y = tier.y;
+          tg.add(cone);
+
+          const cap = new THREE.Mesh(new THREE.ConeGeometry(tier.r * 0.88, tier.h * 0.55, 10), snowGroundMat);
+          cap.position.y = tier.y + tier.h * 0.24;
+          tg.add(cap);
+        });
+
+        tg.position.set(x, y, z);
+        tg.scale.setScalar(scale);
+        snowGlobeGroup.add(tg);
+        return tg;
+      }
+
+      createPineTree(-1.05, -0.95, -0.35, 1.05);
+      createPineTree(-0.82, -0.95, 0.55, 0.78);
+      createPineTree(0.78, -0.95, -0.45, 1.15);
+      createPineTree(1.06, -0.95, 0.38, 0.86);
+      createPineTree(0.32, -0.92, -0.95, 0.92);
+
+      // Chimney Rising Smoke Particles (soft grey-white wisps)
+      const SMOKE_COUNT = 26;
+      const smokePositions = new Float32Array(SMOKE_COUNT * 3);
+      const smokeMeta = [];
+      for (let i = 0; i < SMOKE_COUNT; i++) {
+        smokeMeta.push({
+          age: Math.random(),
+          speed: 0.26 + Math.random() * 0.14,
+          drift: (Math.random() - 0.5) * 0.18
+        });
+      }
+      const smokeGeo = new THREE.BufferGeometry();
+      smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePositions, 3));
+      const smokeMat = new THREE.PointsMaterial({
+        size: 0.22,
+        map: createSnowSpriteTexture(),
+        transparent: true,
+        opacity: 0.34,
+        depthWrite: false,
+        color: 0xe2e8f0
+      });
+      const smokePoints = new THREE.Points(smokeGeo, smokeMat);
+      snowGlobeGroup.add(smokePoints);
+
+      // Nâng cấp 2: Nearby 3D Candle & Glowing Tree Props + Real-Time Two-Pass Refraction Glass Shader
+      const roomPropsGroup = new THREE.Group();
+      scene.add(roomPropsGroup);
+
+      // Left Warm Wax Candle Cluster (reflects on glass surface)
+      const candleMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.4 });
+      const candle1 = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 1.05, 18), candleMat);
+      candle1.position.set(-3.45, -1.68, -1.2);
+      roomPropsGroup.add(candle1);
+
+      const flame1 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.11, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xfde047 })
+      );
+      flame1.scale.set(0.75, 1.55, 0.75);
+      flame1.position.set(-3.45, -1.02, -1.2);
+      roomPropsGroup.add(flame1);
+
+      // Right Glowing Mini Christmas Tree (reflects on glass surface)
+      const roomTree = new THREE.Group();
+      const rtGreen = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.65 });
+      [
+        { r: 0.55, h: 0.85, y: -1.55 },
+        { r: 0.42, h: 0.72, y: -1.05 },
+        { r: 0.28, h: 0.58, y: -0.60 }
+      ].forEach((t) => {
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(t.r, t.h, 12), rtGreen);
+        cone.position.y = t.y;
+        roomTree.add(cone);
+      });
+      const rtStar = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.14, 0),
+        new THREE.MeshBasicMaterial({ color: 0xfef08a })
+      );
+      rtStar.position.y = -0.22;
+      roomTree.add(rtStar);
+      roomTree.position.set(3.55, 0, -1.35);
+      roomPropsGroup.add(roomTree);
+
+      // Offscreen RenderTarget for Real-time Refraction Pass
+      const refractRT = new THREE.WebGLRenderTarget(
+        Math.min(window.innerWidth, 1024),
+        Math.min(window.innerHeight, 1024),
+        { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }
+      );
+
+      const glassShaderUniforms = {
+        tBackground: { value: refractRT.texture },
+        uTime: { value: 0 },
+        uTilt: { value: new THREE.Vector2(0, 0) },
+        uRimColor: { value: new THREE.Color(0xfef08a) },
+        uCandleColor: { value: new THREE.Color(0xffb347) },
+        uTreeColor: { value: new THREE.Color(0x38bdf8) }
+      };
+
+      const glassMat = new THREE.ShaderMaterial({
+        uniforms: glassShaderUniforms,
+        transparent: true,
+        depthWrite: false,
+        vertexShader: `
+          varying vec3 vNormalView;
+          varying vec3 vViewDir;
+          varying vec4 vClipPos;
+          void main() {
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            vNormalView = normalize(normalMatrix * normal);
+            vViewDir = normalize(-mvPos.xyz);
+            vClipPos = projectionMatrix * mvPos;
+            gl_Position = vClipPos;
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D tBackground;
+          uniform float uTime;
+          uniform vec2 uTilt;
+          uniform vec3 uRimColor;
+          uniform vec3 uCandleColor;
+          uniform vec3 uTreeColor;
+          varying vec3 vNormalView;
+          varying vec3 vViewDir;
+          varying vec4 vClipPos;
+
+          void main() {
+            vec3 N = normalize(vNormalView);
+            vec3 V = normalize(vViewDir);
+            vec2 screenUV = (vClipPos.xy / vClipPos.w) * 0.5 + 0.5;
+
+            // Snell's Law Refraction with subtle chromatic dispersion
+            vec3 refr = refract(-V, N, 1.0 / 1.44);
+            vec2 offset = refr.xy * 0.068;
+            float r = texture2D(tBackground, clamp(screenUV + offset * 1.06, 0.002, 0.998)).r;
+            float g = texture2D(tBackground, clamp(screenUV + offset, 0.002, 0.998)).g;
+            float b = texture2D(tBackground, clamp(screenUV + offset * 0.94, 0.002, 0.998)).b;
+            vec3 refractedBg = vec3(r, g, b);
+
+            // Fresnel crystal rim
+            float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.1);
+
+            // Specular reflections from flickering candle (left) & glowing tree (right), shifted by phone tilt
+            vec3 candleDir = normalize(vec3(-0.72 + uTilt.x * 0.35, 0.38 + uTilt.y * 0.35, 0.65));
+            vec3 treeDir   = normalize(vec3(0.75 + uTilt.x * 0.35, 0.45 + uTilt.y * 0.35, 0.58));
+            float flicker = 0.88 + 0.12 * sin(uTime * 11.0);
+            float specCandle = pow(max(dot(reflect(-candleDir, N), V), 0.0), 42.0) * 0.85 * flicker;
+            float specTree   = pow(max(dot(reflect(-treeDir, N), V), 0.0), 36.0) * 0.65;
+
+            // Soft curved studio window highlight
+            float arcHighlight = smoothstep(0.62, 0.94, dot(N, normalize(vec3(-0.35, 0.68, 0.64)))) * 0.22;
+
+            vec3 finalCol = refractedBg
+              + uRimColor * fresnel * 0.48
+              + uCandleColor * specCandle
+              + uTreeColor * specTree
+              + vec3(1.0) * arcHighlight;
+
+            float alpha = clamp(0.28 + fresnel * 0.55 + specCandle + specTree + arcHighlight, 0.25, 0.96);
+            gl_FragColor = vec4(finalCol, alpha);
+          }
+        `
+      });
+      const glassSphere = new THREE.Mesh(new THREE.SphereGeometry(2.12, 48, 36), glassMat);
+      glassSphere.position.y = 0.05;
+      snowGlobeGroup.add(glassSphere);
+
+      // Subtle Golden Rim Halo around glass edge
+      const glassRimHalo = new THREE.Mesh(
+        new THREE.RingGeometry(2.09, 2.15, 64),
+        new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.16, side: THREE.DoubleSide })
+      );
+      glassRimHalo.position.y = 0.05;
+      snowGlobeGroup.add(glassRimHalo);
+
+      // =========================================================================
+      // 4. 2,200 INTERACTIVE SNOW & MORPHING TEXT PARTICLES INSIDE GLOBE
+      // =========================================================================
+      const PARTICLE_COUNT = 2200;
+      const pPositions = new Float32Array(PARTICLE_COUNT * 3);
+      const pColors = new Float32Array(PARTICLE_COUNT * 3);
+      const pData = [];
+      const textTargets = [];
+
+      function buildTextTargets(text) {
+        textTargets.length = 0;
+        const c = document.createElement('canvas');
+        c.width = 768;
+        c.height = 320;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const clean = (text || 'Merry Christmas').trim();
+        const words = clean.split(/\s+/);
+        let line1 = clean;
+        let line2 = '';
+        if (clean.length > 16 && words.length >= 3) {
+          const mid = Math.ceil(words.length / 2);
+          line1 = words.slice(0, mid).join(' ');
+          line2 = words.slice(mid).join(' ');
+        }
+
+        if (line2) {
+          ctx.font = 'bold 58px "Dancing Script", Georgia, serif';
+          ctx.fillText(line1, 384, 112);
+          ctx.font = 'bold 64px "Dancing Script", Georgia, serif';
+          ctx.fillText(line2, 384, 204);
+        } else {
+          ctx.font = 'bold 68px "Dancing Script", Georgia, serif';
+          ctx.fillText(line1, 384, 160);
+        }
+
+        const img = ctx.getImageData(0, 0, c.width, c.height).data;
+        const step = 4;
+        for (let y = 0; y < c.height; y += step) {
+          for (let x = 0; x < c.width; x += step) {
+            if (img[(y * c.width + x) * 4 + 3] > 120) {
+              const wx = ((x / c.width) - 0.5) * 3.15;
+              const wy = (0.5 - (y / c.height)) * 1.35 + 0.52;
+              const wz = (Math.random() - 0.5) * 0.16 + 0.32;
+              // Keep inside sphere radius 1.92
+              if (Math.hypot(wx, wy - 0.05, wz) < 1.90) {
+                textTargets.push(new THREE.Vector3(wx, wy, wz));
+              }
+            }
+          }
+        }
+      }
+      buildTextTargets(appState.globeText);
+
+      function randomPointInGlobe() {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = Math.cbrt(Math.random()) * 1.88;
+        return new THREE.Vector3(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta) + 0.05,
+          r * Math.cos(phi)
+        );
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const pt = randomPointInGlobe();
+        pPositions[i * 3] = pt.x;
+        pPositions[i * 3 + 1] = pt.y;
+        pPositions[i * 3 + 2] = pt.z;
+
+        pColors[i * 3] = 1.0;
+        pColors[i * 3 + 1] = 1.0;
+        pColors[i * 3 + 2] = 1.0;
+
+        pData.push({
+          vel: new THREE.Vector3((Math.random() - 0.5) * 0.4, -0.25 - Math.random() * 0.35, (Math.random() - 0.5) * 0.4),
+          isTextParticle: i < 1550,
+          swirlPhase: Math.random() * Math.PI * 2,
+          settleY: -0.92 + Math.random() * 0.16
+        });
+      }
+
+      const snowGeo = new THREE.BufferGeometry();
+      snowGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+      snowGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+      const snowMat = new THREE.PointsMaterial({
+        size: 0.075,
+        map: createSnowSpriteTexture(),
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.94,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const snowPoints = new THREE.Points(snowGeo, snowMat);
+      snowGlobeGroup.add(snowPoints);
+
+      // =========================================================================
+      // 5. 3D MINIATURE GIFT ENVELOPE AT PEDESTAL FOOT (THE UNVEILING)
+      // =========================================================================
+      const giftBoxGroup = new THREE.Group();
+      giftBoxGroup.position.set(1.55, -1.96, 1.82);
+      giftBoxGroup.rotation.y = -0.35;
+      snowGlobeGroup.add(giftBoxGroup);
+
+      const giftBodyMat = new THREE.MeshStandardMaterial({
+        color: 0xb91c1c,
+        roughness: 0.32,
+        metalness: 0.25,
+        emissive: 0x000000
+      });
+      const giftBody = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.38, 0.42), giftBodyMat);
+      giftBoxGroup.add(giftBody);
+
+      const giftLidPivot = new THREE.Group();
+      giftLidPivot.position.set(0, 0.19, -0.21);
+      giftBoxGroup.add(giftLidPivot);
+
+      const giftLid = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.10, 0.46), giftBodyMat);
+      giftLid.position.set(0, 0.04, 0.21);
+      giftLidPivot.add(giftLid);
+
+      const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.41, 0.45), brassMat);
+      giftBoxGroup.add(ribbonV);
+      const ribbonLid = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.48), brassMat);
+      ribbonLid.position.set(0, 0.04, 0.21);
+      giftLidPivot.add(ribbonLid);
+
+      const giftGlowRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.36, 0.48, 32),
+        new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0.0, side: THREE.DoubleSide })
+      );
+      giftGlowRing.rotation.x = -Math.PI / 2;
+      giftGlowRing.position.y = -0.18;
+      giftBoxGroup.add(giftGlowRing);
+
+      // Ambient Background Falling Snowflakes (outside window room atmosphere)
+      const BG_SNOW = 180;
+      const bgSnowPos = new Float32Array(BG_SNOW * 3);
+      for (let i = 0; i < BG_SNOW; i++) {
+        bgSnowPos[i * 3] = (Math.random() - 0.5) * 14;
+        bgSnowPos[i * 3 + 1] = (Math.random() - 0.5) * 9;
+        bgSnowPos[i * 3 + 2] = -2 - Math.random() * 6;
+      }
+      const bgSnowGeo = new THREE.BufferGeometry();
+      bgSnowGeo.setAttribute('position', new THREE.BufferAttribute(bgSnowPos, 3));
+      const bgSnowPoints = new THREE.Points(
+        bgSnowGeo,
+        new THREE.PointsMaterial({
+          size: 0.11,
+          map: createSnowSpriteTexture(),
+          transparent: true,
+          opacity: 0.45,
+          depthWrite: false
+        })
+      );
+      scene.add(bgSnowPoints);
+
+      // =========================================================================
+      // 6. INTERACTION & MAGIC STATE MACHINE
+      // =========================================================================
+      let globePhase = 'intro'; // 'intro' | 'swirl' | 'morphing' | 'revealed' | 'opening_gift'
+      let phaseTimer = 0;
+      let shakeEnergy = 0;
+      let giftReady = false;
+      let giftOpenProgress = 0;
+
+      function updateResponsiveLayout() {
+        const aspect = window.innerWidth / window.innerHeight;
+        const isMobile = aspect < 0.8;
+        snowGlobeGroup.scale.setScalar(isMobile ? 0.76 : 1.0);
+        snowGlobeGroup.position.y = isMobile ? 0.35 : 0.18;
+        roomPropsGroup.visible = !isMobile;
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        refractRT.setSize(Math.min(window.innerWidth, 1024), Math.min(window.innerHeight, 1024));
+      }
+      updateResponsiveLayout();
+      window.addEventListener('resize', updateResponsiveLayout);
+
+      function triggerMagicGlobe() {
+        audio.tryAutoStart();
+        if (globePhase === 'intro' || globePhase === 'revealed') {
+          globePhase = 'swirl';
+          phaseTimer = 0;
+          shakeEnergy = 1.0;
+          giftReady = false;
+          giftOpenProgress = 0;
+          giftLidPivot.rotation.x = 0;
+          document.getElementById('gift-tap-banner').classList.add('hidden');
+          document.getElementById('magic-hint-wrap').classList.add('hidden');
+          audio.playSleighBells();
+          // Give all particles a magic vortex kick
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const pt = randomPointInGlobe();
+            pData[i].vel.set((Math.random() - 0.5) * 4.5, 1.5 + Math.random() * 3.5, (Math.random() - 0.5) * 4.5);
+            if (globePhase === 'swirl' && i % 4 === 0) {
+              pPositions[i * 3] = pt.x * 0.7;
+              pPositions[i * 3 + 1] = pt.y * 0.7;
+              pPositions[i * 3 + 2] = pt.z * 0.7;
+            }
+          }
+        } else if (globePhase === 'swirl') {
+          shakeEnergy = 1.0;
+          audio.playSleighBells();
+        }
+      }
+
+      function resetToIntro() {
+        globePhase = 'intro';
+        phaseTimer = 0;
+        shakeEnergy = 0;
+        giftReady = false;
+        giftOpenProgress = 0;
+        giftLidPivot.rotation.x = 0;
+        giftBodyMat.emissive.setHex(0x000000);
+        giftGlowRing.material.opacity = 0;
+        document.getElementById('gift-tap-banner').classList.add('hidden');
+        document.getElementById('magic-hint-wrap').classList.remove('hidden');
+        audio.stopChristmasLofi();
+        closeModal('modal-gift');
+      }
+
+      function open3DGiftBox() {
+        if (!giftReady || globePhase === 'opening_gift') return;
+        globePhase = 'opening_gift';
+        phaseTimer = 0;
+        audio.playMagicChime();
+        document.getElementById('gift-tap-banner').classList.add('hidden');
+      }
+
+      // Nâng cấp 3: Dynamic Atmosphere Switcher (Classic Warm / Cyber Ice / Golden Star)
+      const VIBE_LABELS = {
+        classic_warm: '🔥 Ấm Áp',
+        cyber_ice: '❄️ Băng Giá',
+        golden_star: '✨ Hoàng Kim'
+      };
+      const VIBE_ORDER = ['classic_warm', 'cyber_ice', 'golden_star'];
+
+      function applyAtmosphere(vibe) {
+        const key = VIBE_ORDER.includes(vibe) ? vibe : 'classic_warm';
+        appState.vibe = key;
+        document.body.classList.remove('vibe-classic_warm', 'vibe-cyber_ice', 'vibe-golden_star');
+        document.body.classList.add('vibe-' + key);
+
+        const btnVibe = document.getElementById('btn-vibe-cycle');
+        if (btnVibe) btnVibe.textContent = VIBE_LABELS[key];
+        document.querySelectorAll('#vibe-chips .chip-btn').forEach((b) => {
+          b.classList.toggle('active', b.dataset.vibe === key);
+        });
+
+        if (key === 'cyber_ice') {
+          appState.glowTheme = 'ice_blue';
+          glowWinMat.color.setHex(0x38bdf8);
+          cabinWindowLight.color.setHex(0x38bdf8);
+          warmFireLight.color.setHex(0xd946ef);
+          iceRimLight.color.setHex(0x38bdf8);
+          glassShaderUniforms.uRimColor.value.setHex(0x7dd3fc);
+          glassShaderUniforms.uCandleColor.value.setHex(0xe879f9);
+          glassShaderUniforms.uTreeColor.value.setHex(0x38bdf8);
+        } else if (key === 'golden_star') {
+          appState.glowTheme = 'warm_gold';
+          glowWinMat.color.setHex(0xfef08a);
+          cabinWindowLight.color.setHex(0xfbbf24);
+          warmFireLight.color.setHex(0xf59e0b);
+          iceRimLight.color.setHex(0xfef08a);
+          glassShaderUniforms.uRimColor.value.setHex(0xfde047);
+          glassShaderUniforms.uCandleColor.value.setHex(0xfbbf24);
+          glassShaderUniforms.uTreeColor.value.setHex(0xfef08a);
+        } else {
+          appState.glowTheme = 'warm_gold';
+          glowWinMat.color.setHex(0xfde047);
+          cabinWindowLight.color.setHex(0xfbbf24);
+          warmFireLight.color.setHex(0xff9e2c);
+          iceRimLight.color.setHex(0x93c5fd);
+          glassShaderUniforms.uRimColor.value.setHex(0xfef08a);
+          glassShaderUniforms.uCandleColor.value.setHex(0xffb347);
+          glassShaderUniforms.uTreeColor.value.setHex(0x38bdf8);
+        }
+      }
+
+      document.getElementById('btn-vibe-cycle').addEventListener('click', () => {
+        const nextIdx = (VIBE_ORDER.indexOf(appState.vibe) + 1) % VIBE_ORDER.length;
+        applyAtmosphere(VIBE_ORDER[nextIdx]);
+      });
+
+      // Orbit Rotate + Pinch/Wheel Zoom + Tap Detection (so user can inspect photo frame inside!)
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let orbitRotY = 0;
+      let orbitRotX = 0;
+      let targetOrbitY = 0;
+      let targetOrbitX = 0;
+      let targetCamZ = 8.6;
+      let isDragging = false;
+      let dragMoved = false;
+      let prevX = 0;
+      let prevY = 0;
+      let pinchStartDist = 0;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        audio.tryAutoStart();
+        requestGyroIfNeeded();
+        isDragging = true;
+        dragMoved = false;
+        prevX = e.clientX;
+        prevY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        if (Math.hypot(dx, dy) > 4) dragMoved = true;
+        if (dragMoved) {
+          targetOrbitY += dx * 0.008;
+          targetOrbitX = Math.max(-0.42, Math.min(0.45, targetOrbitX + dy * 0.006));
+        }
+        prevX = e.clientX;
+        prevY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (!dragMoved) {
+          pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+          pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+
+          if (giftReady) {
+            const hitGift = raycaster.intersectObjects([giftBody, giftLid], true);
+            if (hitGift.length > 0) {
+              open3DGiftBox();
+              return;
+            }
+          }
+
+          const hitGlobe = raycaster.intersectObjects([glassSphere, baseTop, baseMid], true);
+          if (hitGlobe.length > 0 || globePhase === 'intro') {
+            triggerMagicGlobe();
+          }
+        }
+      });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        targetCamZ = Math.max(5.0, Math.min(10.5, targetCamZ + e.deltaY * 0.004));
+      }, { passive: false });
+
+      canvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          pinchStartDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, { passive: true });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && pinchStartDist > 0) {
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          targetCamZ = Math.max(5.0, Math.min(10.5, targetCamZ - (dist - pinchStartDist) * 0.015));
+          pinchStartDist = dist;
+        }
+      }, { passive: true });
+
+      // Phone Shake / Gyroscope Reflection Tilt Support
+      let lastMotionShake = 0;
+      let gyroRequested = false;
+      function requestGyroIfNeeded() {
+        if (gyroRequested) return;
+        gyroRequested = true;
+        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+          DeviceMotionEvent.requestPermission().catch(() => {});
+        }
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().catch(() => {});
+        }
+      }
+
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma == null || e.beta == null) return;
+        glassShaderUniforms.uTilt.value.set(
+          Math.max(-1, Math.min(1, e.gamma / 40)),
+          Math.max(-1, Math.min(1, (e.beta - 45) / 40))
+        );
+      });
+
+      window.addEventListener('devicemotion', (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (!acc) return;
+        const mag = Math.hypot(acc.x || 0, acc.y || 0, acc.z || 0);
+        if (mag > 19 && Date.now() - lastMotionShake > 900) {
+          lastMotionShake = Date.now();
+          triggerMagicGlobe();
+        }
+      });
+
+      document.getElementById('btn-shake-globe').addEventListener('click', triggerMagicGlobe);
+      document.getElementById('btn-replay').addEventListener('click', resetToIntro);
+      document.getElementById('gift-tap-banner').addEventListener('click', open3DGiftBox);
+
+      // =========================================================================
+      // 7. ANIMATION LOOP
+      // =========================================================================
+      const clock = new THREE.Clock();
+      const warmColor = new THREE.Color(0xfde047);
+      const iceColor = new THREE.Color(0x7dd3fc);
+      const whiteColor = new THREE.Color(0xffffff);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const t = clock.elapsedTime;
+        phaseTimer += dt;
+
+        // Ambient outside snow
+        const bgArr = bgSnowGeo.attributes.position.array;
+        for (let i = 0; i < BG_SNOW; i++) {
+          bgArr[i * 3 + 1] -= dt * 0.45;
+          bgArr[i * 3] += Math.sin(t + i) * dt * 0.15;
+          if (bgArr[i * 3 + 1] < -4.5) bgArr[i * 3 + 1] = 4.5;
+        }
+        bgSnowGeo.attributes.position.needsUpdate = true;
+
+        // Chimney smoke rising inside globe
+        const smArr = smokeGeo.attributes.position.array;
+        for (let i = 0; i < SMOKE_COUNT; i++) {
+          const m = smokeMeta[i];
+          m.age += dt * m.speed;
+          if (m.age > 1) m.age = 0;
+          smArr[i * 3] = -0.02 + Math.sin(t * 1.4 + i) * 0.08 + m.drift * m.age;
+          smArr[i * 3 + 1] = -0.08 + m.age * 1.25;
+          smArr[i * 3 + 2] = -0.25;
+        }
+        smokeGeo.attributes.position.needsUpdate = true;
+
+        // Globe Shake + Smooth Orbit Rotate & Camera Zoom Physics
+        shakeEnergy *= 0.93;
+        orbitRotY += (targetOrbitY - orbitRotY) * 0.1;
+        orbitRotX += (targetOrbitX - orbitRotX) * 0.1;
+        camera.position.z += (targetCamZ - camera.position.z) * 0.1;
+        glassShaderUniforms.uTime.value = t;
+        flame1.scale.y = 1.45 + Math.sin(t * 13) * 0.18;
+        rtStar.rotation.y += dt * 1.4;
+
+        snowGlobeGroup.rotation.z = Math.sin(t * 28) * 0.09 * shakeEnergy;
+        snowGlobeGroup.rotation.x = orbitRotX + Math.cos(t * 24) * 0.05 * shakeEnergy;
+        snowGlobeGroup.rotation.y = orbitRotY + Math.sin(t * 0.45) * 0.05;
+
+        // Phase transitions
+        if (globePhase === 'swirl' && phaseTimer > 2.3) {
+          globePhase = 'morphing';
+          phaseTimer = 0;
+          audio.playMagicChime();
+          audio.startChristmasLofi();
+        } else if (globePhase === 'morphing' && phaseTimer > 2.2) {
+          globePhase = 'revealed';
+          phaseTimer = 0;
+          giftReady = true;
+          document.getElementById('gift-tap-banner').classList.remove('hidden');
+        } else if (globePhase === 'opening_gift') {
+          giftOpenProgress = Math.min(1, giftOpenProgress + dt * 2.2);
+          giftLidPivot.rotation.x = -giftOpenProgress * 2.1;
+          giftBoxGroup.position.y = -1.96 + Math.sin(giftOpenProgress * Math.PI) * 0.25;
+          if (giftOpenProgress >= 1 && document.getElementById('modal-gift').classList.contains('hidden')) {
+            openGiftModal();
+            globePhase = 'revealed';
+          }
+        }
+
+        // Glow pulse on miniature 3D gift when ready
+        if (giftReady) {
+          const pulse = 0.5 + 0.5 * Math.sin(t * 4.5);
+          giftBodyMat.emissive.setHex(0xd97706);
+          giftBodyMat.emissiveIntensity = 0.25 + pulse * 0.55;
+          giftGlowRing.material.opacity = 0.3 + pulse * 0.5;
+          giftGlowRing.scale.setScalar(1 + pulse * 0.22);
+        }
+
+        // Update 2,200 Snow & Text Particles
+        const pArr = snowGeo.attributes.position.array;
+        const cArr = snowGeo.attributes.color.array;
+        const targetGlow = appState.glowTheme === 'ice_blue' ? iceColor : warmColor;
+        const cyberPink = new THREE.Color(0xe879f9);
+        const tLen = textTargets.length || 1;
+        const isCyber = appState.vibe === 'cyber_ice';
+        const isGold = appState.vibe === 'golden_star';
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const ix = i * 3;
+          const d = pData[i];
+          let x = pArr[ix];
+          let y = pArr[ix + 1];
+          let z = pArr[ix + 2];
+
+          const ambCol = isCyber
+            ? (i % 2 === 0 ? iceColor : cyberPink)
+            : (isGold && i % 2 === 0 ? warmColor : whiteColor);
+          const ambMix = (isCyber || isGold) ? 0.65 : 0.0;
+
+          if (globePhase === 'intro') {
+            y += d.vel.y * dt * 0.65;
+            x += Math.sin(t * 1.2 + d.swirlPhase) * dt * 0.14;
+            if (y < -0.95 || Math.hypot(x, y - 0.05, z) > 1.92) {
+              const rp = randomPointInGlobe();
+              x = rp.x;
+              y = 1.45 + Math.random() * 0.35;
+              z = rp.z;
+            }
+            cArr[ix] = THREE.MathUtils.lerp(1, ambCol.r, ambMix);
+            cArr[ix + 1] = THREE.MathUtils.lerp(1, ambCol.g, ambMix);
+            cArr[ix + 2] = THREE.MathUtils.lerp(1, ambCol.b, ambMix);
+          } else if (globePhase === 'swirl') {
+            // Turbulent 3D vortex inside crystal sphere
+            const ang = dt * (3.8 + (i % 5) * 0.35);
+            const nx = x * Math.cos(ang) - z * Math.sin(ang);
+            const nz = x * Math.sin(ang) + z * Math.cos(ang);
+            x = nx + d.vel.x * dt * 0.35;
+            z = nz + d.vel.z * dt * 0.35;
+            y += Math.sin(t * 5 + d.swirlPhase) * dt * 2.2 + 0.45 * dt;
+            const dist = Math.hypot(x, y - 0.05, z);
+            if (dist > 1.88) {
+              const s = 1.84 / dist;
+              x *= s;
+              y = 0.05 + (y - 0.05) * s;
+              z *= s;
+            }
+            const tint = (i % 2 === 0) ? 0.55 : 0.2;
+            cArr[ix] = THREE.MathUtils.lerp(1, ambCol.r, tint);
+            cArr[ix + 1] = THREE.MathUtils.lerp(1, ambCol.g, tint);
+            cArr[ix + 2] = THREE.MathUtils.lerp(1, ambCol.b, tint);
+          } else {
+            // morphing / revealed / opening_gift
+            if (d.isTextParticle && textTargets.length > 0) {
+              const tgt = textTargets[i % tLen];
+              const lerpSpd = globePhase === 'morphing' ? 0.075 : 0.14;
+              x += (tgt.x - x) * lerpSpd + Math.sin(t * 2.2 + i) * 0.0012;
+              y += (tgt.y - y) * lerpSpd + Math.cos(t * 2.4 + i) * 0.0012;
+              z += (tgt.z - z) * lerpSpd;
+              const pulseGlow = 0.72 + 0.28 * Math.sin(t * 3.0 + i * 0.02);
+              const textCol = isCyber && i % 3 === 0 ? cyberPink : targetGlow;
+              cArr[ix] = THREE.MathUtils.lerp(whiteColor.r, textCol.r, pulseGlow);
+              cArr[ix + 1] = THREE.MathUtils.lerp(whiteColor.g, textCol.g, pulseGlow);
+              cArr[ix + 2] = THREE.MathUtils.lerp(whiteColor.b, textCol.b, pulseGlow);
+            } else {
+              // Remaining snow settles gently onto cabin roof & snowy ground
+              if (y > d.settleY) {
+                y -= dt * 0.32;
+                x += Math.sin(t + d.swirlPhase) * dt * 0.08;
+              }
+              cArr[ix] = THREE.MathUtils.lerp(0.95, ambCol.r, ambMix * 0.8);
+              cArr[ix + 1] = THREE.MathUtils.lerp(0.98, ambCol.g, ambMix * 0.8);
+              cArr[ix + 2] = THREE.MathUtils.lerp(1.0, ambCol.b, ambMix * 0.8);
+            }
+          }
+
+          pArr[ix] = x;
+          pArr[ix + 1] = y;
+          pArr[ix + 2] = z;
+        }
+        snowGeo.attributes.position.needsUpdate = true;
+        snowGeo.attributes.color.needsUpdate = true;
+
+        // Two-pass real-time refraction render
+        glassSphere.visible = false;
+        renderer.setRenderTarget(refractRT);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
+        glassSphere.visible = true;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // =========================================================================
+      // 8. MODALS, CREATOR STUDIO & ORDER SHARING
+      // =========================================================================
+      function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+      }
+
+      function renderGiftPhoto() {
+        const box = document.getElementById('gift-photo-box');
+        const img = document.getElementById('gift-photo-img');
+        const nav = document.getElementById('gift-photo-nav');
+        const counter = document.getElementById('gift-photo-counter');
+        if (!appState.photos || appState.photos.length === 0) {
+          box.classList.add('hidden');
+          return;
+        }
+        const total = appState.photos.length;
+        appState.currentGiftPhotoIdx = ((appState.currentGiftPhotoIdx % total) + total) % total;
+        const item = appState.photos[appState.currentGiftPhotoIdx];
+        img.src = typeof item === 'string' ? item : item.url;
+        box.classList.remove('hidden');
+        if (total > 1) {
+          nav.classList.remove('hidden');
+          counter.textContent = `Ảnh ${appState.currentGiftPhotoIdx + 1} / ${total}`;
+        } else {
+          nav.classList.add('hidden');
+        }
+      }
+
+      function openGiftModal() {
+        document.getElementById('gift-card-title').textContent = `Gửi ${appState.receiver || 'Minh Khuê'} Yêu Thương`;
+        document.getElementById('gift-wish-display').textContent = appState.wish || '';
+        document.getElementById('gift-sign-display').textContent = `Thương gửi, ${appState.sender || 'Minh Khang'} ♥`;
+        appState.currentGiftPhotoIdx = 0;
+        renderGiftPhoto();
+        document.getElementById('modal-gift').classList.remove('hidden');
+      }
+
+      document.getElementById('btn-gift-prev').addEventListener('click', () => {
+        appState.currentGiftPhotoIdx--;
+        renderGiftPhoto();
+      });
+      document.getElementById('btn-gift-next').addEventListener('click', () => {
+        appState.currentGiftPhotoIdx++;
+        renderGiftPhoto();
+      });
+      document.getElementById('btn-close-gift').addEventListener('click', () => closeModal('modal-gift'));
+      document.getElementById('btn-back-to-globe').addEventListener('click', () => closeModal('modal-gift'));
+
+      // Creator Modal Controls
+      document.getElementById('btn-open-creator').addEventListener('click', () => {
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-globe-text').value = appState.globeText;
+        document.getElementById('input-wish').value = appState.wish;
+        document.getElementById('modal-creator').classList.remove('hidden');
+      });
+      document.getElementById('btn-close-creator').addEventListener('click', () => closeModal('modal-creator'));
+
+      document.querySelectorAll('#vibe-chips .chip-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyAtmosphere(btn.dataset.vibe);
+        });
+      });
+
+      document.getElementById('input-frame-photo').addEventListener('change', (e) => {
+        const file = (e.target.files || [])[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxSide = 720;
+            const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const c = document.createElement('canvas');
+            c.width = Math.round(img.width * ratio);
+            c.height = Math.round(img.height * ratio);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            const dataUrl = c.toDataURL('image/jpeg', 0.82);
+            appState.framePhoto = dataUrl;
+            updateFramePhotoTexture(dataUrl);
+            document.getElementById('frame-photo-preview-img').src = dataUrl;
+            document.getElementById('frame-photo-preview').style.display = 'flex';
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const div = document.createElement('div');
+          div.className = 'photo-thumb';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.textContent = '✕';
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          div.appendChild(img);
+          div.appendChild(del);
+          grid.appendChild(div);
+        });
+      }
+
+      document.getElementById('input-photos').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files || []).slice(0, 6 - appState.photos.length);
+        files.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const maxSide = 900;
+              const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+              const c = document.createElement('canvas');
+              c.width = Math.round(img.width * ratio);
+              c.height = Math.round(img.height * ratio);
+              c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+              appState.photos.push({ url: c.toDataURL('image/jpeg', 0.8) });
+              renderCreatorPhotoThumbs();
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        e.target.value = '';
+      });
+
+      async function checkOrderStatusOnce(code) {
+        if (!code) return;
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
+          const data = await res.json();
+          if (data && data.status === 'PAID') {
+            if (appState.pollTimer) clearInterval(appState.pollTimer);
+            closeModal('modal-payment');
+            const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(code)}`;
+            document.getElementById('success-share-url').value = shareUrl;
+            document.getElementById('btn-open-share').onclick = () => { window.location.href = shareUrl; };
+            document.getElementById('modal-success').classList.remove('hidden');
+          }
+        } catch (_) {}
+      }
+
+      document.getElementById('btn-close-payment').addEventListener('click', () => {
+        if (appState.pollTimer) clearInterval(appState.pollTimer);
+        closeModal('modal-payment');
+      });
+      document.getElementById('btn-close-success').addEventListener('click', () => closeModal('modal-success'));
+      document.getElementById('btn-copy-link').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(document.getElementById('success-share-url').value);
+          document.getElementById('btn-copy-link').textContent = 'Đã chép ✓';
+        } catch (_) {}
+      });
+
+      document.getElementById('btn-create-order').addEventListener('click', async () => {
+        const sender = document.getElementById('input-sender').value.trim() || 'Minh Khang';
+        const receiver = document.getElementById('input-receiver').value.trim() || 'Minh Khuê';
+        const globeText = document.getElementById('input-globe-text').value.trim() || `Merry Christmas ${receiver}`;
+        const wish = document.getElementById('input-wish').value.trim() || appState.wish;
+
+        appState.sender = sender;
+        appState.receiver = receiver;
+        appState.globeText = globeText;
+        appState.wish = wish;
+        buildTextTargets(globeText);
+        plaqueMat.map = createBrassPlaqueTexture(receiver);
+        plaqueMat.needsUpdate = true;
+
+        const btn = document.getElementById('btn-create-order');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang tạo mã VietQR...';
+
+        try {
+          const res = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              templateId: appState.templateId,
+              templateType: 'snow_globe',
+              senderName: sender,
+              receiverName: receiver,
+              occasion: globeText,
+              message: wish,
+              payload: {
+                globeText,
+                vibe: appState.vibe,
+                glowTheme: appState.glowTheme,
+                framePhoto: appState.framePhoto,
+                photos: appState.photos
+              }
+            })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.orderCode || !data.qrUrl) {
+            throw new Error(data.error || 'Tạo đơn thất bại');
+          }
+          appState.orderCode = data.orderCode;
+          document.getElementById('payment-order-code').textContent = data.orderCode;
+          document.getElementById('payment-qr-img').src = data.qrUrl;
+          closeModal('modal-creator');
+          document.getElementById('modal-payment').classList.remove('hidden');
+          if (appState.pollTimer) clearInterval(appState.pollTimer);
+          appState.pollTimer = setInterval(() => checkOrderStatusOnce(data.orderCode), 3500);
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '💳 Tạo Link Quả Cầu Tuyết Ngay (39.000đ)';
+        }
+      });
+
+      // Hydrate Viewer Mode (?id=...)
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              appState.globeText = p.globeText || o.occasion || `Merry Christmas ${appState.receiver}`;
+              if (p.vibe) applyAtmosphere(p.vibe);
+              else if (p.glowTheme) appState.glowTheme = p.glowTheme;
+              if (Array.isArray(p.photos)) appState.photos = p.photos;
+              if (p.framePhoto) {
+                appState.framePhoto = p.framePhoto;
+                updateFramePhotoTexture(p.framePhoto);
+              } else if (appState.photos.length > 0) {
+                const firstUrl = typeof appState.photos[0] === 'string' ? appState.photos[0] : appState.photos[0].url;
+                updateFramePhotoTexture(firstUrl);
+              }
+              buildTextTargets(appState.globeText);
+              plaqueMat.map = createBrassPlaqueTexture(appState.receiver);
+              plaqueMat.needsUpdate = true;
+            }
+          } catch (_) {}
+        }
+      }
+      init();
+    })();
+  </script>
+</body>
+</html>

@@ -1890,7 +1890,7 @@
       // 5. LUXURY VELVET & GOLD BOW GIFT BOX AT PEDESTAL FOOT (THE UNVEILING)
       // =========================================================================
       const giftBoxGroup = new THREE.Group();
-      giftBoxGroup.position.set(1.92, -2.02, 1.72);
+      giftBoxGroup.position.set(2.45, -2.04, 2.05);
       giftBoxGroup.rotation.y = -0.35;
       snowGlobeGroup.add(giftBoxGroup);
 
@@ -2526,7 +2526,7 @@
         } else if (globePhase === 'opening_gift') {
           giftOpenProgress = Math.min(1, giftOpenProgress + dt * 2.2);
           giftLidPivot.rotation.x = -giftOpenProgress * 2.1;
-          giftBoxGroup.position.y = -2.02 + Math.sin(giftOpenProgress * Math.PI) * 0.22;
+          giftBoxGroup.position.y = -2.04 + Math.sin(giftOpenProgress * Math.PI) * 0.22;
           if (giftOpenProgress >= 1 && document.getElementById('modal-gift').classList.contains('hidden')) {
             openGiftModal();
             globePhase = 'revealed';
@@ -2644,7 +2644,7 @@
         if (id === 'modal-gift') {
           giftOpenProgress = 0;
           giftLidPivot.rotation.x = 0;
-          giftBoxGroup.position.y = -2.02;
+          giftBoxGroup.position.y = -2.04;
         }
       }
 

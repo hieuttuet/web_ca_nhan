@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
   <style>
     :root {
       --bg-cabin: #130907;
@@ -692,80 +693,7 @@
     </div>
   </div>
 
-  <!-- VIETQR PAYMENT & QR CARD MODAL (Chuẩn Hoa Đào / Hoa Mai Rơi 3D) -->
-  <div id="modal-payment" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width:480px;">
-      <button type="button" class="modal-close-corner" id="btn-close-payment" aria-label="Đóng">✕</button>
-
-      <div id="pay-step-waiting">
-        <div style="text-align:center; margin-bottom:6px;"><span class="gift-badge">📲 Thanh Toán Tự Động VietQR</span></div>
-        <h3 class="modal-title" style="text-align:center; padding-right:0;">Quét Mã Mở Khóa Quả Cầu Tuyết 3D</h3>
-        <p class="modal-subtitle" style="text-align:center;">
-          Quét mã VietQR bằng bất kỳ App Ngân Hàng nào. Hệ thống tự động mở khóa link sau 3 giây khi nhận được chuyển khoản!
-        </p>
-
-        <div style="text-align:center;">
-          <div style="display:inline-block;padding:12px;border-radius:16px;background:#fff;box-shadow:0 12px 34px rgba(0,0,0,0.45);margin:6px auto 12px;">
-            <img id="pay-vietqr-img" src="" alt="VietQR" style="width:210px;height:210px;display:block;object-fit:contain;" />
-          </div>
-        </div>
-
-        <button type="button" id="btn-download-vietqr" class="btn-secondary-dock" style="width:100%; margin-bottom:12px;">
-          📥 Tải Mã QR Chuyển Tiền
-        </button>
-
-        <div style="border-radius:14px;background:rgba(15,6,6,0.65);border:1px solid rgba(251,191,36,0.28);padding:10px 14px;margin-bottom:12px;font-size:0.83rem;">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:#d6c7b2;">Ngân hàng:</span>
-            <strong id="pay-bank-name">MB</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:#d6c7b2;">Chủ tài khoản:</span>
-            <strong id="pay-account-name">---</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:#d6c7b2;">Số tài khoản:</span>
-            <strong id="pay-account-no">---</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:#d6c7b2;">Số tiền:</span>
-            <strong id="pay-amount-text" style="color:#fde047;">39.000đ</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;">
-            <span style="color:#d6c7b2;">Nội dung CK (Bắt buộc):</span>
-            <strong id="pay-memo-text" style="color:#fda4af;">---</strong>
-          </div>
-        </div>
-
-        <div style="text-align:center; padding:10px; border-radius:12px; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.35); color:#fde047; font-size:0.82rem; font-weight:700;">
-          🔄 Đang chờ ngân hàng xác nhận tự động...
-        </div>
-      </div>
-
-      <div id="pay-step-success" style="display:none; text-align:center;">
-        <div style="font-size:2.1rem; margin-bottom:4px;">🔮</div>
-        <h3 class="modal-title" style="color:#6ee7b7; padding-right:0;">Quả Cầu Tuyết 3D Đã Sẵn Sàng!</h3>
-        <p class="modal-subtitle">
-          Tải tấm <b>Thiệp QR Quả Cầu Tuyết</b> bên dưới hoặc sao chép đường link gửi cho người nhận nhé!
-        </p>
-
-        <div style="margin:0 auto 12px; max-width:290px; border-radius:16px; overflow:hidden; border:1.5px solid rgba(251,191,36,0.5); box-shadow:0 14px 36px rgba(0,0,0,0.55);">
-          <canvas id="gift-card-canvas" width="600" height="780" style="width:100%; height:auto; display:block;"></canvas>
-        </div>
-
-        <input id="share-url-input" type="text" class="form-input" readonly style="font-size:0.82rem; text-align:center; margin-bottom:10px;" />
-
-        <div class="dock-btn-row" style="width:100%; margin-bottom:8px;">
-          <button type="button" id="btn-copy-url" class="btn-primary-dock" style="flex:1;">📋 Copy Link</button>
-          <button type="button" id="btn-download-card-img" class="btn-secondary-dock" style="flex:1;">📥 Tải Thiệp QR</button>
-        </div>
-        <div class="dock-btn-row" style="width:100%;">
-          <button type="button" id="btn-download-qr-only" class="btn-secondary-dock" style="flex:1; color:#fde047;">📥 Tải Ảnh QR</button>
-          <button type="button" id="btn-open-share" class="btn-primary-dock" style="flex:1;">🔮 Mở xem ngay</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Thanh toán VietQR & Thiệp QR dùng chung từ ../../../shared/payment-qr-kit.js -->
 
   <script>
     (() => {
@@ -2172,29 +2100,17 @@
         });
       });
 
-      document.getElementById('input-frame-photo').addEventListener('change', (e) => {
-        const file = (e.target.files || [])[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            const maxSide = 720;
-            const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
-            const c = document.createElement('canvas');
-            c.width = Math.round(img.width * ratio);
-            c.height = Math.round(img.height * ratio);
-            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-            const dataUrl = c.toDataURL('image/jpeg', 0.82);
-            appState.framePhoto = dataUrl;
-            updateFramePhotoTexture(dataUrl);
-            document.getElementById('frame-photo-preview-img').src = dataUrl;
-            document.getElementById('frame-photo-preview').style.display = 'flex';
-          };
-          img.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-        e.target.value = '';
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-frame-photo'), {
+        maxCount: 1,
+        maxSide: 720,
+        quality: 0.82,
+        getList: () => [],
+        onPhotoReady: (dataUrl) => {
+          appState.framePhoto = dataUrl;
+          updateFramePhotoTexture(dataUrl);
+          document.getElementById('frame-photo-preview-img').src = dataUrl;
+          document.getElementById('frame-photo-preview').style.display = 'flex';
+        }
       });
 
       function renderCreatorPhotoThumbs() {
@@ -2218,259 +2134,44 @@
         });
       }
 
-      document.getElementById('input-photos').addEventListener('change', (e) => {
-        const files = Array.from(e.target.files || []).slice(0, 6 - appState.photos.length);
-        files.forEach((file) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-              const maxSide = 900;
-              const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
-              const c = document.createElement('canvas');
-              c.width = Math.round(img.width * ratio);
-              c.height = Math.round(img.height * ratio);
-              c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-              appState.photos.push({ url: c.toDataURL('image/jpeg', 0.8) });
-              renderCreatorPhotoThumbs();
-            };
-            img.src = ev.target.result;
-          };
-          reader.readAsDataURL(file);
-        });
-        e.target.value = '';
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
       });
 
-      const PENDING_ORDER_KEY = 'pending_order_snow_globe_magic';
-      const ORDER_TTL_MS = 45 * 60 * 1000;
-
-      function savePendingOrder(data) {
-        try {
-          const payload = JSON.stringify({ ...data, savedAt: Date.now() });
-          sessionStorage.setItem(PENDING_ORDER_KEY, payload);
-          localStorage.setItem(PENDING_ORDER_KEY, payload);
-        } catch (_) {}
-      }
-
-      function loadPendingOrder() {
-        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
-        if (!raw) return null;
-        try {
-          const p = JSON.parse(raw);
-          if (!p.savedAt || Date.now() - p.savedAt > ORDER_TTL_MS) {
-            clearPendingOrder();
-            return null;
+      function getPaymentKitConfig() {
+        return {
+          templateId: appState.templateId,
+          templateType: 'snow_globe',
+          emoji: '🔮',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Quả Cầu Tuyết 3D',
+          successTitle: 'Quả Cầu Tuyết 3D Đã Sẵn Sàng!',
+          cardTitle: '🔮 QUẢ CẦU TUYẾT MA THUẬT ❄️',
+          scanLabel: 'Quét QR để Lắc Quả Cầu Tuyết 3D',
+          footerHint: 'Chạm hoặc lắc điện thoại để mở phép thuật & quà 3D',
+          gradientStops: appState.vibe === 'cyber_ice'
+            ? ['#0f172a', '#1e1b4b', '#090d1f']
+            : ['#2c100c', '#6b1414', '#180706'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: appState.globeText,
+          message: appState.wish,
+          payload: {
+            globeText: appState.globeText,
+            vibe: appState.vibe,
+            glowTheme: appState.glowTheme,
+            framePhoto: appState.framePhoto,
+            photos: appState.photos
           }
-          return p;
-        } catch (_) {
-          return null;
-        }
-      }
-
-      function clearPendingOrder() {
-        try { sessionStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
-        try { localStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
-      }
-
-      async function rasterizeBlobToPng(blob) {
-        const url = URL.createObjectURL(blob);
-        try {
-          return await new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-              const c = document.createElement('canvas');
-              c.width = img.naturalWidth || 600;
-              c.height = img.naturalHeight || 600;
-              const g = c.getContext('2d');
-              g.fillStyle = '#ffffff';
-              g.fillRect(0, 0, c.width, c.height);
-              g.drawImage(img, 0, 0);
-              c.toBlob((out) => (out ? resolve(out) : reject(new Error('toBlob failed'))), 'image/png', 1);
-            };
-            img.onerror = reject;
-            img.src = url;
-          });
-        } finally {
-          URL.revokeObjectURL(url);
-        }
-      }
-
-      async function urlToImageBlob(url, filename = 'QR.png') {
-        if (url.startsWith('data:') || url.startsWith('blob:')) {
-          const res = await fetch(url);
-          return await res.blob();
-        }
-        try {
-          const parsed = new URL(url, window.location.href);
-          if (parsed.hostname === 'img.vietqr.io' || parsed.hostname === 'api.qrserver.com') {
-            const proxyUrl = `/api/download-qr?url=${encodeURIComponent(parsed.toString())}&filename=${encodeURIComponent(filename)}`;
-            const pRes = await fetch(proxyUrl);
-            if (pRes.ok) {
-              return await rasterizeBlobToPng(await pRes.blob());
-            }
-          }
-        } catch (_) {}
-        const res = await fetch(url, { mode: 'cors' });
-        return await rasterizeBlobToPng(await res.blob());
-      }
-
-      async function downloadBlobImage(url, filename) {
-        try {
-          const blob = await urlToImageBlob(url, filename);
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
-        } catch (_) {
-          window.open(url, '_blank');
-        }
-      }
-
-      function renderSnowGlobeGiftCard(shareUrl) {
-        const c = document.getElementById('gift-card-canvas');
-        const g = c.getContext('2d');
-        const bg = g.createLinearGradient(0, 0, 600, 780);
-        if (appState.vibe === 'cyber_ice') {
-          bg.addColorStop(0, '#0f172a');
-          bg.addColorStop(0.55, '#1e1b4b');
-          bg.addColorStop(1, '#090d1f');
-        } else {
-          bg.addColorStop(0, '#2c100c');
-          bg.addColorStop(0.55, '#6b1414');
-          bg.addColorStop(1, '#180706');
-        }
-        g.fillStyle = bg;
-        g.fillRect(0, 0, 600, 780);
-
-        g.strokeStyle = '#fde047';
-        g.lineWidth = 4;
-        g.strokeRect(24, 24, 552, 732);
-
-        g.fillStyle = '#fef08a';
-        g.textAlign = 'center';
-        g.font = '800 28px "Cinzel", serif';
-        g.fillText('🔮 QUẢ CẦU TUYẾT MA THUẬT ❄️', 300, 90);
-
-        g.fillStyle = '#ffe4e6';
-        let recSize = 40;
-        const recLine = `Gửi ${appState.receiver}`;
-        do {
-          g.font = `700 ${recSize}px "Dancing Script", cursive`;
-          if (g.measureText(recLine).width <= 500 || recSize <= 22) break;
-          recSize -= 2;
-        } while (recSize > 22);
-        g.fillText(recLine, 300, 148);
-
-        g.fillStyle = '#ffffff';
-        g.fillRect(145, 195, 310, 310);
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
-        const qrImg = new Image();
-        qrImg.crossOrigin = 'anonymous';
-        qrImg.onload = () => {
-          g.drawImage(qrImg, 160, 210, 280, 280);
         };
-        qrImg.src = qrUrl;
-
-        g.fillStyle = '#fde047';
-        g.font = '700 22px "Plus Jakarta Sans", sans-serif';
-        g.fillText('Quét QR để Lắc Quả Cầu Tuyết 3D', 300, 565);
-
-        g.fillStyle = '#fef2f2';
-        let subSize = 18;
-        const subLine = `Từ: ${appState.sender} • ${appState.globeText}`;
-        do {
-          g.font = `500 ${subSize}px "Plus Jakarta Sans", sans-serif`;
-          if (g.measureText(subLine).width <= 510 || subSize <= 12) break;
-          subSize -= 1;
-        } while (subSize > 12);
-        g.fillText(subLine, 300, 610);
-
-        g.fillStyle = 'rgba(253, 224, 71, 0.78)';
-        g.font = '600 15px "Plus Jakarta Sans", sans-serif';
-        g.fillText('Chạm hoặc lắc điện thoại để mở phép thuật & quà 3D', 300, 705);
       }
-
-      function populatePaymentWaitingModal(orderData) {
-        appState.orderCode = orderData.orderCode;
-        document.getElementById('pay-step-waiting').style.display = 'block';
-        document.getElementById('pay-step-success').style.display = 'none';
-        document.getElementById('pay-vietqr-img').src = orderData.qrUrl || '';
-        document.getElementById('pay-bank-name').textContent = orderData.bankId || 'MB';
-        document.getElementById('pay-account-name').textContent = orderData.accountName || '---';
-        document.getElementById('pay-account-no').textContent = orderData.accountNo || '---';
-        document.getElementById('pay-amount-text').textContent = `${Number(orderData.amount || 39000).toLocaleString('vi-VN')}đ`;
-        document.getElementById('pay-memo-text').textContent = orderData.orderCode || '---';
-        document.getElementById('modal-payment').classList.remove('hidden');
-      }
-
-      function showPaymentSuccessStep(orderCode) {
-        clearPendingOrder();
-        if (appState.pollTimer) {
-          clearInterval(appState.pollTimer);
-          appState.pollTimer = null;
-        }
-        document.getElementById('pay-step-waiting').style.display = 'none';
-        document.getElementById('pay-step-success').style.display = 'block';
-        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
-        document.getElementById('share-url-input').value = shareUrl;
-        document.getElementById('btn-open-share').onclick = () => { window.location.href = shareUrl; };
-        renderSnowGlobeGiftCard(shareUrl);
-      }
-
-      async function checkOrderStatusOnce(code) {
-        if (!code) return;
-        try {
-          const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
-          const data = await res.json();
-          if (data && data.status === 'PAID') {
-            showPaymentSuccessStep(code);
-          }
-        } catch (_) {}
-      }
-
-      document.getElementById('btn-close-payment').addEventListener('click', () => {
-        clearPendingOrder();
-        if (appState.pollTimer) clearInterval(appState.pollTimer);
-        closeModal('modal-payment');
-      });
-
-      document.getElementById('btn-download-vietqr').addEventListener('click', () => {
-        const src = document.getElementById('pay-vietqr-img').src;
-        if (src) downloadBlobImage(src, `VietQR-${appState.orderCode || 'SnowGlobe'}.png`);
-      });
-
-      document.getElementById('btn-copy-url').addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(document.getElementById('share-url-input').value);
-          document.getElementById('btn-copy-url').textContent = 'Đã chép ✓';
-        } catch (_) {}
-      });
-
-      document.getElementById('btn-download-card-img').addEventListener('click', async () => {
-        const c = document.getElementById('gift-card-canvas');
-        await downloadBlobImage(c.toDataURL('image/png'), `Thiep-QR-SnowGlobe-${appState.orderCode || 'VIP'}.png`);
-      });
-
-      document.getElementById('btn-download-qr-only').addEventListener('click', async () => {
-        const shareUrl = document.getElementById('share-url-input').value;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(shareUrl)}`;
-        await downloadBlobImage(qrUrl, `QR-SnowGlobe-${appState.orderCode || 'VIP'}.png`);
-      });
-
-      window.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && appState.orderCode && !document.getElementById('modal-payment').classList.contains('hidden')) {
-          checkOrderStatusOnce(appState.orderCode);
-        }
-      });
-      window.addEventListener('focus', () => {
-        if (appState.orderCode && !document.getElementById('modal-payment').classList.contains('hidden')) {
-          checkOrderStatusOnce(appState.orderCode);
-        }
-      });
 
       document.getElementById('btn-create-order').addEventListener('click', async () => {
         const sender = document.getElementById('input-sender').value.trim() || 'Minh Khang';
@@ -2491,35 +2192,8 @@
         btn.textContent = '⏳ Đang tạo mã VietQR...';
 
         try {
-          const res = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              templateId: appState.templateId,
-              templateType: 'snow_globe',
-              senderName: sender,
-              receiverName: receiver,
-              occasion: globeText,
-              message: wish,
-              payload: {
-                globeText,
-                vibe: appState.vibe,
-                glowTheme: appState.glowTheme,
-                framePhoto: appState.framePhoto,
-                photos: appState.photos
-              }
-            })
-          });
-          const data = await res.json();
-          if (!res.ok || !data.orderCode || !data.qrUrl) {
-            throw new Error(data.error || 'Tạo đơn thất bại');
-          }
-          savePendingOrder(data);
           closeModal('modal-creator');
-          populatePaymentWaitingModal(data);
-          if (appState.pollTimer) clearInterval(appState.pollTimer);
-          appState.pollTimer = setInterval(() => checkOrderStatusOnce(data.orderCode), 3000);
-          checkOrderStatusOnce(data.orderCode);
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
         } catch (err) {
           alert('Có lỗi khi tạo đơn: ' + err.message);
         } finally {
@@ -2560,6 +2234,8 @@
               plaqueMat.needsUpdate = true;
             }
           } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
         }
       }
       init();

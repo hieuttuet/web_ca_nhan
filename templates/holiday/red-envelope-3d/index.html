@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
   <style>
     :root {
       --bg-deep: #1a0307;
@@ -4682,110 +4683,34 @@
         e.target.value = '';
       });
 
-      // Direct QR Download Helper (README compliant)
-      async function downloadQrDirectly(url, filename) {
-        try {
-          const proxyUrl = `/api/download-qr?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
-          const res = await fetch(proxyUrl);
-          if (!res.ok) throw new Error('Proxy failed');
-          const blob = await res.blob();
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
-        } catch (err) {
-          alert('Không thể tải mã QR lúc này, vui lòng thử lại.');
-        }
+      // Direct QR Download & Pending Order delegated to shared/payment-qr-kit.js
+      function downloadQrDirectly(url, filename) {
+        return PaymentQrKit.downloadBlobImage(url, filename);
       }
 
-      // Pending Order Persistence
       function savePendingOrder(snap) {
-        const payload = JSON.stringify({ ...snap, savedAt: Date.now() });
-        try { sessionStorage.setItem(PENDING_ORDER_KEY, payload); } catch (_) {}
-        try { localStorage.setItem(PENDING_ORDER_KEY, payload); } catch (_) {}
+        PaymentQrKit.savePendingOrder(appState.templateId, snap);
       }
 
       function loadPendingOrder() {
-        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
-        if (!raw) return null;
-        try {
-          const parsed = JSON.parse(raw);
-          if (!parsed.savedAt || Date.now() - parsed.savedAt > ORDER_TTL_MS) {
-            clearPendingOrder();
-            return null;
-          }
-          return parsed;
-        } catch (_) {
-          return null;
-        }
+        return PaymentQrKit.loadPendingOrder(appState.templateId);
       }
 
       function clearPendingOrder() {
-        try { sessionStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
-        try { localStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
+        PaymentQrKit.clearPendingOrder(appState.templateId);
       }
 
       function renderRedEnvelopeGiftCard(shareUrl) {
-        const c = document.getElementById('gift-card-canvas');
-        const g = c.getContext('2d');
-        const bg = g.createLinearGradient(0, 0, 600, 780);
-        bg.addColorStop(0, '#450a0a');
-        bg.addColorStop(0.55, '#991b1b');
-        bg.addColorStop(1, '#2d0606');
-        g.fillStyle = bg;
-        g.fillRect(0, 0, 600, 780);
-
-        g.strokeStyle = '#fde047';
-        g.lineWidth = 4;
-        g.strokeRect(24, 24, 552, 732);
-
-        g.fillStyle = '#fef08a';
-        g.textAlign = 'center';
-        g.font = '800 30px "Cinzel", serif';
-        g.fillText('🧧 LÌ XÌ ĐỎ 3D HOÀNG GIA 🧧', 300, 90);
-
-        g.fillStyle = '#ffe4e6';
-        let recSize = 40;
-        const recLine = `Gửi ${appState.receiver || 'Minh Khuê'}`;
-        do {
-          g.font = `700 ${recSize}px "Dancing Script", cursive`;
-          if (g.measureText(recLine).width <= 500 || recSize <= 22) break;
-          recSize -= 2;
-        } while (recSize > 22);
-        g.fillText(recLine, 300, 148);
-
-        g.fillStyle = '#ffffff';
-        g.fillRect(145, 195, 310, 310);
-
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
-        const qrImg = new Image();
-        qrImg.crossOrigin = 'anonymous';
-        qrImg.onload = () => {
-          g.drawImage(qrImg, 160, 210, 280, 280);
-        };
-        qrImg.src = qrUrl;
-
-        g.fillStyle = '#fde047';
-        g.font = '700 22px "Plus Jakarta Sans", sans-serif';
-        g.fillText('Quét QR để Vuốt Mở Lì Xì 3D', 300, 565);
-
-        g.fillStyle = '#fef2f2';
-        let subSize = 18;
-        const subLine = `Từ: ${appState.sender || 'Minh Khang'} • ${appState.occasion || 'Tài Lộc Bình An'}`;
-        do {
-          g.font = `500 ${subSize}px "Plus Jakarta Sans", sans-serif`;
-          if (g.measureText(subLine).width <= 510 || subSize <= 12) break;
-          subSize -= 1;
-        } while (subSize > 12);
-        g.fillText(subLine, 300, 610);
-
-        g.fillStyle = 'rgba(253, 224, 71, 0.78)';
-        g.font = '600 15px "Plus Jakarta Sans", sans-serif';
-        g.fillText('Vuốt mở phong bao & Xóc Quẻ Đầu Năm 3D', 300, 705);
+        PaymentQrKit.renderGiftQrCard(document.getElementById('gift-card-canvas'), {
+          shareUrl,
+          cardTitle: '🧧 LÌ XÌ ĐỎ 3D HOÀNG GIA 🧧',
+          receiver: appState.receiver || 'Minh Khuê',
+          sender: appState.sender || 'Minh Khang',
+          occasion: appState.occasion || 'Tài Lộc Bình An',
+          scanLabel: 'Quét QR để Vuốt Mở Lì Xì 3D',
+          footerHint: 'Vuốt mở phong bao & Xóc Quẻ Đầu Năm 3D',
+          gradientStops: ['#450a0a', '#991b1b', '#2d0606']
+        });
       }
 
       function showSuccessModal(orderCode) {

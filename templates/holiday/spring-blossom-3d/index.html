@@ -10,6 +10,7 @@
 
   <script src="../../../templates-catalog.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
 
   <style>
     :root {
@@ -2840,138 +2841,21 @@
     }
 
     function renderSpringGiftCard(shareUrl) {
-      const c = document.getElementById('gift-card-canvas');
-      const g = c.getContext('2d');
       const isNorth = appState.region === 'north';
-
-      const bg = g.createLinearGradient(0, 0, 600, 780);
-      if (isNorth) {
-        bg.addColorStop(0, '#3b0722');
-        bg.addColorStop(0.55, '#7f1d1d');
-        bg.addColorStop(1, '#1e0717');
-      } else {
-        bg.addColorStop(0, '#7c2d12');
-        bg.addColorStop(0.55, '#991b1b');
-        bg.addColorStop(1, '#2b0904');
-      }
-      g.fillStyle = bg;
-      g.fillRect(0, 0, 600, 780);
-
-      g.strokeStyle = '#fde047';
-      g.lineWidth = 4;
-      g.strokeRect(24, 24, 552, 732);
-
-      g.fillStyle = '#fef08a';
-      g.textAlign = 'center';
-      g.font = '800 30px "Cinzel", serif';
-      g.fillText(isNorth ? '🌸 LỘC XUÂN HOA ĐÀO 🌸' : '🌼 LỘC XUÂN HOA MAI 🌼', 300, 90);
-
-      g.fillStyle = '#ffe4e6';
-      let recSize = 40;
-      const recLine = `Gửi ${appState.receiver}`;
-      do {
-        g.font = `700 ${recSize}px "Dancing Script", cursive`;
-        if (g.measureText(recLine).width <= 500 || recSize <= 22) break;
-        recSize -= 2;
-      } while (recSize > 22);
-      g.fillText(recLine, 300, 148);
-
-      // Khung QR
-      g.fillStyle = '#ffffff';
-      g.fillRect(145, 195, 310, 310);
-
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
-      const qrImg = new Image();
-      qrImg.crossOrigin = 'anonymous';
-      qrImg.onload = () => {
-        g.drawImage(qrImg, 160, 210, 280, 280);
-      };
-      qrImg.src = qrUrl;
-
-      g.fillStyle = '#fde047';
-      g.font = '700 22px "Plus Jakarta Sans", sans-serif';
-      g.fillText('Quét QR để Hái Lộc Đầu Xuân 3D', 300, 565);
-
-      g.fillStyle = '#fef2f2';
-      let subSize = 18;
-      const subLine = `Từ: ${appState.sender} • ${appState.occasion}`;
-      do {
-        g.font = `500 ${subSize}px "Plus Jakarta Sans", sans-serif`;
-        if (g.measureText(subLine).width <= 510 || subSize <= 12) break;
-        subSize -= 1;
-      } while (subSize > 12);
-      g.fillText(subLine, 300, 610);
-
-      g.fillStyle = 'rgba(253, 224, 71, 0.72)';
-      g.font = '600 15px "Plus Jakarta Sans", sans-serif';
-      g.fillText('Chạm Nụ Hoa Vàng để mở Cuốn Thư Pháp Đỏ', 300, 705);
-    }
-
-    async function rasterizeBlobToPng(blob) {
-      const url = URL.createObjectURL(blob);
-      try {
-        return await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.naturalWidth || 600;
-            c.height = img.naturalHeight || 600;
-            const g = c.getContext('2d');
-            g.fillStyle = '#ffffff';
-            g.fillRect(0, 0, c.width, c.height);
-            g.drawImage(img, 0, 0);
-            c.toBlob((out) => (out ? resolve(out) : reject(new Error('toBlob failed'))), 'image/png', 1);
-          };
-          img.onerror = reject;
-          img.src = url;
-        });
-      } finally {
-        URL.revokeObjectURL(url);
-      }
-    }
-
-    async function urlToImageBlob(url, filename = 'QR.png') {
-      if (url.startsWith('data:') || url.startsWith('blob:')) {
-        const res = await fetch(url);
-        return await res.blob();
-      }
-      try {
-        const parsed = new URL(url, window.location.href);
-        if (parsed.hostname === 'img.vietqr.io' || parsed.hostname === 'api.qrserver.com') {
-          const proxyUrl = `/api/download-qr?url=${encodeURIComponent(parsed.toString())}&filename=${encodeURIComponent(filename)}`;
-          const pRes = await fetch(proxyUrl);
-          if (pRes.ok) {
-            const rawBlob = await pRes.blob();
-            return await rasterizeBlobToPng(rawBlob);
-          }
-        }
-      } catch (e) {}
-
-      const res = await fetch(url, { mode: 'cors' });
-      const rawBlob = await res.blob();
-      return await rasterizeBlobToPng(rawBlob);
+      PaymentQrKit.renderGiftQrCard(document.getElementById('gift-card-canvas'), {
+        shareUrl,
+        cardTitle: isNorth ? '🌸 LỘC XUÂN HOA ĐÀO 🌸' : '🌼 LỘC XUÂN HOA MAI 🌼',
+        receiver: appState.receiver,
+        sender: appState.sender,
+        occasion: appState.occasion,
+        scanLabel: 'Quét QR để Hái Lộc Đầu Xuân 3D',
+        footerHint: 'Chạm Nụ Hoa Vàng để mở Cuốn Thư Pháp Đỏ',
+        gradientStops: isNorth ? ['#3b0722', '#7f1d1d', '#1e0717'] : ['#7c2d12', '#991b1b', '#2b0904']
+      });
     }
 
     async function downloadBlobImage(url, filename) {
-      try {
-        const blob = await urlToImageBlob(url, filename);
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 2500);
-      } catch (e) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+      return PaymentQrKit.downloadBlobImage(url, filename);
     }
 
     function applyCreatorFormChanges() {

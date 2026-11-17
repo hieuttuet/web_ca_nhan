@@ -1,0 +1,33 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: false,
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/home.html'
+      }
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/galaxy.html',
+        destination: '/templates/confess/galaxy-3d/index.html',
+        permanent: false
+      },
+      {
+        source: '/fireworks.html',
+        destination: '/templates/confess/fireworks/index.html',
+        permanent: false
+      },
+      {
+        source: '/birthday.html',
+        destination: '/templates/birthday/birthday-cake/index.html',
+        permanent: false
+      }
+    ];
+  }
+};
+
+export default nextConfig;

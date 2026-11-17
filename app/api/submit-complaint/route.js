@@ -1,36 +1,32 @@
-/**
- * VERCEL SERVERLESS FUNCTION: POST /api/submit-complaint
- * Nhiệm vụ:
- * 1. Tiếp nhận phiếu khiếu nại / yêu cầu hỗ trợ từ khách hàng trên màn hình chính.
- * 2. Lưu vào Supabase bảng 'complaints'.
- * 3. Nếu khách có đính kèm ảnh biên lai / ảnh lỗi (Base64), tự động tải lên Supabase Storage bucket 'gift-photos'.
- * 4. Trả về mã khiếu nại (complaintCode) và thông báo tiếp nhận để khách an tâm.
- */
+import { NextResponse } from 'next/server';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
+export async function POST(req) {
   try {
+    const body = await req.json().catch(() => ({}));
     const {
       orderCode = '',
       contact = '',
       issueType = 'NOT_UNLOCKED',
       description = '',
       evidenceBase64 = ''
-    } = req.body || {};
+    } = body || {};
 
     const cleanContact = String(contact).trim();
     const cleanDesc = String(description).trim();
     const cleanOrderCode = String(orderCode).trim().toUpperCase();
 
     if (!cleanContact) {
-      return res.status(400).json({ error: 'Vui lòng cung cấp Số điện thoại hoặc Zalo để CSKH liên hệ hỗ trợ.' });
+      return NextResponse.json(
+        { error: 'Vui lòng cung cấp Số điện thoại hoặc Zalo để CSKH liên hệ hỗ trợ.' },
+        { status: 400 }
+      );
     }
 
     if (!cleanDesc) {
-      return res.status(400).json({ error: 'Vui lòng nhập mô tả chi tiết vấn đề bạn đang gặp phải.' });
+      return NextResponse.json(
+        { error: 'Vui lòng nhập mô tả chi tiết vấn đề bạn đang gặp phải.' },
+        { status: 400 }
+      );
     }
 
     const timePart = Date.now().toString(36).toUpperCase();
@@ -39,10 +35,8 @@ export default async function handler(req, res) {
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
     let evidenceUrl = '';
 
-    // Upload ảnh biên lai chuyển khoản (nếu có) lên Supabase Storage
     if (evidenceBase64 && evidenceBase64.startsWith('data:image/') && supabaseUrl && supabaseKey) {
       try {
         const matches = evidenceBase64.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
@@ -70,7 +64,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Lưu vào bảng public.complaints nếu có Supabase
     if (supabaseUrl && supabaseKey) {
       try {
         await fetch(`${supabaseUrl}/rest/v1/complaints`, {
@@ -93,18 +86,19 @@ export default async function handler(req, res) {
           })
         });
       } catch (dbErr) {
-        console.warn('Cảnh báo khi lưu bảng complaints (có thể chưa chạy SQL schema):', dbErr);
+        console.warn('Cảnh báo khi lưu bảng complaints:', dbErr);
       }
     }
 
-    return res.status(200).json({
+    return NextResponse.json({
       success: true,
       complaintCode,
       message: 'Đã tiếp nhận khiếu nại thành công! Đội ngũ CSKH sẽ kiểm tra và liên hệ qua Zalo/SĐT của bạn trong vòng 5 - 15 phút.'
     });
   } catch (err) {
-    console.error('Lỗi API submit-complaint:', err);
-    return res.status(500).json({ error: 'Đã xảy ra lỗi hệ thống, vui lòng thử lại hoặc liên hệ Zalo hỗ trợ.' });
+    return NextResponse.json(
+      { error: 'Đã xảy ra lỗi hệ thống, vui lòng thử lại hoặc liên hệ Zalo hỗ trợ.' },
+      { status: 500 }
+    );
   }
 }
-

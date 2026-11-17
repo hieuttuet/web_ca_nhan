@@ -2204,7 +2204,7 @@
     }
 
     function unlockAndShowShareSuccess(orderCode) {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${orderCode}`;
+      const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
       document.getElementById('share-url-input').value = shareUrl;
       renderChristmasGiftCard(shareUrl);
 

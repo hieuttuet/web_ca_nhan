@@ -354,7 +354,7 @@
     document.getElementById('pqk-step-success').style.display = 'block';
     document.getElementById('pqk-success-emoji').textContent = cfg.emoji || '🎉';
     document.getElementById('pqk-success-title').textContent = cfg.successTitle || 'Thiệp 3D Đã Sẵn Sàng!';
-    const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+    const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
     document.getElementById('pqk-share-url').value = shareUrl;
     document.getElementById('pqk-btn-open-share').onclick = () => { window.location.href = shareUrl; };
     renderGiftQrCard(document.getElementById('pqk-gift-card-canvas'), {

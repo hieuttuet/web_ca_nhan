@@ -2834,7 +2834,7 @@
       clearPendingOrder();
       document.getElementById('pay-step-waiting').style.display = 'none';
       document.getElementById('pay-step-success').style.display = 'block';
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+      const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
       document.getElementById('share-url-input').value = shareUrl;
       renderSpringGiftCard(shareUrl);
       showToast('🎉 Thanh toán thành công! Đã mở khóa link thiệp 3D!');

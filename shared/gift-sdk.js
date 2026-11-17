@@ -146,7 +146,7 @@
     },
 
     unlockOrder(orderCode) {
-      const shareUrl = `${window.location.origin}${this.currentSharePath || window.location.pathname}?id=${orderCode}`;
+      const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
       document.getElementById('gsdk-share-url').value = shareUrl;
       document.getElementById('gsdk-gift-qr-img').src =
         `https://api.qrserver.com/v1/create-qr-code/?size=360x360&color=be185d&data=${encodeURIComponent(shareUrl)}`;

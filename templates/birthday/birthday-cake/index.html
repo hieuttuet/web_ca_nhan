@@ -461,7 +461,7 @@
     });
 
     function unlockBdayOrder(code) {
-      const url = `${window.location.origin}${window.location.pathname}?id=${code}`;
+      const url = `${window.location.origin}/q/${encodeURIComponent(code)}`;
       document.getElementById('bday-share-url').value = url;
       document.getElementById('bday-gift-qr').src =
         `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=be185d&data=${encodeURIComponent(url)}`;

@@ -4721,7 +4721,7 @@
         }
         closeModal('modal-payment');
 
-        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+        const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
         const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(shareUrl)}`;
         document.getElementById('success-share-url').value = shareUrl;
         renderRedEnvelopeGiftCard(shareUrl);

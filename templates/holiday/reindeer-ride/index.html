@@ -3480,7 +3480,7 @@
 
     function onPaymentSuccess(orderCode) {
       clearPendingOrder();
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+      const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
       document.getElementById('share-url-input').value = shareUrl;
       renderReindeerGiftCard(shareUrl);
       document.getElementById('pay-step-waiting').style.display = 'none';

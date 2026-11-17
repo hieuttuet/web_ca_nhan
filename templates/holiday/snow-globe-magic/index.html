@@ -553,16 +553,111 @@
     }
 
     .hidden { display: none !important; }
+
+    /* Idea 2: Window Moon, Gliding Sleigh & Twinkling Fairy Lights */
+    .window-moon {
+      position: absolute;
+      top: 16%;
+      right: 18%;
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fef9c3, #fde047 60%, rgba(251, 191, 36, 0.15));
+      box-shadow: 0 0 36px rgba(254, 240, 138, 0.55);
+      opacity: 0.78;
+    }
+
+    .window-sleigh {
+      position: absolute;
+      top: 22%;
+      left: -25%;
+      width: 140px;
+      opacity: 0.55;
+      animation: glideSleigh 18s linear infinite;
+    }
+
+    @keyframes glideSleigh {
+      0%   { transform: translateX(-10%) translateY(8px); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateX(620%) translateY(-18px); opacity: 0; }
+    }
+
+    .fairy-garland {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      z-index: 6;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      padding: 0 8px;
+    }
+
+    .fairy-bulb {
+      width: 9px;
+      height: 13px;
+      border-radius: 50% 50% 45% 45%;
+      background: #fde047;
+      box-shadow: 0 0 14px 4px rgba(253, 224, 71, 0.75);
+      animation: fairyTwinkle 1.8s ease-in-out infinite alternate;
+      margin-top: 6px;
+    }
+
+    .fairy-bulb:nth-child(3n) { background: #fb7185; box-shadow: 0 0 14px 4px rgba(251, 113, 133, 0.75); animation-delay: 0.5s; margin-top: 12px; }
+    .fairy-bulb:nth-child(3n+2) { background: #38bdf8; box-shadow: 0 0 14px 4px rgba(56, 189, 248, 0.75); animation-delay: 1.1s; margin-top: 16px; }
+
+    @keyframes fairyTwinkle {
+      0%   { opacity: 0.35; transform: scale(0.85); }
+      100% { opacity: 1.0;  transform: scale(1.15); }
+    }
+
+    /* Idea 4: 3D Photo Frame Zoom Controls */
+    .frame-zoom-hud {
+      position: fixed;
+      bottom: 86px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 28;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(24, 10, 8, 0.86);
+      border: 1.5px solid rgba(251, 191, 36, 0.6);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .frame-zoom-hud.hidden { display: none !important; }
   </style>
 </head>
 <body>
   <!-- Cozy Room & Frosty Window Backdrop -->
   <div class="cabin-backdrop" aria-hidden="true">
-    <div class="window-pane"></div>
+    <div class="window-pane">
+      <div class="window-moon"></div>
+      <svg class="window-sleigh" viewBox="0 0 220 60" fill="#fef08a">
+        <path d="M18,42 Q32,48 56,42 L68,28 L42,28 L34,18 L24,28 Z M76,34 L125,30 L152,22 L175,24 L196,12 L192,26 L205,20 L194,30 L176,34 L168,46 L162,46 L164,34 L145,35 L138,46 L132,46 L136,35 L82,38 Z" />
+      </svg>
+    </div>
     <div class="bokeh-light" style="width:240px;height:240px;left:6%;top:18%;background:rgba(245,158,11,0.22);"></div>
     <div class="bokeh-light" style="width:200px;height:200px;right:8%;top:22%;background:rgba(56,189,248,0.18);animation-delay:1.8s;"></div>
     <div class="bokeh-light" style="width:160px;height:160px;left:18%;bottom:24%;background:rgba(239,68,68,0.16);animation-delay:3.1s;"></div>
     <div class="oak-table-glow"></div>
+  </div>
+
+  <!-- Twinkling Fairy Lights Garland -->
+  <div class="fairy-garland" aria-hidden="true">
+    <span class="fairy-bulb"></span><span class="fairy-bulb"></span><span class="fairy-bulb"></span>
+    <span class="fairy-bulb"></span><span class="fairy-bulb"></span><span class="fairy-bulb"></span>
+    <span class="fairy-bulb"></span><span class="fairy-bulb"></span><span class="fairy-bulb"></span>
+    <span class="fairy-bulb"></span><span class="fairy-bulb"></span><span class="fairy-bulb"></span>
+    <span class="fairy-bulb"></span><span class="fairy-bulb"></span><span class="fairy-bulb"></span>
   </div>
 
   <canvas id="globe-canvas"></canvas>
@@ -574,9 +669,17 @@
     </div>
     <div class="top-hud-group">
       <button type="button" id="btn-vibe-cycle" class="hud-btn">🔥 Ấm Áp</button>
+      <button type="button" id="btn-snapshot" class="hud-btn">📸 Chụp</button>
       <button type="button" id="btn-replay" class="hud-btn">🔄 Xem Lại</button>
       <button type="button" id="btn-audio" class="hud-btn">🔇 Âm Thanh</button>
     </div>
+  </div>
+
+  <!-- 3D Photo Frame Zoom HUD -->
+  <div id="frame-zoom-hud" class="frame-zoom-hud hidden">
+    <button type="button" id="btn-frame-prev" class="hud-btn" style="padding:6px 11px;">‹ Ảnh trước</button>
+    <button type="button" id="btn-frame-exit" class="hud-btn" style="padding:6px 12px; border-color:#fde047;">✕ Thoát Zoom</button>
+    <button type="button" id="btn-frame-next" class="hud-btn" style="padding:6px 11px;">Ảnh sau ›</button>
   </div>
 
   <!-- FLOATING MAGIC PROMPT -->
@@ -922,7 +1025,7 @@
       // 3. THREE.JS 3D MAGICAL SNOW GLOBE SCENE
       // =========================================================================
       const canvas = document.getElementById('globe-canvas');
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -1029,47 +1132,124 @@
         metalness: 0.82
       });
 
-      // Antique Oak Pedestal Base
-      const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.96, 0.34, 48), oakMat);
-      baseTop.position.y = -1.52;
+      // Museum-Grade Turned Walnut-Oak & Brass Pedestal Base
+      const walnutMat = new THREE.MeshStandardMaterial({
+        map: createOakWoodTexture(),
+        color: 0x8b5a3c,
+        roughness: 0.34,
+        metalness: 0.16
+      });
+
+      const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(1.76, 1.88, 0.26, 64), walnutMat);
+      baseTop.position.y = -1.48;
       snowGlobeGroup.add(baseTop);
 
-      const baseMid = new THREE.Mesh(new THREE.CylinderGeometry(1.94, 2.16, 0.42, 48), oakMat);
-      baseMid.position.y = -1.88;
+      const baseMid = new THREE.Mesh(new THREE.CylinderGeometry(1.88, 2.08, 0.44, 64), walnutMat);
+      baseMid.position.y = -1.83;
       snowGlobeGroup.add(baseMid);
 
-      const baseFoot = new THREE.Mesh(new THREE.CylinderGeometry(2.16, 2.28, 0.22, 48), oakMat);
-      baseFoot.position.y = -2.18;
+      const baseFoot = new THREE.Mesh(new THREE.CylinderGeometry(2.12, 2.22, 0.20, 64), walnutMat);
+      baseFoot.position.y = -2.14;
       snowGlobeGroup.add(baseFoot);
 
-      const goldCollar = new THREE.Mesh(new THREE.TorusGeometry(1.80, 0.055, 16, 48), brassMat);
+      // Carved brass trim moldings
+      const goldCollar = new THREE.Mesh(new THREE.TorusGeometry(1.76, 0.052, 18, 64), brassMat);
       goldCollar.rotation.x = Math.PI / 2;
-      goldCollar.position.y = -1.36;
+      goldCollar.position.y = -1.35;
       snowGlobeGroup.add(goldCollar);
+
+      const goldMidRing = new THREE.Mesh(new THREE.TorusGeometry(1.89, 0.03, 14, 64), brassMat);
+      goldMidRing.rotation.x = Math.PI / 2;
+      goldMidRing.position.y = -1.61;
+      snowGlobeGroup.add(goldMidRing);
+
+      const goldBaseTrim = new THREE.Mesh(new THREE.TorusGeometry(2.16, 0.036, 14, 64), brassMat);
+      goldBaseTrim.rotation.x = Math.PI / 2;
+      goldBaseTrim.position.y = -2.05;
+      snowGlobeGroup.add(goldBaseTrim);
 
       const plaqueMat = new THREE.MeshStandardMaterial({
         map: createBrassPlaqueTexture(appState.receiver),
-        roughness: 0.3,
-        metalness: 0.65
+        roughness: 0.26,
+        metalness: 0.72
       });
-      const plaqueMesh = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.30, 0.08), plaqueMat);
-      plaqueMesh.position.set(0, -1.86, 2.02);
+      const plaqueMesh = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.28, 0.06), plaqueMat);
+      plaqueMesh.position.set(0, -1.84, 1.98);
+      plaqueMesh.rotation.x = -0.18;
       snowGlobeGroup.add(plaqueMesh);
 
-      // Snow Ground Mound inside Globe
+      // Idea 5A: Brass Music-Box Wind-Up Key on left side of walnut pedestal
+      const windUpKeyGroup = new THREE.Group();
+      windUpKeyGroup.position.set(-2.06, -1.84, 0.0);
+      snowGlobeGroup.add(windUpKeyGroup);
+      const keyShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.36, 12), brassMat);
+      keyShaft.rotation.z = Math.PI / 2;
+      windUpKeyGroup.add(keyShaft);
+      [-0.12, 0.12].forEach((ky) => {
+        const ear = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.025, 10, 20), brassMat);
+        ear.position.set(-0.20, ky, 0);
+        ear.rotation.y = Math.PI / 2;
+        windUpKeyGroup.add(ear);
+      });
+
+      // Idea 1: Miniature 3D Christmas Train orbiting around the pedestal base
+      const trainRail = new THREE.Mesh(
+        new THREE.TorusGeometry(2.58, 0.028, 10, 72),
+        new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.45, metalness: 0.5 })
+      );
+      trainRail.rotation.x = Math.PI / 2;
+      trainRail.position.y = -2.23;
+      snowGlobeGroup.add(trainRail);
+
+      const trainCars = [];
+      const trainRedMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.35, metalness: 0.2 });
+      const trainDarkMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.6 });
+      const trainGoldMat = brassMat;
+
+      // Locomotive + 2 Gift Carriages
+      for (let cIdx = 0; cIdx < 3; cIdx++) {
+        const car = new THREE.Group();
+        if (cIdx === 0) {
+          // Steam Locomotive
+          car.add(new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.38), trainRedMat));
+          const boiler = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.24, 14), trainDarkMat);
+          boiler.rotation.x = Math.PI / 2;
+          boiler.position.set(0, 0.12, 0.05);
+          car.add(boiler);
+          const cab = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.20, 0.16), trainRedMat);
+          cab.position.set(0, 0.15, -0.10);
+          car.add(cab);
+          const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.025, 0.12, 10), trainGoldMat);
+          funnel.position.set(0, 0.24, 0.11);
+          car.add(funnel);
+          const headLight = new THREE.Mesh(new THREE.SphereGeometry(0.036, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+          headLight.position.set(0, 0.12, 0.19);
+          car.add(headLight);
+        } else {
+          // Gift Carriage
+          car.add(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.11, 0.30), cIdx === 1 ? trainRedMat : new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.45 })));
+          const miniGift = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.14), cIdx === 1 ? trainGoldMat : trainRedMat);
+          miniGift.position.y = 0.11;
+          car.add(miniGift);
+        }
+        snowGlobeGroup.add(car);
+        trainCars.push(car);
+      }
+
+      // Snow Ground Mound tucked cleanly inside the brass bezel
       const snowGroundMat = new THREE.MeshStandardMaterial({
         color: 0xf8fafc,
-        roughness: 0.72,
-        metalness: 0.05
+        roughness: 0.75,
+        metalness: 0.04
       });
-      const snowMound = new THREE.Mesh(new THREE.SphereGeometry(1.84, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.48), snowGroundMat);
+      const snowMound = new THREE.Mesh(new THREE.SphereGeometry(1.72, 42, 24, 0, Math.PI * 2, 0, Math.PI * 0.45), snowGroundMat);
       snowMound.scale.set(1, 0.38, 1);
-      snowMound.position.y = -1.38;
+      snowMound.position.y = -1.34;
       snowGlobeGroup.add(snowMound);
 
       // Cozy Wooden Cabin inside Globe (GLTF/GLB Hybrid Loader + Safe Fallback)
       const cabinGroup = new THREE.Group();
-      cabinGroup.position.set(-0.22, -0.78, -0.15);
+      cabinGroup.position.set(-0.26, -0.44, -0.12);
       cabinGroup.rotation.y = 0.28;
       snowGlobeGroup.add(cabinGroup);
 
@@ -1102,7 +1282,7 @@
 
       // Nâng cấp 1: Antique Wooden Photo Frame next to Cabin inside the 3D Snow Globe
       const photoFrameGroup = new THREE.Group();
-      photoFrameGroup.position.set(0.62, -0.74, 0.30);
+      photoFrameGroup.position.set(0.66, -0.42, 0.28);
       photoFrameGroup.rotation.y = -0.32;
       snowGlobeGroup.add(photoFrameGroup);
 
@@ -1193,11 +1373,11 @@
       const pineTreeContainer = new THREE.Group();
       snowGlobeGroup.add(pineTreeContainer);
       const TREE_SPOTS = [
-        { x: -1.05, y: -0.98, z: -0.35, s: 1.05 },
-        { x: -0.82, y: -0.98, z: 0.55, s: 0.78 },
-        { x: 0.78, y: -0.98, z: -0.45, s: 1.15 },
-        { x: 1.06, y: -0.98, z: 0.38, s: 0.86 },
-        { x: 0.32, y: -0.95, z: -0.95, s: 0.92 }
+        { x: -1.05, y: -0.82, z: -0.35, s: 1.05 },
+        { x: -0.82, y: -0.80, z: 0.55, s: 0.78 },
+        { x: 0.78, y: -0.82, z: -0.45, s: 1.15 },
+        { x: 1.06, y: -0.82, z: 0.38, s: 0.86 },
+        { x: 0.32, y: -0.78, z: -0.95, s: 0.92 }
       ];
 
       function createFallbackPineTree(x, y, z, scale) {
@@ -1285,11 +1465,138 @@
             hideGlbLoadingPill();
           }
         );
+
+        // Ý tưởng 1: Nhân vật Người Tuyết & Hộp thư đỏ (.glb) nhảy ăn mừng & hướng về khung ảnh
+        gltfLoader.load(
+          './models/character.glb',
+          (gltf) => {
+            characterGroup.add(gltf.scene);
+          },
+          undefined,
+          () => {}
+        );
       } else {
         buildFallbackCabin();
         TREE_SPOTS.forEach((sp) => createFallbackPineTree(sp.x, sp.y, sp.z, sp.s));
         hideGlbLoadingPill();
       }
+
+      const characterGroup = new THREE.Group();
+      characterGroup.position.set(0.14, -0.78, 0.42);
+      characterGroup.rotation.y = -0.15;
+      snowGlobeGroup.add(characterGroup);
+
+      // Ý tưởng 2A: Vòm Cực Quang Bắc Cực (GLSL 2D Simplex Noise Aurora Shader)
+      const auroraUniforms = {
+        uTime: { value: 0 },
+        uColorA: { value: new THREE.Color(0xfbbf24) },
+        uColorB: { value: new THREE.Color(0xfb7185) }
+      };
+      const auroraMat = new THREE.ShaderMaterial({
+        uniforms: auroraUniforms,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        vertexShader: `
+          varying vec2 vUv;
+          varying vec3 vLocalPos;
+          void main() {
+            vUv = uv;
+            vLocalPos = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uColorA;
+          uniform vec3 uColorB;
+          varying vec2 vUv;
+          varying vec3 vLocalPos;
+
+          vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
+          float snoise(vec2 v) {
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy));
+            vec2 x0 = v - i + dot(i, C.xx);
+            vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod289(i);
+            vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+            m = m * m; m = m * m;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+            vec3 g;
+            g.x  = a0.x * x0.x + h.x * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+          }
+
+          void main() {
+            float heightMask = smoothstep(0.05, 0.65, vLocalPos.y / 1.95) * (1.0 - smoothstep(0.78, 1.0, vLocalPos.y / 1.95));
+            float n1 = snoise(vec2(vUv.x * 5.2 + uTime * 0.12, vUv.y * 2.4 - uTime * 0.08));
+            float n2 = snoise(vec2(vUv.x * 9.5 - uTime * 0.18, vUv.y * 3.8 + uTime * 0.06));
+            float ribbon = smoothstep(0.15, 0.85, (n1 * 0.65 + n2 * 0.35) * 0.5 + 0.5);
+            vec3 col = mix(uColorA, uColorB, smoothstep(-0.4, 0.5, n2));
+            float alpha = heightMask * ribbon * 0.42;
+            gl_FragColor = vec4(col * 1.15, alpha);
+          }
+        `
+      });
+      const auroraDome = new THREE.Mesh(
+        new THREE.SphereGeometry(1.94, 42, 24, 0, Math.PI * 2, 0, Math.PI * 0.54),
+        auroraMat
+      );
+      auroraDome.position.y = 0.06;
+      snowGlobeGroup.add(auroraDome);
+
+      // Ý tưởng 2B: Hồ Băng Phản Chiếu Ánh Đèn Cửa Sổ (GLSL Ice Pond Shader)
+      const pondUniforms = {
+        uTime: { value: 0 },
+        uIceBase: { value: new THREE.Color(0x0c4a6e) },
+        uWindowGlow: { value: new THREE.Color(0xfde047) }
+      };
+      const icePondMat = new THREE.ShaderMaterial({
+        uniforms: pondUniforms,
+        transparent: true,
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uIceBase;
+          uniform vec3 uWindowGlow;
+          varying vec2 vUv;
+
+          void main() {
+            vec2 p = vUv * 2.0 - 1.0;
+            float dist = length(p);
+            float edge = 1.0 - smoothstep(0.74, 0.98, dist);
+            float ripple = sin(p.x * 16.0 + uTime * 1.8) * cos(p.y * 14.0 - uTime * 1.4) * 0.5 + 0.5;
+            float winReflect = exp(-dot(p - vec2(-0.15, -0.25), p - vec2(-0.15, -0.25)) * 4.5);
+            float shimmer = smoothstep(0.45, 0.95, ripple) * winReflect;
+            vec3 col = mix(uIceBase, vec3(0.72, 0.92, 1.0), ripple * 0.28 + (1.0 - dist) * 0.18);
+            col += uWindowGlow * (winReflect * 0.42 + shimmer * 0.55);
+            gl_FragColor = vec4(col, edge * 0.88);
+          }
+        `
+      });
+      const icePond = new THREE.Mesh(new THREE.CircleGeometry(0.56, 36), icePondMat);
+      icePond.rotation.x = -Math.PI / 2;
+      icePond.scale.set(1.22, 0.78, 1);
+      icePond.position.set(-0.24, -0.71, 0.72);
+      snowGlobeGroup.add(icePond);
 
       // Chimney Rising Smoke Particles (soft grey-white wisps)
       const SMOKE_COUNT = 26;
@@ -1319,37 +1626,75 @@
       const roomPropsGroup = new THREE.Group();
       scene.add(roomPropsGroup);
 
-      // Left Warm Wax Candle Cluster (reflects on glass surface)
-      const candleMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.4 });
-      const candle1 = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 1.05, 18), candleMat);
-      candle1.position.set(-3.45, -1.68, -1.2);
+      // Left Warm Wax Candle with Brass Candlestick Holder (reflects on glass surface)
+      const candleMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.38 });
+      const candleSaucer = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.34, 0.09, 24), brassMat);
+      candleSaucer.position.set(-3.45, -2.18, -1.2);
+      roomPropsGroup.add(candleSaucer);
+
+      const candle1 = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.22, 0.96, 24), candleMat);
+      candle1.position.set(-3.45, -1.66, -1.2);
       roomPropsGroup.add(candle1);
 
       const flame1 = new THREE.Mesh(
-        new THREE.SphereGeometry(0.11, 12, 12),
+        new THREE.SphereGeometry(0.10, 12, 12),
         new THREE.MeshBasicMaterial({ color: 0xfde047 })
       );
       flame1.scale.set(0.75, 1.55, 0.75);
-      flame1.position.set(-3.45, -1.02, -1.2);
+      flame1.position.set(-3.45, -1.06, -1.2);
       roomPropsGroup.add(flame1);
 
-      // Right Glowing Mini Christmas Tree (reflects on glass surface)
+      const flameHalo = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: createSnowSpriteTexture(),
+          color: 0xfbbf24,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      flameHalo.scale.set(1.15, 1.15, 1);
+      flameHalo.position.set(-3.45, -1.04, -1.2);
+      roomPropsGroup.add(flameHalo);
+
+      // Right Decorated Luxury Mini Christmas Tree (reflects on glass surface)
       const roomTree = new THREE.Group();
-      const rtGreen = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.65 });
+      const rtTrunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.10, 0.14, 0.36, 12),
+        new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 })
+      );
+      rtTrunk.position.y = -2.02;
+      roomTree.add(rtTrunk);
+
+      const rtSpruce = new THREE.MeshStandardMaterial({ color: 0x0f3d22, roughness: 0.68 });
+      const rtSnow = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 });
+      const rtBaubleGold = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xd97706, emissiveIntensity: 0.55, roughness: 0.2, metalness: 0.8 });
+      const rtBaubleRuby = new THREE.MeshStandardMaterial({ color: 0xe11d48, emissive: 0x9f1239, emissiveIntensity: 0.45, roughness: 0.25, metalness: 0.4 });
+
       [
-        { r: 0.55, h: 0.85, y: -1.55 },
-        { r: 0.42, h: 0.72, y: -1.05 },
-        { r: 0.28, h: 0.58, y: -0.60 }
-      ].forEach((t) => {
-        const cone = new THREE.Mesh(new THREE.ConeGeometry(t.r, t.h, 12), rtGreen);
+        { r: 0.62, h: 0.72, y: -1.58 },
+        { r: 0.49, h: 0.64, y: -1.16 },
+        { r: 0.36, h: 0.56, y: -0.76 },
+        { r: 0.23, h: 0.46, y: -0.40 }
+      ].forEach((t, ti) => {
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(t.r, t.h, 16), rtSpruce);
         cone.position.y = t.y;
         roomTree.add(cone);
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(t.r * 0.82, t.h * 0.45, 16), rtSnow);
+        cap.position.y = t.y + t.h * 0.28;
+        roomTree.add(cap);
+        for (let b = 0; b < 5; b++) {
+          const ang = (b / 5) * Math.PI * 2 + ti * 0.7;
+          const bauble = new THREE.Mesh(new THREE.SphereGeometry(0.052, 10, 10), (b + ti) % 2 === 0 ? rtBaubleGold : rtBaubleRuby);
+          bauble.position.set(Math.cos(ang) * t.r * 0.82, t.y - t.h * 0.24, Math.sin(ang) * t.r * 0.82);
+          roomTree.add(bauble);
+        }
       });
       const rtStar = new THREE.Mesh(
         new THREE.OctahedronGeometry(0.14, 0),
         new THREE.MeshBasicMaterial({ color: 0xfef08a })
       );
-      rtStar.position.y = -0.22;
+      rtStar.position.y = -0.10;
       roomTree.add(rtStar);
       roomTree.position.set(3.55, 0, -1.35);
       roomPropsGroup.add(roomTree);
@@ -1402,34 +1747,34 @@
             vec3 V = normalize(vViewDir);
             vec2 screenUV = (vClipPos.xy / vClipPos.w) * 0.5 + 0.5;
 
-            // Snell's Law Refraction with subtle chromatic dispersion
-            vec3 refr = refract(-V, N, 1.0 / 1.44);
-            vec2 offset = refr.xy * 0.068;
-            float r = texture2D(tBackground, clamp(screenUV + offset * 1.06, 0.002, 0.998)).r;
-            float g = texture2D(tBackground, clamp(screenUV + offset, 0.002, 0.998)).g;
-            float b = texture2D(tBackground, clamp(screenUV + offset * 0.94, 0.002, 0.998)).b;
-            vec3 refractedBg = vec3(r, g, b);
+            // Fresnel crystal rim (clear center so interior 3D cabin/frame/text stay 100% sharp, thick refraction at glass wall)
+            float fresnel = pow(1.0 - max(dot(N, V), 0.0), 2.75);
 
-            // Fresnel crystal rim
-            float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.1);
+            // Snell's Law Refraction & prismatic chromatic dispersion concentrated along the curved crystal wall
+            vec3 refr = refract(-V, N, 1.0 / 1.45);
+            vec2 offset = refr.xy * (0.015 + fresnel * 0.075);
+            float r = texture2D(tBackground, clamp(screenUV + offset * 1.08, 0.002, 0.998)).r;
+            float g = texture2D(tBackground, clamp(screenUV + offset, 0.002, 0.998)).g;
+            float b = texture2D(tBackground, clamp(screenUV + offset * 0.92, 0.002, 0.998)).b;
+            vec3 refractedRim = vec3(r, g, b) * fresnel * 0.55;
 
             // Specular reflections from flickering candle (left) & glowing tree (right), shifted by phone tilt
             vec3 candleDir = normalize(vec3(-0.72 + uTilt.x * 0.35, 0.38 + uTilt.y * 0.35, 0.65));
             vec3 treeDir   = normalize(vec3(0.75 + uTilt.x * 0.35, 0.45 + uTilt.y * 0.35, 0.58));
             float flicker = 0.88 + 0.12 * sin(uTime * 11.0);
-            float specCandle = pow(max(dot(reflect(-candleDir, N), V), 0.0), 42.0) * 0.85 * flicker;
-            float specTree   = pow(max(dot(reflect(-treeDir, N), V), 0.0), 36.0) * 0.65;
+            float specCandle = pow(max(dot(reflect(-candleDir, N), V), 0.0), 42.0) * 0.92 * flicker;
+            float specTree   = pow(max(dot(reflect(-treeDir, N), V), 0.0), 36.0) * 0.72;
 
             // Soft curved studio window highlight
-            float arcHighlight = smoothstep(0.62, 0.94, dot(N, normalize(vec3(-0.35, 0.68, 0.64)))) * 0.22;
+            float arcHighlight = smoothstep(0.64, 0.94, dot(N, normalize(vec3(-0.35, 0.68, 0.64)))) * 0.26;
 
-            vec3 finalCol = refractedBg
-              + uRimColor * fresnel * 0.48
+            vec3 finalCol = refractedRim
+              + uRimColor * fresnel * 0.62
               + uCandleColor * specCandle
               + uTreeColor * specTree
               + vec3(1.0) * arcHighlight;
 
-            float alpha = clamp(0.28 + fresnel * 0.55 + specCandle + specTree + arcHighlight, 0.25, 0.96);
+            float alpha = clamp(0.05 + fresnel * 0.68 + specCandle + specTree + arcHighlight, 0.05, 0.92);
             gl_FragColor = vec4(finalCol, alpha);
           }
         `
@@ -1438,18 +1783,10 @@
       glassSphere.position.y = 0.05;
       snowGlobeGroup.add(glassSphere);
 
-      // Subtle Golden Rim Halo around glass edge
-      const glassRimHalo = new THREE.Mesh(
-        new THREE.RingGeometry(2.09, 2.15, 64),
-        new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.16, side: THREE.DoubleSide })
-      );
-      glassRimHalo.position.y = 0.05;
-      snowGlobeGroup.add(glassRimHalo);
-
       // =========================================================================
-      // 4. 2,200 INTERACTIVE SNOW & MORPHING TEXT PARTICLES INSIDE GLOBE
+      // 4. 2,800 INTERACTIVE SNOW & CRISP MORPHING TEXT PARTICLES INSIDE GLOBE
       // =========================================================================
-      const PARTICLE_COUNT = 2200;
+      const PARTICLE_COUNT = 2800;
       const pPositions = new Float32Array(PARTICLE_COUNT * 3);
       const pColors = new Float32Array(PARTICLE_COUNT * 3);
       const pData = [];
@@ -1477,25 +1814,24 @@
         }
 
         if (line2) {
-          ctx.font = 'bold 58px "Dancing Script", Georgia, serif';
-          ctx.fillText(line1, 384, 112);
           ctx.font = 'bold 64px "Dancing Script", Georgia, serif';
-          ctx.fillText(line2, 384, 204);
+          ctx.fillText(line1, 384, 108);
+          ctx.font = 'bold 74px "Dancing Script", Georgia, serif';
+          ctx.fillText(line2, 384, 212);
         } else {
-          ctx.font = 'bold 68px "Dancing Script", Georgia, serif';
+          ctx.font = 'bold 76px "Dancing Script", Georgia, serif';
           ctx.fillText(line1, 384, 160);
         }
 
         const img = ctx.getImageData(0, 0, c.width, c.height).data;
-        const step = 4;
+        const step = 3;
         for (let y = 0; y < c.height; y += step) {
           for (let x = 0; x < c.width; x += step) {
-            if (img[(y * c.width + x) * 4 + 3] > 120) {
-              const wx = ((x / c.width) - 0.5) * 3.15;
-              const wy = (0.5 - (y / c.height)) * 1.35 + 0.52;
-              const wz = (Math.random() - 0.5) * 0.16 + 0.32;
-              // Keep inside sphere radius 1.92
-              if (Math.hypot(wx, wy - 0.05, wz) < 1.90) {
+            if (img[(y * c.width + x) * 4 + 3] > 110) {
+              const wx = ((x / c.width) - 0.5) * 2.85;
+              const wy = (0.5 - (y / c.height)) * 1.12 + 1.06;
+              const wz = (Math.random() - 0.5) * 0.08 + 0.42;
+              if (Math.hypot(wx, wy - 0.05, wz) < 1.92) {
                 textTargets.push(new THREE.Vector3(wx, wy, wz));
               }
             }
@@ -1529,9 +1865,9 @@
 
         pData.push({
           vel: new THREE.Vector3((Math.random() - 0.5) * 0.4, -0.25 - Math.random() * 0.35, (Math.random() - 0.5) * 0.4),
-          isTextParticle: i < 1550,
+          isTextParticle: i < 2150,
           swirlPhase: Math.random() * Math.PI * 2,
-          settleY: -0.92 + Math.random() * 0.16
+          settleY: -0.82 + Math.random() * 0.14
         });
       }
 
@@ -1539,11 +1875,11 @@
       snowGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
       snowGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
       const snowMat = new THREE.PointsMaterial({
-        size: 0.075,
+        size: 0.088,
         map: createSnowSpriteTexture(),
         vertexColors: true,
         transparent: true,
-        opacity: 0.94,
+        opacity: 0.96,
         blending: THREE.AdditiveBlending,
         depthWrite: false
       });
@@ -1551,43 +1887,66 @@
       snowGlobeGroup.add(snowPoints);
 
       // =========================================================================
-      // 5. 3D MINIATURE GIFT ENVELOPE AT PEDESTAL FOOT (THE UNVEILING)
+      // 5. LUXURY VELVET & GOLD BOW GIFT BOX AT PEDESTAL FOOT (THE UNVEILING)
       // =========================================================================
       const giftBoxGroup = new THREE.Group();
-      giftBoxGroup.position.set(1.55, -1.96, 1.82);
+      giftBoxGroup.position.set(1.92, -2.02, 1.72);
       giftBoxGroup.rotation.y = -0.35;
       snowGlobeGroup.add(giftBoxGroup);
 
       const giftBodyMat = new THREE.MeshStandardMaterial({
-        color: 0xb91c1c,
-        roughness: 0.32,
-        metalness: 0.25,
-        emissive: 0x000000
+        color: 0x991b1b,
+        roughness: 0.36,
+        metalness: 0.18,
+        emissive: 0x000000,
+        toneMapped: false
       });
-      const giftBody = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.38, 0.42), giftBodyMat);
+      const giftBody = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.34, 0.44), giftBodyMat);
       giftBoxGroup.add(giftBody);
 
       const giftLidPivot = new THREE.Group();
-      giftLidPivot.position.set(0, 0.19, -0.21);
+      giftLidPivot.position.set(0, 0.17, -0.22);
       giftBoxGroup.add(giftLidPivot);
 
-      const giftLid = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.10, 0.46), giftBodyMat);
-      giftLid.position.set(0, 0.04, 0.21);
+      const giftLid = new THREE.Mesh(new THREE.BoxGeometry(0.61, 0.09, 0.48), giftBodyMat);
+      giftLid.position.set(0, 0.04, 0.22);
       giftLidPivot.add(giftLid);
 
-      const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.41, 0.45), brassMat);
+      // Crossed Gold Satin Ribbons
+      const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.36, 0.46), brassMat);
       giftBoxGroup.add(ribbonV);
-      const ribbonLid = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.48), brassMat);
-      ribbonLid.position.set(0, 0.04, 0.21);
-      giftLidPivot.add(ribbonLid);
+      const ribbonH = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.36, 0.095), brassMat);
+      giftBoxGroup.add(ribbonH);
+      const ribbonLidV = new THREE.Mesh(new THREE.BoxGeometry(0.105, 0.105, 0.50), brassMat);
+      ribbonLidV.position.set(0, 0.04, 0.22);
+      giftLidPivot.add(ribbonLidV);
+      const ribbonLidH = new THREE.Mesh(new THREE.BoxGeometry(0.63, 0.105, 0.105), brassMat);
+      ribbonLidH.position.set(0, 0.04, 0.22);
+      giftLidPivot.add(ribbonLidH);
 
-      const giftGlowRing = new THREE.Mesh(
-        new THREE.RingGeometry(0.36, 0.48, 32),
-        new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0.0, side: THREE.DoubleSide })
+      // Sculpted 3D Bow Loops on Lid
+      const bowKnot = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 12), brassMat);
+      bowKnot.position.set(0, 0.105, 0.22);
+      giftLidPivot.add(bowKnot);
+      [-1, 1].forEach((dir) => {
+        const loop = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.026, 10, 20), brassMat);
+        loop.position.set(dir * 0.085, 0.125, 0.22);
+        loop.rotation.set(0.35, dir * 0.4, dir * -0.35);
+        giftLidPivot.add(loop);
+      });
+
+      const giftGlowHalo = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: createSnowSpriteTexture(),
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.0,
+          blending: THREE.AdditiveBlending
+        })
       );
-      giftGlowRing.rotation.x = -Math.PI / 2;
-      giftGlowRing.position.y = -0.18;
-      giftBoxGroup.add(giftGlowRing);
+      giftGlowHalo.scale.set(1.25, 1.25, 1);
+      giftGlowHalo.position.set(0, 0.04, 0);
+      giftBoxGroup.add(giftGlowHalo);
 
       // Ambient Background Falling Snowflakes (outside window room atmosphere)
       const BG_SNOW = 180;
@@ -1610,6 +1969,88 @@
         })
       );
       scene.add(bgSnowPoints);
+
+      // Idea 3: Spiral Stardust Ribbons & Mini 3D Fireworks
+      const SPIRAL_COUNT = 160;
+      const spiralPos = new Float32Array(SPIRAL_COUNT * 3);
+      const spiralGeo = new THREE.BufferGeometry();
+      spiralGeo.setAttribute('position', new THREE.BufferAttribute(spiralPos, 3));
+      const spiralPoints = new THREE.Points(
+        spiralGeo,
+        new THREE.PointsMaterial({
+          size: 0.12,
+          map: createSnowSpriteTexture(),
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      snowGlobeGroup.add(spiralPoints);
+
+      const FW_COUNT = 150;
+      const fwPos = new Float32Array(FW_COUNT * 3);
+      const fwVel = [];
+      for (let i = 0; i < FW_COUNT; i++) fwVel.push(new THREE.Vector3());
+      const fwGeo = new THREE.BufferGeometry();
+      fwGeo.setAttribute('position', new THREE.BufferAttribute(fwPos, 3));
+      const fwMat = new THREE.PointsMaterial({
+        size: 0.14,
+        map: createSnowSpriteTexture(),
+        color: 0xfef08a,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const fwPoints = new THREE.Points(fwGeo, fwMat);
+      scene.add(fwPoints);
+      let fwLife = 0;
+
+      function launchMagicCelebration() {
+        fwLife = 1.0;
+        const centers = [
+          new THREE.Vector3(-2.6, 2.0, 0.4),
+          new THREE.Vector3(2.6, 2.2, 0.4),
+          new THREE.Vector3(0.0, 2.9, -0.3)
+        ];
+        for (let i = 0; i < FW_COUNT; i++) {
+          const c = centers[i % centers.length];
+          fwPos[i * 3] = c.x;
+          fwPos[i * 3 + 1] = c.y;
+          fwPos[i * 3 + 2] = c.z;
+          const th = Math.random() * Math.PI * 2;
+          const ph = Math.acos(2 * Math.random() - 1);
+          const spd = 1.2 + Math.random() * 2.2;
+          fwVel[i].set(
+            spd * Math.sin(ph) * Math.cos(th),
+            spd * Math.sin(ph) * Math.sin(th),
+            spd * Math.cos(ph)
+          );
+        }
+        fwGeo.attributes.position.needsUpdate = true;
+      }
+
+      // Idea 4B: Candle Wish Orb flying from left candle into globe
+      const wishOrb = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: createSnowSpriteTexture(),
+          color: 0xfef08a,
+          transparent: true,
+          opacity: 0.0,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      wishOrb.scale.set(0.45, 0.45, 1);
+      scene.add(wishOrb);
+      let wishProgress = -1;
+
+      function sendCandleWish() {
+        wishProgress = 0;
+        audio.playMagicChime();
+        flameHalo.scale.set(1.85, 1.85, 1);
+      }
 
       // =========================================================================
       // 6. INTERACTION & MAGIC STATE MACHINE
@@ -1670,7 +2111,7 @@
         giftOpenProgress = 0;
         giftLidPivot.rotation.x = 0;
         giftBodyMat.emissive.setHex(0x000000);
-        giftGlowRing.material.opacity = 0;
+        giftGlowHalo.material.opacity = 0;
         document.getElementById('gift-tap-banner').classList.add('hidden');
         document.getElementById('magic-hint-wrap').classList.remove('hidden');
         audio.stopChristmasLofi();
@@ -1715,6 +2156,9 @@
           glassShaderUniforms.uRimColor.value.setHex(0x7dd3fc);
           glassShaderUniforms.uCandleColor.value.setHex(0xe879f9);
           glassShaderUniforms.uTreeColor.value.setHex(0x38bdf8);
+          auroraUniforms.uColorA.value.setHex(0x22d3ee);
+          auroraUniforms.uColorB.value.setHex(0xe879f9);
+          pondUniforms.uWindowGlow.value.setHex(0x38bdf8);
         } else if (key === 'golden_star') {
           appState.glowTheme = 'warm_gold';
           glowWinMat.color.setHex(0xfef08a);
@@ -1725,6 +2169,9 @@
           glassShaderUniforms.uRimColor.value.setHex(0xfde047);
           glassShaderUniforms.uCandleColor.value.setHex(0xfbbf24);
           glassShaderUniforms.uTreeColor.value.setHex(0xfef08a);
+          auroraUniforms.uColorA.value.setHex(0xfde047);
+          auroraUniforms.uColorB.value.setHex(0xf59e0b);
+          pondUniforms.uWindowGlow.value.setHex(0xfef08a);
         } else {
           appState.glowTheme = 'warm_gold';
           glowWinMat.color.setHex(0xfde047);
@@ -1735,6 +2182,9 @@
           glassShaderUniforms.uRimColor.value.setHex(0xfef08a);
           glassShaderUniforms.uCandleColor.value.setHex(0xffb347);
           glassShaderUniforms.uTreeColor.value.setHex(0x38bdf8);
+          auroraUniforms.uColorA.value.setHex(0xfbbf24);
+          auroraUniforms.uColorB.value.setHex(0xfb7185);
+          pondUniforms.uWindowGlow.value.setHex(0xfde047);
         }
       }
 
@@ -1779,6 +2229,58 @@
         prevY = e.clientY;
       });
 
+      let photoZoomMode = false;
+      function setPhotoZoom(on) {
+        photoZoomMode = on;
+        document.getElementById('frame-zoom-hud').classList.toggle('hidden', !on);
+        if (on) {
+          targetCamZ = 4.65;
+          targetOrbitY = -0.18;
+          targetOrbitX = 0.06;
+        } else {
+          targetCamZ = 8.6;
+          targetOrbitY = 0;
+          targetOrbitX = 0;
+        }
+      }
+
+      function cycle3DFramePhoto(dir) {
+        if (!appState.photos || appState.photos.length === 0) return;
+        const total = appState.photos.length;
+        appState.currentGiftPhotoIdx = ((appState.currentGiftPhotoIdx + dir) % total + total) % total;
+        const item = appState.photos[appState.currentGiftPhotoIdx];
+        updateFramePhotoTexture(typeof item === 'string' ? item : item.url);
+      }
+
+      document.getElementById('btn-frame-exit').addEventListener('click', () => setPhotoZoom(false));
+      document.getElementById('btn-frame-prev').addEventListener('click', () => cycle3DFramePhoto(-1));
+      document.getElementById('btn-frame-next').addEventListener('click', () => cycle3DFramePhoto(1));
+
+      // Idea 5B: Story Snapshot Download
+      document.getElementById('btn-snapshot').addEventListener('click', () => {
+        renderer.render(scene, camera);
+        const snap = document.createElement('canvas');
+        snap.width = canvas.width;
+        snap.height = canvas.height;
+        const ctx = snap.getContext('2d');
+        const g = ctx.createRadialGradient(snap.width * 0.5, snap.height * 0.45, 40, snap.width * 0.5, snap.height * 0.5, snap.width * 0.75);
+        g.addColorStop(0, appState.vibe === 'cyber_ice' ? '#10193a' : (appState.vibe === 'golden_star' ? '#362108' : '#2b130d'));
+        g.addColorStop(1, '#070304');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, snap.width, snap.height);
+        ctx.drawImage(canvas, 0, 0);
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.92)';
+        ctx.font = `bold ${Math.round(snap.width * 0.028)}px "Dancing Script", Georgia, serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(`✨ ${appState.globeText} ✨`, snap.width * 0.5, snap.height - 34);
+        const a = document.createElement('a');
+        a.href = snap.toDataURL('image/png');
+        a.download = `Qua-Cau-Tuyet-${(appState.receiver || '3D').replace(/\s+/g, '-')}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+
       window.addEventListener('pointerup', (e) => {
         if (!isDragging) return;
         isDragging = false;
@@ -1793,6 +2295,20 @@
               open3DGiftBox();
               return;
             }
+          }
+
+          // Idea 4B: Tap left candle to send golden wish orb
+          const hitCandle = raycaster.intersectObjects([candle1, flame1, candleSaucer], true);
+          if (hitCandle.length > 0) {
+            sendCandleWish();
+            return;
+          }
+
+          // Idea 4A: Tap 3D Photo Frame to zoom in & flip photos directly
+          const hitFrame = raycaster.intersectObjects([framePhotoPlane, frameOuterWood], true);
+          if (hitFrame.length > 0 && globePhase !== 'intro') {
+            setPhotoZoom(!photoZoomMode);
+            return;
           }
 
           const hitGlobe = raycaster.intersectObjects([glassSphere, baseTop, baseMid], true);
@@ -1886,17 +2402,23 @@
         }
         bgSnowGeo.attributes.position.needsUpdate = true;
 
-        // Chimney smoke rising inside globe
+        // Chimney smoke rising directly from the cabin's stone chimney mouth
         const smArr = smokeGeo.attributes.position.array;
         for (let i = 0; i < SMOKE_COUNT; i++) {
           const m = smokeMeta[i];
           m.age += dt * m.speed;
           if (m.age > 1) m.age = 0;
-          smArr[i * 3] = -0.02 + Math.sin(t * 1.4 + i) * 0.08 + m.drift * m.age;
-          smArr[i * 3 + 1] = -0.08 + m.age * 1.25;
-          smArr[i * 3 + 2] = -0.25;
+          smArr[i * 3] = -0.05 + Math.sin(t * 1.4 + i) * 0.07 + m.drift * m.age;
+          smArr[i * 3 + 1] = 0.34 + m.age * 1.15;
+          smArr[i * 3 + 2] = -0.22;
         }
         smokeGeo.attributes.position.needsUpdate = true;
+
+        // Smoothly re-center globe orientation when morphing text so the greeting faces forward
+        if (globePhase === 'morphing') {
+          targetOrbitY *= 0.92;
+          targetOrbitX *= 0.92;
+        }
 
         // Globe Shake + Smooth Orbit Rotate & Camera Zoom Physics
         shakeEnergy *= 0.93;
@@ -1904,8 +2426,86 @@
         orbitRotX += (targetOrbitX - orbitRotX) * 0.1;
         camera.position.z += (targetCamZ - camera.position.z) * 0.1;
         glassShaderUniforms.uTime.value = t;
+        auroraUniforms.uTime.value = t;
+        pondUniforms.uTime.value = t;
         flame1.scale.y = 1.45 + Math.sin(t * 13) * 0.18;
+        flameHalo.scale.lerp(new THREE.Vector3(1.15, 1.15, 1), 0.08);
         rtStar.rotation.y += dt * 1.4;
+
+        // Idea 1: Animate 3D Christmas Train orbiting around pedestal
+        const trainSpeed = globePhase !== 'intro' ? 0.65 : 0.36;
+        trainCars.forEach((car, idx) => {
+          const ang = t * trainSpeed - idx * 0.22;
+          const rx = Math.cos(ang) * 2.58;
+          const rz = Math.sin(ang) * 2.58;
+          car.position.set(rx, -2.14, rz);
+          car.rotation.y = -ang;
+        });
+
+        // Idea 5A: Spin Music-Box Wind-Up Key
+        if (audio.enabled || globePhase !== 'intro') {
+          windUpKeyGroup.rotation.x += dt * 2.2;
+        }
+
+        // Idea 3: Spiral Stardust Ribbons & Mini Fireworks
+        if (globePhase === 'morphing' || globePhase === 'revealed') {
+          spiralPoints.material.opacity = Math.min(0.85, spiralPoints.material.opacity + dt * 1.2);
+          const spArr = spiralGeo.attributes.position.array;
+          for (let i = 0; i < SPIRAL_COUNT; i++) {
+            const prog = ((i / SPIRAL_COUNT) + t * 0.22) % 1;
+            const ang = prog * Math.PI * 6 + (i % 2) * Math.PI;
+            const rad = 1.98 * Math.sin(prog * Math.PI);
+            spArr[i * 3] = Math.cos(ang) * rad;
+            spArr[i * 3 + 1] = -1.1 + prog * 3.1;
+            spArr[i * 3 + 2] = Math.sin(ang) * rad;
+          }
+          spiralGeo.attributes.position.needsUpdate = true;
+        } else {
+          spiralPoints.material.opacity = 0;
+        }
+
+        if (fwLife > 0) {
+          fwLife = Math.max(0, fwLife - dt * 0.65);
+          fwMat.opacity = fwLife;
+          const fArr = fwGeo.attributes.position.array;
+          for (let i = 0; i < FW_COUNT; i++) {
+            fwVel[i].y -= 2.4 * dt;
+            fArr[i * 3] += fwVel[i].x * dt;
+            fArr[i * 3 + 1] += fwVel[i].y * dt;
+            fArr[i * 3 + 2] += fwVel[i].z * dt;
+          }
+          fwGeo.attributes.position.needsUpdate = true;
+        } else {
+          fwMat.opacity = 0;
+        }
+
+        // Idea 4B: Candle Wish Orb arc
+        if (wishProgress >= 0) {
+          wishProgress += dt * 0.9;
+          if (wishProgress >= 1) {
+            wishProgress = -1;
+            wishOrb.material.opacity = 0;
+            launchMagicCelebration();
+          } else {
+            wishOrb.material.opacity = Math.sin(wishProgress * Math.PI);
+            wishOrb.position.set(
+              THREE.MathUtils.lerp(-3.45, 0.0, wishProgress),
+              THREE.MathUtils.lerp(-1.0, 0.55, wishProgress) + Math.sin(wishProgress * Math.PI) * 1.4,
+              THREE.MathUtils.lerp(-1.2, 0.2, wishProgress)
+            );
+          }
+        }
+
+        // Ý tưởng 1: Nhân vật từ .glb nhún nhảy ăn mừng & hướng về khung ảnh kỷ niệm khi chạm/lắc
+        if (globePhase !== 'intro') {
+          characterGroup.position.y = -0.78 + Math.abs(Math.sin(t * 6.5)) * 0.09;
+          characterGroup.rotation.z = Math.sin(t * 8.0) * 0.08;
+          characterGroup.rotation.y += (0.42 - characterGroup.rotation.y) * 0.06;
+        } else {
+          characterGroup.position.y = -0.78 + Math.sin(t * 2.0) * 0.015;
+          characterGroup.rotation.z = Math.sin(t * 1.6) * 0.03;
+          characterGroup.rotation.y += (-0.15 - characterGroup.rotation.y) * 0.06;
+        }
 
         snowGlobeGroup.rotation.z = Math.sin(t * 28) * 0.09 * shakeEnergy;
         snowGlobeGroup.rotation.x = orbitRotX + Math.cos(t * 24) * 0.05 * shakeEnergy;
@@ -1917,6 +2517,7 @@
           phaseTimer = 0;
           audio.playMagicChime();
           audio.startChristmasLofi();
+          launchMagicCelebration();
         } else if (globePhase === 'morphing' && phaseTimer > 2.2) {
           globePhase = 'revealed';
           phaseTimer = 0;
@@ -1925,7 +2526,7 @@
         } else if (globePhase === 'opening_gift') {
           giftOpenProgress = Math.min(1, giftOpenProgress + dt * 2.2);
           giftLidPivot.rotation.x = -giftOpenProgress * 2.1;
-          giftBoxGroup.position.y = -1.96 + Math.sin(giftOpenProgress * Math.PI) * 0.25;
+          giftBoxGroup.position.y = -2.02 + Math.sin(giftOpenProgress * Math.PI) * 0.22;
           if (giftOpenProgress >= 1 && document.getElementById('modal-gift').classList.contains('hidden')) {
             openGiftModal();
             globePhase = 'revealed';
@@ -1935,10 +2536,10 @@
         // Glow pulse on miniature 3D gift when ready
         if (giftReady) {
           const pulse = 0.5 + 0.5 * Math.sin(t * 4.5);
-          giftBodyMat.emissive.setHex(0xd97706);
-          giftBodyMat.emissiveIntensity = 0.25 + pulse * 0.55;
-          giftGlowRing.material.opacity = 0.3 + pulse * 0.5;
-          giftGlowRing.scale.setScalar(1 + pulse * 0.22);
+          giftBodyMat.emissive.setHex(0x7f1d1d);
+          giftBodyMat.emissiveIntensity = 0.15 + pulse * 0.28;
+          giftGlowHalo.material.opacity = 0.28 + pulse * 0.45;
+          giftGlowHalo.scale.setScalar(1.15 + pulse * 0.28);
         }
 
         // Update 2,200 Snow & Text Particles
@@ -2040,6 +2641,11 @@
       // =========================================================================
       function closeModal(id) {
         document.getElementById(id).classList.add('hidden');
+        if (id === 'modal-gift') {
+          giftOpenProgress = 0;
+          giftLidPivot.rotation.x = 0;
+          giftBoxGroup.position.y = -2.02;
+        }
       }
 
       function renderGiftPhoto() {
@@ -2141,6 +2747,9 @@
         getList: () => appState.photos,
         onPhotoReady: (dataUrl) => {
           appState.photos.push({ url: dataUrl });
+          if (!appState.framePhoto && appState.photos.length === 1) {
+            updateFramePhotoTexture(dataUrl);
+          }
           renderCreatorPhotoThumbs();
         }
       });

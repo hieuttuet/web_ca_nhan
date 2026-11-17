@@ -1652,25 +1652,44 @@
         <img id="payment-qr-img" src="" alt="Mã VietQR thanh toán" />
       </div>
 
-      <div style="font-size: 0.82rem; color: #fde68a; margin-bottom: 12px;">
-        Mã đơn: <strong id="payment-order-code">--</strong> • Số tiền: <strong>39.000đ</strong>
-      </div>
-
-      <button type="button" id="btn-download-pay-qr" class="btn-download-qr">
+      <button type="button" id="btn-download-pay-qr" class="btn-download-qr" style="margin-bottom:12px;">
         📥 Tải Mã QR Chuyển Tiền
       </button>
+
+      <div style="border-radius:14px;background:rgba(15,6,6,0.65);border:1px solid rgba(251,191,36,0.28);padding:10px 14px;margin-bottom:8px;font-size:0.82rem;text-align:left;">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="color:#d6c7b2;">Ngân hàng:</span>
+          <strong id="pay-bank-name">MB</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="color:#d6c7b2;">Chủ tài khoản:</span>
+          <strong id="pay-account-name">---</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="color:#d6c7b2;">Số tài khoản:</span>
+          <strong id="pay-account-no">---</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <span style="color:#d6c7b2;">Số tiền:</span>
+          <strong id="pay-amount-text" style="color:#fde047;">39.000đ</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;">
+          <span style="color:#d6c7b2;">Nội dung CK (Bắt buộc):</span>
+          <strong id="payment-order-code" style="color:#fda4af;">--</strong>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- SUCCESS MODAL -->
+  <!-- SUCCESS MODAL (Chuẩn Hoa Đào / Hoa Mai Rơi 3D) -->
   <div id="modal-success" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width: 440px; text-align: center;">
+    <div class="modal-card" style="max-width: 460px; text-align: center;">
       <button type="button" class="modal-close-corner" onclick="closeModal('modal-success')" aria-label="Đóng">✕</button>
-      <h3 class="modal-title" style="padding-right: 0;">🎉 Tạo Lì Xì Đỏ 3D Thành Công!</h3>
-      <p class="modal-subtitle">Gửi link hoặc mã QR này cho người nhận để họ tự tay vuốt mở bao lì xì 3D nhé.</p>
+      <h3 class="modal-title" style="padding-right: 0; color: #6ee7b7;">🎉 Tạo Lì Xì Đỏ 3D Thành Công!</h3>
+      <p class="modal-subtitle">Tải tấm <b>Thiệp QR Lì Xì 3D</b> hoặc sao chép link gửi cho người nhận tự tay vuốt mở bao lì xì nhé.</p>
 
-      <div class="qr-box">
-        <img id="success-share-qr" src="" alt="QR Link Lì Xì" />
+      <div style="margin: 0 auto 12px; max-width: 280px; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(251,191,36,0.5); box-shadow: 0 14px 34px rgba(0,0,0,0.55);">
+        <canvas id="gift-card-canvas" width="600" height="780" style="width:100%; height:auto; display:block;"></canvas>
       </div>
 
       <div class="share-link-box">
@@ -1678,10 +1697,11 @@
         <button type="button" id="btn-copy-link" class="mini-chip" style="padding: 0 14px;">Sao chép</button>
       </div>
 
-      <div class="share-actions-3">
-        <button type="button" id="btn-download-share-qr" class="btn-download-qr" style="margin-bottom:0;">📥 Tải Mã QR</button>
-        <button type="button" id="btn-preview-created" class="btn-primary-dock" style="padding: 10px 12px; font-size:0.84rem;">✨ Mở Xem Ngay</button>
+      <div class="share-actions-3" style="margin-bottom:8px;">
+        <button type="button" id="btn-download-card-img" class="btn-download-qr" style="margin-bottom:0;">📥 Tải Thiệp QR</button>
+        <button type="button" id="btn-download-share-qr" class="btn-download-qr" style="margin-bottom:0;">📥 Tải Ảnh QR</button>
       </div>
+      <button type="button" id="btn-preview-created" class="btn-primary-dock" style="width:100%; padding: 11px 14px; font-size:0.86rem;">✨ Mở Xem Ngay</button>
     </div>
   </div>
 
@@ -4709,6 +4729,65 @@
         try { localStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
       }
 
+      function renderRedEnvelopeGiftCard(shareUrl) {
+        const c = document.getElementById('gift-card-canvas');
+        const g = c.getContext('2d');
+        const bg = g.createLinearGradient(0, 0, 600, 780);
+        bg.addColorStop(0, '#450a0a');
+        bg.addColorStop(0.55, '#991b1b');
+        bg.addColorStop(1, '#2d0606');
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 600, 780);
+
+        g.strokeStyle = '#fde047';
+        g.lineWidth = 4;
+        g.strokeRect(24, 24, 552, 732);
+
+        g.fillStyle = '#fef08a';
+        g.textAlign = 'center';
+        g.font = '800 30px "Cinzel", serif';
+        g.fillText('🧧 LÌ XÌ ĐỎ 3D HOÀNG GIA 🧧', 300, 90);
+
+        g.fillStyle = '#ffe4e6';
+        let recSize = 40;
+        const recLine = `Gửi ${appState.receiver || 'Minh Khuê'}`;
+        do {
+          g.font = `700 ${recSize}px "Dancing Script", cursive`;
+          if (g.measureText(recLine).width <= 500 || recSize <= 22) break;
+          recSize -= 2;
+        } while (recSize > 22);
+        g.fillText(recLine, 300, 148);
+
+        g.fillStyle = '#ffffff';
+        g.fillRect(145, 195, 310, 310);
+
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
+        const qrImg = new Image();
+        qrImg.crossOrigin = 'anonymous';
+        qrImg.onload = () => {
+          g.drawImage(qrImg, 160, 210, 280, 280);
+        };
+        qrImg.src = qrUrl;
+
+        g.fillStyle = '#fde047';
+        g.font = '700 22px "Plus Jakarta Sans", sans-serif';
+        g.fillText('Quét QR để Vuốt Mở Lì Xì 3D', 300, 565);
+
+        g.fillStyle = '#fef2f2';
+        let subSize = 18;
+        const subLine = `Từ: ${appState.sender || 'Minh Khang'} • ${appState.occasion || 'Tài Lộc Bình An'}`;
+        do {
+          g.font = `500 ${subSize}px "Plus Jakarta Sans", sans-serif`;
+          if (g.measureText(subLine).width <= 510 || subSize <= 12) break;
+          subSize -= 1;
+        } while (subSize > 12);
+        g.fillText(subLine, 300, 610);
+
+        g.fillStyle = 'rgba(253, 224, 71, 0.78)';
+        g.font = '600 15px "Plus Jakarta Sans", sans-serif';
+        g.fillText('Vuốt mở phong bao & Xóc Quẻ Đầu Năm 3D', 300, 705);
+      }
+
       function showSuccessModal(orderCode) {
         clearPendingOrder();
         if (appState.pollTimer) {
@@ -4718,13 +4797,17 @@
         closeModal('modal-payment');
 
         const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
-        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
+        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(shareUrl)}`;
         document.getElementById('success-share-url').value = shareUrl;
-        document.getElementById('success-share-qr').src = qrImgUrl;
+        renderRedEnvelopeGiftCard(shareUrl);
         document.getElementById('modal-success').classList.remove('hidden');
 
+        document.getElementById('btn-download-card-img').onclick = () => {
+          const c = document.getElementById('gift-card-canvas');
+          downloadQrDirectly(c.toDataURL('image/png'), `Thiep-QR-LiXi-${orderCode}.png`);
+        };
         document.getElementById('btn-download-share-qr').onclick = () => {
-          downloadQrDirectly(qrImgUrl, `lixi-3d-${orderCode}.png`);
+          downloadQrDirectly(qrImgUrl, `QR-LiXi-${orderCode}.png`);
         };
         document.getElementById('btn-preview-created').onclick = () => {
           window.location.href = shareUrl;
@@ -4746,6 +4829,10 @@
         appState.orderCode = snap.orderCode;
         document.getElementById('payment-order-code').textContent = snap.orderCode;
         document.getElementById('payment-qr-img').src = snap.qrUrl;
+        document.getElementById('pay-bank-name').textContent = snap.bankId || 'MB';
+        document.getElementById('pay-account-name').textContent = snap.accountName || '---';
+        document.getElementById('pay-account-no').textContent = snap.accountNo || '---';
+        document.getElementById('pay-amount-text').textContent = `${Number(snap.amount || 39000).toLocaleString('vi-VN')}đ`;
         document.getElementById('btn-download-pay-qr').onclick = () => {
           downloadQrDirectly(snap.qrUrl, `vietqr-${snap.orderCode}.png`);
         };
@@ -4835,7 +4922,14 @@
           if (!res.ok || !data.orderCode || !data.qrUrl) {
             throw new Error(data.error || 'Tạo đơn thất bại');
           }
-          const snap = { orderCode: data.orderCode, qrUrl: data.qrUrl };
+          const snap = {
+            orderCode: data.orderCode,
+            qrUrl: data.qrUrl,
+            bankId: data.bankId,
+            accountName: data.accountName,
+            accountNo: data.accountNo,
+            amount: data.amount
+          };
           savePendingOrder(snap);
           closeModal('modal-creator');
           openPaymentModal(snap);

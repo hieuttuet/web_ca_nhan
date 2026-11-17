@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="../../../templates-catalog.js"></script>
   <style>
     :root {
@@ -578,6 +580,9 @@
 
   <!-- FLOATING MAGIC PROMPT -->
   <div id="magic-hint-wrap" class="magic-hint-wrap">
+    <div id="glb-loading-pill" class="magic-hint-pill" style="margin-bottom:6px; font-size:0.78rem; padding:6px 14px;">
+      ⏳ Đang tải mô hình 3D (GLB)...
+    </div>
     <div id="magic-hint-pill" class="magic-hint-pill">
       ❄️ Chạm quả cầu hoặc lắc điện thoại để khởi động phép thuật...
     </div>
@@ -687,27 +692,77 @@
     </div>
   </div>
 
-  <!-- VIETQR PAYMENT MODAL -->
+  <!-- VIETQR PAYMENT & QR CARD MODAL (Chuẩn Hoa Đào / Hoa Mai Rơi 3D) -->
   <div id="modal-payment" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width:410px; text-align:center;">
+    <div class="modal-card" style="max-width:480px;">
       <button type="button" class="modal-close-corner" id="btn-close-payment" aria-label="Đóng">✕</button>
-      <h3 class="modal-title">💳 Quét Mã VietQR Để Kích Hoạt</h3>
-      <p class="modal-subtitle">Mã đơn: <strong id="payment-order-code">---</strong> • Tự động mở link sau khi chuyển khoản.</p>
-      <img id="payment-qr-img" src="" alt="Mã VietQR" style="width:240px;max-width:100%;border-radius:14px;background:#fff;padding:8px;margin:0 auto 14px;display:block;" />
-      <p style="font-size:0.8rem;color:#fde68a;opacity:0.85;">Hệ thống đang tự động kiểm tra thanh toán...</p>
-    </div>
-  </div>
 
-  <!-- SUCCESS LINK MODAL -->
-  <div id="modal-success" class="modal-backdrop hidden">
-    <div class="modal-card" style="max-width:430px; text-align:center;">
-      <button type="button" class="modal-close-corner" id="btn-close-success" aria-label="Đóng">✕</button>
-      <h3 class="modal-title">🎉 Tạo Quả Cầu Tuyết Thành Công!</h3>
-      <p class="modal-subtitle">Gửi đường link dưới đây cho người thương để mở quả cầu tuyết ma thuật nhé.</p>
-      <input id="success-share-url" class="form-input" type="text" readonly style="margin-bottom:10px; text-align:center;" />
-      <div class="dock-btn-row" style="width:100%;">
-        <button type="button" id="btn-copy-link" class="btn-secondary-dock" style="flex:1;">📋 Sao chép link</button>
-        <button type="button" id="btn-open-share" class="btn-primary-dock" style="flex:1;">🔮 Mở xem ngay</button>
+      <div id="pay-step-waiting">
+        <div style="text-align:center; margin-bottom:6px;"><span class="gift-badge">📲 Thanh Toán Tự Động VietQR</span></div>
+        <h3 class="modal-title" style="text-align:center; padding-right:0;">Quét Mã Mở Khóa Quả Cầu Tuyết 3D</h3>
+        <p class="modal-subtitle" style="text-align:center;">
+          Quét mã VietQR bằng bất kỳ App Ngân Hàng nào. Hệ thống tự động mở khóa link sau 3 giây khi nhận được chuyển khoản!
+        </p>
+
+        <div style="text-align:center;">
+          <div style="display:inline-block;padding:12px;border-radius:16px;background:#fff;box-shadow:0 12px 34px rgba(0,0,0,0.45);margin:6px auto 12px;">
+            <img id="pay-vietqr-img" src="" alt="VietQR" style="width:210px;height:210px;display:block;object-fit:contain;" />
+          </div>
+        </div>
+
+        <button type="button" id="btn-download-vietqr" class="btn-secondary-dock" style="width:100%; margin-bottom:12px;">
+          📥 Tải Mã QR Chuyển Tiền
+        </button>
+
+        <div style="border-radius:14px;background:rgba(15,6,6,0.65);border:1px solid rgba(251,191,36,0.28);padding:10px 14px;margin-bottom:12px;font-size:0.83rem;">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:#d6c7b2;">Ngân hàng:</span>
+            <strong id="pay-bank-name">MB</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:#d6c7b2;">Chủ tài khoản:</span>
+            <strong id="pay-account-name">---</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:#d6c7b2;">Số tài khoản:</span>
+            <strong id="pay-account-no">---</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:#d6c7b2;">Số tiền:</span>
+            <strong id="pay-amount-text" style="color:#fde047;">39.000đ</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;">
+            <span style="color:#d6c7b2;">Nội dung CK (Bắt buộc):</span>
+            <strong id="pay-memo-text" style="color:#fda4af;">---</strong>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding:10px; border-radius:12px; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.35); color:#fde047; font-size:0.82rem; font-weight:700;">
+          🔄 Đang chờ ngân hàng xác nhận tự động...
+        </div>
+      </div>
+
+      <div id="pay-step-success" style="display:none; text-align:center;">
+        <div style="font-size:2.1rem; margin-bottom:4px;">🔮</div>
+        <h3 class="modal-title" style="color:#6ee7b7; padding-right:0;">Quả Cầu Tuyết 3D Đã Sẵn Sàng!</h3>
+        <p class="modal-subtitle">
+          Tải tấm <b>Thiệp QR Quả Cầu Tuyết</b> bên dưới hoặc sao chép đường link gửi cho người nhận nhé!
+        </p>
+
+        <div style="margin:0 auto 12px; max-width:290px; border-radius:16px; overflow:hidden; border:1.5px solid rgba(251,191,36,0.5); box-shadow:0 14px 36px rgba(0,0,0,0.55);">
+          <canvas id="gift-card-canvas" width="600" height="780" style="width:100%; height:auto; display:block;"></canvas>
+        </div>
+
+        <input id="share-url-input" type="text" class="form-input" readonly style="font-size:0.82rem; text-align:center; margin-bottom:10px;" />
+
+        <div class="dock-btn-row" style="width:100%; margin-bottom:8px;">
+          <button type="button" id="btn-copy-url" class="btn-primary-dock" style="flex:1;">📋 Copy Link</button>
+          <button type="button" id="btn-download-card-img" class="btn-secondary-dock" style="flex:1;">📥 Tải Thiệp QR</button>
+        </div>
+        <div class="dock-btn-row" style="width:100%;">
+          <button type="button" id="btn-download-qr-only" class="btn-secondary-dock" style="flex:1; color:#fde047;">📥 Tải Ảnh QR</button>
+          <button type="button" id="btn-open-share" class="btn-primary-dock" style="flex:1;">🔮 Mở xem ngay</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1084,58 +1139,38 @@
       snowMound.position.y = -1.38;
       snowGlobeGroup.add(snowMound);
 
-      // Cozy Wooden Cabin inside Globe
+      // Cozy Wooden Cabin inside Globe (GLTF/GLB Hybrid Loader + Safe Fallback)
       const cabinGroup = new THREE.Group();
       cabinGroup.position.set(-0.22, -0.78, -0.15);
       cabinGroup.rotation.y = 0.28;
       snowGlobeGroup.add(cabinGroup);
 
-      const cabinWallMat = new THREE.MeshStandardMaterial({ color: 0x6b3518, roughness: 0.75 });
-      const cabinBody = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.52, 0.68), cabinWallMat);
-      cabinGroup.add(cabinBody);
-
-      // Snow-covered Pitched Roof
-      const roofWood = new THREE.Mesh(
-        new THREE.ConeGeometry(0.66, 0.46, 4),
-        new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.7 })
-      );
-      roofWood.rotation.y = Math.PI / 4;
-      roofWood.position.y = 0.46;
-      cabinGroup.add(roofWood);
-
-      const roofSnow = new THREE.Mesh(
-        new THREE.ConeGeometry(0.68, 0.42, 4),
-        snowGroundMat
-      );
-      roofSnow.rotation.y = Math.PI / 4;
-      roofSnow.position.y = 0.50;
-      cabinGroup.add(roofSnow);
-
-      // Glowing Cabin Windows & Door
       const glowWinMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
-      const winFront = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
-      winFront.position.set(-0.18, 0.04, 0.345);
-      cabinGroup.add(winFront);
+      const glbWindowMats = [];
 
-      const winSide = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
-      winSide.rotation.y = Math.PI / 2;
-      winSide.position.set(0.395, 0.04, 0.06);
-      cabinGroup.add(winSide);
-
-      const doorMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.16, 0.28),
-        new THREE.MeshStandardMaterial({ color: 0x451a03 })
-      );
-      doorMesh.position.set(0.14, -0.11, 0.345);
-      cabinGroup.add(doorMesh);
-
-      // Stone Chimney
-      const chimney = new THREE.Mesh(
-        new THREE.BoxGeometry(0.14, 0.36, 0.14),
-        new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.85 })
-      );
-      chimney.position.set(0.22, 0.58, -0.10);
-      cabinGroup.add(chimney);
+      function buildFallbackCabin() {
+        if (cabinGroup.children.length > 0) return;
+        const cabinWallMat = new THREE.MeshStandardMaterial({ color: 0x6b3518, roughness: 0.75 });
+        cabinGroup.add(new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.52, 0.68), cabinWallMat));
+        const roofWood = new THREE.Mesh(new THREE.ConeGeometry(0.66, 0.46, 4), new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.7 }));
+        roofWood.rotation.y = Math.PI / 4; roofWood.position.y = 0.46;
+        cabinGroup.add(roofWood);
+        const roofSnow = new THREE.Mesh(new THREE.ConeGeometry(0.68, 0.42, 4), snowGroundMat);
+        roofSnow.rotation.y = Math.PI / 4; roofSnow.position.y = 0.50;
+        cabinGroup.add(roofSnow);
+        const winFront = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
+        winFront.position.set(-0.18, 0.04, 0.345);
+        cabinGroup.add(winFront);
+        const winSide = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), glowWinMat);
+        winSide.rotation.y = Math.PI / 2; winSide.position.set(0.395, 0.04, 0.06);
+        cabinGroup.add(winSide);
+        const doorMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.28), new THREE.MeshStandardMaterial({ color: 0x451a03 }));
+        doorMesh.position.set(0.14, -0.11, 0.345);
+        cabinGroup.add(doorMesh);
+        const chimney = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.36, 0.14), new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.85 }));
+        chimney.position.set(0.22, 0.58, -0.10);
+        cabinGroup.add(chimney);
+      }
 
       // Nâng cấp 1: Antique Wooden Photo Frame next to Cabin inside the 3D Snow Globe
       const photoFrameGroup = new THREE.Group();
@@ -1226,8 +1261,18 @@
         img.src = imgUrl;
       }
 
-      // Snow-Dusted Pine Trees
-      function createPineTree(x, y, z, scale) {
+      // Snow-Dusted Pine Trees (GLTF/GLB Hybrid Loader + Safe Fallback)
+      const pineTreeContainer = new THREE.Group();
+      snowGlobeGroup.add(pineTreeContainer);
+      const TREE_SPOTS = [
+        { x: -1.05, y: -0.98, z: -0.35, s: 1.05 },
+        { x: -0.82, y: -0.98, z: 0.55, s: 0.78 },
+        { x: 0.78, y: -0.98, z: -0.45, s: 1.15 },
+        { x: 1.06, y: -0.98, z: 0.38, s: 0.86 },
+        { x: 0.32, y: -0.95, z: -0.95, s: 0.92 }
+      ];
+
+      function createFallbackPineTree(x, y, z, scale) {
         const tg = new THREE.Group();
         const trunk = new THREE.Mesh(
           new THREE.CylinderGeometry(0.04, 0.06, 0.24, 8),
@@ -1235,7 +1280,6 @@
         );
         trunk.position.y = 0.12;
         tg.add(trunk);
-
         const greenMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.78 });
         [
           { r: 0.30, h: 0.40, y: 0.34 },
@@ -1245,23 +1289,79 @@
           const cone = new THREE.Mesh(new THREE.ConeGeometry(tier.r, tier.h, 10), greenMat);
           cone.position.y = tier.y;
           tg.add(cone);
-
           const cap = new THREE.Mesh(new THREE.ConeGeometry(tier.r * 0.88, tier.h * 0.55, 10), snowGroundMat);
           cap.position.y = tier.y + tier.h * 0.24;
           tg.add(cap);
         });
-
         tg.position.set(x, y, z);
         tg.scale.setScalar(scale);
-        snowGlobeGroup.add(tg);
+        pineTreeContainer.add(tg);
         return tg;
       }
 
-      createPineTree(-1.05, -0.95, -0.35, 1.05);
-      createPineTree(-0.82, -0.95, 0.55, 0.78);
-      createPineTree(0.78, -0.95, -0.45, 1.15);
-      createPineTree(1.06, -0.95, 0.38, 0.86);
-      createPineTree(0.32, -0.92, -0.95, 0.92);
+      function hideGlbLoadingPill() {
+        const pill = document.getElementById('glb-loading-pill');
+        if (pill) pill.style.display = 'none';
+      }
+
+      if (typeof THREE.GLTFLoader === 'function') {
+        const loadingMgr = new THREE.LoadingManager();
+        loadingMgr.onProgress = (_, loaded, total) => {
+          const pill = document.getElementById('glb-loading-pill');
+          if (pill && total > 0) {
+            pill.textContent = `⏳ Đang tải mô hình 3D... ${Math.round((loaded / total) * 100)}%`;
+          }
+        };
+        loadingMgr.onLoad = hideGlbLoadingPill;
+
+        const gltfLoader = new THREE.GLTFLoader(loadingMgr);
+        if (typeof THREE.DRACOLoader === 'function') {
+          const dracoLoader = new THREE.DRACOLoader();
+          dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+          gltfLoader.setDRACOLoader(dracoLoader);
+        }
+
+        gltfLoader.load(
+          './models/cabin.glb',
+          (gltf) => {
+            const model = gltf.scene;
+            model.traverse((child) => {
+              if (child.isMesh && child.material && child.material.name === 'GlowWindow') {
+                glbWindowMats.push(child.material);
+              }
+            });
+            cabinGroup.add(model);
+          },
+          undefined,
+          () => {
+            buildFallbackCabin();
+            hideGlbLoadingPill();
+          }
+        );
+
+        gltfLoader.load(
+          './models/pine-tree.glb',
+          (gltf) => {
+            TREE_SPOTS.forEach((sp) => {
+              const treeClone = gltf.scene.clone(true);
+              treeClone.position.set(sp.x, sp.y, sp.z);
+              treeClone.scale.setScalar(sp.s);
+              pineTreeContainer.add(treeClone);
+            });
+          },
+          undefined,
+          () => {
+            if (pineTreeContainer.children.length === 0) {
+              TREE_SPOTS.forEach((sp) => createFallbackPineTree(sp.x, sp.y, sp.z, sp.s));
+            }
+            hideGlbLoadingPill();
+          }
+        );
+      } else {
+        buildFallbackCabin();
+        TREE_SPOTS.forEach((sp) => createFallbackPineTree(sp.x, sp.y, sp.z, sp.s));
+        hideGlbLoadingPill();
+      }
 
       // Chimney Rising Smoke Particles (soft grey-white wisps)
       const SMOKE_COUNT = 26;
@@ -1680,6 +1780,7 @@
         if (key === 'cyber_ice') {
           appState.glowTheme = 'ice_blue';
           glowWinMat.color.setHex(0x38bdf8);
+          glbWindowMats.forEach((m) => { m.color.setHex(0x38bdf8); m.emissive.setHex(0x38bdf8); });
           cabinWindowLight.color.setHex(0x38bdf8);
           warmFireLight.color.setHex(0xd946ef);
           iceRimLight.color.setHex(0x38bdf8);
@@ -1689,6 +1790,7 @@
         } else if (key === 'golden_star') {
           appState.glowTheme = 'warm_gold';
           glowWinMat.color.setHex(0xfef08a);
+          glbWindowMats.forEach((m) => { m.color.setHex(0xfef08a); m.emissive.setHex(0xfbbf24); });
           cabinWindowLight.color.setHex(0xfbbf24);
           warmFireLight.color.setHex(0xf59e0b);
           iceRimLight.color.setHex(0xfef08a);
@@ -1698,6 +1800,7 @@
         } else {
           appState.glowTheme = 'warm_gold';
           glowWinMat.color.setHex(0xfde047);
+          glbWindowMats.forEach((m) => { m.color.setHex(0xfde047); m.emissive.setHex(0xf59e0b); });
           cabinWindowLight.color.setHex(0xfbbf24);
           warmFireLight.color.setHex(0xff9e2c);
           iceRimLight.color.setHex(0x93c5fd);
@@ -2138,32 +2241,235 @@
         e.target.value = '';
       });
 
+      const PENDING_ORDER_KEY = 'pending_order_snow_globe_magic';
+      const ORDER_TTL_MS = 45 * 60 * 1000;
+
+      function savePendingOrder(data) {
+        try {
+          const payload = JSON.stringify({ ...data, savedAt: Date.now() });
+          sessionStorage.setItem(PENDING_ORDER_KEY, payload);
+          localStorage.setItem(PENDING_ORDER_KEY, payload);
+        } catch (_) {}
+      }
+
+      function loadPendingOrder() {
+        const raw = sessionStorage.getItem(PENDING_ORDER_KEY) || localStorage.getItem(PENDING_ORDER_KEY);
+        if (!raw) return null;
+        try {
+          const p = JSON.parse(raw);
+          if (!p.savedAt || Date.now() - p.savedAt > ORDER_TTL_MS) {
+            clearPendingOrder();
+            return null;
+          }
+          return p;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function clearPendingOrder() {
+        try { sessionStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
+        try { localStorage.removeItem(PENDING_ORDER_KEY); } catch (_) {}
+      }
+
+      async function rasterizeBlobToPng(blob) {
+        const url = URL.createObjectURL(blob);
+        try {
+          return await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              const c = document.createElement('canvas');
+              c.width = img.naturalWidth || 600;
+              c.height = img.naturalHeight || 600;
+              const g = c.getContext('2d');
+              g.fillStyle = '#ffffff';
+              g.fillRect(0, 0, c.width, c.height);
+              g.drawImage(img, 0, 0);
+              c.toBlob((out) => (out ? resolve(out) : reject(new Error('toBlob failed'))), 'image/png', 1);
+            };
+            img.onerror = reject;
+            img.src = url;
+          });
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      async function urlToImageBlob(url, filename = 'QR.png') {
+        if (url.startsWith('data:') || url.startsWith('blob:')) {
+          const res = await fetch(url);
+          return await res.blob();
+        }
+        try {
+          const parsed = new URL(url, window.location.href);
+          if (parsed.hostname === 'img.vietqr.io' || parsed.hostname === 'api.qrserver.com') {
+            const proxyUrl = `/api/download-qr?url=${encodeURIComponent(parsed.toString())}&filename=${encodeURIComponent(filename)}`;
+            const pRes = await fetch(proxyUrl);
+            if (pRes.ok) {
+              return await rasterizeBlobToPng(await pRes.blob());
+            }
+          }
+        } catch (_) {}
+        const res = await fetch(url, { mode: 'cors' });
+        return await rasterizeBlobToPng(await res.blob());
+      }
+
+      async function downloadBlobImage(url, filename) {
+        try {
+          const blob = await urlToImageBlob(url, filename);
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+        } catch (_) {
+          window.open(url, '_blank');
+        }
+      }
+
+      function renderSnowGlobeGiftCard(shareUrl) {
+        const c = document.getElementById('gift-card-canvas');
+        const g = c.getContext('2d');
+        const bg = g.createLinearGradient(0, 0, 600, 780);
+        if (appState.vibe === 'cyber_ice') {
+          bg.addColorStop(0, '#0f172a');
+          bg.addColorStop(0.55, '#1e1b4b');
+          bg.addColorStop(1, '#090d1f');
+        } else {
+          bg.addColorStop(0, '#2c100c');
+          bg.addColorStop(0.55, '#6b1414');
+          bg.addColorStop(1, '#180706');
+        }
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 600, 780);
+
+        g.strokeStyle = '#fde047';
+        g.lineWidth = 4;
+        g.strokeRect(24, 24, 552, 732);
+
+        g.fillStyle = '#fef08a';
+        g.textAlign = 'center';
+        g.font = '800 28px "Cinzel", serif';
+        g.fillText('🔮 QUẢ CẦU TUYẾT MA THUẬT ❄️', 300, 90);
+
+        g.fillStyle = '#ffe4e6';
+        let recSize = 40;
+        const recLine = `Gửi ${appState.receiver}`;
+        do {
+          g.font = `700 ${recSize}px "Dancing Script", cursive`;
+          if (g.measureText(recLine).width <= 500 || recSize <= 22) break;
+          recSize -= 2;
+        } while (recSize > 22);
+        g.fillText(recLine, 300, 148);
+
+        g.fillStyle = '#ffffff';
+        g.fillRect(145, 195, 310, 310);
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(shareUrl)}`;
+        const qrImg = new Image();
+        qrImg.crossOrigin = 'anonymous';
+        qrImg.onload = () => {
+          g.drawImage(qrImg, 160, 210, 280, 280);
+        };
+        qrImg.src = qrUrl;
+
+        g.fillStyle = '#fde047';
+        g.font = '700 22px "Plus Jakarta Sans", sans-serif';
+        g.fillText('Quét QR để Lắc Quả Cầu Tuyết 3D', 300, 565);
+
+        g.fillStyle = '#fef2f2';
+        let subSize = 18;
+        const subLine = `Từ: ${appState.sender} • ${appState.globeText}`;
+        do {
+          g.font = `500 ${subSize}px "Plus Jakarta Sans", sans-serif`;
+          if (g.measureText(subLine).width <= 510 || subSize <= 12) break;
+          subSize -= 1;
+        } while (subSize > 12);
+        g.fillText(subLine, 300, 610);
+
+        g.fillStyle = 'rgba(253, 224, 71, 0.78)';
+        g.font = '600 15px "Plus Jakarta Sans", sans-serif';
+        g.fillText('Chạm hoặc lắc điện thoại để mở phép thuật & quà 3D', 300, 705);
+      }
+
+      function populatePaymentWaitingModal(orderData) {
+        appState.orderCode = orderData.orderCode;
+        document.getElementById('pay-step-waiting').style.display = 'block';
+        document.getElementById('pay-step-success').style.display = 'none';
+        document.getElementById('pay-vietqr-img').src = orderData.qrUrl || '';
+        document.getElementById('pay-bank-name').textContent = orderData.bankId || 'MB';
+        document.getElementById('pay-account-name').textContent = orderData.accountName || '---';
+        document.getElementById('pay-account-no').textContent = orderData.accountNo || '---';
+        document.getElementById('pay-amount-text').textContent = `${Number(orderData.amount || 39000).toLocaleString('vi-VN')}đ`;
+        document.getElementById('pay-memo-text').textContent = orderData.orderCode || '---';
+        document.getElementById('modal-payment').classList.remove('hidden');
+      }
+
+      function showPaymentSuccessStep(orderCode) {
+        clearPendingOrder();
+        if (appState.pollTimer) {
+          clearInterval(appState.pollTimer);
+          appState.pollTimer = null;
+        }
+        document.getElementById('pay-step-waiting').style.display = 'none';
+        document.getElementById('pay-step-success').style.display = 'block';
+        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(orderCode)}`;
+        document.getElementById('share-url-input').value = shareUrl;
+        document.getElementById('btn-open-share').onclick = () => { window.location.href = shareUrl; };
+        renderSnowGlobeGiftCard(shareUrl);
+      }
+
       async function checkOrderStatusOnce(code) {
         if (!code) return;
         try {
           const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
           const data = await res.json();
           if (data && data.status === 'PAID') {
-            if (appState.pollTimer) clearInterval(appState.pollTimer);
-            closeModal('modal-payment');
-            const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(code)}`;
-            document.getElementById('success-share-url').value = shareUrl;
-            document.getElementById('btn-open-share').onclick = () => { window.location.href = shareUrl; };
-            document.getElementById('modal-success').classList.remove('hidden');
+            showPaymentSuccessStep(code);
           }
         } catch (_) {}
       }
 
       document.getElementById('btn-close-payment').addEventListener('click', () => {
+        clearPendingOrder();
         if (appState.pollTimer) clearInterval(appState.pollTimer);
         closeModal('modal-payment');
       });
-      document.getElementById('btn-close-success').addEventListener('click', () => closeModal('modal-success'));
-      document.getElementById('btn-copy-link').addEventListener('click', async () => {
+
+      document.getElementById('btn-download-vietqr').addEventListener('click', () => {
+        const src = document.getElementById('pay-vietqr-img').src;
+        if (src) downloadBlobImage(src, `VietQR-${appState.orderCode || 'SnowGlobe'}.png`);
+      });
+
+      document.getElementById('btn-copy-url').addEventListener('click', async () => {
         try {
-          await navigator.clipboard.writeText(document.getElementById('success-share-url').value);
-          document.getElementById('btn-copy-link').textContent = 'Đã chép ✓';
+          await navigator.clipboard.writeText(document.getElementById('share-url-input').value);
+          document.getElementById('btn-copy-url').textContent = 'Đã chép ✓';
         } catch (_) {}
+      });
+
+      document.getElementById('btn-download-card-img').addEventListener('click', async () => {
+        const c = document.getElementById('gift-card-canvas');
+        await downloadBlobImage(c.toDataURL('image/png'), `Thiep-QR-SnowGlobe-${appState.orderCode || 'VIP'}.png`);
+      });
+
+      document.getElementById('btn-download-qr-only').addEventListener('click', async () => {
+        const shareUrl = document.getElementById('share-url-input').value;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(shareUrl)}`;
+        await downloadBlobImage(qrUrl, `QR-SnowGlobe-${appState.orderCode || 'VIP'}.png`);
+      });
+
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && appState.orderCode && !document.getElementById('modal-payment').classList.contains('hidden')) {
+          checkOrderStatusOnce(appState.orderCode);
+        }
+      });
+      window.addEventListener('focus', () => {
+        if (appState.orderCode && !document.getElementById('modal-payment').classList.contains('hidden')) {
+          checkOrderStatusOnce(appState.orderCode);
+        }
       });
 
       document.getElementById('btn-create-order').addEventListener('click', async () => {
@@ -2208,13 +2514,12 @@
           if (!res.ok || !data.orderCode || !data.qrUrl) {
             throw new Error(data.error || 'Tạo đơn thất bại');
           }
-          appState.orderCode = data.orderCode;
-          document.getElementById('payment-order-code').textContent = data.orderCode;
-          document.getElementById('payment-qr-img').src = data.qrUrl;
+          savePendingOrder(data);
           closeModal('modal-creator');
-          document.getElementById('modal-payment').classList.remove('hidden');
+          populatePaymentWaitingModal(data);
           if (appState.pollTimer) clearInterval(appState.pollTimer);
-          appState.pollTimer = setInterval(() => checkOrderStatusOnce(data.orderCode), 3500);
+          appState.pollTimer = setInterval(() => checkOrderStatusOnce(data.orderCode), 3000);
+          checkOrderStatusOnce(data.orderCode);
         } catch (err) {
           alert('Có lỗi khi tạo đơn: ' + err.message);
         } finally {

@@ -16,7 +16,7 @@ const EVENT_CATEGORIES = [
   { id: 'confess', name: 'Tỏ Tình', icon: '💘' },
   { id: 'anniversary', name: 'Kỷ Niệm Yêu', icon: '💑' },
   { id: 'birthday', name: 'Sinh Nhật', icon: '🎂' },
-  { id: 'valentine', name: 'Valentine 14/2', icon: '🌹' },
+  { id: 'valentine', name: 'Valentine', icon: '🌹' },
   { id: 'women', name: '8/3 & 20/10', icon: '🌸' },
   { id: 'holiday', name: 'Lễ Tết & Noel', icon: '🧧' }
 ];

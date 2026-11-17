@@ -226,6 +226,26 @@
       align-items: center;
       gap: 10px;
       pointer-events: auto;
+      max-width: calc(100vw - 16px);
+    }
+
+    .dock-btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      width: max-content;
+      max-width: calc(100vw - 16px);
+    }
+
+    @media (max-width: 520px) {
+      .dock-btn-row .btn-primary-dock,
+      .dock-btn-row .btn-secondary-dock {
+        padding: 10px 13px;
+        font-size: 0.78rem;
+        gap: 5px;
+      }
     }
 
     .btn-primary-dock {
@@ -1400,7 +1420,7 @@
     <div id="god-tap-hint" class="swipe-hint-pill hidden" style="pointer-events:none; animation: pulseHint 2s ease-in-out infinite;">
       ✨ Chạm Ông Thần Tài nhận lộc ✨
     </div>
-    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+    <div class="dock-btn-row">
       <button type="button" id="btn-shake-fortune" class="btn-secondary-dock">
         🎋 Xóc Quẻ Đầu Năm
       </button>
@@ -2563,11 +2583,15 @@
       function positionLanternsForAspect() {
         const aspect = window.innerWidth / window.innerHeight;
         if (aspect < 0.8) {
-          leftLantern.position.set(-2.95, 4.35, -3.2);
-          rightLantern.position.set(2.95, 4.35, -3.2);
+          leftLantern.position.set(-2.02, 4.15, -3.2);
+          rightLantern.position.set(2.02, 4.15, -3.2);
+          leftLantern.scale.setScalar(1.05);
+          rightLantern.scale.setScalar(1.05);
         } else {
           leftLantern.position.set(-6.15, 3.55, -3.2);
           rightLantern.position.set(6.15, 3.55, -3.2);
+          leftLantern.scale.setScalar(1.32);
+          rightLantern.scale.setScalar(1.32);
         }
       }
       positionLanternsForAspect();
@@ -2700,9 +2724,9 @@
       function positionEnvelopesForAspect() {
         const aspect = window.innerWidth / window.innerHeight;
         const isMobile = aspect < 0.8;
-        const spacing = isMobile ? 1.82 : 2.55;
-        const sc = isMobile ? 0.66 : 0.82;
-        const yOff = isMobile ? 0.36 : 0.42;
+        const spacing = isMobile ? 1.38 : 2.55;
+        const sc = isMobile ? 0.50 : 0.82;
+        const yOff = isMobile ? 0.32 : 0.42;
         envelopes.forEach((env, i) => {
           const offsetIdx = i - 1; // -1, 0, +1
           env.baseX = offsetIdx * spacing;

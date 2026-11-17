@@ -1,0 +1,3755 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tuần Lộc Chạy Qua ✨ Bụi Tiên Tụ Chữ & Hộp Quà Bất Ngờ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+
+  <style>
+    :root {
+      --bg-night: #030614;
+      --gold-primary: #fbbf24;
+      --gold-light: #fef08a;
+      --accent-rose: #fb7185;
+      --glass-bg: rgba(8, 12, 32, 0.76);
+      --glass-border: rgba(251, 191, 36, 0.38);
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-title: 'Cinzel', serif;
+      --font-script: 'Dancing Script', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #030614;
+      font-family: var(--font-main);
+      color: #ffffff;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #magic-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      touch-action: none;
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: 14px;
+      left: 16px;
+      right: 16px;
+      z-index: 25;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .top-hud > * {
+      pointer-events: auto;
+    }
+
+    .top-right-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hud-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: #f8fafc;
+      font-family: var(--font-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      transition: all 0.22s ease;
+    }
+
+    .hud-btn:hover {
+      background: rgba(251, 191, 36, 0.22);
+      border-color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+
+    .hud-btn.active {
+      background: rgba(251, 191, 36, 0.28);
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+
+    /* ==================== SOUND UNLOCK / SUBTLE HINT ==================== */
+    .sound-prompt-pill {
+      position: fixed;
+      top: 62px;
+      right: 16px;
+      z-index: 24;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      color: #fef08a;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      animation: softPulse 2s infinite;
+      transition: opacity 0.35s ease;
+    }
+
+    .sound-prompt-pill.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes softPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.25); }
+      50% { transform: scale(1.04); box-shadow: 0 0 18px rgba(251, 191, 36, 0.55); }
+    }
+
+    /* ==================== BOTTOM HUD STACK ==================== */
+    .bottom-hud-stack {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      width: 95%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .bottom-dock {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .dock-btn {
+      pointer-events: auto;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: #ffffff;
+      font-family: var(--font-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .dock-btn:hover {
+      background: rgba(251, 191, 36, 0.24);
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .dock-btn.primary-cta {
+      background: linear-gradient(135deg, #b91c1c, #e11d48, #d97706);
+      border-color: #fde047;
+      box-shadow: 0 6px 22px rgba(225, 29, 72, 0.45);
+    }
+
+    /* ==================== EXPLODED PHOTO GALLERY OVERLAY ==================== */
+    .memory-burst-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.78) 0%, rgba(3, 6, 20, 0.92) 100%);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .memory-burst-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .memory-header {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .memory-pill {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.16);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: #fde047;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .memory-title {
+      font-family: var(--font-script);
+      font-size: clamp(1.7rem, 5vw, 2.4rem);
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+    }
+
+    .memory-stage {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      touch-action: none;
+    }
+
+    .polaroid-card {
+      background: linear-gradient(145deg, #fffdf7 0%, #f8f1df 100%);
+      border-radius: 18px;
+      padding: 12px 12px 18px;
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.75), 0 0 28px rgba(251, 191, 36, 0.3);
+      border: 2px solid rgba(251, 191, 36, 0.7);
+      transform-origin: center;
+      animation: burstPopIn 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      text-align: center;
+    }
+
+    @keyframes burstPopIn {
+      0% { opacity: 0; transform: scale(0.35) translateY(80px) rotate(-6deg); }
+      70% { opacity: 1; transform: scale(1.03) translateY(-4px) rotate(1deg); }
+      100% { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
+    }
+
+    .polaroid-img-wrap {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    .polaroid-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .polaroid-caption {
+      margin-top: 12px;
+      font-family: var(--font-script);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.25;
+    }
+
+    .polaroid-counter {
+      margin-top: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .memory-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mem-nav-btn {
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      background: rgba(15, 23, 42, 0.85);
+      color: #fef08a;
+      font-family: var(--font-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mem-arrow-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .mem-nav-btn:hover {
+      background: rgba(251, 191, 36, 0.24);
+    }
+
+    .mem-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    .mem-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mem-dot.active {
+      width: 22px;
+      border-radius: 999px;
+      background: #fbbf24;
+      box-shadow: 0 0 10px #fbbf24;
+    }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      z-index: 5;
+    }
+
+    .modal-close-corner:hover {
+      background: rgba(225, 29, 72, 0.85);
+      transform: rotate(90deg);
+    }
+
+    /* ==================== MODALS (LETTER / CREATOR / VIETQR) ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(2, 6, 18, 0.82);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      transition: opacity 0.28s ease;
+    }
+
+    .modal-backdrop.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 530px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: linear-gradient(155deg, rgba(15, 23, 42, 0.97), rgba(6, 10, 26, 0.98));
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      border-radius: 24px;
+      padding: 24px 22px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+    }
+
+    .modal-title {
+      font-family: var(--font-title);
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: #fde047;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.84rem;
+      color: #cbd5e1;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .letter-card {
+      max-width: 480px;
+      text-align: center;
+      border-color: rgba(251, 113, 133, 0.55);
+      background: linear-gradient(155deg, rgba(28, 12, 32, 0.96), rgba(8, 11, 26, 0.98));
+    }
+
+    .letter-body {
+      font-family: var(--font-script);
+      font-size: 1.48rem;
+      line-height: 1.6;
+      color: #fff5f8;
+      background: rgba(0, 0, 0, 0.35);
+      border-left: 3px solid #fb7185;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 14px 0;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+
+    /* Form Controls */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #fef08a;
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--gold-primary);
+      background: rgba(251, 191, 36, 0.08);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+    }
+
+    .form-select {
+      color-scheme: dark;
+      background-color: #0b1322;
+      cursor: pointer;
+    }
+
+    .form-select option {
+      background-color: #0f172a;
+      color: #ffffff;
+    }
+
+    .form-textarea {
+      min-height: 85px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .ai-btn {
+      background: none;
+      border: none;
+      color: #fde047;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-btn:hover {
+      text-decoration: underline;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .photo-cell {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px dashed rgba(251, 191, 36, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .photo-cell:hover {
+      border-color: var(--gold-light);
+      background: rgba(251, 191, 36, 0.14);
+    }
+
+    .photo-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-cell .remove-tag {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .modal-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #be123c, #e11d48, #d97706);
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(225, 29, 72, 0.35);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #fff;
+    }
+
+    .qr-box-center {
+      background: #fff;
+      padding: 10px;
+      border-radius: 14px;
+      display: inline-block;
+      margin: 8px auto 12px;
+    }
+
+    .qr-box-center img {
+      width: 210px;
+      height: 210px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .info-table {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .gift-card-preview {
+      margin: 10px auto 14px;
+      max-width: 300px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .gift-card-preview canvas {
+      width: 100%;
+      display: block;
+    }
+
+    .toast-msg {
+      position: fixed;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      z-index: 90;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(8, 13, 30, 0.94);
+      border: 1px solid #fbbf24;
+      color: #fef08a;
+      font-size: 0.82rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .hud-btn {
+        height: 36px;
+        padding: 0 11px;
+        font-size: 0.76rem;
+      }
+      .top-hud {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        align-items: flex-start;
+      }
+      .top-right-group {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+      .top-right-group .hud-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        justify-content: center;
+      }
+      .top-right-group .hud-btn-label {
+        display: none;
+      }
+      .bottom-hud-stack {
+        bottom: 12px;
+        gap: 6px;
+      }
+      .dock-btn {
+        padding: 8px 12px;
+        font-size: 0.74rem;
+      }
+      .sound-prompt-pill {
+        top: 98px;
+        right: 10px;
+        font-size: 0.72rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FULLSCREEN DUAL-PARTICLE & SILHOUETTE CANVAS -->
+  <canvas id="magic-canvas"></canvas>
+
+  <!-- Toast -->
+  <div id="toast" class="toast-msg">✨ Phép màu Giáng Sinh!</div>
+
+  <!-- Top Floating HUD -->
+  <header class="top-hud">
+    <a href="../../../index.html" class="hud-btn creator-only" title="Về Kho Mẫu Quà Tặng">
+      <span>🏠</span><span>Kho Mẫu</span>
+    </a>
+    <div class="top-right-group">
+      <button type="button" id="btn-replay" class="hud-btn" title="Xem lại màn Tuần Lộc chạy qua">
+        <span>🔄</span><span class="hud-btn-label">Xem Lại</span>
+      </button>
+      <button type="button" id="btn-toggle-sound" class="hud-btn active" title="Bật/Tắt Âm Thanh">
+        <span id="sound-icon">🔊</span><span id="sound-label" class="hud-btn-label">Âm Thanh</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Non-blocking prompt if browser blocked initial autoplay -->
+  <button type="button" id="sound-unlock-pill" class="sound-prompt-pill hidden">
+    🔊 Chạm để bật tiếng gió & chuông tuần lộc
+  </button>
+
+  <!-- Bottom HUD Stack -->
+  <div class="bottom-hud-stack">
+    <nav class="bottom-dock">
+      <button type="button" id="btn-open-letter" class="dock-btn">
+        <span>💌</span><span>Tâm Thư</span>
+      </button>
+      <button type="button" id="btn-open-memories" class="dock-btn" style="display:none;">
+        <span>📸</span><span>Ảnh Kỷ Niệm</span>
+      </button>
+      <button type="button" id="btn-open-creator" class="dock-btn primary-cta creator-only">
+        <span>🦌 Tạo Thiệp Tuần Lộc Riêng</span>
+        <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 999px; font-size: 0.74rem;">35.000đ</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- EXPLODED MEMORY GALLERY OVERLAY (Triggered when tapping the dropped gift box) -->
+  <div id="memory-burst-overlay" class="memory-burst-overlay hidden">
+    <div class="modal-close-corner" onclick="closeMemoryBurst()" title="Đóng xem ảnh">✕</div>
+
+    <div class="memory-header">
+      <div class="memory-pill">🎁 Món Quà Từ Cỗ Xe Tuần Lộc</div>
+      <h2 id="memory-gallery-title" class="memory-title">Kỷ Niệm Của Minh Anh & Bảo Nam</h2>
+    </div>
+
+    <div id="memory-stage" class="memory-stage">
+      <div id="polaroid-card" class="polaroid-card">
+        <div class="polaroid-img-wrap">
+          <img id="memory-photo-img" src="" alt="Kỷ niệm ngọt ngào" />
+        </div>
+        <div id="memory-photo-caption" class="polaroid-caption">Khoảnh khắc Giáng Sinh ✨</div>
+        <div id="memory-photo-counter" class="polaroid-counter">Ảnh 1 / 6</div>
+      </div>
+
+      <div id="memory-dots" class="mem-dots"></div>
+
+      <div class="memory-nav-row">
+        <button type="button" id="btn-prev-photo" class="mem-nav-btn mem-arrow-btn" aria-label="Ảnh trước" title="Ảnh trước">‹</button>
+        <button type="button" id="btn-burst-read-letter" class="mem-nav-btn" style="background: rgba(225, 29, 72, 0.35); border-color: #fb7185; color: #ffe4e6;">💌 Đọc Tâm Thư</button>
+        <button type="button" id="btn-next-photo" class="mem-nav-btn mem-arrow-btn" aria-label="Ảnh sau" title="Ảnh sau">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: ĐỌC TÂM THƯ -->
+  <div id="modal-letter" class="modal-backdrop hidden">
+    <div class="modal-card letter-card">
+      <div class="modal-close-corner" onclick="closeModal('modal-letter')">✕</div>
+      <div style="font-size: 2.3rem; margin-bottom: 4px;">💌</div>
+      <h3 id="letter-title" class="modal-title" style="color: #fda4af;">Gửi Người Thương</h3>
+      <div id="letter-content" class="letter-body"></div>
+      <div id="letter-sign" style="text-align: right; font-weight: 700; color: #fde047; font-size: 1.1rem;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CREATOR STUDIO -->
+  <div id="modal-creator" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-close-corner" onclick="closeModal('modal-creator')">✕</div>
+      <h3 class="modal-title">🦌 Thiết Kế Thiệp Tuần Lộc Chạy Qua</h3>
+      <p class="modal-subtitle">
+        Không cần form rườm rà khi mở link — người nhận sẽ xem ngay màn tuần lộc in bóng qua trăng, rải bụi vàng tụ tên & hộp quà rơi!
+      </p>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Tên của bạn</label>
+          <input id="in-sender" type="text" class="form-input" placeholder="VD: Bảo Nam" maxlength="30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tên người ấy</label>
+          <input id="in-receiver" type="text" class="form-input" placeholder="VD: Minh Anh" maxlength="30" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Dòng chữ bụi vàng tụ thành</label>
+        <select id="in-occasion" class="form-select">
+          <option value="Merry Christmas">🎄 Merry Christmas [Tên]</option>
+          <option value="Giáng Sinh An Lành">✨ Giáng Sinh An Lành [Tên]</option>
+          <option value="Happy New Year 2027">🎆 Happy New Year 2027 [Tên]</option>
+          <option value="Chúc Mừng Năm Mới">🧧 Chúc Mừng Năm Mới [Tên]</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Lời chúc / Tâm thư bí mật</span>
+          <button type="button" id="btn-ai-wish" class="ai-btn">🪄 AI Viết Lời Chúc</button>
+        </div>
+        <textarea id="in-message" class="form-textarea" placeholder="Nhập lời chúc Giáng Sinh ấm áp gửi tới người nhận..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">
+          <span>Ảnh kỷ niệm bung ra khi mở hộp quà rơi</span>
+          <span id="photo-count-badge" style="color: #fde047; font-size: 0.78rem;">6/8 ảnh</span>
+        </div>
+        <div id="photo-upload-grid" class="photo-grid"></div>
+        <input id="in-photo-file" type="file" accept="image/*" multiple style="display:none;" />
+      </div>
+
+      <div class="modal-btn-row">
+        <button type="button" id="btn-preview-ride" class="btn-full btn-secondary">
+          👁️ Xem Thử Ngay
+        </button>
+        <button type="button" id="btn-proceed-pay" class="btn-full btn-primary">
+          💳 Lấy Link & Thiệp QR (35k)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: THANH TOÁN VIETQR & THIỆP QR -->
+  <div id="modal-payment" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-close-corner" onclick="closeModal('modal-payment')">✕</div>
+
+      <div id="pay-step-waiting">
+        <div style="text-align:center;"><span class="memory-pill">📲 Thanh Toán Tự Động VietQR</span></div>
+        <h3 class="modal-title">Quét Mã Mở Khóa Thiệp Tuần Lộc</h3>
+        <p class="modal-subtitle">
+          Quét mã VietQR bằng bất kỳ App Ngân Hàng nào. Hệ thống tự động mở khóa link sau 3 giây khi nhận được chuyển khoản!
+        </p>
+
+        <div style="text-align:center;">
+          <div class="qr-box-center">
+            <img id="pay-vietqr-img" src="" alt="VietQR" />
+          </div>
+        </div>
+
+        <button type="button" id="btn-download-vietqr" class="btn-full btn-secondary" style="margin-bottom: 12px; font-size: 0.85rem;">
+          📥 Tải Mã QR Chuyển Tiền
+        </button>
+
+        <div class="info-table">
+          <div class="info-row">
+            <span style="color:#94a3b8;">Ngân hàng:</span>
+            <strong id="pay-bank-name">MB</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Chủ tài khoản:</span>
+            <strong id="pay-account-name">---</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Số tài khoản:</span>
+            <strong id="pay-account-no">---</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Số tiền:</span>
+            <strong id="pay-amount-text" style="color: #fde047;">35.000đ</strong>
+          </div>
+          <div class="info-row">
+            <span style="color:#94a3b8;">Nội dung CK (Bắt buộc):</span>
+            <strong id="pay-memo-text" style="color: #fda4af;">LOVE...</strong>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding: 10px; border-radius: 12px; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); color: #fde047; font-size: 0.82rem; font-weight: 700;">
+          🔄 Đang chờ ngân hàng xác nhận tự động...
+        </div>
+      </div>
+
+      <div id="pay-step-success" style="display:none; text-align: center;">
+        <div style="font-size: 2.2rem; margin-bottom: 4px;">🎉</div>
+        <h3 class="modal-title" style="color: #6ee7b7;">Thiệp Tuần Lộc Đã Sẵn Sàng!</h3>
+        <p class="modal-subtitle">
+          Tải tấm <b>Thiệp QR Phép Màu</b> bên dưới hoặc sao chép đường link gửi cho người ấy nhé!
+        </p>
+
+        <div class="gift-card-preview">
+          <canvas id="gift-card-canvas" width="600" height="780"></canvas>
+        </div>
+
+        <input id="share-url-input" type="text" class="form-input" readonly style="font-size: 0.82rem; text-align: center; margin-bottom: 10px;" />
+
+        <div class="modal-btn-row" style="margin-bottom: 8px;">
+          <button type="button" id="btn-copy-url" class="btn-full btn-primary">
+            📋 Copy Link
+          </button>
+          <button type="button" id="btn-download-card-img" class="btn-full btn-secondary">
+            📥 Tải Thiệp QR
+          </button>
+        </div>
+        <button type="button" id="btn-download-qr-only" class="btn-full btn-secondary" style="font-size: 0.82rem; color: #fde047; border-color: rgba(251, 191, 36, 0.35);">
+          📥 Tải Ảnh QR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. STATE & AI WISH TEMPLATES (100% TRUNG TÍNH)
+     * ============================================================================
+     */
+    const appState = {
+      templateId: 'reindeer_sleigh_magic',
+      sender: 'Bảo Nam',
+      receiver: 'Minh Anh',
+      occasion: 'Merry Christmas',
+      message: 'Đêm Noel ngoài kia có thể se lạnh, nhưng trong bầu trời sao này luôn có cỗ xe tuần lộc mang theo điều kỳ diệu và lời chúc bình an nhất gửi tới bạn. Chúc một mùa Giáng Sinh thật ấm áp, rạng rỡ và ngập tràn tiếng cười! ❤️🎄',
+      price: 35000,
+      photos: []
+    };
+
+    const AI_WISH_BY_OCCASION = {
+      'Merry Christmas': [
+        'Đêm Noel ngoài kia có thể se lạnh, nhưng cỗ xe tuần lộc này mang theo cả bầu trời phép màu đến bên {receiver}. Chúc {receiver} một mùa Giáng Sinh an lành và ngập tràn hạnh phúc! ❤️🎄',
+        'Merry Christmas {receiver}! Chúc {receiver} luôn rạng rỡ, vui vẻ, bình an và sớm chạm tay tới mọi điều ước đẹp nhất trong mùa đông này ✨🎁',
+        'Gửi tới {receiver} ngàn ánh sao vàng và món quà bất ngờ từ bầu trời đêm Giáng Sinh. Cảm ơn {receiver} vì đã luôn là điều thật đặc biệt! 🌟💖'
+      ],
+      'Giáng Sinh An Lành': [
+        'Chúc {receiver} một mùa Giáng Sinh thật an lành, ấm áp bên những người thương yêu và luôn giữ mãi nụ cười tươi trên môi nhé ❤️❄️',
+        'Khi bụi tiên vàng sáng rực trên bầu trời đêm cũng là lúc ngàn lời chúc bình an gửi đến {receiver}. Chúc {receiver} Giáng Sinh hạnh phúc viên mãn! ✨🎄',
+        'Mùa đông năm nay trở nên ấm áp hơn rất nhiều vì có {receiver}. Mong mọi điều dịu dàng nhất sẽ luôn tìm đến bên {receiver} 💖🎁'
+      ],
+      'Happy New Year 2027': [
+        'Happy New Year 2027, {receiver}! Chúc {receiver} một năm mới tràn đầy sức khỏe, may mắn, công việc học tập hanh thông và hạnh phúc rạng ngời! 🎆🧧',
+        'Cỗ xe tuần lộc vừa mang theo những điều may mắn đầu tiên của năm 2027 đến cho {receiver}. Chúc {receiver} 365 ngày sắp tới rực rỡ thành công! 🌟✨',
+        'Chào 2027 thật tuyệt vời cùng {receiver}! Chúc {receiver} gạt bỏ hết muộn phiền, đón thật nhiều niềm vui mới và bình an trọn vẹn 💖🎆'
+      ],
+      'Chúc Mừng Năm Mới': [
+        'Chúc mừng năm mới {receiver}! Kính chúc {receiver} và gia đình một năm An Khang Thịnh Vượng, Vạn Sự Như Ý và ngập tràn tiếng cười! 🧧🌸',
+        'Xuân mới gõ cửa, gửi tới {receiver} thật nhiều năng lượng tích cực, tài lộc dồi dào và những khoảnh khắc hạnh phúc đáng nhớ nhất ✨🏮',
+        'Mong rằng năm mới sẽ mang đến cho {receiver} thật nhiều cơ hội rực rỡ, sức khỏe dồi dào và luôn được bao bọc bởi yêu thương 💖🧧'
+      ]
+    };
+
+    function generateAiWish(occasion, receiver, idx = 0) {
+      const pool = AI_WISH_BY_OCCASION[occasion] || AI_WISH_BY_OCCASION['Merry Christmas'];
+      const safeIdx = ((idx % pool.length) + pool.length) % pool.length;
+      const targetName = (receiver || '').trim() || 'bạn';
+      return pool[safeIdx].replace(/\{receiver\}/g, targetName);
+    }
+
+    let currentBurstIndex = 0;
+    let pollTimer = null;
+    let activeOrderCode = null;
+
+    /**
+     * ============================================================================
+     * 2. PROCEDURAL CINEMATIC AUDIO ENGINE (WIND -> SPATIAL BELLS -> LOFI BGM)
+     * ============================================================================
+     */
+    class ReindeerAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.enabled = true;
+        this.unlocked = false;
+        this.bgmTimer = null;
+        this.rideTimers = [];
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return false;
+          this.ctx = new AudioCtx();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.value = this.enabled ? 0.85 : 0;
+          this.masterGain.connect(this.ctx.destination);
+        }
+        return true;
+      }
+
+      async tryUnlock(onAutoplaySuccess) {
+        if (!this.initContext()) return false;
+        if (this.ctx.state === 'suspended') {
+          try {
+            await this.ctx.resume();
+          } catch (e) {}
+        }
+        this.unlocked = (this.ctx.state === 'running');
+        const pill = document.getElementById('sound-unlock-pill');
+        if (this.unlocked) {
+          pill?.classList.add('hidden');
+          if (typeof onAutoplaySuccess === 'function') onAutoplaySuccess();
+        } else {
+          pill?.classList.remove('hidden');
+        }
+        return this.unlocked;
+      }
+
+      clearScheduled() {
+        this.rideTimers.forEach((id) => clearTimeout(id));
+        this.rideTimers = [];
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+        if (this.activeFlyby) {
+          try { this.activeFlyby.gain.gain.setTargetAtTime(0.0001, this.ctx.currentTime, 0.03); } catch (e) {}
+          try { this.activeFlyby.sources.forEach((s) => s.stop()); } catch (e) {}
+          this.activeFlyby = null;
+        }
+      }
+
+      mute(silent = false) {
+        this.enabled = false;
+        this.clearScheduled();
+        if (this.masterGain && this.ctx) {
+          this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
+        }
+        const btn = document.getElementById('btn-toggle-sound');
+        btn?.classList.remove('active');
+        const icon = document.getElementById('sound-icon');
+        const label = document.getElementById('sound-label');
+        if (icon) icon.textContent = '🔇';
+        if (label) label.textContent = 'Tắt Tiếng';
+        document.getElementById('sound-unlock-pill')?.classList.add('hidden');
+        if (!silent) showToast('🔇 Đã tắt âm thanh');
+      }
+
+      toggle() {
+        this.enabled = !this.enabled;
+        this.initContext();
+        if (this.ctx && this.ctx.state === 'suspended' && this.enabled) {
+          this.ctx.resume().catch(() => {});
+        }
+        if (this.masterGain && this.ctx) {
+          this.masterGain.gain.setTargetAtTime(this.enabled ? 0.85 : 0, this.ctx.currentTime, 0.08);
+        }
+        const btn = document.getElementById('btn-toggle-sound');
+        btn?.classList.toggle('active', this.enabled);
+        document.getElementById('sound-icon').textContent = this.enabled ? '🔊' : '🔇';
+        document.getElementById('sound-label').textContent = this.enabled ? 'Âm Thanh' : 'Tắt Tiếng';
+        if (this.enabled) {
+          this.unlocked = true;
+          document.getElementById('sound-unlock-pill')?.classList.add('hidden');
+          if (!this.bgmTimer && typeof sleighProgress === 'number' && sleighProgress >= 0.85) {
+            this.startChristmasLofiBgm();
+          }
+        } else {
+          this.clearScheduled();
+        }
+        showToast(this.enabled ? '🔊 Đã bật âm thanh phép màu' : '🔇 Đã tắt âm thanh');
+      }
+
+      // 1) Tiếng gió mùa đông rít lạnh lẽo (0s -> 6.2s)
+      playWinterWind() {
+        if (!this.ctx || !this.enabled) return;
+        const now = this.ctx.currentTime;
+        const duration = 6.2;
+        const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          lastOut = (lastOut + 0.03 * white) / 1.03;
+          data[i] = lastOut * 3.5;
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.Q.setValueAtTime(3.2, now);
+        filter.frequency.setValueAtTime(240, now);
+        filter.frequency.exponentialRampToValueAtTime(840, now + 2.6);
+        filter.frequency.exponentialRampToValueAtTime(300, now + duration);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.24, now + 1.1);
+        gain.gain.linearRampToValueAtTime(0.001, now + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+        noise.start(now);
+        noise.stop(now + duration);
+      }
+
+      // 2) Âm thanh Không Gian (Spatial / Panning + Fade-in/out + Doppler):
+      // Tiếng chuông & luồng gió cỗ xe quét liên tục từ Loa Trái (nhỏ) -> Giữa mặt (rất rõ) -> Loa Phải (nhỏ dần)
+      createSpatialFlybyBus(startAtProgress, durationSec) {
+        const now = this.ctx.currentTime;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.Q.setValueAtTime(0.75, now);
+
+        const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        const gain = this.ctx.createGain();
+
+        if (panner) {
+          filter.connect(panner);
+          panner.connect(gain);
+        } else {
+          filter.connect(gain);
+        }
+        gain.connect(this.masterGain);
+
+        const curveSteps = 24;
+        for (let i = 0; i <= curveSteps; i++) {
+          const u = i / curveSteps;
+          const prog = startAtProgress + (1 - startAtProgress) * u;
+          const t = now + durationSec * u;
+
+          // Quét liên tục từ Trái (-0.98) -> Giữa (0.0) -> Phải (+0.98)
+          const pan = -0.98 + prog * 1.96;
+          if (panner) {
+            if (i === 0) panner.pan.setValueAtTime(pan, t);
+            else panner.pan.linearRampToValueAtTime(pan, t);
+          }
+
+          // Fade-in mượt từ xa, bùng nổ rõ ngay trước mặt ở giữa (prog=0.5), rồi nhỏ dần khi bay khuất
+          const proximity = Math.pow(Math.max(0.05, Math.sin(prog * Math.PI)), 1.35);
+          const vol = 0.06 + proximity * 0.94;
+          if (i === 0) gain.gain.setValueAtTime(vol, t);
+          else gain.gain.linearRampToValueAtTime(vol, t);
+
+          // Mô phỏng không khí hấp thụ âm cao ở xa & sáng rực khi lướt ngay trước mặt
+          const cutoff = 1400 + proximity * 8400;
+          if (i === 0) filter.frequency.setValueAtTime(cutoff, t);
+          else filter.frequency.linearRampToValueAtTime(cutoff, t);
+        }
+
+        const flyby = { input: filter, gain, sources: [] };
+        this.activeFlyby = flyby;
+        return flyby;
+      }
+
+      playSpatialAirWhoosh(dest, durationSec) {
+        if (!this.ctx || !this.enabled) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = Math.max(1024, Math.floor(this.ctx.sampleRate * durationSec));
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          lastOut = (lastOut + 0.06 * white) / 1.06;
+          data[i] = lastOut * 2.8;
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const bp = this.ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.Q.setValueAtTime(1.6, now);
+        bp.frequency.setValueAtTime(340, now);
+        bp.frequency.exponentialRampToValueAtTime(1250, now + durationSec * 0.48);
+        bp.frequency.exponentialRampToValueAtTime(280, now + durationSec);
+
+        const whooshGain = this.ctx.createGain();
+        whooshGain.gain.setValueAtTime(0.28, now);
+
+        noise.connect(bp);
+        bp.connect(whooshGain);
+        whooshGain.connect(dest);
+        noise.start(now);
+        noise.stop(now + durationSec);
+        if (this.activeFlyby) this.activeFlyby.sources.push(noise);
+      }
+
+      playSleighBellCluster(dest, atTime, dopplerRatio, intensity) {
+        if (!this.ctx || !this.enabled) return;
+        // Tạo 2 nhịp rung chuông sát nhau mô phỏng chùm lục lạc cổ tuần lộc khi phi nước đại
+        const microHits = [0, 0.048];
+        const basePartials = [2160, 2980, 3890, 5240, 6480];
+
+        microHits.forEach((offset, hIdx) => {
+          const t0 = atTime + offset;
+          const hitScale = hIdx === 0 ? 1.0 : 0.62;
+          basePartials.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+            const f = freq * dopplerRatio + (Math.random() - 0.5) * 38;
+            osc.frequency.setValueAtTime(f, t0);
+
+            const amp = (intensity * hitScale * 0.075) / (idx + 1);
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.exponentialRampToValueAtTime(Math.max(0.0008, amp), t0 + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.23);
+
+            osc.connect(g);
+            g.connect(dest);
+            osc.start(t0);
+            osc.stop(t0 + 0.25);
+          });
+        });
+      }
+
+      startRideAudioSequence(startAtProgress = 0) {
+        this.clearScheduled();
+        if (!this.ctx || !this.unlocked) return;
+
+        if (startAtProgress < 0.2) {
+          this.playWinterWind();
+        }
+
+        const totalRideSec = 6.6;
+        const remainingSec = Math.max(0.4, (1 - startAtProgress) * totalRideSec);
+        const now = this.ctx.currentTime;
+
+        // Kênh âm thanh không gian quét mượt Trái -> Giữa -> Phải
+        const flyby = this.createSpatialFlybyBus(startAtProgress, remainingSec);
+        this.playSpatialAirWhoosh(flyby.input, remainingSec);
+
+        // Lên lịch chùm chuông tuần lộc chuẩn xác theo timeline Web Audio (không giật lag)
+        const totalSteps = 26;
+        for (let i = 0; i < totalSteps; i++) {
+          const prog = i / (totalSteps - 1);
+          if (prog < startAtProgress) continue;
+          const relTime = ((prog - startAtProgress) / Math.max(0.01, 1 - startAtProgress)) * remainingSec;
+          // Hiệu ứng Doppler nhẹ: tiến tới hơi cao hơn (+3%), bay xa hơi trầm xuống (-4%)
+          const dopplerRatio = 1.03 - prog * 0.07;
+          const intensity = 0.72 + Math.sin(prog * Math.PI) * 0.48;
+          this.playSleighBellCluster(flyby.input, now + relTime, dopplerRatio, intensity);
+        }
+
+        // Bắt đầu nhạc Giáng Sinh Lofi êm dịu sau khi tuần lộc rải xong bụi (~6.6s)
+        const bgmDelay = Math.max(200, (1 - startAtProgress) * 6600);
+        const bgmStartId = setTimeout(() => {
+          this.startChristmasLofiBgm();
+        }, bgmDelay);
+        this.rideTimers.push(bgmStartId);
+      }
+
+      // 3) Nhạc nền Giáng Sinh Lofi ấm áp
+      startChristmasLofiBgm() {
+        if (this.bgmTimer) return;
+
+        // Hòa âm Lofi ấm: Cmaj7 -> Am7 -> Fmaj7 -> G6 cùng giai điệu giáng sinh nhẹ nhàng
+        const progression = [
+          { chord: [261.63, 329.63, 392.00, 493.88], melody: [523.25, 659.25, 587.33] },
+          { chord: [220.00, 261.63, 329.63, 392.00], melody: [523.25, 493.88, 440.00] },
+          { chord: [174.61, 220.00, 261.63, 329.63], melody: [440.00, 523.25, 659.25] },
+          { chord: [196.00, 246.94, 293.66, 329.63], melody: [587.33, 493.88, 392.00] }
+        ];
+        let stepIdx = 0;
+
+        const playBar = () => {
+          if (!this.ctx || !this.enabled || this.ctx.state !== 'running') return;
+          const bar = progression[stepIdx % progression.length];
+          stepIdx++;
+          const now = this.ctx.currentTime;
+
+          // Pad / Warm Electric Piano Chord
+          bar.chord.forEach((freq) => {
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(750, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.028, now + 0.35);
+            gain.gain.exponentialRampToValueAtTime(0.0005, now + 2.3);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(now);
+            osc.stop(now + 2.4);
+          });
+
+          // Lofi Bell Melody Notes
+          bar.melody.forEach((freq, mIdx) => {
+            const t = now + mIdx * 0.72;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, t);
+
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.exponentialRampToValueAtTime(0.04, t + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0002, t + 0.68);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(t);
+            osc.stop(t + 0.72);
+          });
+        };
+
+        playBar();
+        this.bgmTimer = setInterval(playBar, 2400);
+      }
+
+      // 4) Âm thanh nổ hộp quà rộn ràng
+      playGiftExplosionSound() {
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+        if (!this.enabled) return;
+
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+        notes.forEach((freq, i) => {
+          const t = now + i * 0.065;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(0.11, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start(t);
+          osc.stop(t + 0.6);
+        });
+      }
+    }
+
+    const audioEngine = new ReindeerAudioEngine();
+
+    /**
+     * ============================================================================
+     * 3. DUAL-PARTICLE MAGIC RIDE & MOON SILHOUETTE ENGINE
+     * ============================================================================
+     */
+    const canvas = document.getElementById('magic-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let W = window.innerWidth;
+    let H = window.innerHeight;
+    let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    // Layer 1: Background Snowflakes
+    let snowflakes = [];
+    // Ambient Stars
+    let stars = [];
+    // Layer 2: Gold Pixie Dust (morphs into text)
+    let magicDust = [];
+    // Celebration bursts when tapping the dropped gift box
+    let burstSparks = [];
+
+    // Animation Timeline State (Chậm rãi, mượt mà & điện ảnh hơn)
+    let rideStartTime = performance.now();
+    let sleighProgress = 0; // 0 -> 1 over 6.8s
+    const RIDE_DURATION_MS = 6800;
+
+    // Winter Landscape Assets (Snow hills, pine trees, twinkling light garland)
+    let snowTrees = [];
+    let garlandSegments = [];
+    let snowGlints = [];
+
+    // Dropped Gift Box Physics
+    const giftBox = {
+      spawned: false,
+      landed: false,
+      opened: false,
+      x: 0,
+      y: 0,
+      vy: 0,
+      vx: 0,
+      rot: 0,
+      targetY: 0,
+      size: 38,
+      bounceCount: 0,
+      scaleBounce: 1
+    };
+
+    // Cached offscreen texture for gentle ambient text glow after particles settle
+    let textGlowCanvas = null;
+    let textGlowRect = { x: 0, y: 0, w: 0, h: 0 };
+
+    function getMoonSpec() {
+      const isMobile = W < 768;
+      const r = Math.min(W, H) * (isMobile ? 0.195 : 0.185);
+      // Đặt mặt trăng cao lên sát mép trên bầu trời
+      return { x: W * 0.5, y: r + (isMobile ? 12 : 14), r };
+    }
+
+    function getSnowGroundY(x) {
+      const nx = (x / Math.max(1, W)) - 0.5;
+      const centerBase = H * (W < 768 ? 0.86 : 0.875);
+      // Mặt đất tuyết trắng thấp xuống sát đáy, hai bên nâng nhẹ đặt cây thông
+      const hillRise = Math.pow(Math.abs(nx) * 2, 1.5) * (H * 0.032);
+      const gentleRoll = Math.sin(nx * 7.5 + 0.4) * (H * 0.008);
+      return centerBase - hillRise + gentleRoll;
+    }
+
+    function resizeCanvas() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+      initSkyAndSnow();
+      giftBox.size = W < 640 ? 36 : 44;
+      giftBox.targetY = W < 768
+        ? Math.min(getSnowGroundY(W * 0.5) - giftBox.size * 1.15, H - 178)
+        : Math.min(getSnowGroundY(W * 0.5) - giftBox.size * 0.44, H - 114);
+      if (giftBox.landed) {
+        giftBox.x = W * 0.5;
+        giftBox.y = giftBox.targetY;
+      }
+      rebuildTextTargets();
+    }
+
+    function initSkyAndSnow() {
+      const isMobile = W < 768;
+      const starCount = isMobile ? 95 : 160;
+      stars = Array.from({ length: starCount }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.86,
+        r: Math.random() * 1.5 + 0.4,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 2 + 1
+      }));
+
+      // Lớp 1: Tuyết rơi liên tục trắng / xanh lơ nhạt
+      const snowCount = isMobile ? 130 : 210;
+      snowflakes = Array.from({ length: snowCount }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2.4 + 1.0,
+        vy: Math.random() * 0.9 + 0.45,
+        vx: (Math.random() - 0.5) * 0.35,
+        swayPhase: Math.random() * Math.PI * 2,
+        color: Math.random() > 0.35 ? 'rgba(255, 255, 255, 0.75)' : 'rgba(186, 230, 253, 0.7)'
+      }));
+
+      // Cây thông Noel phủ tuyết hai bên nền đất (tỉ lệ gọn để hợp mặt đất thấp)
+      const treeSpecs = isMobile
+        ? [
+            { nx: 0.06, scale: 0.64, back: true },
+            { nx: 0.18, scale: 0.48, back: true },
+            { nx: 0.82, scale: 0.50, back: true },
+            { nx: 0.94, scale: 0.66, back: true },
+            { nx: 0.09, scale: 0.80, back: false },
+            { nx: 0.23, scale: 0.58, back: false },
+            { nx: 0.77, scale: 0.60, back: false },
+            { nx: 0.91, scale: 0.82, back: false }
+          ]
+        : [
+            { nx: 0.04, scale: 0.82, back: true },
+            { nx: 0.14, scale: 0.62, back: true },
+            { nx: 0.27, scale: 0.48, back: true },
+            { nx: 0.73, scale: 0.50, back: true },
+            { nx: 0.86, scale: 0.64, back: true },
+            { nx: 0.96, scale: 0.82, back: true },
+            { nx: 0.08, scale: 0.98, back: false },
+            { nx: 0.19, scale: 0.74, back: false },
+            { nx: 0.81, scale: 0.76, back: false },
+            { nx: 0.92, scale: 1.00, back: false }
+          ];
+
+      const bulbPalette = ['#fde047', '#fb7185', '#38bdf8', '#4ade80', '#fb923c', '#fffbeb'];
+      snowTrees = treeSpecs.map((spec, idx) => {
+        const x = spec.nx * W;
+        const groundY = spec.back
+          ? H * (isMobile ? 0.838 : 0.852) + Math.sin(spec.nx * 8) * 6
+          : getSnowGroundY(x) + 8;
+        const lights = [];
+        if (!spec.back) {
+          const lightPositions = [
+            { rx: -0.22, ry: -0.26 }, { rx: 0.16, ry: -0.32 },
+            { rx: -0.14, ry: -0.48 }, { rx: 0.20, ry: -0.54 },
+            { rx: -0.08, ry: -0.70 }, { rx: 0.11, ry: -0.78 }
+          ];
+          lightPositions.forEach((lp, li) => {
+            lights.push({
+              rx: lp.rx,
+              ry: lp.ry,
+              color: bulbPalette[(idx + li) % bulbPalette.length],
+              phase: Math.random() * Math.PI * 2,
+              speed: 2.2 + Math.random() * 2.2
+            });
+          });
+        }
+        return { x, y: groundY, scale: spec.scale, back: spec.back, lights };
+      });
+
+      // Dải đèn lấp lánh giăng ngang qua nền tuyết & gốc cây thông ở dưới
+      const anchorCount = isMobile ? 5 : 7;
+      const anchors = [];
+      for (let i = 0; i < anchorCount; i++) {
+        const ax = (i / (anchorCount - 1)) * W;
+        const postH = (i === 0 || i === anchorCount - 1) ? 36 : (i % 2 === 0 ? 28 : 22);
+        anchors.push({ x: ax, y: getSnowGroundY(ax) - postH + 10, baseY: getSnowGroundY(ax) + 8 });
+      }
+      garlandSegments = [];
+      for (let i = 0; i < anchors.length - 1; i++) {
+        const p0 = anchors[i];
+        const p1 = anchors[i + 1];
+        const midX = (p0.x + p1.x) * 0.5;
+        const sag = isMobile ? 18 : 22;
+        const ctrlY = Math.max(p0.y, p1.y) + sag;
+        const bulbsPerSeg = isMobile ? 7 : 9;
+        const bulbs = [];
+        for (let b = 1; b < bulbsPerSeg; b++) {
+          const t = b / bulbsPerSeg;
+          const inv = 1 - t;
+          const bx = inv * inv * p0.x + 2 * inv * t * midX + t * t * p1.x;
+          const by = inv * inv * p0.y + 2 * inv * t * ctrlY + t * t * p1.y;
+          bulbs.push({
+            x: bx,
+            y: by,
+            color: bulbPalette[(i * 3 + b) % bulbPalette.length],
+            phase: i * 1.1 + b * 0.65,
+            speed: 2.4 + (b % 3) * 0.7
+          });
+        }
+        garlandSegments.push({ p0, p1, midX, ctrlY, bulbs });
+      }
+
+      // Hạt ánh trăng lấp lánh trên mặt tuyết trắng
+      snowGlints = Array.from({ length: isMobile ? 24 : 42 }, () => {
+        const sx = Math.random() * W;
+        const sy = getSnowGroundY(sx) + 4 + Math.random() * (H * 0.08);
+        return {
+          x: sx,
+          y: sy,
+          r: Math.random() * 1.6 + 0.8,
+          phase: Math.random() * Math.PI * 2,
+          speed: 1.8 + Math.random() * 2.5
+        };
+      });
+    }
+
+    function sampleTextTargets() {
+      const isMobile = W < 768;
+      const boxW = Math.min(W * 0.92, 920);
+      const boxH = Math.round(isMobile ? Math.min(H * 0.30, 250) : Math.min(H * 0.32, 300));
+      const off = document.createElement('canvas');
+      off.width = Math.max(320, Math.round(boxW));
+      off.height = Math.max(160, Math.round(boxH));
+      const octx = off.getContext('2d');
+      octx.clearRect(0, 0, off.width, off.height);
+
+      // Line 1: Dịp lễ (Merry Christmas / Happy New Year 2027...)
+      const topLine = (appState.occasion || 'Merry Christmas').trim();
+      let topSize = isMobile ? 34 : 52;
+      while (topSize > 20) {
+        octx.font = `800 ${topSize}px "Cinzel", "Plus Jakarta Sans", serif`;
+        if (octx.measureText(topLine).width <= off.width - 40) break;
+        topSize -= 2;
+      }
+
+      // Line 2: Tên người nhận + icon 🎄 (viết mềm mại rõ nét)
+      const receiverLine = `${(appState.receiver || 'Minh Anh').trim()} 🎄`;
+      let nameSize = isMobile ? 48 : 74;
+      while (nameSize > 26) {
+        octx.font = `700 ${nameSize}px "Dancing Script", "Plus Jakarta Sans", cursive`;
+        if (octx.measureText(receiverLine).width <= off.width - 40) break;
+        nameSize -= 2;
+      }
+
+      octx.textAlign = 'center';
+      octx.textBaseline = 'middle';
+      octx.fillStyle = '#ffd700';
+
+      // Vẽ Line 1
+      octx.font = `800 ${topSize}px "Cinzel", "Plus Jakarta Sans", serif`;
+      octx.fillText(topLine, off.width / 2, off.height * 0.30);
+
+      // Vẽ Line 2 với độ dày vừa phải để hạt bụi tụ chữ rõ cả dấu tiếng Việt
+      octx.font = `700 ${nameSize}px "Dancing Script", "Plus Jakarta Sans", cursive`;
+      octx.lineWidth = isMobile ? 1.3 : 1.6;
+      octx.strokeStyle = '#ffd700';
+      octx.strokeText(receiverLine, off.width / 2, off.height * 0.70);
+      octx.fillText(receiverLine, off.width / 2, off.height * 0.70);
+
+      // Lưu lớp glow dịu để hỗ trợ đọc tên cực nét khi tụ xong
+      textGlowCanvas = off;
+      const offsetX = (W - off.width) / 2;
+      const offsetY = isMobile ? H * 0.27 : H * 0.37;
+      textGlowRect = { x: offsetX, y: offsetY, w: off.width, h: off.height };
+
+      const imgData = octx.getImageData(0, 0, off.width, off.height).data;
+      const step = 2;
+      const points = [];
+      for (let y = 0; y < off.height; y += step) {
+        for (let x = 0; x < off.width; x += step) {
+          const alpha = imgData[(y * off.width + x) * 4 + 3];
+          if (alpha > 90) {
+            points.push({ x: offsetX + x, y: offsetY + y });
+          }
+        }
+      }
+
+      // Trộn ngẫu nhiên thứ tự điểm để hạt bay về từ mọi phía đẹp mắt
+      for (let i = points.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [points[i], points[j]] = [points[j], points[i]];
+      }
+
+      const maxParticles = isMobile ? 3800 : 5600;
+      if (points.length > maxParticles) {
+        // Lấy mẫu đều để giữ đủ hình dáng toàn bộ chữ
+        const stride = points.length / maxParticles;
+        const sampled = [];
+        for (let i = 0; i < maxParticles; i++) {
+          sampled.push(points[Math.floor(i * stride)]);
+        }
+        return sampled;
+      }
+      return points;
+    }
+
+    function computeSpawnProgressForX(tx) {
+      const startX = -240;
+      const endX = W + 240;
+      const baseProg = (tx - startX) / Math.max(1, endX - startX);
+      return Math.max(0.03, Math.min(0.96, baseProg + (Math.random() - 0.5) * 0.05));
+    }
+
+    function rebuildTextTargets() {
+      const targets = sampleTextTargets();
+      if (magicDust.length === 0) {
+        // Khi mới khởi tạo, gắn trước đích đến theo vị trí ngang để xe chạy tới đâu rớt bụi ghép chữ tới đó
+        magicDust = targets.map((pt) => ({
+          x: -100,
+          y: -100,
+          vx: 0,
+          vy: 0,
+          tx: pt.x,
+          ty: pt.y,
+          size: Math.random() * 0.85 + 0.4,
+          spawnProgress: computeSpawnProgressForX(pt.x),
+          spawnTime: 0,
+          spawned: false,
+          settled: false,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.25 ? '#ffd700' : (Math.random() > 0.5 ? '#fef08a' : '#fffbeb')
+        }));
+      } else {
+        // Nếu người dùng resize màn hình hoặc đổi tên -> gán lại tọa độ đích mới mượt mà
+        const oldLen = magicDust.length;
+        const newList = targets.map((pt, idx) => {
+          const existing = magicDust[idx % oldLen];
+          return {
+            x: existing.x,
+            y: existing.y,
+            vx: existing.vx,
+            vy: existing.vy,
+            tx: pt.x,
+            ty: pt.y,
+            size: Math.random() * 0.85 + 0.4,
+            spawnProgress: computeSpawnProgressForX(pt.x),
+            spawnTime: existing.spawnTime || 0,
+            spawned: existing.spawned,
+            settled: false,
+            twinklePhase: existing.twinklePhase,
+            color: existing.color
+          };
+        });
+        magicDust = newList;
+      }
+    }
+
+    function getSleighPosition(progress) {
+      const isMobile = W < 768;
+      const startX = -240;
+      const endX = W + 240;
+      const x = startX + (endX - startX) * progress;
+
+      const moon = getMoonSpec();
+      // Đường bay cong qua mặt trăng trên cao + nhấp nhô nhịp phi chậm rãi của tuần lộc
+      const arcLift = Math.sin(progress * Math.PI) * (isMobile ? 20 : 32);
+      const gallopWave = Math.sin(progress * Math.PI * 5) * (isMobile ? 8 : 13);
+      const y = moon.y + 8 - arcLift + gallopWave;
+
+      // Tính góc nghiêng nhẹ theo hướng nhấp nhô
+      const dWave = Math.cos(progress * Math.PI * 5) * 0.11 - Math.cos(progress * Math.PI) * 0.08;
+      return { x, y, tilt: dWave };
+    }
+
+    // Vẽ Cỗ xe Tuần Lộc & Ông già Noel đầy màu sắc rực rỡ khi bay ngang Mặt Trăng
+    function drawSleighSilhouette(x, y, tilt, timeSec, scale) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // --- 1. Cỗ Xe Trượt Tuyết (Sleigh) nhiều màu ở phía trái ---
+      // Càng trượt vàng óng
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 4.6;
+      ctx.beginPath();
+      ctx.moveTo(-115, 22);
+      ctx.quadraticCurveTo(-75, 28, -42, 22);
+      ctx.quadraticCurveTo(-28, 18, -26, 8);
+      ctx.stroke();
+
+      // Bao quà xanh lá phía sau xe
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.arc(-88, -14, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-95, -21);
+      ctx.lineTo(-81, -18);
+      ctx.stroke();
+
+      // Thân xe trượt đỏ thắm viền vàng kim
+      const sleighGrad = ctx.createLinearGradient(-110, -14, -34, 16);
+      sleighGrad.addColorStop(0, '#ef4444');
+      sleighGrad.addColorStop(1, '#991b1b');
+      ctx.fillStyle = sleighGrad;
+      ctx.beginPath();
+      ctx.moveTo(-110, 14);
+      ctx.quadraticCurveTo(-118, -8, -96, -12);
+      ctx.lineTo(-82, -2);
+      ctx.quadraticCurveTo(-60, 0, -48, -14);
+      ctx.lineTo(-34, 14);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      // Ông già Noel ngồi trên xe (áo đỏ, râu trắng, mặt hồng, mũ Noel viền trắng)
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.ellipse(-66, -12, 11, 13, 0, 0, Math.PI * 2); // thân áo đỏ
+      ctx.fill();
+      // Thắt lưng đen khóa vàng
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-76, -10);
+      ctx.lineTo(-56, -10);
+      ctx.stroke();
+
+      // Mặt hồng & râu trắng
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-64, -28, 7.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-62, -23, 6.2, 0, Math.PI);
+      ctx.fill();
+
+      // Mũ Noel đỏ chóp nhọn bay về sau + viền trắng & chóp bông trắng
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.moveTo(-71, -31);
+      ctx.lineTo(-57, -31);
+      ctx.lineTo(-76, -42);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-72, -33, 16, 4);
+      ctx.beginPath();
+      ctx.arc(-78, -42, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dây cương vàng nối tới đàn tuần lộc
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(-46, -8);
+      ctx.lineTo(135, -8);
+      ctx.stroke();
+
+      // --- 2. Đàn 3 chú Tuần Lộc màu nâu hạt dẻ phi nước đại ---
+      const offsets = [
+        { dx: 18, dy: 4, phase: 0, lead: false },
+        { dx: 72, dy: -4, phase: 1.4, lead: false },
+        { dx: 128, dy: -10, phase: 2.8, lead: true }
+      ];
+
+      offsets.forEach((r) => {
+        ctx.save();
+        const bounce = Math.sin(timeSec * 7.5 + r.phase) * 3.0;
+        ctx.translate(r.dx, r.dy + bounce);
+
+        // 4 chân nâu sẫm phi nhịp nhàng khoan thai
+        const kick = Math.sin(timeSec * 8.5 + r.phase);
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 2.8;
+        ctx.beginPath();
+        ctx.moveTo(11, 4);
+        ctx.lineTo(19 + kick * 6, 15 - kick * 4);
+        ctx.moveTo(8, 5);
+        ctx.lineTo(14 - kick * 5, 17);
+        ctx.moveTo(-12, 3);
+        ctx.lineTo(-22 - kick * 7, 14 + kick * 3);
+        ctx.moveTo(-10, 4);
+        ctx.lineTo(-17 + kick * 5, 17);
+        ctx.stroke();
+
+        // Thân tuần lộc nâu hạt dẻ
+        ctx.fillStyle = '#92400e';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18, 7.5, -0.1, 0, Math.PI * 2);
+        ctx.fill();
+        // Bụng sáng kem nhẹ
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.ellipse(0, 3, 12, 3.2, -0.1, 0, Math.PI);
+        ctx.fill();
+
+        // Cổ & Đầu ngẩng cao
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath();
+        ctx.moveTo(10, -2);
+        ctx.lineTo(22, -16);
+        ctx.lineTo(28, -14);
+        ctx.lineTo(17, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Vòng cổ lục lạc đỏ vàng
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(12, -3);
+        ctx.lineTo(18, 1);
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(16, 1, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Đầu & Mõm
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath();
+        ctx.ellipse(26, -16, 7.5, 4.2, 0.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Mũi đỏ phát sáng cho chú tuần lộc dẫn đầu (Rudolph)
+        if (r.lead) {
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(33, -15, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Gạc sừng nhánh nâu gỗ
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(22, -19);
+        ctx.lineTo(17, -33);
+        ctx.moveTo(20, -26);
+        ctx.lineTo(25, -31);
+        ctx.moveTo(18, -30);
+        ctx.lineTo(12, -33);
+        ctx.stroke();
+
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+
+    function drawGiantMoonAndSilhouette(sleighPos, sleighVisible, timeSec) {
+      const isMobile = W < 768;
+      const moon = getMoonSpec();
+      const moonX = moon.x;
+      const moonY = moon.y;
+      const moonR = moon.r;
+
+      // 1) Hào quang sáng dịu của Mặt Trăng Khổng Lồ
+      const aura = ctx.createRadialGradient(moonX, moonY, moonR * 0.7, moonX, moonY, moonR * 2.5);
+      aura.addColorStop(0, 'rgba(254, 240, 138, 0.48)');
+      aura.addColorStop(0.45, 'rgba(253, 224, 71, 0.14)');
+      aura.addColorStop(1, 'rgba(3, 6, 20, 0)');
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR * 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2) Thân Mặt Trăng tròn rực sáng
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      ctx.clip();
+
+      const discGrad = ctx.createRadialGradient(moonX - moonR * 0.2, moonY - moonR * 0.2, moonR * 0.1, moonX, moonY, moonR);
+      discGrad.addColorStop(0, '#fffef2');
+      discGrad.addColorStop(0.65, '#fef08a');
+      discGrad.addColorStop(1, '#f5d061');
+      ctx.fillStyle = discGrad;
+      ctx.fillRect(moonX - moonR, moonY - moonR, moonR * 2, moonR * 2);
+
+      // Bóng bề mặt mặt trăng nhẹ nhàng tăng tính chân thực điện ảnh
+      ctx.fillStyle = 'rgba(202, 138, 4, 0.12)';
+      [
+        { ox: -0.32, oy: -0.18, r: 0.22 },
+        { ox: 0.28, oy: 0.24, r: 0.28 },
+        { ox: 0.18, oy: -0.34, r: 0.14 },
+        { ox: -0.18, oy: 0.36, r: 0.16 }
+      ].forEach((c) => {
+        ctx.beginPath();
+        ctx.arc(moonX + c.ox * moonR, moonY + c.oy * moonR, c.r * moonR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3) CẢI TIẾN 1: Bóng đen (Silhouette) Xe Tuần Lộc & Ông già Noel in rõ nét khi bay qua Mặt Trăng!
+      if (sleighVisible) {
+        const silScale = isMobile ? 0.56 : 0.88;
+        drawSleighSilhouette(sleighPos.x, sleighPos.y, sleighPos.tilt, timeSec, silScale);
+      }
+
+      ctx.restore();
+    }
+
+    function drawSparkleStarHead(cx, cy, outerR, glowR, rot = 0) {
+      // Quầng sáng tỏa dịu quanh ngôi sao
+      const starGlow = ctx.createRadialGradient(cx, cy, 1, cx, cy, glowR);
+      starGlow.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      starGlow.addColorStop(0.32, 'rgba(254, 240, 138, 0.85)');
+      starGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = starGlow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hình ngôi sao 4 cánh lấp lánh sắc nét
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.fillStyle = '#fffef2';
+      ctx.beginPath();
+      const innerR = outerR * 0.28;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const r = i % 2 === 0 ? outerR : innerR;
+        const px = Math.cos(angle) * r;
+        const py = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Tâm sao rực sáng
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, outerR * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawGoldenStreakHead(sleighPos) {
+      const isMobile = W < 768;
+      const baseX = sleighPos.x + (isMobile ? 55 : 90);
+      const baseY = sleighPos.y;
+      const spreadY = isMobile ? 14 : 22;
+      const leadOffset = isMobile ? 18 : 28;
+
+      // 3 vệt sáng đầu ngôi sao: ngôi sao ở giữa tiến lên trước 1 xíu so với 2 ngôi sao bên cạnh
+      const streaks = [
+        { dx: -leadOffset, dy: -spreadY, scale: 0.72, tailLen: isMobile ? 125 : 190, waveAmp: 5, phase: 0.9 },
+        { dx: -leadOffset, dy: spreadY, scale: 0.72, tailLen: isMobile ? 125 : 190, waveAmp: -5, phase: 2.1 },
+        { dx: 0, dy: 0, scale: 1.0, tailLen: isMobile ? 170 : 255, waveAmp: 7, phase: 0 }
+      ];
+
+      ctx.save();
+      ctx.lineCap = 'round';
+      streaks.forEach((st) => {
+        const hx = baseX + st.dx;
+        const hy = baseY + st.dy;
+        const tailGrad = ctx.createLinearGradient(hx - st.tailLen, hy, hx + 12, hy);
+        tailGrad.addColorStop(0, 'rgba(251, 191, 36, 0)');
+        tailGrad.addColorStop(0.55, `rgba(253, 224, 71, ${(0.36 * st.scale).toFixed(2)})`);
+        tailGrad.addColorStop(0.88, `rgba(254, 249, 195, ${(0.88 * st.scale).toFixed(2)})`);
+        tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.96)');
+
+        ctx.strokeStyle = tailGrad;
+        ctx.lineWidth = (isMobile ? 5.5 : 8) * st.scale;
+        ctx.beginPath();
+        ctx.moveTo(hx - st.tailLen, hy + Math.sin(sleighProgress * 11 + st.phase) * st.waveAmp);
+        ctx.quadraticCurveTo(hx - st.tailLen * 0.42, hy - st.waveAmp * 0.45, hx, hy);
+        ctx.stroke();
+
+        const outerR = (isMobile ? 11 : 15) * st.scale;
+        const glowR = (isMobile ? 24 : 36) * st.scale;
+        drawSparkleStarHead(hx, hy, outerR, glowR, sleighProgress * 3 + st.phase);
+      });
+      ctx.restore();
+    }
+
+    function drawRoundedRectPath(x, y, w, h, r) {
+      const rr = Math.min(r, w * 0.5, h * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+    }
+
+    // Vẽ từng Cây Thông Noel phủ tuyết + đèn nháy trên nền đất trắng
+    function drawSnowPineTree(tree, timeSec) {
+      const s = tree.scale;
+      const trunkW = 8 * s;
+      const trunkH = 16 * s;
+      const totalH = 74 * s;
+      const maxW = 48 * s;
+
+      ctx.save();
+      ctx.translate(tree.x, tree.y);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Thân cây nhỏ
+      ctx.fillStyle = tree.back ? '#1e293b' : '#451a03';
+      drawRoundedRectPath(-trunkW * 0.5, -trunkH, trunkW, trunkH + 4, 3 * s);
+      ctx.fill();
+
+      // 4 tầng tán lá thông mềm mại + tuyết trắng phủ đỉnh
+      const tiers = 4;
+      for (let i = 0; i < tiers; i++) {
+        const t = i / (tiers - 1);
+        const tierW = maxW * (1 - t * 0.55);
+        const tierBottom = -trunkH - i * (totalH * 0.19);
+        const tierTop = tierBottom - totalH * (0.34 - t * 0.06);
+
+        const pineGrad = ctx.createLinearGradient(0, tierTop, 0, tierBottom);
+        if (tree.back) {
+          pineGrad.addColorStop(0, '#1e3a5f');
+          pineGrad.addColorStop(1, '#0f2544');
+        } else {
+          pineGrad.addColorStop(0, '#15803d');
+          pineGrad.addColorStop(1, '#064e3b');
+        }
+        ctx.fillStyle = pineGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, tierTop);
+        ctx.quadraticCurveTo(tierW * 0.35, (tierTop + tierBottom) * 0.52, tierW * 0.52, tierBottom);
+        ctx.quadraticCurveTo(0, tierBottom + 5 * s, -tierW * 0.52, tierBottom);
+        ctx.quadraticCurveTo(-tierW * 0.35, (tierTop + tierBottom) * 0.52, 0, tierTop);
+        ctx.closePath();
+        ctx.fill();
+
+        // Lớp tuyết trắng mềm phủ trên cành
+        ctx.fillStyle = tree.back ? 'rgba(219, 234, 254, 0.72)' : 'rgba(255, 255, 255, 0.92)';
+        ctx.beginPath();
+        ctx.moveTo(0, tierTop);
+        ctx.quadraticCurveTo(tierW * 0.24, tierTop + (tierBottom - tierTop) * 0.36, tierW * 0.38, tierTop + (tierBottom - tierTop) * 0.48);
+        ctx.quadraticCurveTo(tierW * 0.15, tierTop + (tierBottom - tierTop) * 0.42, 0, tierTop + (tierBottom - tierTop) * 0.50);
+        ctx.quadraticCurveTo(-tierW * 0.15, tierTop + (tierBottom - tierTop) * 0.42, -tierW * 0.38, tierTop + (tierBottom - tierTop) * 0.48);
+        ctx.quadraticCurveTo(-tierW * 0.24, tierTop + (tierBottom - tierTop) * 0.36, 0, tierTop);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Ngôi sao vàng đỉnh cây + đèn lấp lánh trên tán cây tiền cảnh
+      if (!tree.back) {
+        const starY = -trunkH - totalH * 0.93;
+        const starGlow = ctx.createRadialGradient(0, starY, 0.5, 0, starY, 10 * s);
+        starGlow.addColorStop(0, 'rgba(254, 249, 195, 0.95)');
+        starGlow.addColorStop(0.5, 'rgba(251, 191, 36, 0.45)');
+        starGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+        ctx.fillStyle = starGlow;
+        ctx.beginPath();
+        ctx.arc(0, starY, 10 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(0, starY, 2.8 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        tree.lights.forEach((b) => {
+          const lx = b.rx * maxW;
+          const ly = -trunkH + b.ry * totalH;
+          const pulse = 0.5 + 0.5 * Math.sin(timeSec * b.speed + b.phase);
+          ctx.globalAlpha = 0.4 + pulse * 0.6;
+          const bGlow = ctx.createRadialGradient(lx, ly, 0.5, lx, ly, 7 * s);
+          bGlow.addColorStop(0, '#ffffff');
+          bGlow.addColorStop(0.35, b.color);
+          bGlow.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = bGlow;
+          ctx.beginPath();
+          ctx.arc(lx, ly, 7 * s, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.restore();
+    }
+
+    // Ngôi nhà mùa đông có màu sắc, cửa sổ sáng ấm & ống khói bếp sưởi
+    function drawColorfulCozyHouse(x, y, scale, timeSec, palette = {}) {
+      const wall = palette.wall || '#fef3c7';
+      const wallSide = palette.wallSide || '#fde68a';
+      const roof = palette.roof || '#b91c1c';
+      const door = palette.door || '#78350f';
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Ánh sáng ấm áp tỏa ra tuyết trước cửa & cửa sổ
+      const warmHalo = ctx.createRadialGradient(0, -14, 4, 0, -14, 44);
+      warmHalo.addColorStop(0, 'rgba(251, 191, 36, 0.28)');
+      warmHalo.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = warmHalo;
+      ctx.beginPath();
+      ctx.arc(0, -14, 44, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Khói ấm bay lên từ ống khói bếp sưởi
+      for (let i = 0; i < 4; i++) {
+        const drift = Math.sin(timeSec * 1.5 + i * 1.3) * 3.5;
+        const puffY = -60 - i * 9 - ((timeSec * 9 + i * 6) % 15);
+        const alpha = Math.max(0.08, 0.36 - i * 0.08);
+        ctx.fillStyle = i === 0
+          ? `rgba(254, 240, 138, ${(alpha * 0.9).toFixed(2)})`
+          : `rgba(241, 245, 249, ${alpha.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(16 + drift + i * 2, puffY, 3.0 + i * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ống khói gạch nâu đỏ có miệng sáng ấm
+      ctx.fillStyle = '#9a3412';
+      drawRoundedRectPath(12, -54, 9, 24, 2);
+      ctx.fill();
+      ctx.fillStyle = '#7c2d12';
+      drawRoundedRectPath(10.5, -56, 12, 4, 1.5);
+      ctx.fill();
+
+      // Thân nhà chính & hiên phụ có màu sắc
+      ctx.fillStyle = wall;
+      drawRoundedRectPath(-24, -28, 48, 30, 3);
+      ctx.fill();
+      ctx.fillStyle = wallSide;
+      drawRoundedRectPath(20, -18, 16, 20, 2);
+      ctx.fill();
+
+      // Cửa gỗ ấm & tay nắm vàng
+      ctx.fillStyle = door;
+      drawRoundedRectPath(-5, -17, 10, 19, 3);
+      ctx.fill();
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(2.5, -7.5, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cửa sổ phát sáng vàng cam ấm áp (cửa chính + hiên)
+      const flicker = 0.88 + 0.12 * Math.sin(timeSec * 4.5 + x);
+      ctx.fillStyle = `rgba(253, 224, 71, ${flicker.toFixed(2)})`;
+      drawRoundedRectPath(-19, -21, 9, 9, 2);
+      ctx.fill();
+      drawRoundedRectPath(10, -21, 9, 9, 2);
+      ctx.fill();
+      drawRoundedRectPath(24, -13, 8, 8, 2);
+      ctx.fill();
+
+      // Khung chia ô cửa sổ
+      ctx.strokeStyle = '#92400e';
+      ctx.lineWidth = 1;
+      [[-19, -21, 9, 9], [10, -21, 9, 9], [24, -13, 8, 8]].forEach(([wx, wy, ww, wh]) => {
+        ctx.beginPath();
+        ctx.moveTo(wx + ww / 2, wy);
+        ctx.lineTo(wx + ww / 2, wy + wh);
+        ctx.moveTo(wx, wy + wh / 2);
+        ctx.lineTo(wx + ww, wy + wh / 2);
+        ctx.stroke();
+      });
+
+      // Mái nhà dốc nhiều màu + hiên nhỏ
+      ctx.fillStyle = roof;
+      ctx.beginPath();
+      ctx.moveTo(-31, -26);
+      ctx.lineTo(0, -52);
+      ctx.lineTo(31, -26);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(19, -17);
+      ctx.lineTo(29, -27);
+      ctx.lineTo(40, -17);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lớp tuyết trắng mềm phủ trên mái nhà
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-30, -27);
+      ctx.lineTo(0, -52);
+      ctx.lineTo(30, -27);
+      ctx.stroke();
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(20, -18);
+      ctx.lineTo(29, -27);
+      ctx.lineTo(39, -18);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Bếp sưởi ngoài trời lửa bập bùng & người ngồi sưởi ấm bên bếp
+    function drawHearthFireAndSitters(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Quầng sáng ấm của bếp lửa hắt xuống nền tuyết trắng
+      const firePulse = 0.85 + 0.15 * Math.sin(timeSec * 8);
+      const fireGlow = ctx.createRadialGradient(0, -8, 2, 0, -8, 38 * firePulse);
+      fireGlow.addColorStop(0, 'rgba(254, 240, 138, 0.55)');
+      fireGlow.addColorStop(0.45, 'rgba(249, 115, 22, 0.25)');
+      fireGlow.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.beginPath();
+      ctx.arc(0, -8, 38 * firePulse, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bếp đá & củi cháy
+      ctx.fillStyle = '#475569';
+      [-9, -3, 3, 9].forEach((sx) => {
+        ctx.beginPath();
+        ctx.arc(sx, 0, 3.3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-7, -1);
+      ctx.lineTo(6, -6);
+      ctx.moveTo(7, -1);
+      ctx.lineTo(-6, -6);
+      ctx.stroke();
+
+      // Ngọn lửa bếp sưởi bập bùng (cam -> vàng -> trắng)
+      const sway = Math.sin(timeSec * 9) * 2.2;
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(-7, -3);
+      ctx.quadraticCurveTo(-8, -14, sway, -21 - Math.sin(timeSec * 11) * 2.5);
+      ctx.quadraticCurveTo(8, -14, 7, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(-4.5, -3);
+      ctx.quadraticCurveTo(-4.5, -11, sway * 0.7, -15.5);
+      ctx.quadraticCurveTo(4.5, -11, 4.5, -3);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(sway * 0.3, -6.5, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người ngồi bên trái sưởi tay bên bếp (áo đỏ, mũ vàng) ---
+      ctx.fillStyle = '#78350f'; // Khúc gỗ ngồi
+      drawRoundedRectPath(-28, -8, 12, 8, 2);
+      ctx.fill();
+      // Chân co ngồi sưởi
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-21, -8);
+      ctx.lineTo(-14, -7);
+      ctx.lineTo(-13, 0);
+      ctx.stroke();
+      // Thân áo khoác đỏ
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.moveTo(-27, -7);
+      ctx.quadraticCurveTo(-26, -21, -20, -23);
+      ctx.lineTo(-16, -22);
+      ctx.quadraticCurveTo(-15, -14, -18, -7);
+      ctx.closePath();
+      ctx.fill();
+      // Tay đưa ra hơ ấm bên bếp
+      ctx.strokeStyle = '#e11d48';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(-18, -19);
+      ctx.lineTo(-10, -14);
+      ctx.stroke();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-9.5, -14, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      // Đầu & mũ len vàng
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-19, -27, 4.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(-19.5, -28.8, 4.1, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người ngồi bên phải sưởi bên bếp (áo xanh dương, khăn đỏ) ---
+      ctx.fillStyle = '#78350f';
+      drawRoundedRectPath(16, -8, 12, 8, 2);
+      ctx.fill();
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(21, -8);
+      ctx.lineTo(14, -7);
+      ctx.lineTo(13, 0);
+      ctx.stroke();
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.moveTo(27, -7);
+      ctx.quadraticCurveTo(26, -21, 20, -23);
+      ctx.lineTo(16, -22);
+      ctx.quadraticCurveTo(15, -14, 18, -7);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(18, -19);
+      ctx.lineTo(10, -14);
+      ctx.stroke();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(9.5, -14, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(19, -27, 4.0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.arc(19.5, -28.8, 4.1, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Cô bé bán diêm cầm khay diêm & que diêm cháy sáng rực giữa trời đông
+    function drawLittleMatchGirl(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // Ánh sáng diệu kỳ từ que diêm đang cháy
+      const matchFlicker = 0.88 + 0.12 * Math.sin(timeSec * 12);
+      const matchX = -11;
+      const matchY = -28;
+      const matchGlow = ctx.createRadialGradient(matchX, matchY, 1, matchX, matchY, 22 * matchFlicker);
+      matchGlow.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      matchGlow.addColorStop(0.35, 'rgba(253, 224, 71, 0.72)');
+      matchGlow.addColorStop(0.7, 'rgba(251, 146, 60, 0.28)');
+      matchGlow.addColorStop(1, 'rgba(251, 146, 60, 0)');
+      ctx.fillStyle = matchGlow;
+      ctx.beginPath();
+      ctx.arc(matchX, matchY, 22 * matchFlicker, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ủng nâu nhỏ
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 3.2;
+      ctx.beginPath();
+      ctx.moveTo(-2.5, -10);
+      ctx.lineTo(-3, 0);
+      ctx.moveTo(2.5, -10);
+      ctx.lineTo(3, 0);
+      ctx.stroke();
+
+      // Váy xanh tím & khăn choàng đỏ tía
+      ctx.fillStyle = '#312e81';
+      ctx.beginPath();
+      ctx.moveTo(-8, -9);
+      ctx.quadraticCurveTo(-6, -23, -3, -26);
+      ctx.lineTo(3, -26);
+      ctx.quadraticCurveTo(6, -23, 8, -9);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#be185d';
+      ctx.beginPath();
+      ctx.moveTo(-6, -20);
+      ctx.quadraticCurveTo(0, -17, 6, -20);
+      ctx.lineTo(3, -27);
+      ctx.lineTo(-3, -27);
+      ctx.closePath();
+      ctx.fill();
+
+      // Đầu, tóc vàng hạt dẻ & khăn trùm đầu ấm
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.arc(0, -31.5, 4.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath();
+      ctx.arc(-0.5, -31.2, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#be185d';
+      ctx.beginPath();
+      ctx.arc(0.8, -32.2, 4.4, Math.PI * 0.85, Math.PI * 2.15);
+      ctx.fill();
+
+      // Tay phải cầm khay gỗ đựng hộp diêm
+      ctx.strokeStyle = '#be185d';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(4, -22);
+      ctx.lineTo(10, -18);
+      ctx.stroke();
+      ctx.fillStyle = '#92400e';
+      drawRoundedRectPath(6, -19, 10, 3.2, 1);
+      ctx.fill();
+      ctx.fillStyle = '#f43f5e';
+      drawRoundedRectPath(8, -21.5, 5, 2.8, 0.8);
+      ctx.fill();
+
+      // Tay trái giơ que diêm cháy sáng rực
+      ctx.strokeStyle = '#be185d';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(-3.5, -22);
+      ctx.lineTo(-10, -25);
+      ctx.stroke();
+      ctx.strokeStyle = '#fde68a';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(-10, -25);
+      ctx.lineTo(matchX, matchY + 2.5);
+      ctx.stroke();
+
+      // Ngọn lửa đầu que diêm
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.ellipse(matchX, matchY, 2.2, 3.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(matchX, matchY + 0.8, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Cặp đôi mặc đồ mùa đông nhiều màu đứng nắm tay nhau ngắm trăng & tuần lộc
+    function drawColorfulCouple(x, y, scale, timeSec) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // --- Người 1 (áo khoác xanh navy, mũ len đỏ) ---
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 4.0;
+      ctx.beginPath();
+      ctx.moveTo(-11, -13);
+      ctx.lineTo(-13, 1);
+      ctx.moveTo(-6, -13);
+      ctx.lineTo(-5, 1);
+      ctx.stroke();
+
+      ctx.fillStyle = '#1d4ed8';
+      ctx.beginPath();
+      ctx.moveTo(-15, -12);
+      ctx.quadraticCurveTo(-15, -31, -11, -34);
+      ctx.lineTo(-5, -34);
+      ctx.quadraticCurveTo(-2, -26, -3, -12);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(-8.5, -39.5, 4.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(-8.5, -40.8, 4.6, Math.PI, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-9.5, -45.4, 2.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Người 2 (áo khoác đỏ hồng ấm, khăn choàng vàng bay nhẹ) ---
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3.8;
+      ctx.beginPath();
+      ctx.moveTo(6, -12);
+      ctx.lineTo(5, 1);
+      ctx.moveTo(11, -12);
+      ctx.lineTo(13, 1);
+      ctx.stroke();
+
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.moveTo(2, -10);
+      ctx.quadraticCurveTo(3, -27, 6, -30);
+      ctx.lineTo(11, -30);
+      ctx.quadraticCurveTo(15, -21, 16, -10);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(8.5, -35.5, 4.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.arc(9.2, -36.5, 4.4, Math.PI * 0.85, Math.PI * 2.1);
+      ctx.fill();
+
+      // Khăn choàng vàng bay nhẹ trong gió đông
+      const scarfWave = Math.sin(timeSec * 2.8) * 2.2;
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(10, -29);
+      ctx.quadraticCurveTo(16, -28 + scarfWave * 0.4, 21, -24 + scarfWave);
+      ctx.stroke();
+
+      // Cánh tay nắm lấy nhau
+      ctx.strokeStyle = '#1e3a8a';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-4, -28);
+      ctx.quadraticCurveTo(0, -21, 5, -26);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Nền đất tuyết trắng, hàng cây thông và dải đèn lấp lánh ở dưới
+    function drawWinterGroundAndTrees(timeSec) {
+      const isMobile = W < 768;
+
+      // 1) Đồi tuyết xa mờ ánh trăng phía sau (thấp xuống sát đáy)
+      const backBase = H * (isMobile ? 0.838 : 0.852);
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      ctx.lineTo(0, backBase - 10);
+      ctx.quadraticCurveTo(W * 0.25, backBase - 20, W * 0.5, backBase + 6);
+      ctx.quadraticCurveTo(W * 0.75, backBase - 18, W, backBase - 10);
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      const backSnowGrad = ctx.createLinearGradient(0, backBase - 22, 0, H);
+      backSnowGrad.addColorStop(0, '#dbeafe');
+      backSnowGrad.addColorStop(0.55, '#bfdbfe');
+      backSnowGrad.addColorStop(1, '#93c5fd');
+      ctx.fillStyle = backSnowGrad;
+      ctx.fill();
+
+      // Cây thông lớp nền xa
+      snowTrees.forEach((t) => {
+        if (t.back) drawSnowPineTree(t, timeSec);
+      });
+
+      // 2) Nền đất tuyết trắng bồng bềnh phía trước
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      const step = 28;
+      ctx.lineTo(0, getSnowGroundY(0));
+      for (let x = step; x <= W; x += step) {
+        ctx.lineTo(x, getSnowGroundY(x));
+      }
+      ctx.lineTo(W, getSnowGroundY(W));
+      ctx.lineTo(W, H);
+      ctx.closePath();
+
+      const frontSnowGrad = ctx.createLinearGradient(0, H * 0.83, 0, H);
+      frontSnowGrad.addColorStop(0, '#ffffff');
+      frontSnowGrad.addColorStop(0.35, '#f0f9ff');
+      frontSnowGrad.addColorStop(0.85, '#dbeafe');
+      frontSnowGrad.addColorStop(1, '#cbd5e1');
+      ctx.fillStyle = frontSnowGrad;
+      ctx.fill();
+
+      // Viền sáng ánh trăng dọc sống đồi tuyết trắng
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, getSnowGroundY(0));
+      for (let x = step; x <= W; x += step) {
+        ctx.lineTo(x, getSnowGroundY(x));
+      }
+      ctx.lineTo(W, getSnowGroundY(W));
+      ctx.stroke();
+
+      // Tinh thể tuyết lấp lánh trên mặt đất trắng
+      snowGlints.forEach((g) => {
+        const alpha = 0.2 + 0.75 * (0.5 + 0.5 * Math.sin(timeSec * g.speed + g.phase));
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3) Cây thông Noel phủ tuyết lớp tiền cảnh
+      snowTrees.forEach((t) => {
+        if (!t.back) drawSnowPineTree(t, timeSec);
+      });
+
+      // 3.5) Nhiều ngôi nhà có màu sắc, ống khói bếp sưởi, người ngồi sưởi bên bếp, cô bé bán diêm & cặp đôi
+      const houseConfigs = isMobile
+        ? [
+            { nx: 0.17, sc: 0.62, palette: { wall: '#fef3c7', wallSide: '#fde68a', roof: '#b91c1c', door: '#78350f' } },
+            { nx: 0.85, sc: 0.60, palette: { wall: '#fed7aa', wallSide: '#fdba74', roof: '#15803d', door: '#7c2d12' } }
+          ]
+        : [
+            { nx: 0.14, sc: 0.90, palette: { wall: '#fef3c7', wallSide: '#fde68a', roof: '#b91c1c', door: '#78350f' } },
+            { nx: 0.25, sc: 0.72, palette: { wall: '#e0f2fe', wallSide: '#bae6fd', roof: '#9a3412', door: '#78350f' } },
+            { nx: 0.85, sc: 0.88, palette: { wall: '#fed7aa', wallSide: '#fdba74', roof: '#15803d', door: '#7c2d12' } }
+          ];
+      houseConfigs.forEach((hCfg) => {
+        const hx = W * hCfg.nx;
+        const hy = getSnowGroundY(hx) + 12;
+        drawColorfulCozyHouse(hx, hy, hCfg.sc, timeSec, hCfg.palette);
+      });
+
+      const fireX = W * (isMobile ? 0.32 : 0.35);
+      drawHearthFireAndSitters(fireX, getSnowGroundY(fireX) + 10, isMobile ? 0.68 : 0.92, timeSec);
+
+      const matchGirlX = W * (isMobile ? 0.62 : 0.61);
+      drawLittleMatchGirl(matchGirlX, getSnowGroundY(matchGirlX) + 10, isMobile ? 0.72 : 0.94, timeSec);
+
+      const peopleX = W * (isMobile ? 0.74 : 0.73);
+      drawColorfulCouple(peopleX, getSnowGroundY(peopleX) + 10, isMobile ? 0.72 : 0.96, timeSec);
+
+      // 4) Dải đèn lấp lánh giăng ngang phía dưới
+      ctx.save();
+      ctx.lineCap = 'round';
+      garlandSegments.forEach((seg, segIdx) => {
+        // Cọc gỗ nhỏ giữ dây đèn (bỏ qua 2 mép ngoài cùng màn hình)
+        if (segIdx > 0) {
+          ctx.strokeStyle = 'rgba(71, 85, 105, 0.75)';
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(seg.p0.x, seg.p0.baseY);
+          ctx.lineTo(seg.p0.x, seg.p0.y);
+          ctx.stroke();
+        }
+
+        // Dây đèn cong mềm
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(seg.p0.x, seg.p0.y);
+        ctx.quadraticCurveTo(seg.midX, seg.ctrlY, seg.p1.x, seg.p1.y);
+        ctx.stroke();
+
+        // Bóng đèn nhấp nháy tỏa sáng lên tuyết trắng
+        seg.bulbs.forEach((b) => {
+          const pulse = 0.45 + 0.55 * Math.sin(timeSec * b.speed + b.phase);
+          const haloR = (isMobile ? 10 : 13) * (0.8 + pulse * 0.4);
+          const bulbGlow = ctx.createRadialGradient(b.x, b.y, 0.5, b.x, b.y, haloR);
+          bulbGlow.addColorStop(0, '#ffffff');
+          bulbGlow.addColorStop(0.32, b.color);
+          bulbGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.globalAlpha = 0.42 + pulse * 0.58;
+          ctx.fillStyle = bulbGlow;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, haloR, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.globalAlpha = 0.85 + pulse * 0.15;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, isMobile ? 2.1 : 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      });
+      ctx.restore();
+    }
+
+    // Vẽ Hộp Quà 3D Rơi Bất Ngờ — bo tròn, nét vẽ mềm mại tự nhiên
+    function drawDroppedGiftBox(timeSec) {
+      if (!giftBox.spawned) return;
+
+      const hoverOffset = giftBox.landed ? Math.sin(timeSec * 2.5) * 4.2 : 0;
+      const gx = giftBox.x;
+      const gy = giftBox.y + hoverOffset;
+      const s = giftBox.size * giftBox.scaleBounce;
+
+      // Bóng đổ mềm trên nền tuyết trắng bên dưới hộp quà
+      if (giftBox.landed) {
+        const shadowScale = 1 - (hoverOffset + 4.2) * 0.025;
+        ctx.save();
+        ctx.fillStyle = 'rgba(30, 58, 138, 0.20)';
+        ctx.beginPath();
+        ctx.ellipse(gx + 5, giftBox.targetY + s * 0.45, s * 0.62 * shadowScale, s * 0.18 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.save();
+      ctx.translate(gx, gy);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      if (!giftBox.landed) {
+        ctx.rotate(giftBox.rot);
+      } else {
+        ctx.rotate(Math.sin(timeSec * 2.0) * 0.035);
+      }
+
+      // Vòng hào quang mời chạm phía sau hộp quà
+      const pulseR = s * (1.35 + Math.sin(timeSec * 3.2) * 0.16);
+      const glow = ctx.createRadialGradient(0, 0, s * 0.2, 0, 0, pulseR * 1.4);
+      glow.addColorStop(0, 'rgba(251, 191, 36, 0.55)');
+      glow.addColorStop(0.6, 'rgba(244, 63, 94, 0.26)');
+      glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, pulseR * 1.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      const w = s * 0.92;
+      const h = s * 0.78;
+      const rCorner = s * 0.14;
+      const depthX = s * 0.30;
+      const depthY = -s * 0.20;
+
+      // Mặt hông bên phải bo mềm tạo khối 3D dịu mắt
+      const sideGrad = ctx.createLinearGradient(w / 2, -h / 2, w / 2 + depthX, h / 2);
+      sideGrad.addColorStop(0, '#be123c');
+      sideGrad.addColorStop(1, '#881337');
+      ctx.fillStyle = sideGrad;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 2, -h / 2 + rCorner * 0.3);
+      ctx.quadraticCurveTo(w / 2 + depthX * 0.55, -h / 2 + depthY * 0.55, w / 2 + depthX - 2, -h / 2 + depthY + rCorner * 0.45);
+      ctx.quadraticCurveTo(w / 2 + depthX + 2, depthY * 0.2, w / 2 + depthX - 2, h / 2 + depthY - rCorner * 0.45);
+      ctx.quadraticCurveTo(w / 2 + depthX * 0.55, h / 2 + depthY * 0.55, w / 2 - 2, h / 2 - rCorner * 0.3);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mặt chính phía trước bo tròn mềm
+      const frontGrad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+      frontGrad.addColorStop(0, '#fb7185');
+      frontGrad.addColorStop(0.55, '#f43f5e');
+      frontGrad.addColorStop(1, '#be123c');
+      ctx.fillStyle = frontGrad;
+      drawRoundedRectPath(-w / 2, -h / 2, w, h, rCorner);
+      ctx.fill();
+
+      // Viền sáng lụa nhẹ mặt hộp
+      ctx.strokeStyle = 'rgba(255, 228, 230, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Bóng đổ mềm ngay dưới nắp hộp
+      ctx.fillStyle = 'rgba(136, 19, 55, 0.28)';
+      drawRoundedRectPath(-w / 2 + 1, -h / 2 + 1, w - 2, h * 0.16, rCorner * 0.5);
+      ctx.fill();
+
+      // Dải ruy băng vàng óng bo mềm theo thân hộp
+      const ribGradV = ctx.createLinearGradient(-w * 0.13, 0, w * 0.13, 0);
+      ribGradV.addColorStop(0, '#f59e0b');
+      ribGradV.addColorStop(0.5, '#fef08a');
+      ribGradV.addColorStop(1, '#d97706');
+      ctx.fillStyle = ribGradV;
+      drawRoundedRectPath(-w * 0.12, -h / 2 + 1, w * 0.24, h - 2, 4);
+      ctx.fill();
+
+      const ribGradH = ctx.createLinearGradient(0, -h * 0.11, 0, h * 0.11);
+      ribGradH.addColorStop(0, '#fef08a');
+      ribGradH.addColorStop(0.5, '#fbbf24');
+      ribGradH.addColorStop(1, '#d97706');
+      ctx.fillStyle = ribGradH;
+      drawRoundedRectPath(-w / 2 + 1, -h * 0.11, w - 2, h * 0.22, 4);
+      ctx.fill();
+
+      // Nắp hộp quà phồng nhẹ, bo tròn góc (đỡ cứng)
+      const lidGrad = ctx.createLinearGradient(-w / 2, -h / 2 + depthY, w / 2 + depthX, -h / 2 + 4);
+      lidGrad.addColorStop(0, '#ffe4e6');
+      lidGrad.addColorStop(0.5, '#fda4af');
+      lidGrad.addColorStop(1, '#fb7185');
+      ctx.fillStyle = lidGrad;
+      ctx.beginPath();
+      ctx.moveTo(-w / 2 - 2, -h / 2 + 2);
+      ctx.quadraticCurveTo(0, -h / 2 + 5, w / 2 + 2, -h / 2 + 2);
+      ctx.quadraticCurveTo(w / 2 + depthX + 3, -h / 2 + depthY * 0.45, w / 2 + depthX, -h / 2 + depthY + 1);
+      ctx.quadraticCurveTo(depthX * 0.5, -h / 2 + depthY - 3, -w / 2 + depthX, -h / 2 + depthY + 1);
+      ctx.quadraticCurveTo(-w / 2 - 3, -h / 2 + depthY * 0.55, -w / 2 - 2, -h / 2 + 2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dải ruy băng lượn trên nắp hộp
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.moveTo(-w * 0.12, -h / 2 + 3);
+      ctx.quadraticCurveTo(w * 0.0, -h / 2 + 4, w * 0.12, -h / 2 + 3);
+      ctx.quadraticCurveTo(w * 0.12 + depthX * 0.6, -h / 2 + depthY * 0.5, w * 0.12 + depthX * 0.96, -h / 2 + depthY);
+      ctx.lineTo(-w * 0.12 + depthX * 0.96, -h / 2 + depthY);
+      ctx.quadraticCurveTo(-w * 0.12 + depthX * 0.5, -h / 2 + depthY * 0.5, -w * 0.12, -h / 2 + 3);
+      ctx.closePath();
+      ctx.fill();
+
+      // Nơ lụa mềm 2 cánh + đuôi ruy băng cong dịu trên đỉnh nắp
+      const bowX = depthX * 0.48;
+      const bowY = -h / 2 + depthY * 0.5 - 3;
+
+      // Hai đuôi nơ rủ nhẹ
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3.2;
+      ctx.beginPath();
+      ctx.moveTo(bowX - 1, bowY + 1);
+      ctx.quadraticCurveTo(bowX - 10, bowY + 4, bowX - 13, bowY + 11);
+      ctx.moveTo(bowX + 1, bowY + 1);
+      ctx.quadraticCurveTo(bowX + 10, bowY + 4, bowX + 13, bowY + 11);
+      ctx.stroke();
+
+      // Hai tai nơ phồng
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.moveTo(bowX, bowY);
+      ctx.bezierCurveTo(bowX - 6, bowY - 12, bowX - 18, bowY - 6, bowX - 11, bowY + 2);
+      ctx.bezierCurveTo(bowX - 6, bowY + 5, bowX - 2, bowY + 2, bowX, bowY);
+      ctx.moveTo(bowX, bowY);
+      ctx.bezierCurveTo(bowX + 6, bowY - 12, bowX + 18, bowY - 6, bowX + 11, bowY + 2);
+      ctx.bezierCurveTo(bowX + 6, bowY + 5, bowX + 2, bowY + 2, bowX, bowY);
+      ctx.fill();
+
+      // Nút thắt tròn giữa nơ
+      ctx.fillStyle = '#fef9c3';
+      ctx.beginPath();
+      ctx.arc(bowX, bowY, 4.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spawnGiftBurstParticles(cx, cy) {
+      for (let i = 0; i < 110; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 7 + 2;
+        burstSparks.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2.5,
+          life: 1,
+          decay: Math.random() * 0.015 + 0.012,
+          size: Math.random() * 3.2 + 1.4,
+          color: Math.random() > 0.35 ? '#fde047' : (Math.random() > 0.5 ? '#fb7185' : '#ffffff')
+        });
+      }
+    }
+
+    function renderLoop(now) {
+      requestAnimationFrame(renderLoop);
+      const elapsed = now - rideStartTime;
+      const timeSec = now * 0.001;
+
+      // 1. Nền bầu trời đêm mùa đông (Xanh đen -> Tím than)
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+      skyGrad.addColorStop(0, '#020512');
+      skyGrad.addColorStop(0.55, '#0b102c');
+      skyGrad.addColorStop(1, '#1a1236');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Sao trời lấp lánh
+      stars.forEach((s) => {
+        const alpha = 0.25 + 0.65 * (0.5 + 0.5 * Math.sin(timeSec * s.speed + s.phase));
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Tính tiến độ bay của cỗ xe tuần lộc
+      sleighProgress = Math.min(1.05, elapsed / RIDE_DURATION_MS);
+      const sleighVisible = sleighProgress < 1.02;
+      const sleighPos = getSleighPosition(Math.min(1, sleighProgress));
+
+      // 2. Mặt Trăng Khổng Lồ + Silhouette Cỗ Xe Tuần Lộc in bóng đen
+      drawGiantMoonAndSilhouette(sleighPos, sleighVisible, timeSec);
+
+      // 2.5 Nền đất tuyết trắng, cây thông Noel & dải đèn lấp lánh ở dưới
+      drawWinterGroundAndTrees(timeSec);
+
+      // 3. Lớp 1 (Nền): Tuyết rơi liên tục trắng / xanh lơ nhạt
+      snowflakes.forEach((sf) => {
+        sf.y += sf.vy;
+        sf.x += sf.vx + Math.sin(timeSec * 1.4 + sf.swayPhase) * 0.28;
+        if (sf.y > H + 10) {
+          sf.y = -10;
+          sf.x = Math.random() * W;
+        }
+        if (sf.x > W + 10) sf.x = -10;
+        if (sf.x < -10) sf.x = W + 10;
+
+        ctx.fillStyle = sf.color;
+        ctx.beginPath();
+        ctx.arc(sf.x, sf.y, sf.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 4. Vệt sáng Vàng Kim của cỗ xe & Rải Bụi Tiên
+      if (sleighVisible) {
+        drawGoldenStreakHead(sleighPos);
+      }
+
+      // Sinh & cập nhật Lớp 2 (Chữ): Bụi sao nhỏ li ti rơi từ từ xuống và ghép chữ sắc nét theo đường bay
+      const settleRevealX = Math.max(0, Math.min(textGlowRect.w, (sleighPos.x - 130) - textGlowRect.x));
+      const postRideAlpha = Math.max(0, Math.min(1, (elapsed - RIDE_DURATION_MS * 0.5) / 2400));
+      if (settleRevealX > 20 && textGlowCanvas && postRideAlpha > 0.02) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(textGlowRect.x, textGlowRect.y, settleRevealX, textGlowRect.h);
+        ctx.clip();
+        ctx.globalAlpha = postRideAlpha * 0.42;
+        ctx.drawImage(textGlowCanvas, textGlowRect.x, textGlowRect.y, textGlowRect.w, textGlowRect.h);
+        ctx.restore();
+      }
+
+      const streakSpreadY = W < 768 ? 14 : 22;
+      magicDust.forEach((p, idx) => {
+        if (!p.spawned && sleighProgress >= p.spawnProgress) {
+          p.spawned = true;
+          p.spawnTime = now;
+          const laneOffset = (idx % 3 - 1) * streakSpreadY;
+          p.x = sleighPos.x + (laneOffset === 0 ? 12 : -14) + (Math.random() - 0.5) * 30;
+          p.y = sleighPos.y + laneOffset + (Math.random() - 0.5) * 10;
+          p.vx = (Math.random() - 0.5) * 1.3 - 0.25;
+          p.vy = 0.9 + Math.random() * 1.4; // Rơi nhẹ xuống phía dưới khi 3 vệt sao lướt qua
+        }
+        if (!p.spawned) return;
+
+        const ageSec = Math.max(0, (now - p.spawnTime) * 0.001);
+        if (ageSec < 0.36) {
+          // Rơi từ từ xuống theo trọng lực dịu nhẹ ngay sau khi rớt khỏi vệt sáng
+          p.vy = Math.min(2.4, p.vy + 0.042);
+          p.vx *= 0.96;
+          p.x += p.vx;
+          p.y += p.vy + Math.sin(timeSec * 2.5 + p.twinklePhase) * 0.14;
+        } else {
+          // Hút chính xác vào vị trí chữ tương ứng để chữ ghép rõ nét
+          const pullT = Math.min(1, (ageSec - 0.36) / 1.45);
+          p.vx *= 0.84;
+          p.vy *= 0.84;
+          p.x += p.vx;
+          p.y += p.vy;
+          const ease = 0.03 + pullT * pullT * 0.11;
+          p.x += (p.tx - p.x) * ease;
+          p.y += (p.ty - p.y) * ease;
+        }
+
+        const dx = p.tx - p.x;
+        const dy = p.ty - p.y;
+        const dist = Math.hypot(dx, dy);
+        const alpha = dist < 3
+          ? 0.78 + 0.22 * Math.sin(timeSec * 3.2 + p.twinklePhase)
+          : 0.94;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0.3, Math.min(1, alpha));
+        if (p.size <= 0.9) {
+          const d = p.size * 2;
+          ctx.fillRect(p.x - p.size, p.y - p.size, d, d);
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1;
+
+      // 5. Cải tiến 4: Hộp quà thả rơi lơ lửng từ từ khi xe bay tới giữa màn hình
+      if (!giftBox.spawned && sleighProgress >= 0.48) {
+        giftBox.spawned = true;
+        giftBox.landed = false;
+        giftBox.x = W * 0.5;
+        giftBox.y = sleighPos.y + 12;
+        giftBox.vy = 0.55;
+        giftBox.vx = 0;
+        giftBox.rot = 0;
+        giftBox.bounceCount = 0;
+        giftBox.scaleBounce = 1;
+      }
+
+      if (giftBox.spawned && !giftBox.landed) {
+        // Rơi chậm rãi bồng bềnh như dù lượn kèm đung đưa nhẹ
+        giftBox.vy = Math.min(2.05, giftBox.vy + 0.032);
+        giftBox.y += giftBox.vy;
+
+        const distLeft = Math.max(0, giftBox.targetY - giftBox.y);
+        const swayFade = Math.min(1, distLeft / 120);
+        const swayAmp = W < 768 ? 16 : 24;
+        giftBox.x = W * 0.5 + Math.sin(timeSec * 2.3) * swayAmp * swayFade;
+        giftBox.rot = Math.sin(timeSec * 2.3) * 0.14 * swayFade;
+
+        if (giftBox.y >= giftBox.targetY) {
+          giftBox.y = giftBox.targetY;
+          giftBox.x = W * 0.5;
+          if (giftBox.bounceCount < 1) {
+            giftBox.vy = -giftBox.vy * 0.22;
+            giftBox.bounceCount++;
+          } else {
+            giftBox.vy = 0;
+            giftBox.rot = 0;
+            giftBox.landed = true;
+          }
+        }
+      }
+
+      if (giftBox.spawned) {
+        drawDroppedGiftBox(timeSec);
+      }
+
+      // 6. Hạt nổ pháo bông từ hộp quà khi bấm mở
+      for (let i = burstSparks.length - 1; i >= 0; i--) {
+        const sp = burstSparks[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.vy += 0.14;
+        sp.life -= sp.decay;
+        if (sp.life <= 0) {
+          burstSparks.splice(i, 1);
+          continue;
+        }
+        ctx.globalAlpha = sp.life;
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function replayMagicRide() {
+      rideStartTime = performance.now();
+      sleighProgress = 0;
+      giftBox.spawned = false;
+      giftBox.landed = false;
+      giftBox.opened = false;
+      magicDust.forEach((p) => {
+        p.spawned = false;
+        p.spawnTime = 0;
+        p.x = -100;
+        p.y = -100;
+        p.vx = 0;
+        p.vy = 0;
+      });
+      audioEngine.tryUnlock(() => {
+        audioEngine.startRideAudioSequence(0);
+      });
+    }
+
+    /**
+     * ============================================================================
+     * 4. DEFAULT PHOTOS, BURST MEMORY GALLERY & GESTURE INTERACTIONS
+     * ============================================================================
+     */
+    function generateFestivePhoto(title, sub, icon) {
+      const c = document.createElement('canvas');
+      c.width = 560;
+      c.height = 420;
+      const gctx = c.getContext('2d');
+
+      const grad = gctx.createLinearGradient(0, 0, 560, 420);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(0.5, '#1e1b4b');
+      grad.addColorStop(1, '#3b0764');
+      gctx.fillStyle = grad;
+      gctx.fillRect(0, 0, 560, 420);
+
+      // Tuyết & bụi vàng trang trí ảnh mẫu
+      for (let i = 0; i < 45; i++) {
+        gctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.65)' : 'rgba(251,191,36,0.75)';
+        gctx.beginPath();
+        gctx.arc((i * 89) % 540 + 10, (i * 67) % 400 + 10, (i % 3) + 1, 0, Math.PI * 2);
+        gctx.fill();
+      }
+
+      gctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
+      gctx.lineWidth = 4;
+      gctx.strokeRect(20, 20, 520, 380);
+
+      gctx.textAlign = 'center';
+      gctx.font = '68px Arial';
+      gctx.fillText(icon, 280, 145);
+
+      gctx.font = 'bold 34px "Cinzel", serif';
+      gctx.fillStyle = '#fde047';
+      gctx.fillText(title, 280, 230);
+
+      gctx.font = 'italic 22px "Plus Jakarta Sans", sans-serif';
+      gctx.fillStyle = '#fce7f3';
+      gctx.fillText(sub, 280, 275);
+
+      return c.toDataURL('image/jpeg', 0.85);
+    }
+
+    function initDefaultPhotos() {
+      const presets = [
+        { t: 'Ánh Trăng & Tuần Lộc', s: 'Khoảnh khắc diệu kỳ ✨', icon: '🦌' },
+        { t: 'Đêm Giáng Sinh Ấm Áp', s: 'Bình yên bên nhau ❤️', icon: '🎄' },
+        { t: 'Món Quà Bất Ngờ', s: 'Gửi ngàn yêu thương 💖', icon: '🎁' },
+        { t: 'Bụi Tiên Vàng Kim', s: 'Điều ước thành hiện thực 🌟', icon: '✨' },
+        { t: 'Mùa Đông Không Lạnh', s: 'Luôn mỉm cười nhé ❄️', icon: '☃️' },
+        { t: 'Merry Christmas', s: 'Kỷ niệm thật đẹp 🥂', icon: '🥂' }
+      ];
+      appState.photos = presets.map((p) => ({
+        url: generateFestivePhoto(p.t, p.s, p.icon),
+        caption: `${p.t} • ${appState.receiver}`
+      }));
+    }
+
+    function triggerDroppedGiftExplosion() {
+      giftBox.opened = true;
+      giftBox.scaleBounce = 1.25;
+      setTimeout(() => { giftBox.scaleBounce = 1; }, 220);
+
+      audioEngine.playGiftExplosionSound();
+      spawnGiftBurstParticles(giftBox.x, giftBox.y);
+      document.getElementById('btn-open-memories').style.display = 'inline-flex';
+
+      setTimeout(() => {
+        openMemoryBurst(0);
+      }, 360);
+    }
+
+    function openMemoryBurst(index = 0) {
+      if (!appState.photos.length) return;
+      currentBurstIndex = ((index % appState.photos.length) + appState.photos.length) % appState.photos.length;
+      renderMemoryCard();
+      document.getElementById('memory-burst-overlay').classList.remove('hidden');
+    }
+
+    function closeMemoryBurst() {
+      document.getElementById('memory-burst-overlay').classList.add('hidden');
+    }
+
+    function renderMemoryCard() {
+      const total = appState.photos.length;
+      const photo = appState.photos[currentBurstIndex];
+      document.getElementById('memory-gallery-title').textContent = `Kỷ Niệm Của ${appState.receiver} & ${appState.sender}`;
+      document.getElementById('memory-photo-img').src = photo.url;
+      document.getElementById('memory-photo-caption').textContent = photo.caption || `Khoảnh khắc ngọt ngào ${currentBurstIndex + 1}`;
+      document.getElementById('memory-photo-counter').textContent = `Ảnh ${currentBurstIndex + 1} / ${total}`;
+
+      const dotsWrap = document.getElementById('memory-dots');
+      dotsWrap.innerHTML = '';
+      appState.photos.forEach((_, idx) => {
+        const d = document.createElement('span');
+        d.className = 'mem-dot' + (idx === currentBurstIndex ? ' active' : '');
+        d.addEventListener('click', () => {
+          currentBurstIndex = idx;
+          renderMemoryCard();
+        });
+        dotsWrap.appendChild(d);
+      });
+    }
+
+    /**
+     * ============================================================================
+     * 5. CREATOR STUDIO, VIETQR PAYMENT & QR GIFT CARD
+     * ============================================================================
+     */
+    function syncUIFromState() {
+      document.getElementById('letter-title').textContent = `Gửi ${appState.receiver} Yêu Thương`;
+      document.getElementById('letter-content').textContent = appState.message;
+      document.getElementById('letter-sign').textContent = `Thương gửi, ${appState.sender} ❤️`;
+      rebuildTextTargets();
+    }
+
+    function renderPhotoUploaderGrid() {
+      const grid = document.getElementById('photo-upload-grid');
+      grid.innerHTML = '';
+
+      appState.photos.forEach((photo, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'photo-cell';
+        cell.innerHTML = `
+          <img src="${photo.url}" alt="Ảnh ${idx + 1}" />
+          <div class="remove-tag" title="Xóa ảnh">✕</div>
+        `;
+        cell.querySelector('img').addEventListener('click', () => {
+          const cap = prompt('Sửa lời chú thích cho bức ảnh này:', photo.caption || '');
+          if (cap !== null) {
+            photo.caption = cap.trim() || 'Khoảnh khắc Giáng Sinh ✨';
+            showToast('✨ Đã cập nhật chú thích!');
+          }
+        });
+        cell.querySelector('.remove-tag').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (appState.photos.length <= 1) {
+            showToast('Cần giữ lại ít nhất 1 ảnh trong hộp quà nhé!');
+            return;
+          }
+          appState.photos.splice(idx, 1);
+          renderPhotoUploaderGrid();
+        });
+        grid.appendChild(cell);
+      });
+
+      if (appState.photos.length < 8) {
+        const addCell = document.createElement('div');
+        addCell.className = 'photo-cell';
+        addCell.innerHTML = `<span style="font-size:1.5rem; color:#fde047;">➕</span><span style="font-size:0.68rem; color:#cbd5e1;">Thêm</span>`;
+        addCell.addEventListener('click', () => document.getElementById('in-photo-file').click());
+        grid.appendChild(addCell);
+      }
+
+      document.getElementById('photo-count-badge').textContent = `${appState.photos.length}/8 ảnh`;
+    }
+
+    function compressUploadedImage(file, maxSize = 420, quality = 0.78) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const c = document.createElement('canvas');
+            const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+            c.width = Math.round(img.width * scale);
+            c.height = Math.round(img.height * scale);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function applyCreatorFormChanges() {
+      appState.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      appState.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      appState.occasion = document.getElementById('in-occasion').value;
+      appState.message = document.getElementById('in-message').value.trim() || generateAiWish(appState.occasion, appState.receiver, 0);
+      syncUIFromState();
+    }
+
+    function renderReindeerGiftCard(shareUrl) {
+      const cardCanvas = document.getElementById('gift-card-canvas');
+      const gctx = cardCanvas.getContext('2d');
+
+      const grad = gctx.createLinearGradient(0, 0, 600, 780);
+      grad.addColorStop(0, '#04081a');
+      grad.addColorStop(0.5, '#111638');
+      grad.addColorStop(1, '#1e1036');
+      gctx.fillStyle = grad;
+      gctx.fillRect(0, 0, 600, 780);
+
+      // Mặt trăng trang trí trên thiệp QR
+      gctx.fillStyle = 'rgba(254, 240, 138, 0.2)';
+      gctx.beginPath();
+      gctx.arc(485, 110, 56, 0, Math.PI * 2);
+      gctx.fill();
+
+      // Viền vàng kim
+      gctx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+      gctx.lineWidth = 4;
+      gctx.beginPath();
+      gctx.roundRect(24, 24, 552, 732, 28);
+      gctx.stroke();
+
+      gctx.textAlign = 'center';
+      gctx.font = 'bold 20px "Cinzel", serif';
+      gctx.fillStyle = '#fde047';
+      gctx.fillText('🦌 MÓN QUÀ TUẦN LỘC PHÉP MÀU 🎄', 300, 84);
+
+      gctx.font = 'bold 42px "Dancing Script", cursive';
+      gctx.fillStyle = '#ffffff';
+      gctx.fillText(`${appState.receiver} ❤️ ${appState.sender}`, 300, 146);
+
+      gctx.font = '600 18px "Cinzel", serif';
+      gctx.fillStyle = '#fef08a';
+      gctx.fillText(appState.occasion, 300, 186);
+
+      gctx.fillStyle = '#ffffff';
+      gctx.beginPath();
+      gctx.roundRect(145, 222, 310, 310, 24);
+      gctx.fill();
+
+      const qrData = encodeURIComponent(shareUrl);
+      const qrImg = new Image();
+      qrImg.crossOrigin = 'anonymous';
+      qrImg.onload = () => {
+        gctx.drawImage(qrImg, 165, 242, 270, 270);
+      };
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&color=0f172a&data=${qrData}`;
+
+      gctx.font = 'bold 20px "Plus Jakarta Sans", sans-serif';
+      gctx.fillStyle = '#fde047';
+      gctx.fillText('📲 Quét QR xem Tuần Lộc & Mở Hộp Quà', 300, 590);
+
+      gctx.font = 'italic 16px "Plus Jakarta Sans", sans-serif';
+      gctx.fillStyle = '#e2e8f0';
+      const shortWish = appState.message.length > 80 ? appState.message.slice(0, 80) + '...' : appState.message;
+      gctx.fillText(`"${shortWish.slice(0, 42)}"`, 300, 640);
+      if (shortWish.length > 42) {
+        gctx.fillText(`"${shortWish.slice(42)}"`, 300, 670);
+      }
+    }
+
+    const PENDING_ORDER_KEY = `pending_order_${appState.templateId}`;
+
+    function savePendingOrder(orderData) {
+      PaymentQrKit.savePendingOrder(appState.templateId, {
+        ...orderData,
+        sender: appState.sender,
+        receiver: appState.receiver,
+        occasion: appState.occasion,
+        message: appState.message
+      });
+    }
+
+    function readPendingOrder() {
+      const p = PaymentQrKit.loadPendingOrder(appState.templateId);
+      return p && p.orderCode ? p : null;
+    }
+
+    function clearPendingOrder() {
+      PaymentQrKit.clearPendingOrder(appState.templateId);
+    }
+
+    function populatePaymentWaitingModal(orderData) {
+      activeOrderCode = orderData.orderCode;
+      document.getElementById('pay-vietqr-img').src = orderData.qrUrl || '';
+      document.getElementById('pay-bank-name').textContent = orderData.bankId || 'MB';
+      document.getElementById('pay-account-name').textContent = orderData.accountName || '---';
+      document.getElementById('pay-account-no').textContent = orderData.accountNo || '---';
+      document.getElementById('pay-amount-text').textContent = `${Number(orderData.amount || 35000).toLocaleString('vi-VN')}đ`;
+      document.getElementById('pay-memo-text').textContent = orderData.orderCode;
+
+      document.getElementById('pay-step-waiting').style.display = 'block';
+      document.getElementById('pay-step-success').style.display = 'none';
+      closeModal('modal-creator');
+      openModal('modal-payment');
+    }
+
+    async function checkActiveOrderOnce() {
+      if (!activeOrderCode) return false;
+      try {
+        const cRes = await fetch(`/api/check-order?code=${encodeURIComponent(activeOrderCode)}`);
+        const cData = await cRes.json();
+        if (cRes.ok && cData.status === 'PAID') {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          onPaymentSuccess(activeOrderCode);
+          return true;
+        }
+      } catch (err) {}
+      return false;
+    }
+
+    function startOrderPolling(orderCode) {
+      activeOrderCode = orderCode;
+      if (pollTimer) clearInterval(pollTimer);
+      checkActiveOrderOnce();
+      pollTimer = setInterval(checkActiveOrderOnce, 2500);
+    }
+
+    // Khi người dùng tab ra app ngân hàng rồi quay lại trình duyệt -> kiểm tra ngay lập tức & giữ nguyên trang chờ
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && activeOrderCode) {
+        const payModal = document.getElementById('modal-payment');
+        const waitBox = document.getElementById('pay-step-waiting');
+        if (payModal && !payModal.classList.contains('hidden') && waitBox && waitBox.style.display !== 'none') {
+          startOrderPolling(activeOrderCode);
+        }
+      }
+    });
+    window.addEventListener('focus', () => {
+      if (activeOrderCode) {
+        const payModal = document.getElementById('modal-payment');
+        const waitBox = document.getElementById('pay-step-waiting');
+        if (payModal && !payModal.classList.contains('hidden') && waitBox && waitBox.style.display !== 'none') {
+          checkActiveOrderOnce();
+        }
+      }
+    });
+
+    async function openVietQRPayment() {
+      applyCreatorFormChanges();
+      const btn = document.getElementById('btn-proceed-pay');
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang tạo mã VietQR...';
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId: appState.templateId,
+            templateType: appState.templateId,
+            senderName: appState.sender,
+            receiverName: appState.receiver,
+            occasion: appState.occasion,
+            message: appState.message,
+            payload: { photos: appState.photos }
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Lỗi tạo đơn hàng');
+
+        savePendingOrder(data);
+        populatePaymentWaitingModal(data);
+        startOrderPolling(data.orderCode);
+      } catch (err) {
+        alert('Không thể kết nối tạo đơn hàng: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💳 Lấy Link & Thiệp QR (35k)';
+      }
+    }
+
+    function onPaymentSuccess(orderCode) {
+      clearPendingOrder();
+      const shareUrl = `${window.location.origin}/q/${encodeURIComponent(orderCode)}`;
+      document.getElementById('share-url-input').value = shareUrl;
+      renderReindeerGiftCard(shareUrl);
+      document.getElementById('pay-step-waiting').style.display = 'none';
+      document.getElementById('pay-step-success').style.display = 'block';
+      showToast('🎉 Thanh toán thành công! Thiệp Tuần Lộc đã sẵn sàng!');
+    }
+
+    async function rasterizeBlobToPng(blob) {
+      const objUrl = URL.createObjectURL(blob);
+      try {
+        return await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const c = document.createElement('canvas');
+              c.width = img.naturalWidth || 600;
+              c.height = img.naturalHeight || 600;
+              const cctx = c.getContext('2d');
+              cctx.fillStyle = '#ffffff';
+              cctx.fillRect(0, 0, c.width, c.height);
+              cctx.drawImage(img, 0, 0);
+              c.toBlob(
+                (pngBlob) => (pngBlob ? resolve(pngBlob) : reject(new Error('toBlob failed'))),
+                'image/png'
+              );
+            } catch (err) {
+              reject(err);
+            }
+          };
+          img.onerror = reject;
+          img.src = objUrl;
+        });
+      } finally {
+        URL.revokeObjectURL(objUrl);
+      }
+    }
+
+    async function urlToImageBlob(url, filename = 'QR.png') {
+      return PaymentQrKit.urlToImageBlob(url, filename);
+    }
+
+    async function downloadBlobImage(url, filename) {
+      return PaymentQrKit.downloadBlobImage(url, filename);
+    }
+
+    function openModal(id) {
+      document.getElementById(id)?.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      if (id === 'modal-payment') {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+        clearPendingOrder();
+        activeOrderCode = null;
+      }
+      document.getElementById(id)?.classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /**
+     * ============================================================================
+     * 6. INITIALIZATION & USER INTERACTIONS
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      initDefaultPhotos();
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Bảo đảm font web load xong vẽ lại mặt nạ chữ bụi vàng sắc nét nhất
+      if (document.fonts) {
+        Promise.all([
+          document.fonts.load('800 48px "Cinzel"'),
+          document.fonts.load('700 68px "Dancing Script"')
+        ]).catch(() => {}).finally(() => {
+          document.fonts.ready.then(() => rebuildTextTargets());
+        });
+      }
+
+      // Kiểm tra chế độ người nhận (?id=LOVE...) -> Chạy ngay không qua form
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      if (orderId) {
+        try {
+          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'PAID' && data.order) {
+            const ord = data.order;
+            appState.sender = ord.sender_name || appState.sender;
+            appState.receiver = ord.receiver_name || appState.receiver;
+            appState.occasion = ord.occasion || appState.occasion;
+            appState.message = ord.message || appState.message;
+            if (ord.payload && Array.isArray(ord.payload.photos) && ord.payload.photos.length > 0) {
+              appState.photos = ord.payload.photos;
+            }
+            document.querySelectorAll('.creator-only').forEach((el) => el.style.display = 'none');
+            replayMagicRide();
+          }
+        } catch (e) {}
+      } else {
+        // Nếu người dùng vừa chuyển sang App Ngân Hàng và trình duyệt tải lại tab -> khôi phục ngay màn hình chờ xác nhận VietQR
+        const pending = readPendingOrder();
+        if (pending) {
+          appState.sender = pending.sender || appState.sender;
+          appState.receiver = pending.receiver || appState.receiver;
+          appState.occasion = pending.occasion || appState.occasion;
+          appState.message = pending.message || appState.message;
+          audioEngine.mute(true);
+          populatePaymentWaitingModal(pending);
+          startOrderPolling(pending.orderCode);
+        }
+      }
+
+      syncUIFromState();
+      rideStartTime = performance.now();
+      requestAnimationFrame(renderLoop);
+
+      // Thử mở âm thanh tự động; nếu trình duyệt chặn sẽ mở ngay ở lần chạm đầu tiên
+      audioEngine.tryUnlock(() => {
+        audioEngine.startRideAudioSequence(0);
+      });
+
+      const unlockOnFirstTouch = () => {
+        if (!audioEngine.unlocked && audioEngine.enabled) {
+          audioEngine.tryUnlock(() => {
+            if (sleighProgress < 0.85) {
+              audioEngine.startRideAudioSequence(Math.min(0.8, sleighProgress));
+            } else {
+              audioEngine.startChristmasLofiBgm();
+            }
+          });
+        }
+      };
+      window.addEventListener('pointerdown', unlockOnFirstTouch, { once: true });
+
+      document.getElementById('sound-unlock-pill').addEventListener('click', () => {
+        audioEngine.tryUnlock(() => {
+          if (sleighProgress < 0.85) {
+            audioEngine.startRideAudioSequence(Math.min(0.8, sleighProgress));
+          } else {
+            audioEngine.startChristmasLofiBgm();
+          }
+        });
+      });
+
+      // Chạm vào Hộp Quà Rơi trên Canvas
+      canvas.addEventListener('pointerdown', (e) => {
+        unlockOnFirstTouch();
+        if (!giftBox.spawned) return;
+        const rect = canvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const py = e.clientY - rect.top;
+        const dist = Math.hypot(px - giftBox.x, py - giftBox.y);
+        if (dist <= 75) {
+          triggerDroppedGiftExplosion();
+        }
+      });
+
+      // Vuốt ngang chuyển ảnh trong Gallery
+      const memStage = document.getElementById('memory-stage');
+      let swipeStartX = 0;
+      memStage.addEventListener('pointerdown', (e) => {
+        swipeStartX = e.clientX;
+      });
+      memStage.addEventListener('pointerup', (e) => {
+        const dx = e.clientX - swipeStartX;
+        if (Math.abs(dx) > 35) {
+          openMemoryBurst(dx < 0 ? currentBurstIndex + 1 : currentBurstIndex - 1);
+        }
+      });
+
+      document.getElementById('btn-prev-photo').addEventListener('click', () => openMemoryBurst(currentBurstIndex - 1));
+      document.getElementById('btn-next-photo').addEventListener('click', () => openMemoryBurst(currentBurstIndex + 1));
+      document.getElementById('btn-burst-read-letter').addEventListener('click', () => {
+        closeMemoryBurst();
+        openModal('modal-letter');
+      });
+
+      // Controls
+      document.getElementById('btn-replay').addEventListener('click', replayMagicRide);
+      document.getElementById('btn-toggle-sound').addEventListener('click', () => audioEngine.toggle());
+      document.getElementById('btn-open-letter').addEventListener('click', () => openModal('modal-letter'));
+      document.getElementById('btn-open-memories').addEventListener('click', () => openMemoryBurst(currentBurstIndex));
+
+      // Creator Studio (tự động tắt âm thanh khi mở giao diện tạo thiệp)
+      document.getElementById('btn-open-creator').addEventListener('click', () => {
+        audioEngine.mute(true);
+        document.getElementById('in-sender').value = appState.sender;
+        document.getElementById('in-receiver').value = appState.receiver;
+        document.getElementById('in-occasion').value = appState.occasion;
+        document.getElementById('in-message').value = appState.message;
+        renderPhotoUploaderGrid();
+        openModal('modal-creator');
+      });
+
+      const wishIdxByOccasion = {};
+      document.getElementById('btn-ai-wish').addEventListener('click', () => {
+        const occ = document.getElementById('in-occasion').value;
+        const rec = document.getElementById('in-receiver').value.trim() || 'bạn';
+        wishIdxByOccasion[occ] = (wishIdxByOccasion[occ] ?? -1) + 1;
+        document.getElementById('in-message').value = generateAiWish(occ, rec, wishIdxByOccasion[occ]);
+        showToast('🪄 AI đã viết lời chúc mới theo dịp lễ!');
+      });
+
+      document.getElementById('in-photo-file').addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        showToast('⏳ Đang tối ưu ảnh kỷ niệm...');
+        for (const f of files) {
+          if (appState.photos.length >= 8) break;
+          const compressed = await compressUploadedImage(f, 420, 0.78);
+          appState.photos.push({
+            url: compressed,
+            caption: `${appState.receiver} ❤️ ${appState.sender}`
+          });
+        }
+        e.target.value = '';
+        renderPhotoUploaderGrid();
+        showToast('✅ Đã thêm ảnh vào hộp quà Tuần Lộc!');
+      });
+
+      document.getElementById('btn-preview-ride').addEventListener('click', () => {
+        applyCreatorFormChanges();
+        closeModal('modal-creator');
+        replayMagicRide();
+        showToast('🦌 Đang phát lại màn Tuần Lộc với tên của bạn!');
+      });
+
+      document.getElementById('btn-proceed-pay').addEventListener('click', openVietQRPayment);
+
+      document.getElementById('btn-download-vietqr').addEventListener('click', async () => {
+        const img = document.getElementById('pay-vietqr-img');
+        if (!img.src) return;
+        showToast('⏳ Đang tải mã VietQR...');
+        await downloadBlobImage(img.src, `VietQR-TuanLoc-${activeOrderCode || 'BIDV'}.png`);
+        showToast('✅ Đã lưu mã VietQR!');
+      });
+
+      document.getElementById('btn-copy-url').addEventListener('click', () => {
+        const inp = document.getElementById('share-url-input');
+        inp.select();
+        navigator.clipboard.writeText(inp.value);
+        showToast('📋 Đã sao chép đường link quà tặng!');
+      });
+
+      document.getElementById('btn-download-card-img').addEventListener('click', () => {
+        const url = document.getElementById('gift-card-canvas').toDataURL('image/png');
+        downloadBlobImage(url, `Thiep-QR-TuanLoc-${activeOrderCode || 'Gift'}.png`);
+        showToast('📥 Đã lưu ảnh Thiệp QR Phép Màu!');
+      });
+
+      document.getElementById('btn-download-qr-only').addEventListener('click', async () => {
+        const shareUrl = document.getElementById('share-url-input').value;
+        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&color=0f172a&data=${encodeURIComponent(shareUrl)}`;
+        await downloadBlobImage(qrSrc, `QR-TuanLoc-${activeOrderCode || 'Gift'}.png`);
+        showToast('📥 Đã lưu mã QR!');
+      });
+    });
+  </script>
+</body>
+</html>
+

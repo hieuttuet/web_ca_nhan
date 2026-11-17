@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kho Mẫu Web Quà Tặng 3D Cá Nhân Hóa ✨ Tỏ Tình • Sinh Nhật • Kỷ Niệm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="templates-catalog.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #090414;
+      --card-bg: rgba(24, 13, 44, 0.72);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #ff2a85;
+      --secondary: #9333ea;
+      --gold: #fde047;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(219, 39, 119, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 15% 35%, rgba(147, 51, 234, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 85% 65%, rgba(236, 72, 153, 0.14) 0%, transparent 50%);
+      background-attachment: fixed;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      padding-bottom: 80px;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ánh sáng Tinh Vân dịu mắt tạo chiều sâu */
+    .aurora-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(110px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.42;
+    }
+    .orb-1 {
+      width: 420px;
+      height: 420px;
+      top: -120px;
+      left: 20%;
+      background: linear-gradient(135deg, #ff2a85, #db2777);
+    }
+    .orb-2 {
+      width: 360px;
+      height: 360px;
+      top: 40%;
+      right: -100px;
+      background: linear-gradient(135deg, #9333ea, #6366f1);
+    }
+
+    /* Nền sao tinh tế */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background-image:
+        radial-gradient(1.5px 1.5px at 15% 18%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 38% 52%, rgba(255,209,232,0.6), transparent),
+        radial-gradient(1.8px 1.8px at 65% 20%, rgba(255,255,255,0.65), transparent),
+        radial-gradient(1.2px 1.2px at 82% 44%, rgba(233,213,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 24% 82%, rgba(251,207,232,0.6), transparent);
+      background-size: 340px 340px;
+      opacity: 0.65;
+    }
+
+    .container {
+      position: relative;
+      z-index: 3;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ==================== 1. HERO SECTION ==================== */
+    .hero {
+      text-align: center;
+      padding: 44px 0 28px;
+    }
+
+    .hero-live-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.03em;
+      margin-bottom: 14px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: livePulse 2s infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.55; }
+    }
+
+    /* Typography hiện đại, rõ ràng, chỉ nhấn Script ở từ khóa "Yêu Thương" */
+    .hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.85rem, 4.6vw, 3.1rem);
+      color: #ffffff;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .script-highlight {
+      font-family: 'Dancing Script', cursive;
+      font-weight: 700;
+      font-size: 1.26em;
+      background: linear-gradient(135deg, #ff5ca8 0%, #fde047 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding: 0 4px;
+      display: inline-block;
+    }
+
+    .hero-desc {
+      font-size: clamp(0.92rem, 2vw, 1.04rem);
+      color: #cbd5e1;
+      max-width: 580px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Thanh Tiến Trình 3 Bước (Linear Stepper nối bằng đường kẻ thẳng) */
+    .steps-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 640px;
+      margin: 0 auto 24px;
+      gap: 0;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .step-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 42, 133, 0.18);
+      border: 1.5px solid #ff2a85;
+      color: #ff9ec6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 1px;
+      min-width: 24px;
+      max-width: 60px;
+      background: linear-gradient(90deg, rgba(255,42,133,0.4), rgba(147,51,234,0.4));
+      margin: 0 12px;
+    }
+
+    /* Cam Kết Dịch Vụ (Icon + Text trơn, bỏ hoàn toàn khung viên thuốc) */
+    .trust-strip {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      padding-top: 8px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .trust-divider {
+      color: rgba(255, 255, 255, 0.18);
+      user-select: none;
+    }
+
+    @media (max-width: 640px) {
+      .steps-stepper {
+        gap: 4px;
+      }
+      .step-line {
+        min-width: 12px;
+        margin: 0 6px;
+      }
+      .step-node {
+        font-size: 0.74rem;
+        gap: 5px;
+      }
+      .trust-divider {
+        display: none;
+      }
+      .privacy-notice-strip {
+        border-radius: 14px;
+        padding: 10px 16px;
+        font-size: 0.78rem;
+      }
+    }
+
+    /* ==================== 2. FILTER MENU (UNDERLINE TABS) ==================== */
+    .category-nav-bar-container {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(9, 4, 20, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0 -20px 32px;
+      padding: 0 20px;
+    }
+
+    .tab-arrow-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    .tab-arrow-btn:hover {
+      color: #ffffff;
+    }
+
+    .category-tabs-wrap {
+      flex: 1;
+      display: flex;
+      gap: 22px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .category-tabs-wrap::-webkit-scrollbar {
+      height: 2px;
+      width: 0;
+    }
+    .category-tabs-wrap::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .category-tabs-wrap::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+    }
+
+    .cat-tab {
+      position: relative;
+      padding: 14px 4px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .cat-tab:hover {
+      color: #e2e8f0;
+    }
+
+    .cat-tab.active {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Gạch chân phát sáng cho Tab đang chọn */
+    .cat-tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: linear-gradient(90deg, #ff2a85, #fde047);
+      box-shadow: 0 -2px 10px rgba(255, 42, 133, 0.6);
+    }
+
+    /* ==================== 3. PRODUCT CARDS (CLEAN & LUXURIOUS) ==================== */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 26px;
+    }
+
+    .tpl-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(16px);
+      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .tpl-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 120, 196, 0.45);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ==================== BROWSER WINDOW MOCKUP PREVIEW ==================== */
+    .tpl-window-frame {
+      position: relative;
+      background: rgba(10, 6, 20, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    /* Top Browser Chrome Bar */
+    .tpl-browser-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 28px;
+      padding: 0 12px;
+      background: rgba(18, 10, 32, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+
+    .tpl-browser-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tpl-browser-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .tpl-browser-dots span:nth-child(1) { background: #ef4444; }
+    .tpl-browser-dots span:nth-child(2) { background: #eab308; }
+    .tpl-browser-dots span:nth-child(3) { background: #22c55e; }
+
+    .tpl-browser-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fde047;
+      background: rgba(253, 224, 71, 0.12);
+      border: 1px solid rgba(253, 224, 71, 0.3);
+      padding: 1px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Thumbnail Preview Stage */
+    .tpl-preview {
+      position: relative;
+      height: 185px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    /* Static Content Layer */
+    .tpl-preview-static {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.35s ease;
+      z-index: 1;
+    }
+
+    .tpl-card.is-previewing .tpl-preview-static {
+      opacity: 0.15;
+    }
+
+    .tpl-preview-emoji {
+      font-size: 3.8rem;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
+      animation: floatEmoji 3.4s ease-in-out infinite;
+      transition: transform 0.25s ease;
+    }
+
+    .tpl-card:hover .tpl-preview-emoji {
+      transform: scale(1.08);
+    }
+
+    .tpl-preview-prompt {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 3px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tpl-card.is-previewing .tpl-preview-prompt {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+
+    /* Live Iframe Stage */
+    .tpl-live-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      background: #000;
+    }
+
+    .tpl-live-iframe.loaded {
+      opacity: 1;
+    }
+
+    /* Live Status Badge on corner */
+    .tpl-live-status-pill {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 5;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #34d399;
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      animation: fadeInStatus 0.3s ease;
+    }
+
+    .tpl-live-status-pill.active {
+      display: inline-flex;
+    }
+
+    .tpl-live-status-pill .live-dot-green {
+      width: 6px;
+      height: 6px;
+    }
+
+    .tpl-btn-stop-preview {
+      display: none;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 6;
+      background: rgba(239, 68, 68, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease;
+    }
+
+    .tpl-card.is-previewing .tpl-btn-stop-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tpl-btn-stop-preview:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeInStatus {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Nội dung Card thoáng đãng (More Whitespace) */
+    .tpl-body {
+      padding: 22px 22px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .tpl-header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .tpl-rating-compact {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tpl-rating-compact b {
+      color: #fde047;
+    }
+
+    .tpl-price-inline {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .tpl-price-current {
+      color: var(--gold);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .tpl-price-old {
+      color: #64748b;
+      font-size: 0.76rem;
+      text-decoration: line-through;
+    }
+
+    .tpl-title {
+      font-size: 1.16rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+
+    /* Danh sách tính năng gọn gàng (Bỏ khung pill rườm rà) */
+    .tpl-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin-bottom: 22px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .tpl-feat-item {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tpl-feat-check {
+      color: #ff5ca8;
+      font-weight: 800;
+    }
+
+    /* ==================== 4. CTA HIERARCHY (PRIMARY VS SECONDARY) ==================== */
+    .tpl-actions {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Secondary CTA: Xem Demo / Xem Thử */
+    .btn-demo {
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+    }
+
+    .btn-demo:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .btn-demo.active {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    /* Primary CTA: Tạo Ngay nổi bật tuyệt đối (Luôn cố định 1 dòng) */
+    .btn-create {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff2a85 0%, #db2777 55%, #9333ea 100%);
+      border: none;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 6px 22px rgba(255, 42, 133, 0.42);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 42, 133, 0.68);
+    }
+
+    /* ==================== 5. REVIEWS SECTION ==================== */
+    .reviews-section {
+      margin-top: 72px;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3.8vw, 2.1rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 28px;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px;
+    }
+
+    .review-card {
+      background: rgba(24, 13, 44, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 22px;
+      text-align: left;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .review-author {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .review-stars {
+      color: #fde047;
+      font-size: 0.8rem;
+    }
+
+    .review-text {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Cam kết bảo mật dữ liệu */
+    .privacy-notice-strip {
+      margin: 36px auto 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      max-width: 90%;
+      line-height: 1.5;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .privacy-notice-strip .privacy-icon {
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* ==================== 6. NON-INTRUSIVE FOMO NOTIFICATION ==================== */
+    .live-buyer-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 90;
+      background: rgba(18, 9, 34, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(14px);
+      border-radius: 12px;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      max-width: 310px;
+      transform: translateY(130%);
+      opacity: 0;
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .live-buyer-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .buyer-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .buyer-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .buyer-sub {
+      font-size: 0.7rem;
+      color: #6ee7b7;
+    }
+
+    /* Trên Mobile: Đẩy thông báo lên góc trên (dạng Top Banner nhỏ gọn) để TUYỆT ĐỐI không che nút Tạo Ngay */
+    @media (max-width: 768px) {
+      .live-buyer-toast {
+        bottom: auto;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-150%);
+        padding: 7px 14px;
+        border-radius: 999px;
+        max-width: 90vw;
+        white-space: nowrap;
+      }
+      .live-buyer-toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* ==================== 7. FLOATING SUPPORT WIDGET (BOTTOM-RIGHT) ==================== */
+    .hero-live-stat-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    /* Floating Support Button */
+    .floating-support-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 85;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(18, 9, 34, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.25);
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .floating-support-btn:hover {
+      background: rgba(28, 14, 52, 0.98);
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.45);
+    }
+
+    .floating-online-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseGreen 1.8s infinite ease-in-out;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .support-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .live-dot-green {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseGreen 1.8s infinite ease-in-out;
+      display: inline-block;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px #10b981; }
+      50% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 3px #10b981; }
+    }
+
+    .btn-support-zalo {
+      background: rgba(0, 104, 255, 0.18);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.22s ease;
+      text-decoration: none;
+    }
+
+    .btn-support-zalo:hover {
+      background: rgba(0, 104, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ==================== 8. COMPLAINT & SUPPORT MODAL ==================== */
+    .complaint-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5, 2, 12, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 1;
+      visibility: visible;
+      transition: all 0.28s ease;
+    }
+
+    .complaint-modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .complaint-modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 26px;
+      background: linear-gradient(150deg, rgba(24, 13, 44, 0.98) 0%, rgba(10, 5, 20, 0.99) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.18);
+      padding: 28px 24px;
+    }
+
+    .modal-close-corner {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-corner:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .complaint-header {
+      margin-bottom: 20px;
+      padding-right: 32px;
+    }
+
+    .complaint-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .complaint-sub {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Modal Navigation Tabs */
+    .complaint-tabs-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .complaint-tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .complaint-tab-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Form controls in modal */
+    .c-form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .c-form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .c-form-input,
+    .c-form-select,
+    .c-form-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .c-form-input:focus,
+    .c-form-select:focus,
+    .c-form-textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .c-form-textarea {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .c-btn-submit {
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.22s ease;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .c-btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.6);
+    }
+
+    .c-btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Lookup result card */
+    .lookup-result-card {
+      margin-top: 16px;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .lookup-result-card.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .lookup-result-card.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+
+    .lookup-result-card.danger {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+    }
+
+    .lookup-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-lookup-action {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .btn-lookup-action.primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #34d399;
+    }
+
+    .btn-lookup-action:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Image upload in complaint */
+    .complaint-upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .complaint-preview-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .complaint-remove-img {
+      color: #f87171;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .floating-support-btn {
+        bottom: 16px;
+        right: 16px;
+        padding: 8px 14px;
+        font-size: 0.76rem;
+      }
+      .support-card {
+        padding: 24px 18px;
+      }
+      .support-features-grid {
+        grid-template-columns: 1fr;
+      }
+      .complaint-modal-card {
+        padding: 22px 16px;
+      }
+      .complaint-tabs-bar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ánh sáng nền dịu -->
+  <div class="aurora-orb orb-1"></div>
+  <div class="aurora-orb orb-2"></div>
+  <div class="stars-bg"></div>
+
+  <!-- Thông báo FOMO tinh tế (Không che nút bấm trên Mobile) -->
+  <div id="live-buyer-toast" class="live-buyer-toast">
+    <div class="buyer-icon" id="live-buyer-emoji">💖</div>
+    <div>
+      <div class="buyer-name" id="live-buyer-title">Minh Anh (Hà Nội) vừa tạo quà</div>
+      <div class="buyer-sub" id="live-buyer-detail">Dải Ngân Hà 3D • 1 phút trước</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- 1. HERO HEADER -->
+    <header class="hero">
+      <div class="hero-live-stat-wrap">
+        <div class="hero-live-stat">
+          <span class="live-dot"></span>
+          <span>3.840+ món quà đã được tạo & gửi trao</span>
+        </div>
+      </div>
+
+      <h1 class="hero-title">
+        Trao Gửi <span class="script-highlight">Yêu Thương</span><br />
+        Theo Cách Độc Đáo Nhất
+      </h1>
+
+      <!-- Thanh tiến trình 3 bước dạng Stepper nối thẳng -->
+      <div class="steps-stepper">
+        <div class="step-node">
+          <span class="step-circle">1</span>
+          <span>Chọn mẫu 3D</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node">
+          <span class="step-circle">2</span>
+          <span>Nhập tên & ảnh</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node">
+          <span class="step-circle">3</span>
+          <span>Nhận Link & QR</span>
+        </div>
+      </div>
+
+      <!-- Cam kết dịch vụ dạng Text trơn đi kèm Icon -->
+      <div class="trust-strip">
+        <span class="trust-item">⚡ Mở khóa tự động sau 3s</span>
+        <span class="trust-divider">•</span>
+        <span class="trust-item">🔒 Thanh toán VietQR an toàn</span>
+        <span class="trust-divider">•</span>
+        <span class="trust-item">♾️ Lưu giữ kỷ niệm trọn đời</span>
+      </div>
+    </header>
+
+    <!-- 2. THANH BỘ LỌC DANH MỤC (UNDERLINE TAB MENU) -->
+    <div class="category-nav-bar-container">
+      <button type="button" id="tab-arrow-prev" class="tab-arrow-btn" title="Cuộn sang trái">❮</button>
+      <nav id="category-tabs" class="category-tabs-wrap"></nav>
+      <button type="button" id="tab-arrow-next" class="tab-arrow-btn" title="Cuộn sang phải">❯</button>
+    </div>
+
+    <!-- 3. LƯỚI THẺ SẢN PHẨM -->
+    <main id="templates-grid" class="templates-grid"></main>
+
+    <!-- 4. ĐÁNH GIÁ TỪ KHÁCH HÀNG -->
+    <section class="reviews-section">
+      <h2 class="section-title">Cảm Nhận Từ Người Nhận Quà 💬</h2>
+      <p class="section-desc">Những khoảnh khắc bất ngờ và hạnh phúc thật sự</p>
+
+      <div class="reviews-grid">
+        <div class="review-card">
+          <div class="review-header">
+            <span class="review-author">Thảo My • Hà Nội</span>
+            <span class="review-stars">★★★★★</span>
+          </div>
+          <p class="review-text">
+            "Mình tặng người yêu kỷ niệm 1 năm. Bạn ấy quét mã QR mở ra cả dải ngân hà 3D với bài Romance, xúc động đến rớt nước mắt luôn ❤️"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-header">
+            <span class="review-author">Tuấn Kiệt • TP.HCM</span>
+            <span class="review-stars">★★★★★</span>
+          </div>
+          <p class="review-text">
+            "Bánh sinh nhật thổi tắt nến qua micro điện thoại ảo diệu thực sự. Cả bàn tiệc ai cũng trầm trồ hỏi làm ở đâu đỉnh thế!"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-header">
+            <span class="review-author">Hoàng Yến • Đà Nẵng</span>
+            <span class="review-stars">★★★★★</span>
+          </div>
+          <p class="review-text">
+            "Pháo hoa bắn lên ghép tên hai đứa cực kỳ lãng mạn. Chuyển khoản xong đúng 3 giây có ngay thiệp QR tải về in kẹp vào bó hoa."
+          </p>
+        </div>
+      </div>
+
+      <!-- Cam kết bảo mật dữ liệu khách hàng -->
+      <div class="privacy-notice-strip">
+        <span class="privacy-icon">🔒</span>
+        <span>Dữ liệu hình ảnh và tên của bạn chỉ được sử dụng để tự động tạo món quà 3D này không nhằm mục đích gì khác</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Nút Hỗ Trợ Nổi Cố Định (Floating Widget) -->
+  <button type="button" id="floating-support-btn" class="floating-support-btn" onclick="openComplaintModal()" title="Khiếu nại & Hỗ trợ 24/7">
+    <span class="floating-online-dot"></span>
+    <span style="font-size: 1.05rem;">🛡️</span>
+    <span>Khiếu nại & Hỗ trợ</span>
+  </button>
+
+  <!-- MODAL XỬ LÝ KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG -->
+  <div id="modal-complaint" class="complaint-modal-backdrop hidden" onclick="handleComplaintBackdropClick(event)">
+    <div class="complaint-modal-card">
+      <div class="modal-close-corner" onclick="closeComplaintModal()" title="Đóng">✕</div>
+
+      <div class="complaint-header">
+        <div class="support-badge" style="margin-bottom: 8px;">
+          <span class="live-dot-green"></span>
+          <span>Hỗ Trợ Khách Hàng 24/7</span>
+        </div>
+        <h3 class="complaint-title">🛡️ Trung Tâm Xử Lý Khiếu Nại</h3>
+        <p class="complaint-sub">
+          Cam kết bảo vệ quyền lợi khách hàng 100% • Tiếp nhận đối soát và phản hồi trong 5 - 15 phút.
+        </p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="complaint-tabs-bar">
+        <button type="button" id="tab-btn-lookup" class="complaint-tab-btn active" onclick="switchComplaintTab('lookup')">
+          ⚡ Tra Cứu & Tự Mở Khóa
+        </button>
+        <button type="button" id="tab-btn-form" class="complaint-tab-btn" onclick="switchComplaintTab('form')">
+          📝 Gửi Phiếu Khiếu Nại
+        </button>
+        <button type="button" id="tab-btn-direct" class="complaint-tab-btn" onclick="switchComplaintTab('direct')">
+          💬 Kênh Hỗ Trợ Trực Tiếp
+        </button>
+      </div>
+
+      <!-- TAB 1: TRA CỨU ĐƠN HÀNG TỰ ĐỘNG -->
+      <div id="panel-tab-lookup">
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 16px; line-height: 1.5;">
+          💡 <b>Tự động lấy lại link:</b> Nếu bạn đã chuyển khoản nhưng lỡ tắt màn hình thanh toán, hãy nhập mã đơn hàng (bắt đầu bằng <code>LOVE...</code> trong nội dung chuyển tiền ngân hàng) để kiểm tra và nhận lại link quà tặng ngay tức khắc!
+        </div>
+
+        <div class="c-form-group">
+          <label class="c-form-label">Mã đơn hàng của bạn</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="lookup-order-code" class="c-form-input" placeholder="VD: LOVEM8K3X9A7" style="text-transform: uppercase;" />
+            <button type="button" id="btn-do-lookup" class="c-btn-submit" style="width: auto; padding: 0 20px; white-space: nowrap;" onclick="handleLookupOrder()">
+              <span>🔍 Tra Cứu</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="lookup-result-box" style="display: none;"></div>
+      </div>
+
+      <!-- TAB 2: GỬI PHIẾU KHIẾU NẠI -->
+      <div id="panel-tab-form" style="display: none;">
+        <form id="form-complaint" onsubmit="handleSubmitComplaint(event)">
+          <div class="c-form-group">
+            <label class="c-form-label">Mã đơn hàng (nếu có)</label>
+            <input type="text" id="complaint-order-code" class="c-form-input" placeholder="VD: LOVEM8K3X9A7" style="text-transform: uppercase;" />
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Số điện thoại hoặc Zalo nhận phản hồi <span style="color:#f87171;">*</span></label>
+            <input type="tel" id="complaint-contact" class="c-form-input" placeholder="VD: 0987654321" required />
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Vấn đề bạn đang gặp phải <span style="color:#f87171;">*</span></label>
+            <select id="complaint-issue-type" class="c-form-select">
+              <option value="NOT_UNLOCKED">Đã chuyển tiền nhưng chưa nhận được link quà (Kèm ảnh bill)</option>
+              <option value="LOST_LINK">Quên mã đơn hàng / Cần tìm lại đường link quà</option>
+              <option value="EDIT_INFO">Muốn chỉnh sửa lại ảnh / lời chúc / tên người nhận</option>
+              <option value="TECH_ERROR">Lỗi giao diện / Không nghe được nhạc trên điện thoại</option>
+              <option value="REFUND">Yêu cầu hoàn tiền do sự cố</option>
+              <option value="OTHER">Vấn đề khác</option>
+            </select>
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Mô tả chi tiết sự cố <span style="color:#f87171;">*</span></label>
+            <textarea id="complaint-desc" class="c-form-textarea" placeholder="Mô tả cụ thể vấn đề hoặc thông tin cần chỉnh sửa để kỹ thuật viên hỗ trợ bạn nhanh nhất..." required></textarea>
+          </div>
+
+          <div class="c-form-group">
+            <label class="c-form-label">Ảnh chụp biên lai chuyển tiền / Ảnh lỗi (nếu có)</label>
+            <input type="file" id="complaint-file" accept="image/*" style="display: none;" onchange="handleComplaintImageSelect(event)" />
+            <button type="button" class="btn-lookup-action" onclick="document.getElementById('complaint-file').click()">
+              <span>📷 Chọn ảnh biên lai / Ảnh lỗi</span>
+            </button>
+            <div id="complaint-upload-preview" class="complaint-upload-preview" style="display: none;">
+              <img id="complaint-preview-img" class="complaint-preview-thumb" src="" alt="Biên lai" />
+              <div>
+                <div id="complaint-preview-name" style="font-size: 0.8rem; color: #cbd5e1;"></div>
+                <span class="complaint-remove-img" onclick="removeComplaintImage()">Xóa ảnh</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-submit-complaint" class="c-btn-submit">
+            <span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>
+          </button>
+        </form>
+
+        <div id="complaint-success-box" style="display: none;"></div>
+      </div>
+
+      <!-- TAB 3: KÊNH HỖ TRỢ TRỰC TIẾP -->
+      <div id="panel-tab-direct" style="display: none;">
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;">
+          <div style="font-size: 2.2rem; margin-bottom: 8px;">💬</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Chat Trực Tiếp Với Kỹ Thuật Viên</h4>
+          <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin-bottom: 18px;">
+            Nếu bạn đang cần quà gấp trong ngày kỷ niệm hoặc gặp sự cố khẩn cấp, vui lòng liên hệ trực tiếp với chúng tôi qua Zalo:
+          </p>
+          <a href="https://zalo.me" target="_blank" class="btn-support-zalo" style="justify-content: center; font-size: 0.92rem; padding: 12px 28px;">
+            <span>💬 Mở Chat Zalo CSKH Tức Thì</span>
+          </a>
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">🤝 Cam Kết Quyền Lợi Khách Hàng:</div>
+          <div>• <b>Thời gian trực:</b> 8h00 - 24h00 hàng ngày (kể cả Lễ, Tết).</div>
+          <div>• <b>Xử lý đơn chưa mở khóa:</b> Mở khóa thủ công trong vòng 5 phút sau khi nhận được bill.</div>
+          <div>• <b>Chính sách hoàn tiền:</b> Hoàn tiền 100% không phiền hà nếu phát sinh lỗi kỹ thuật hệ thống.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedCategory = 'hot';
+
+    // Tự động chuyển hướng nếu người nhận mở link quà tặng cũ ở trang chủ
+    async function checkAndRedirectGiftOrder() {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      if (!orderId) return;
+
+      try {
+        const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+        const data = await res.json();
+        if (res.ok && data.order) {
+          const tplType = data.order.template_type || '';
+          const matched = (window.TEMPLATES_CATALOG || []).find((t) => t.id === tplType);
+          if (matched) {
+            window.location.replace(`${matched.engineUrl}?id=${encodeURIComponent(orderId)}&tpl=${matched.id}`);
+          } else if (tplType === 'fireworks') {
+            window.location.replace(`templates/confess/fireworks/index.html?id=${encodeURIComponent(orderId)}`);
+          } else if (tplType === 'birthday') {
+            window.location.replace(`templates/birthday/birthday-cake/index.html?id=${encodeURIComponent(orderId)}`);
+          } else {
+            window.location.replace(`templates/confess/galaxy-3d/index.html?id=${encodeURIComponent(orderId)}`);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderCategoryTabs() {
+      const wrap = document.getElementById('category-tabs');
+      wrap.innerHTML = '';
+
+      (window.EVENT_CATEGORIES || []).forEach((cat) => {
+        const btn = document.createElement('button');
+        btn.className = `cat-tab ${cat.id === selectedCategory ? 'active' : ''}`.trim();
+        btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
+        btn.addEventListener('click', () => {
+          selectedCategory = cat.id;
+          renderCategoryTabs();
+          renderTemplateCards();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    /* ==================== SMART 3D LIVE PREVIEW CONTROLLER ==================== */
+    let activePreviewCard = null;
+    let previewHoverTimer = null;
+
+    function destroyActiveLivePreview() {
+      if (previewHoverTimer) {
+        clearTimeout(previewHoverTimer);
+        previewHoverTimer = null;
+      }
+      if (!activePreviewCard) return;
+
+      activePreviewCard.classList.remove('is-previewing');
+      const previewBox = activePreviewCard.querySelector('.tpl-preview');
+      if (previewBox) {
+        const iframe = previewBox.querySelector('.tpl-live-iframe');
+        if (iframe) {
+          iframe.src = 'about:blank'; // Giải phóng bộ nhớ WebGL ngay lập tức
+          iframe.remove();
+        }
+        const statusPill = previewBox.querySelector('.tpl-live-status-pill');
+        if (statusPill) statusPill.classList.remove('active');
+      }
+
+      const triggerBtn = activePreviewCard.querySelector('.btn-preview-trigger');
+      if (triggerBtn) {
+        triggerBtn.innerHTML = '<span>▶ Xem Thử</span>';
+        triggerBtn.classList.remove('active');
+      }
+
+      activePreviewCard = null;
+    }
+
+    function activateLivePreview(card, engineUrl, tplId) {
+      if (activePreviewCard === card) return;
+
+      // Hủy mọi iframe đang chạy trước đó (Đảm bảo tối đa 1 iframe WebGL hoạt động)
+      destroyActiveLivePreview();
+
+      activePreviewCard = card;
+      card.classList.add('is-previewing');
+
+      const previewBox = card.querySelector('.tpl-preview');
+      if (!previewBox) return;
+
+      const statusPill = previewBox.querySelector('.tpl-live-status-pill');
+      if (statusPill) {
+        statusPill.innerHTML = '<span class="live-dot-green"></span><span>Đang tải 3D...</span>';
+        statusPill.classList.add('active');
+      }
+
+      const triggerBtn = card.querySelector('.btn-preview-trigger');
+      if (triggerBtn) {
+        triggerBtn.innerHTML = '<span>👁️ Toàn Cảnh</span>';
+        triggerBtn.classList.add('active');
+      }
+
+      // Tạo thẻ iframe nạp template với cờ preview=1 (tắt tiếng & ẩn menu thừa)
+      const iframe = document.createElement('iframe');
+      iframe.className = 'tpl-live-iframe';
+      const sep = engineUrl.includes('?') ? '&' : '?';
+      iframe.src = `${engineUrl}${sep}preview=1`;
+      iframe.setAttribute('loading', 'lazy');
+      iframe.setAttribute('title', '3D Live Preview');
+      iframe.setAttribute('allow', 'autoplay');
+
+      iframe.onload = () => {
+        if (activePreviewCard === card) {
+          iframe.classList.add('loaded');
+          if (statusPill) {
+            statusPill.innerHTML = '<span class="live-dot-green"></span><span>🟢 3D Live</span>';
+          }
+
+          // Khóa âm thanh và ẩn mọi thanh menu/modal để khoe trọn đồ họa 3D chuyển động
+          try {
+            const doc = iframe.contentDocument;
+            if (doc) {
+              const style = doc.createElement('style');
+              style.textContent = `
+                .top-hud-bar, .bottom-dock, .center-hud-header, .hud-hint-bottom, #hud-hint,
+                .intro-overlay, .intro-splash, .modal-backdrop, .ambient-controls, 
+                .top-bar, .hud-occasion-badge, .hud-couple-names, #hud-days,
+                .creator-modal, .form-container, #creator-panel, .ui-panel, .nav-btn,
+                #toast-container, .watermark-btn, .top-right-group {
+                  display: none !important;
+                  opacity: 0 !important;
+                  visibility: hidden !important;
+                  pointer-events: none !important;
+                }
+                body, html {
+                  overflow: hidden !important;
+                  background: transparent !important;
+                }
+              `;
+              doc.head.appendChild(style);
+
+              doc.querySelectorAll('audio, video').forEach((el) => {
+                el.muted = true;
+                el.pause();
+              });
+
+              if (iframe.contentWindow) {
+                if (iframe.contentWindow.soundEnabled !== undefined) {
+                  iframe.contentWindow.soundEnabled = false;
+                }
+                if (iframe.contentWindow.musicBox) {
+                  iframe.contentWindow.musicBox.isMuted = true;
+                }
+              }
+            }
+          } catch (err) {}
+        }
+      };
+
+      previewBox.appendChild(iframe);
+    }
+
+    function renderTemplateCards() {
+      // Hủy preview cũ khi đổi danh mục
+      destroyActiveLivePreview();
+
+      const grid = document.getElementById('templates-grid');
+      grid.innerHTML = '';
+
+      const list = (window.TEMPLATES_CATALOG || []).filter((item) => {
+        if (selectedCategory === 'hot') return item.isHot === true;
+        if (selectedCategory === 'all') return true;
+        return item.category === selectedCategory;
+      });
+
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+      list.forEach((tpl) => {
+        const card = document.createElement('article');
+        card.className = 'tpl-card';
+        card.dataset.id = tpl.id;
+
+        const demoUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&demo=1`;
+        const createUrl = `${tpl.engineUrl}?tpl=${encodeURIComponent(tpl.id)}&create=1`;
+        const priceFormatted = Number(tpl.price).toLocaleString('vi-VN') + 'đ';
+        const oldPriceFormatted = tpl.oldPrice ? Number(tpl.oldPrice).toLocaleString('vi-VN') + 'đ' : '';
+        const salesText = tpl.salesCount || '650+ đã tạo';
+
+        const featuresHtml = (tpl.features || [])
+          .map((f) => `<span class="tpl-feat-item"><span class="tpl-feat-check">✓</span> ${f}</span>`)
+          .join('');
+
+        card.innerHTML = `
+          <!-- Mockup Cửa sổ Trình duyệt -->
+          <div class="tpl-window-frame">
+            <div class="tpl-browser-bar">
+              <div class="tpl-browser-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="tpl-browser-badge">${tpl.badge}</span>
+            </div>
+
+            <!-- Vùng Xem Trước Động / Tĩnh -->
+            <div class="tpl-preview" style="background: ${tpl.previewGradient};" data-demo-url="${demoUrl}">
+              <div class="tpl-preview-static">
+                <div class="tpl-preview-emoji">${tpl.previewEmoji}</div>
+                <div class="tpl-preview-prompt">
+                  <span>${isTouchDevice ? '👆 Chạm xem động 3D' : '✨ Rê chuột xem động 3D'}</span>
+                </div>
+              </div>
+
+              <!-- Huy hiệu trạng thái Live khi kích hoạt -->
+              <div class="tpl-live-status-pill">
+                <span class="live-dot-green"></span>
+                <span>3D Live</span>
+              </div>
+
+              <!-- Nút đóng xem thử trên Mobile -->
+              <button type="button" class="tpl-btn-stop-preview" title="Dừng xem thử">✕ Dừng</button>
+            </div>
+          </div>
+
+          <div class="tpl-body">
+            <div class="tpl-header-meta">
+              <span class="tpl-rating-compact"><b>★ 4.9</b> (${salesText})</span>
+              <div class="tpl-price-inline">
+                ${oldPriceFormatted ? `<span class="tpl-price-old">${oldPriceFormatted}</span>` : ''}
+                <span class="tpl-price-current">${priceFormatted}</span>
+              </div>
+            </div>
+            <h2 class="tpl-title">${tpl.title}</h2>
+            <div class="tpl-features">${featuresHtml}</div>
+            <div class="tpl-actions">
+              <button type="button" class="btn-demo btn-preview-trigger">▶ Xem Thử</button>
+              <a href="${createUrl}" class="btn-create">✨ Tạo Ngay</a>
+            </div>
+          </div>
+        `;
+
+        const previewBox = card.querySelector('.tpl-preview');
+        const triggerBtn = card.querySelector('.btn-preview-trigger');
+        const stopBtn = card.querySelector('.tpl-btn-stop-preview');
+
+        // 1. Kích hoạt trên Desktop bằng Hover (có độ trễ 200ms để mượt mà khi cuộn)
+        if (!isTouchDevice) {
+          card.addEventListener('mouseenter', () => {
+            if (card === activePreviewCard) return;
+            if (previewHoverTimer) clearTimeout(previewHoverTimer);
+            previewHoverTimer = setTimeout(() => {
+              activateLivePreview(card, tpl.engineUrl, tpl.id);
+            }, 200);
+          });
+
+          card.addEventListener('mouseleave', () => {
+            if (previewHoverTimer) {
+              clearTimeout(previewHoverTimer);
+              previewHoverTimer = null;
+            }
+            if (card === activePreviewCard) {
+              destroyActiveLivePreview();
+            }
+          });
+        }
+
+        // 2. Chạm vào màn hình Preview
+        previewBox.addEventListener('click', (e) => {
+          if (e.target.closest('.tpl-btn-stop-preview')) return;
+          if (isTouchDevice && card !== activePreviewCard) {
+            // Chạm lần 1: Kích hoạt xem động 3D
+            activateLivePreview(card, tpl.engineUrl, tpl.id);
+          } else {
+            // Chạm lần 2 hoặc trên Desktop: Chuyển trang xem Demo toàn cảnh
+            window.location.href = demoUrl;
+          }
+        });
+
+        // 3. Nút "Xem Thử" / "Toàn Cảnh"
+        triggerBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (card === activePreviewCard) {
+            window.location.href = demoUrl;
+          } else {
+            activateLivePreview(card, tpl.engineUrl, tpl.id);
+          }
+        });
+
+        // 4. Nút Dừng xem thử
+        stopBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          destroyActiveLivePreview();
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Thông báo FOMO tinh tế
+    const RECENT_BUYERS = [
+      { name: 'Minh Anh • Hà Nội', gift: 'Dải Ngân Hà 3D', time: '1 phút trước', emoji: '🪐' },
+      { name: 'Tuấn Kiệt • TP.HCM', gift: 'Bánh Sinh Nhật Thổi Nến', time: '2 phút trước', emoji: '🎂' },
+      { name: 'Hoàng Yến • Đà Nẵng', gift: 'Pháo Hoa Ghép Tên', time: '3 phút trước', emoji: '🎆' },
+      { name: 'Thanh Hằng • Hải Phòng', gift: 'Trái Tim Hạt Ánh Sáng', time: '5 phút trước', emoji: '💖' },
+      { name: 'Đức Trọng • Cần Thơ', gift: 'Vòng Nhẫn Tinh Vân Đôi', time: '7 phút trước', emoji: '💍' }
+    ];
+
+    let buyerIdx = 0;
+    function startLiveBuyerTicker() {
+      const toast = document.getElementById('live-buyer-toast');
+      const titleEl = document.getElementById('live-buyer-title');
+      const detailEl = document.getElementById('live-buyer-detail');
+      const emojiEl = document.getElementById('live-buyer-emoji');
+      if (!toast) return;
+
+      function showNextBuyer() {
+        const item = RECENT_BUYERS[buyerIdx];
+        buyerIdx = (buyerIdx + 1) % RECENT_BUYERS.length;
+
+        emojiEl.textContent = item.emoji;
+        titleEl.textContent = `${item.name} vừa tạo quà`;
+        detailEl.textContent = `${item.gift} • ${item.time}`;
+
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3800);
+      }
+
+      setTimeout(() => {
+        showNextBuyer();
+        setInterval(showNextBuyer, 10000);
+      }, 3000);
+    }
+
+    // Điều khiển Cuộn Thanh Menu Danh Mục
+    function initCategoryTabsScroll() {
+      const tabsWrap = document.getElementById('category-tabs');
+      const arrowPrev = document.getElementById('tab-arrow-prev');
+      const arrowNext = document.getElementById('tab-arrow-next');
+      if (!tabsWrap) return;
+
+      if (arrowPrev) {
+        arrowPrev.addEventListener('click', () => {
+          tabsWrap.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+      }
+      if (arrowNext) {
+        arrowNext.addEventListener('click', () => {
+          tabsWrap.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+      }
+
+      tabsWrap.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          tabsWrap.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+
+      let isDown = false;
+      let startX = 0;
+      let scrollLeftPos = 0;
+
+      tabsWrap.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - tabsWrap.offsetLeft;
+        scrollLeftPos = tabsWrap.scrollLeft;
+      });
+      tabsWrap.addEventListener('mouseleave', () => { isDown = false; });
+      tabsWrap.addEventListener('mouseup', () => { isDown = false; });
+      tabsWrap.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - tabsWrap.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        tabsWrap.scrollLeft = scrollLeftPos - walk;
+      });
+    }
+
+    // ============================================================================
+    // CONTROLLER: TRUNG TÂM XỬ LÝ KHIẾU NẠI & HỖ TRỢ KHÁCH HÀNG
+    // ============================================================================
+    let complaintEvidenceBase64 = '';
+
+    function openComplaintModal(initialTab = 'lookup') {
+      const modal = document.getElementById('modal-complaint');
+      if (modal) {
+        modal.classList.remove('hidden');
+        switchComplaintTab(initialTab);
+      }
+    }
+
+    function closeComplaintModal() {
+      const modal = document.getElementById('modal-complaint');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleComplaintBackdropClick(e) {
+      if (e.target.id === 'modal-complaint') {
+        closeComplaintModal();
+      }
+    }
+
+    function switchComplaintTab(tabKey) {
+      const tabs = ['lookup', 'form', 'direct'];
+      tabs.forEach((key) => {
+        const btn = document.getElementById(`tab-btn-${key}`);
+        const panel = document.getElementById(`panel-tab-${key}`);
+        if (btn) btn.classList.toggle('active', key === tabKey);
+        if (panel) panel.style.display = (key === tabKey) ? 'block' : 'none';
+      });
+    }
+
+    // Tra cứu mã đơn hàng tự động
+    async function handleLookupOrder() {
+      const input = document.getElementById('lookup-order-code');
+      const resultBox = document.getElementById('lookup-result-box');
+      const code = (input.value || '').trim().toUpperCase();
+
+      if (!code) {
+        alert('Vui lòng nhập mã đơn hàng (Ví dụ: LOVEM8K3...)');
+        input.focus();
+        return;
+      }
+
+      resultBox.style.display = 'block';
+      resultBox.className = 'lookup-result-card';
+      resultBox.innerHTML = '<div style="color:#94a3b8; font-size:0.86rem; text-align:center;">⏳ Đang kiểm tra dữ liệu đơn hàng...</div>';
+
+      try {
+        const res = await fetch(`/api/check-order?code=${encodeURIComponent(code)}`);
+        const data = await res.json();
+
+        if (res.ok && data.order) {
+          const ord = data.order;
+          if (data.status === 'PAID') {
+            const tplType = ord.template_type || 'galaxy';
+            const matched = (window.TEMPLATES_CATALOG || []).find((t) => t.id === tplType || t.engineUrl.includes(tplType));
+            const engineUrl = matched ? matched.engineUrl : 'templates/confess/galaxy-3d/index.html';
+            const giftUrl = `${window.location.origin}/${engineUrl}?id=${encodeURIComponent(code)}&tpl=${encodeURIComponent(tplType)}`;
+
+            resultBox.className = 'lookup-result-card success';
+            resultBox.innerHTML = `
+              <div style="font-weight:700; color:#34d399; font-size:0.96rem; margin-bottom:6px;">
+                🎉 Đơn Hàng Đã Thanh Toán Thành Công!
+              </div>
+              <div style="font-size:0.84rem; color:#cbd5e1; line-height:1.6;">
+                <div>• <b>Mã đơn:</b> <span style="color:#ffd700;">${code}</span></div>
+                <div>• <b>Người gửi:</b> ${ord.sender_name || 'Anh'} ❤️ <b>Người nhận:</b> ${ord.receiver_name || 'Em'}</div>
+                <div>• <b>Dịp kỷ niệm:</b> ${ord.occasion || 'Món quà đặc biệt'}</div>
+              </div>
+              <div class="lookup-actions-row">
+                <a href="${giftUrl}" target="_blank" class="btn-lookup-action primary">
+                  <span>🚀 Mở Quà Tặng Ngay</span>
+                </a>
+                <button type="button" class="btn-lookup-action" onclick="navigator.clipboard.writeText('${giftUrl}'); alert('Đã sao chép link quà tặng vào bộ nhớ đệm!');">
+                  <span>📋 Sao Chép Link</span>
+                </button>
+              </div>
+            `;
+          } else {
+            resultBox.className = 'lookup-result-card warning';
+            resultBox.innerHTML = `
+              <div style="font-weight:700; color:#fbbf24; font-size:0.96rem; margin-bottom:6px;">
+                ⏳ Đơn Hàng Đang Chờ Thanh Toán
+              </div>
+              <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin-bottom:12px;">
+                Hệ thống ghi nhận đơn hàng <b>${code}</b> chưa nhận được thông báo tiền về từ ngân hàng.<br />
+                Nếu bạn <b>ĐÃ TRỪ TIỀN</b> rồi, hãy bấm nút dưới để gửi ảnh biên lai, chúng tôi sẽ kích hoạt thủ công trong 5 phút!
+              </p>
+              <button type="button" class="btn-lookup-action" style="background:#f59e0b; border-color:#d97706; color:#000;" onclick="prefillComplaintWithOrder('${code}')">
+                <span>📝 Gửi Biên Lai Để Kích Hoạt Ngay</span>
+              </button>
+            `;
+          }
+        } else {
+          resultBox.className = 'lookup-result-card danger';
+          resultBox.innerHTML = `
+            <div style="font-weight:700; color:#f87171; font-size:0.94rem; margin-bottom:4px;">
+              ❌ Không Tìm Thấy Mã Đơn Hàng
+            </div>
+            <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+              Không có dữ liệu cho mã <b>${code}</b>. Vui lòng kiểm tra lại nội dung chuyển khoản trên ứng dụng ngân hàng của bạn.
+            </p>
+            <button type="button" class="btn-lookup-action" onclick="prefillComplaintWithOrder('${code}')">
+              <span>📝 Gửi Khiếu Nại Cho CSKH</span>
+            </button>
+          `;
+        }
+      } catch (err) {
+        resultBox.className = 'lookup-result-card danger';
+        resultBox.innerHTML = `
+          <div style="font-weight:700; color:#f87171;">⚠️ Lỗi kết nối</div>
+          <p style="font-size:0.84rem; color:#cbd5e1;">Không thể kiểm tra đơn lúc này. Vui lòng thử lại hoặc gửi khiếu nại qua Tab 2.</p>
+        `;
+      }
+    }
+
+    function prefillComplaintWithOrder(code) {
+      document.getElementById('complaint-order-code').value = code;
+      switchComplaintTab('form');
+    }
+
+    function handleComplaintImageSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        complaintEvidenceBase64 = evt.target.result;
+        document.getElementById('complaint-preview-img').src = complaintEvidenceBase64;
+        document.getElementById('complaint-preview-name').textContent = file.name;
+        document.getElementById('complaint-upload-preview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeComplaintImage() {
+      complaintEvidenceBase64 = '';
+      document.getElementById('complaint-file').value = '';
+      document.getElementById('complaint-upload-preview').style.display = 'none';
+    }
+
+    async function handleSubmitComplaint(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-complaint');
+      const orderCode = document.getElementById('complaint-order-code').value.trim();
+      const contact = document.getElementById('complaint-contact').value.trim();
+      const issueType = document.getElementById('complaint-issue-type').value;
+      const description = document.getElementById('complaint-desc').value.trim();
+
+      if (!contact) {
+        alert('Vui lòng nhập Số điện thoại hoặc Zalo để CSKH liên hệ hỗ trợ bạn!');
+        return;
+      }
+      if (!description) {
+        alert('Vui lòng nhập chi tiết sự cố bạn đang gặp phải!');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Đang gửi yêu cầu khiếu nại...</span>';
+
+      try {
+        const res = await fetch('/api/submit-complaint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderCode,
+            contact,
+            issueType,
+            description,
+            evidenceBase64: complaintEvidenceBase64
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const form = document.getElementById('form-complaint');
+          const successBox = document.getElementById('complaint-success-box');
+          form.style.display = 'none';
+          successBox.style.display = 'block';
+          successBox.className = 'lookup-result-card success';
+          successBox.innerHTML = `
+            <div style="font-weight:700; color:#34d399; font-size:1.05rem; margin-bottom:8px;">
+              🎉 ĐÃ TIẾP NHẬN PHIẾU KHIẾU NẠI!
+            </div>
+            <div style="font-size:0.86rem; color:#cbd5e1; line-height:1.6; margin-bottom:14px;">
+              <div>• <b>Mã tiếp nhận:</b> <span style="color:#ffd700; font-weight:700;">${data.complaintCode}</span></div>
+              <div>• <b>Thông tin liên hệ:</b> ${contact}</div>
+              <div style="margin-top:6px;">Bộ phận CSKH đã ghi nhận yêu cầu và đang kiểm tra đối soát với ngân hàng. Chúng tôi sẽ liên hệ phản hồi qua Zalo/SĐT của bạn trong <b>5 - 15 phút</b>!</div>
+            </div>
+            <div class="lookup-actions-row">
+              <a href="https://zalo.me" target="_blank" class="btn-lookup-action primary">
+                <span>💬 Chat Zalo Khẩn Cấp</span>
+              </a>
+              <button type="button" class="btn-lookup-action" onclick="resetComplaintForm()">
+                <span>➕ Gửi Yêu Cầu Khác</span>
+              </button>
+            </div>
+          `;
+        } else {
+          alert(data.error || 'Đã có lỗi xảy ra khi gửi khiếu nại. Vui lòng thử lại!');
+          btn.disabled = false;
+          btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ. Bạn có thể chat trực tiếp qua Zalo để được xử lý ngay!');
+        btn.disabled = false;
+        btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+      }
+    }
+
+    function resetComplaintForm() {
+      document.getElementById('form-complaint').reset();
+      document.getElementById('form-complaint').style.display = 'block';
+      document.getElementById('complaint-success-box').style.display = 'none';
+      const btn = document.getElementById('btn-submit-complaint');
+      btn.disabled = false;
+      btn.innerHTML = '<span>🚀 Gửi Phiếu Khiếu Nại Để Xử Lý Ngay</span>';
+      removeComplaintImage();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAndRedirectGiftOrder();
+      renderCategoryTabs();
+      renderTemplateCards();
+      startLiveBuyerTicker();
+      initCategoryTabsScroll();
+    });
+  </script>
+</body>
+</html>

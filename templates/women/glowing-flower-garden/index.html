@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vườn Hoa Ánh Sáng 3D • Trăm Hoa Đua Nở 8/3 & 20/10 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <style>
+    :root {
+      --bg-top: #071c24;
+      --bg-mid: #040d14;
+      --bg-deep: #02050a;
+      --glass-bg: rgba(6, 24, 30, 0.74);
+      --glass-border: rgba(110, 231, 183, 0.34);
+      --accent-primary: #f472b6;
+      --accent-secondary: #fde047;
+      --accent-emerald: #6ee7b7;
+      --text-main: #f0fdf4;
+      --text-sub: #fbcfe8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 28%, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-deep) 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    #stage-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    #floating-wishes-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .floating-wish-chip {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(8, 28, 34, 0.84);
+      border: 1px solid rgba(253, 224, 71, 0.65);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 18px rgba(244, 114, 182, 0.4);
+      color: #fffbeb;
+      font-size: 0.84rem;
+      font-weight: 700;
+      line-height: 1.5;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: wishFloatUp 2.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes wishFloatUp {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -20%) scale(0.75);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -65%) scale(1.03);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -140%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -185%) scale(0.92);
+      }
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      left: 12px;
+      right: 12px;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .top-hud-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      pointer-events: auto;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .hud-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(253, 224, 71, 0.7);
+      background: rgba(12, 40, 48, 0.88);
+    }
+
+    /* ==================== GARDEN HEADER & WISH BANNER (NO TEXT CLIPPING) ==================== */
+    .garden-header {
+      position: fixed;
+      top: max(56px, calc(env(safe-area-inset-top) + 46px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 16;
+      width: calc(100vw - 24px);
+      max-width: 540px;
+      padding: 10px 16px 12px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(6, 26, 32, 0.78) 0%, rgba(4, 16, 22, 0.64) 100%);
+      border: 1px solid rgba(110, 231, 183, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+      pointer-events: none;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    .garden-occasion-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(244, 114, 182, 0.18);
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      color: #fde047;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+
+    .garden-receiver-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.42rem, 4.2vw, 2.02rem);
+      font-weight: 700;
+      line-height: 1.45;
+      padding: 4px 6px 6px;
+      color: #fffbeb;
+      text-shadow: 0 2px 14px rgba(244, 114, 182, 0.65), 0 0 24px rgba(110, 231, 183, 0.35);
+      word-break: break-word;
+    }
+
+    .garden-hint-line {
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #a7f3d0;
+      padding-top: 2px;
+      white-space: normal;
+    }
+
+    .wish-banner {
+      position: fixed;
+      left: 50%;
+      bottom: calc(max(14px, env(safe-area-inset-bottom)) + 58px);
+      transform: translateX(-50%);
+      z-index: 18;
+      width: calc(100vw - 24px);
+      max-width: 540px;
+      padding: 11px 16px 13px;
+      border-radius: 18px;
+      background: rgba(7, 25, 31, 0.82);
+      border: 1px solid rgba(244, 114, 182, 0.42);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .wish-banner:hover {
+      transform: translateX(-50%) translateY(-2px);
+      border-color: rgba(253, 224, 71, 0.65);
+    }
+
+    .wish-banner-text {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      padding: 3px 2px 4px;
+      color: #fff1f5;
+      word-break: break-word;
+    }
+
+    .wish-banner-meta {
+      margin-top: 4px;
+      padding-top: 2px;
+      font-size: 0.75rem;
+      line-height: 1.45;
+      color: #fde047;
+      font-weight: 700;
+    }
+
+    /* ==================== BOTTOM DOCK (1 ROW ALWAYS) ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      max-width: calc(100vw - 12px);
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(6, 22, 28, 0.88);
+      border: 1px solid rgba(110, 231, 183, 0.38);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6);
+    }
+
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 38px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f0fdf4;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.4;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .dock-btn.primary {
+      background: linear-gradient(135deg, #0d9488 0%, #db2777 52%, #f59e0b 100%);
+      border-color: rgba(253, 224, 71, 0.72);
+      color: #fffbeb;
+      box-shadow: 0 6px 20px rgba(219, 39, 119, 0.45);
+    }
+
+    @media (max-width: 520px) {
+      .top-hud {
+        left: 8px;
+        right: 8px;
+        gap: 4px;
+      }
+      .top-hud-group {
+        gap: 4px;
+      }
+      .hud-btn {
+        min-height: 32px;
+        padding: 4px 8px;
+        font-size: 0.68rem;
+        gap: 3px;
+      }
+      .garden-header {
+        top: max(48px, calc(env(safe-area-inset-top) + 42px));
+        padding: 7px 11px 9px;
+      }
+      .garden-occasion-badge {
+        font-size: 0.68rem;
+        padding: 3px 9px;
+      }
+      .garden-hint-line {
+        font-size: 0.69rem;
+      }
+      .wish-banner {
+        bottom: calc(max(10px, env(safe-area-inset-bottom)) + 52px);
+        padding: 8px 11px 10px;
+      }
+      .wish-banner-text {
+        font-size: 0.76rem;
+      }
+      .wish-banner-meta {
+        font-size: 0.69rem;
+      }
+      .bottom-dock {
+        gap: 4px;
+        padding: 4px 6px;
+        max-width: calc(100vw - 12px);
+      }
+      .dock-btn {
+        min-height: 32px;
+        padding: 4px 7px;
+        font-size: 0.64rem;
+        gap: 2px;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(3, 10, 14, 0.84);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 490px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      padding: 22px 20px;
+      background: linear-gradient(165deg, rgba(8, 34, 42, 0.98), rgba(4, 15, 20, 0.99));
+      border: 1.5px solid rgba(110, 231, 183, 0.45);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
+      color: #f0fdf4;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(110, 231, 183, 0.4);
+      background: rgba(255, 255, 255, 0.08);
+      color: #a7f3d0;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.14rem;
+      line-height: 1.45;
+      color: #fde047;
+      margin-bottom: 6px;
+      padding-right: 34px;
+    }
+
+    .modal-sub {
+      font-size: 0.82rem;
+      color: #a7f3d0;
+      opacity: 0.9;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #fde68a;
+      margin-bottom: 5px;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 231, 183, 0.35);
+      background: rgba(3, 12, 16, 0.82);
+      color: #f0fdf4;
+      font-family: inherit;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      border-color: #fde047;
+    }
+
+    .form-textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .chip-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .option-chip {
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 231, 183, 0.32);
+      background: rgba(255, 255, 255, 0.05);
+      color: #d1fae5;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-chip.active {
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.5), rgba(219, 39, 119, 0.45));
+      border-color: #fde047;
+      color: #fffbeb;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+    }
+
+    .preset-wishes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .preset-wish-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 114, 182, 0.38);
+      background: rgba(244, 114, 182, 0.12);
+      color: #fbcfe8;
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .preset-wish-btn:hover {
+      border-color: #fde047;
+      color: #fffbeb;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(253, 224, 71, 0.45);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-thumb button {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.74);
+      color: #fff;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .upload-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(253, 224, 71, 0.55);
+      background: rgba(253, 224, 71, 0.08);
+      color: #fde68a;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+      cursor: pointer;
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(253, 224, 71, 0.78);
+      background: linear-gradient(135deg, #0d9488 0%, #db2777 52%, #f59e0b 100%);
+      color: #fffbeb;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.45;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Viewer Modal */
+    .viewer-wish-box {
+      padding: 15px 16px;
+      border-radius: 14px;
+      background: rgba(3, 12, 16, 0.72);
+      border: 1px solid rgba(110, 231, 183, 0.34);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #f0fdf4;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    .viewer-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .viewer-photos-grid img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(253, 224, 71, 0.45);
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <div id="floating-wishes-layer"></div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="/" class="hud-btn" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-theme" title="Đổi bảng màu hoa ánh sáng">🎨 Màu Hoa</button>
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Nở Hoa Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Âm Thanh</button>
+    </div>
+  </header>
+
+  <!-- Garden Header (Không cắt dấu tiếng Việt hay nét dưới g, y, p, q) -->
+  <section class="garden-header" id="garden-header">
+    <div class="garden-occasion-badge" id="header-occasion-badge">🌸 Chúc Mừng Ngày Quốc Tế Phụ Nữ 8/3</div>
+    <h1 class="garden-receiver-title" id="header-receiver-title">Gửi Minh Anh Yêu Thương ✨</h1>
+    <div class="garden-hint-line" id="header-hint-line">🌷 Chạm vào thảm cỏ để gieo thêm hoa ánh sáng • Kéo nhẹ để ngắm vườn 3D</div>
+  </section>
+
+  <!-- Bottom Wish Banner -->
+  <section class="wish-banner" id="wish-banner" title="Chạm để đọc trọn vẹn tâm thư & xem ảnh kỷ niệm">
+    <div class="wish-banner-text" id="banner-wish">Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!</div>
+    <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • Chúc mừng 8/3 (Chạm để mở thư & ảnh 💌)</div>
+  </section>
+
+  <!-- Bottom Dock (1 hàng ngang trên mọi màn hình) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-open-wish">💌 Thư & Ảnh</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">✏️ Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- Modal Tùy Chỉnh Vườn Hoa -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">🌷 Cá Nhân Hóa Vườn Hoa Ánh Sáng 3D</h2>
+      <p class="modal-sub">Tùy chỉnh dịp lễ 8/3 hoặc 20/10, tên người nhận, lời chúc yêu thương, màu sắc hoa và ảnh kỷ niệm trong khu vườn.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Dịp Tôn Vinh Phái Đẹp</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip occasion-chip active" data-occasion="8/3">🌸 Quốc Tế Phụ Nữ 8/3</button>
+          <button type="button" class="option-chip occasion-chip" data-occasion="20/10">💐 Phụ Nữ Việt Nam 20/10</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bảng Màu Hoa Ánh Sáng</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="rose_emerald">🌷 Hồng Ngọc Lục Bảo</button>
+          <button type="button" class="option-chip theme-chip" data-theme="starlight_gold">🌼 Vàng Ánh Sao</button>
+          <button type="button" class="option-chip theme-chip" data-theme="sakura_violet">🪻 Tím Anh Đào</button>
+          <button type="button" class="option-chip theme-chip" data-theme="crystal_cyan">💎 Xanh Pha Lê</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu, Cô Giáo..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Con Trai, Tập Thể Lớp..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Chúc Ngọt Ngào</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời chúc gửi tới người phụ nữ tuyệt vời..."></textarea>
+        <div class="preset-wishes-row">
+          <button type="button" class="preset-wish-btn" data-preset="Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!">💖 Tặng Người Yêu / Vợ</button>
+          <button type="button" class="preset-wish-btn" data-preset="Con kính chúc Mẹ yêu luôn mạnh khỏe, bình an, tươi trẻ như hoa mùa xuân và mãi là ánh sáng ấm áp nhất của gia đình mình!">🌷 Kính Tặng Mẹ</button>
+          <button type="button" class="preset-wish-btn" data-preset="Chúc bạn luôn tự tin, tỏa sáng rực rỡ, gặt hái thật nhiều thành công và luôn được yêu thương trọn vẹn mỗi ngày!">✨ Tặng Bạn / Đồng Nghiệp</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Album Ảnh Kỷ Niệm Mọc Giữa Vườn Hoa (Tối đa 6 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🌸 Áp Dụng & Đánh Thức Vườn Hoa</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Thư & Xem Album Ảnh -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Anh Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. STATE & THEME PALETTES ====================
+      const THEMES = {
+        rose_emerald: {
+          name: 'Hồng Ngọc Lục Bảo',
+          petalOuter: '#ff5ca8',
+          petalInner: '#ffc2df',
+          coreGlow: '#fde047',
+          grassTip: '#34d399',
+          waveLight: '#ff6ec7',
+          fireflyA: '#fde047',
+          fireflyB: '#f472b6',
+          bgTop: '#071c24',
+          bgMid: '#040d14'
+        },
+        starlight_gold: {
+          name: 'Vàng Ánh Sao',
+          petalOuter: '#f59e0b',
+          petalInner: '#fef08a',
+          coreGlow: '#ffffff',
+          grassTip: '#2dd4bf',
+          waveLight: '#fbbf24',
+          fireflyA: '#fde047',
+          fireflyB: '#5eead4',
+          bgTop: '#161807',
+          bgMid: '#090d06'
+        },
+        sakura_violet: {
+          name: 'Tím Anh Đào',
+          petalOuter: '#c084fc',
+          petalInner: '#fbcfe8',
+          coreGlow: '#fde047',
+          grassTip: '#6ee7b7',
+          waveLight: '#e879f9',
+          fireflyA: '#f472b6',
+          fireflyB: '#c084fc',
+          bgTop: '#190b28',
+          bgMid: '#0b0514'
+        },
+        crystal_cyan: {
+          name: 'Xanh Pha Lê',
+          petalOuter: '#38bdf8',
+          petalInner: '#e0f2fe',
+          coreGlow: '#fde047',
+          grassTip: '#5eead4',
+          waveLight: '#38bdf8',
+          fireflyA: '#7dd3fc',
+          fireflyB: '#fde047',
+          bgTop: '#061a2e',
+          bgMid: '#030b14'
+        }
+      };
+
+      const THEME_KEYS = Object.keys(THEMES);
+
+      const SHORT_WISH_BUBBLES = [
+        '🌸 Luôn rạng rỡ như hoa!',
+        '💖 Hạnh phúc ngập tràn!',
+        '✨ Xinh đẹp & Tự tin!',
+        '🌷 Mãi tươi trẻ & Yêu đời!',
+        '👑 Người phụ nữ tuyệt vời!',
+        '💐 Ngàn điều ước thành hiện thực!'
+      ];
+
+      const appState = {
+        templateId: 'women_glowing_flower_garden',
+        occasionType: '8/3',
+        theme: 'rose_emerald',
+        sender: 'Bảo Nam',
+        receiver: 'Minh Anh',
+        wish: 'Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!',
+        photos: [],
+        isViewerMode: false,
+        plantedCount: 0
+      };
+
+      // ==================== 2. WEB AUDIO API (SPRING HARP MELODY + DISTANT BIRD CHIRPS) ====================
+      const AudioEngine = (() => {
+        let ctx = null;
+        let masterGain = null;
+        let delayNode = null;
+        let delayFeedback = null;
+        let isEnabled = false;
+        let melodyTimer = null;
+        let birdTimer = null;
+        let stepIdx = 0;
+
+        // Bright Spring Lydian/Major progression: Fmaj7 -> G6 -> Em7 -> Am9 -> Dm7 -> G13 -> Cmaj9
+        const SPRING_CHORDS = [
+          [261.63, 329.63, 392.00, 493.88, 587.33], // Cmaj9
+          [220.00, 329.63, 392.00, 493.88, 523.25], // Am9
+          [174.61, 261.63, 349.23, 440.00, 523.25], // Fmaj7
+          [196.00, 293.66, 392.00, 493.88, 587.33]  // G6/9
+        ];
+
+        const SPRING_ARPEGGIO = [
+          523.25, 659.25, 783.99, 987.77, 783.99, 659.25, 1046.50, 783.99,
+          440.00, 523.25, 659.25, 783.99, 987.77, 659.25, 880.00, 659.25,
+          349.23, 440.00, 523.25, 659.25, 880.00, 659.25, 783.99, 523.25,
+          392.00, 493.88, 587.33, 783.99, 987.77, 783.99, 659.25, 587.33
+        ];
+
+        function ensureContext() {
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            ctx = new AudioCtx();
+            masterGain = ctx.createGain();
+            masterGain.gain.value = 0.44;
+
+            // Gentle garden echo delay for distant birds & harp
+            delayNode = ctx.createDelay(1.0);
+            delayNode.delayTime.value = 0.28;
+            delayFeedback = ctx.createGain();
+            delayFeedback.gain.value = 0.26;
+
+            const delayFilter = ctx.createBiquadFilter();
+            delayFilter.type = 'lowpass';
+            delayFilter.frequency.value = 2400;
+
+            delayNode.connect(delayFilter);
+            delayFilter.connect(delayFeedback);
+            delayFeedback.connect(delayNode);
+            delayFilter.connect(masterGain);
+
+            masterGain.connect(ctx.destination);
+          }
+          if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+          }
+          return ctx;
+        }
+
+        function playWarmSpringPad(freqs, duration) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(980, now);
+          filter.connect(masterGain);
+
+          freqs.forEach((f) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now);
+
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.032, now + 0.35);
+            g.gain.exponentialRampToValueAtTime(0.0008, now + duration);
+
+            osc.connect(g);
+            g.connect(filter);
+            osc.start(now);
+            osc.stop(now + duration + 0.08);
+          });
+        }
+
+        function playHarpNote(freq, velocity = 0.075) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const oscHarm = ctx.createOscillator();
+          const g = ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          oscHarm.type = 'triangle';
+          oscHarm.frequency.setValueAtTime(freq * 2, now);
+
+          const harmGain = ctx.createGain();
+          harmGain.gain.setValueAtTime(0.18, now);
+          harmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.linearRampToValueAtTime(velocity, now + 0.012);
+          g.gain.exponentialRampToValueAtTime(0.0008, now + 1.25);
+
+          osc.connect(g);
+          oscHarm.connect(harmGain);
+          harmGain.connect(g);
+
+          g.connect(masterGain);
+          if (delayNode) g.connect(delayNode);
+
+          osc.start(now);
+          oscHarm.start(now);
+          osc.stop(now + 1.3);
+          oscHarm.stop(now + 0.25);
+        }
+
+        // Synthesize distant spring bird chirps (2-4 syllables with pitch glide + FM trill)
+        function playDistantBirdChirp(intensity = 1.0) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          const syllables = 2 + Math.floor(Math.random() * 2);
+          const baseFreq = 1950 + Math.random() * 850;
+
+          const band = ctx.createBiquadFilter();
+          band.type = 'bandpass';
+          band.frequency.setValueAtTime(2500, now);
+          band.Q.value = 1.6;
+          band.connect(masterGain);
+          if (delayNode) band.connect(delayNode);
+
+          let offset = 0;
+          for (let s = 0; s < syllables; s++) {
+            const start = now + offset;
+            const dur = 0.085 + Math.random() * 0.065;
+            const osc = ctx.createOscillator();
+            const mod = ctx.createOscillator();
+            const modGain = ctx.createGain();
+            const env = ctx.createGain();
+
+            osc.type = 'sine';
+            const fStart = baseFreq * (1 + s * 0.08);
+            const fPeak = fStart * (1.28 + Math.random() * 0.18);
+            const fEnd = fStart * 0.92;
+
+            osc.frequency.setValueAtTime(fStart, start);
+            osc.frequency.exponentialRampToValueAtTime(fPeak, start + dur * 0.45);
+            osc.frequency.exponentialRampToValueAtTime(fEnd, start + dur);
+
+            // Rapid gentle vibrato/trill
+            mod.type = 'sine';
+            mod.frequency.setValueAtTime(28 + Math.random() * 18, start);
+            modGain.gain.setValueAtTime(65, start);
+            mod.connect(modGain);
+            modGain.connect(osc.frequency);
+
+            const peakGain = 0.026 * intensity;
+            env.gain.setValueAtTime(0.0001, start);
+            env.gain.linearRampToValueAtTime(peakGain, start + dur * 0.22);
+            env.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+            osc.connect(env);
+            env.connect(band);
+
+            osc.start(start);
+            mod.start(start);
+            osc.stop(start + dur + 0.02);
+            mod.stop(start + dur + 0.02);
+
+            offset += dur + 0.045 + Math.random() * 0.04;
+          }
+        }
+
+        function playBloomChime() {
+          if (!ctx || !isEnabled) return;
+          const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+          notes.forEach((n, idx) => {
+            setTimeout(() => {
+              if (isEnabled) playHarpNote(n, 0.055);
+            }, idx * 55);
+          });
+          playDistantBirdChirp(0.85);
+        }
+
+        function tickSpringMusic() {
+          if (!isEnabled) return;
+          const barStep = stepIdx % 8;
+          if (barStep === 0) {
+            const chord = SPRING_CHORDS[Math.floor(stepIdx / 8) % SPRING_CHORDS.length];
+            playWarmSpringPad(chord, 3.1);
+          }
+          const noteFreq = SPRING_ARPEGGIO[stepIdx % SPRING_ARPEGGIO.length];
+          playHarpNote(noteFreq, barStep % 2 === 0 ? 0.068 : 0.045);
+          stepIdx++;
+        }
+
+        function setEnabled(next) {
+          isEnabled = next;
+          const btn = document.getElementById('btn-sound');
+          if (isEnabled) {
+            ensureContext();
+            if (!melodyTimer) {
+              tickSpringMusic();
+              melodyTimer = setInterval(tickSpringMusic, 380);
+            }
+            if (!birdTimer) {
+              setTimeout(() => { if (isEnabled) playDistantBirdChirp(0.9); }, 650);
+              birdTimer = setInterval(() => {
+                if (isEnabled && Math.random() < 0.78) {
+                  playDistantBirdChirp(0.7 + Math.random() * 0.35);
+                }
+              }, 3400);
+            }
+            btn.textContent = '🔊 Âm Thanh';
+          } else {
+            if (melodyTimer) {
+              clearInterval(melodyTimer);
+              melodyTimer = null;
+            }
+            if (birdTimer) {
+              clearInterval(birdTimer);
+              birdTimer = null;
+            }
+            btn.textContent = '🔇 Âm Thanh';
+          }
+        }
+
+        function autoUnlock() {
+          if (!isEnabled) setEnabled(true);
+        }
+
+        return {
+          setEnabled,
+          toggle: () => setEnabled(!isEnabled),
+          autoUnlock,
+          playBloomChime,
+          playDistantBirdChirp
+        };
+      })();
+
+      // ==================== 3. THREE.JS 3D SCENE, TERRAIN & SWAYING GRASS ====================
+      const webglCanvas = document.getElementById('webgl-canvas');
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: webglCanvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x030c12, 0.028);
+
+      const camera = new THREE.PerspectiveCamera(48, cw / ch, 0.1, 140);
+      let baseCamPos = { x: 0, y: 4.5, z: 11.8 };
+
+      function updateCameraResponsive() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        const aspect = cw / ch;
+        const isMobile = cw < 768 || aspect < 0.8;
+        camera.aspect = aspect;
+        baseCamPos.y = isMobile ? 4.85 : 4.35;
+        baseCamPos.z = isMobile ? (aspect < 0.58 ? 14.6 : 13.4) : 11.4;
+        camera.position.set(baseCamPos.x, baseCamPos.y, baseCamPos.z);
+        camera.lookAt(0, 1.0, -9.5);
+        camera.updateProjectionMatrix();
+        renderer.setSize(cw, ch, false);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      }
+
+      // 3-Point Lighting + Warm/Cool Contrast (3d-visual.md)
+      const ambientLight = new THREE.AmbientLight(0xd8f3dc, 0.68);
+      scene.add(ambientLight);
+
+      const warmWaveLight = new THREE.PointLight(0xff6ec7, 2.5, 34);
+      warmWaveLight.position.set(0, 2.8, 4);
+      scene.add(warmWaveLight);
+
+      const goldCenterLight = new THREE.PointLight(0xffbe0b, 1.45, 50);
+      goldCenterLight.position.set(0, 6.5, -8);
+      scene.add(goldCenterLight);
+
+      const coolRimLight = new THREE.DirectionalLight(0x38bdf8, 0.92);
+      coolRimLight.position.set(-14, 12, -16);
+      scene.add(coolRimLight);
+
+      // Procedural Glow Sprite Texture (sRGBEncoding)
+      function createGlowTexture(innerHex = '#ffffff', midHex = '#f472b6') {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, innerHex);
+        grad.addColorStop(0.32, midHex);
+        grad.addColorStop(0.7, 'rgba(244, 114, 182, 0.18)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const glowSpriteTex = createGlowTexture('#fffbeb', '#f472b6');
+
+      // Terrain height function: gentle rolling hills + central valley so flowers stretch vertically up the screen
+      function getTerrainHeight(x, z) {
+        const valley = Math.min(1.4, (x * x) * 0.018);
+        const roll = Math.sin(x * 0.24) * 0.22 + Math.cos(z * 0.21) * 0.26;
+        const slopeUp = Math.max(0, (-z - 2) * 0.065); // Gently rises toward the distant horizon so back flowers are visible vertically!
+        return valley + roll + slopeUp - 0.65;
+      }
+
+      // 3.1 Rolling Meadow Terrain Mesh (Raycast target)
+      const terrainGeo = new THREE.PlaneGeometry(42, 48, 64, 72);
+      terrainGeo.rotateX(-Math.PI / 2);
+      const tPos = terrainGeo.attributes.position;
+      const tCols = new Float32Array(tPos.count * 3);
+      for (let i = 0; i < tPos.count; i++) {
+        const vx = tPos.getX(i);
+        const vz = tPos.getZ(i) - 10;
+        tPos.setZ(i, vz);
+        const vy = getTerrainHeight(vx, vz);
+        tPos.setY(i, vy);
+
+        const pathGlow = Math.exp(-(vx * vx) * 0.08);
+        const c = new THREE.Color('#041519').lerp(new THREE.Color('#0c3b3e'), pathGlow * 0.75);
+        tCols[i * 3] = c.r;
+        tCols[i * 3 + 1] = c.g;
+        tCols[i * 3 + 2] = c.b;
+      }
+      terrainGeo.setAttribute('color', new THREE.BufferAttribute(tCols, 3));
+      terrainGeo.computeVertexNormals();
+
+      const terrainMat = new THREE.MeshLambertMaterial({
+        vertexColors: true,
+        side: THREE.DoubleSide
+      });
+      const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+      scene.add(terrainMesh);
+      terrainMesh.updateMatrixWorld(true);
+
+      // 3.2 3D Swaying Grass Meadow (4,500 3D blades in a custom ShaderMaterial BufferGeometry)
+      const GRASS_COUNT = 4500;
+      const grassGeo = new THREE.BufferGeometry();
+      const gVerts = new Float32Array(GRASS_COUNT * 5 * 3);
+      const gBase = new Float32Array(GRASS_COUNT * 5 * 3);
+      const gUvY = new Float32Array(GRASS_COUNT * 5);
+      const gPhase = new Float32Array(GRASS_COUNT * 5);
+      const gIndices = [];
+
+      for (let i = 0; i < GRASS_COUNT; i++) {
+        const gx = (Math.random() - 0.5) * 32;
+        const gz = 8.5 - Math.random() * 38.5; // z from +8.5 to -30
+        const gy = getTerrainHeight(gx, gz);
+        const h = 0.42 + Math.random() * 0.55;
+        const w = 0.045 + Math.random() * 0.03;
+        const angle = Math.random() * Math.PI * 2;
+        const dx = Math.cos(angle) * w;
+        const dz = Math.sin(angle) * w;
+        const leanX = (Math.random() - 0.5) * 0.16;
+        const leanZ = (Math.random() - 0.5) * 0.16;
+        const phase = Math.random() * Math.PI * 2;
+
+        // 5 vertices per blade: [0: baseL, 1: baseR, 2: midL, 3: midR, 4: tip]
+        const localPts = [
+          [-dx, 0, -dz, 0.0],
+          [dx, 0, dz, 0.0],
+          [-dx * 0.65 + leanX * 0.4, h * 0.52, -dz * 0.65 + leanZ * 0.4, 0.52],
+          [dx * 0.65 + leanX * 0.4, h * 0.52, dz * 0.65 + leanZ * 0.4, 0.52],
+          [leanX, h, leanZ, 1.0]
+        ];
+
+        const baseVertex = i * 5;
+        for (let v = 0; v < 5; v++) {
+          const idx3 = (baseVertex + v) * 3;
+          gVerts[idx3] = gx + localPts[v][0];
+          gVerts[idx3 + 1] = gy + localPts[v][1];
+          gVerts[idx3 + 2] = gz + localPts[v][2];
+
+          gBase[idx3] = gx;
+          gBase[idx3 + 1] = gy;
+          gBase[idx3 + 2] = gz;
+
+          gUvY[baseVertex + v] = localPts[v][3];
+          gPhase[baseVertex + v] = phase;
+        }
+
+        gIndices.push(
+          baseVertex + 0, baseVertex + 1, baseVertex + 2,
+          baseVertex + 1, baseVertex + 3, baseVertex + 2,
+          baseVertex + 2, baseVertex + 3, baseVertex + 4
+        );
+      }
+
+      grassGeo.setIndex(gIndices);
+      grassGeo.setAttribute('position', new THREE.BufferAttribute(gVerts, 3));
+      grassGeo.setAttribute('aBasePos', new THREE.BufferAttribute(gBase, 3));
+      grassGeo.setAttribute('aUvY', new THREE.BufferAttribute(gUvY, 1));
+      grassGeo.setAttribute('aPhase', new THREE.BufferAttribute(gPhase, 1));
+
+      const grassUniforms = {
+        uTime: { value: 0 },
+        uWaveZ: { value: 8.5 },
+        uBaseColor: { value: new THREE.Color('#041b1d') },
+        uTipColor: { value: new THREE.Color('#34d399') },
+        uWaveGlowColor: { value: new THREE.Color('#ff6ec7') }
+      };
+
+      const grassMat = new THREE.ShaderMaterial({
+        uniforms: grassUniforms,
+        side: THREE.DoubleSide,
+        vertexShader: `
+          uniform float uTime;
+          uniform float uWaveZ;
+          attribute vec3 aBasePos;
+          attribute float aUvY;
+          attribute float aPhase;
+          varying float vUvY;
+          varying float vWaveProx;
+          void main() {
+            vUvY = aUvY;
+            vec3 pos = position;
+            float bendFactor = aUvY * aUvY;
+            float wind = sin(uTime * 2.1 + aBasePos.x * 0.35 + aBasePos.z * 0.25 + aPhase) * 0.24
+                       + cos(uTime * 1.3 + aBasePos.z * 0.4) * 0.10;
+            pos.x += wind * bendFactor;
+            pos.z += wind * 0.45 * bendFactor;
+            float distToWave = abs(aBasePos.z - uWaveZ);
+            vWaveProx = smoothstep(4.2, 0.0, distToWave);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uBaseColor;
+          uniform vec3 uTipColor;
+          uniform vec3 uWaveGlowColor;
+          varying float vUvY;
+          varying float vWaveProx;
+          void main() {
+            vec3 col = mix(uBaseColor, uTipColor, pow(vUvY, 1.35));
+            col = mix(col, uWaveGlowColor, vWaveProx * vUvY * 0.65);
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `
+      });
+
+      const grassMesh = new THREE.Mesh(grassGeo, grassMat);
+      scene.add(grassMesh);
+
+      // ==================== 4. 3D GLOWING FLOWERS & CONTINUOUS BLOOM WAVE ====================
+      const flowersGroup = new THREE.Group();
+      scene.add(flowersGroup);
+      const flowers = [];
+
+      // Shared sculpted 3D petal geometry (curved, cupped petal)
+      function createSculptedPetalGeometry(length = 0.65, width = 0.28) {
+        const geo = new THREE.PlaneGeometry(width, length, 5, 7);
+        geo.translate(0, length * 0.5, 0);
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          const t = Math.max(0, Math.min(1, y / length));
+          // Taper width at base and tip, wider in the middle
+          const profile = Math.sin(t * Math.PI) * 0.92 + 0.14 * (1 - t);
+          const nx = x * profile;
+          // Cup curve along width + graceful arch along length
+          const cupZ = (nx * nx) * 1.4 - Math.sin(t * Math.PI) * 0.14;
+          pos.setX(i, nx);
+          pos.setZ(i, cupZ);
+        }
+        geo.computeVertexNormals();
+        return geo;
+      }
+
+      const outerPetalGeo = createSculptedPetalGeometry(0.96, 0.42);
+      const innerPetalGeo = createSculptedPetalGeometry(0.72, 0.34);
+      const stemGeo = new THREE.CylinderGeometry(0.028, 0.045, 1.0, 6);
+      stemGeo.translate(0, 0.5, 0);
+      const coreGeo = new THREE.SphereGeometry(0.16, 12, 12);
+
+      const outerPetalMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#ff5ca8'),
+        emissive: new THREE.Color('#db2777'),
+        emissiveIntensity: 0.55,
+        roughness: 0.3,
+        metalness: 0.08,
+        side: THREE.DoubleSide
+      });
+
+      const innerPetalMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#ffc2df'),
+        emissive: new THREE.Color('#f472b6'),
+        emissiveIntensity: 0.72,
+        roughness: 0.25,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+
+      const stemMat = new THREE.MeshLambertMaterial({
+        color: new THREE.Color('#10b981'),
+        emissive: new THREE.Color('#064e3b'),
+        emissiveIntensity: 0.35
+      });
+
+      const coreMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#fde047'),
+        toneMapped: false
+      });
+
+      function createFlowerInstance(x, z, scale = 1.0, startBloom = 0.08, isUserPlanted = false) {
+        const y = getTerrainHeight(x, z);
+        const root = new THREE.Group();
+        root.position.set(x, y, z);
+
+        const stemHeight = (0.78 + Math.random() * 0.52) * scale;
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.scale.set(scale, stemHeight, scale);
+        root.add(stem);
+
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, stemHeight, 0);
+        // Tilt slightly toward the camera so the blooming petals face the viewer clearly
+        headGroup.rotation.x = 0.38 + (Math.random() - 0.5) * 0.14;
+        headGroup.rotation.z = (Math.random() - 0.5) * 0.18;
+        root.add(headGroup);
+
+        const outerPivots = [];
+        const outerCount = 8;
+        for (let i = 0; i < outerCount; i++) {
+          const piv = new THREE.Group();
+          piv.rotation.y = (i / outerCount) * Math.PI * 2;
+          const petal = new THREE.Mesh(outerPetalGeo, outerPetalMat);
+          petal.scale.setScalar(scale);
+          piv.add(petal);
+          headGroup.add(piv);
+          outerPivots.push(piv);
+        }
+
+        const innerPivots = [];
+        const innerCount = 6;
+        for (let i = 0; i < innerCount; i++) {
+          const piv = new THREE.Group();
+          piv.rotation.y = ((i + 0.5) / innerCount) * Math.PI * 2;
+          const petal = new THREE.Mesh(innerPetalGeo, innerPetalMat);
+          petal.scale.setScalar(scale);
+          piv.add(petal);
+          headGroup.add(piv);
+          innerPivots.push(piv);
+        }
+
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        coreMesh.scale.setScalar(scale);
+        headGroup.add(coreMesh);
+
+        const haloMat = new THREE.SpriteMaterial({
+          map: glowSpriteTex,
+          color: new THREE.Color('#fde047'),
+          transparent: true,
+          opacity: 0.75,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const haloSprite = new THREE.Sprite(haloMat);
+        haloSprite.scale.setScalar(1.35 * scale);
+        haloSprite.position.set(0, 0.12 * scale, 0);
+        headGroup.add(haloSprite);
+
+        flowersGroup.add(root);
+
+        const flowerObj = {
+          root,
+          headGroup,
+          outerPivots,
+          innerPivots,
+          haloSprite,
+          x,
+          y: y + stemHeight,
+          z,
+          baseScale: scale,
+          growProgress: isUserPlanted ? 0.05 : 1.0,
+          bloom: startBloom,
+          targetBloom: startBloom,
+          wavePulse: 0,
+          swayPhase: Math.random() * Math.PI * 2,
+          lastTriggeredCycle: -1
+        };
+
+        flowers.push(flowerObj);
+        return flowerObj;
+      }
+
+      // Populate 64 flowers arranged from foreground (z = +7.6) to distant horizon (z = -28.0)
+      function buildInitialFlowerGarden() {
+        const rows = 16;
+        for (let r = 0; r < rows; r++) {
+          const t = r / (rows - 1);
+          const z = 7.6 - t * 35.6; // Runs vertically up the screen from z=+7.6 to z=-28.0
+          const rowCount = r < 5 ? 4 : 5;
+          const spreadX = 3.4 + t * 9.8;
+          for (let c = 0; c < rowCount; c++) {
+            const frac = rowCount === 1 ? 0 : (c / (rowCount - 1)) * 2 - 1;
+            const jitterX = (Math.random() - 0.5) * 1.35;
+            const jitterZ = (Math.random() - 0.5) * 1.1;
+            const fx = frac * spreadX + jitterX;
+            const fz = z + jitterZ;
+            const sc = 0.92 + Math.random() * 0.45;
+            const initBloom = 0.55 + 0.45 * Math.cos(t * Math.PI * 1.5);
+            createFlowerInstance(fx, fz, sc, initBloom, false);
+          }
+        }
+      }
+
+      buildInitialFlowerGarden();
+
+      // ==================== 5. BLOOM WAVE RIBBON, POLLEN BURSTS & TAP RIPPLES ====================
+      // Glowing Wave Arc sweeping across the meadow
+      const waveRibbonGeo = new THREE.RingGeometry(4.2, 5.1, 48, 1, 0, Math.PI);
+      waveRibbonGeo.rotateX(-Math.PI / 2);
+      const waveRibbonMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#ff6ec7'),
+        transparent: true,
+        opacity: 0.36,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const waveRibbonMesh = new THREE.Mesh(waveRibbonGeo, waveRibbonMat);
+      scene.add(waveRibbonMesh);
+
+      // Fireflies & Rising Pollen Particles (THREE.Points + BufferGeometry)
+      const FIREFLY_COUNT = 520;
+      const fireflyGeo = new THREE.BufferGeometry();
+      const ffPos = new Float32Array(FIREFLY_COUNT * 3);
+      const ffVel = new Float32Array(FIREFLY_COUNT * 3);
+      const ffCol = new Float32Array(FIREFLY_COUNT * 3);
+      const ffPhase = new Float32Array(FIREFLY_COUNT);
+
+      for (let i = 0; i < FIREFLY_COUNT; i++) {
+        ffPhase[i] = Math.random() * Math.PI * 2;
+        ffPos[i * 3] = (Math.random() - 0.5) * 26;
+        ffPos[i * 3 + 1] = 0.2 + Math.random() * 5.8;
+        ffPos[i * 3 + 2] = 8.0 - Math.random() * 36.0;
+
+        ffVel[i * 3] = (Math.random() - 0.5) * 0.35;
+        ffVel[i * 3 + 1] = 0.22 + Math.random() * 0.48;
+        ffVel[i * 3 + 2] = (Math.random() - 0.5) * 0.35;
+
+        const c = new THREE.Color(i % 2 === 0 ? '#fde047' : '#f472b6');
+        ffCol[i * 3] = c.r;
+        ffCol[i * 3 + 1] = c.g;
+        ffCol[i * 3 + 2] = c.b;
+      }
+
+      fireflyGeo.setAttribute('position', new THREE.BufferAttribute(ffPos, 3));
+      fireflyGeo.setAttribute('color', new THREE.BufferAttribute(ffCol, 3));
+
+      const fireflyMat = new THREE.PointsMaterial({
+        size: 0.36,
+        map: glowSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+
+      const fireflyPoints = new THREE.Points(fireflyGeo, fireflyMat);
+      scene.add(fireflyPoints);
+
+      let pollenCursor = 0;
+      function emitPollenBurst(x, y, z, count = 10) {
+        const posAttr = fireflyGeo.getAttribute('position');
+        for (let i = 0; i < count; i++) {
+          const idx = (pollenCursor++) % FIREFLY_COUNT;
+          const i3 = idx * 3;
+          posAttr.array[i3] = x + (Math.random() - 0.5) * 0.45;
+          posAttr.array[i3 + 1] = y + 0.1;
+          posAttr.array[i3 + 2] = z + (Math.random() - 0.5) * 0.45;
+          ffVel[i3] = (Math.random() - 0.5) * 1.4;
+          ffVel[i3 + 1] = 0.85 + Math.random() * 1.35;
+          ffVel[i3 + 2] = (Math.random() - 0.5) * 1.4;
+        }
+        posAttr.needsUpdate = true;
+      }
+
+      // Ground Ripples when tapping grass
+      const ripples = [];
+      const rippleGeo = new THREE.RingGeometry(0.18, 0.28, 32);
+      rippleGeo.rotateX(-Math.PI / 2);
+
+      function spawnGroundRipple(x, y, z) {
+        const mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(THEMES[appState.theme].coreGlow),
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const mesh = new THREE.Mesh(rippleGeo, mat);
+        mesh.position.set(x, y + 0.06, z);
+        scene.add(mesh);
+        ripples.push({ mesh, age: 0, maxAge: 1.15 });
+      }
+
+      // ==================== 6. 3D SKY EMBLEM & 3D PHOTO FRAMES ====================
+      // 3D Sky Glowing Title Banner (Generous >38% vertical padding so Vietnamese text never clips!)
+      let skyBannerMesh = null;
+
+      function rebuildSkyBannerTexture() {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 512;
+        const g = c.getContext('2d');
+        g.clearRect(0, 0, c.width, c.height);
+
+        // Soft glowing spring aurora & full moon over the horizon
+        const rad = g.createRadialGradient(512, 260, 18, 512, 260, 440);
+        rad.addColorStop(0, 'rgba(253, 224, 71, 0.34)');
+        rad.addColorStop(0.38, 'rgba(244, 114, 182, 0.22)');
+        rad.addColorStop(0.7, 'rgba(16, 185, 129, 0.10)');
+        rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = rad;
+        g.fillRect(0, 0, c.width, c.height);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+
+        if (!skyBannerMesh) {
+          const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            toneMapped: false
+          });
+          skyBannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(22.0, 11.0), mat);
+          skyBannerMesh.position.set(0, 4.2, -21.0);
+          scene.add(skyBannerMesh);
+        } else {
+          if (skyBannerMesh.material.map) skyBannerMesh.material.map.dispose();
+          skyBannerMesh.material.map = tex;
+          skyBannerMesh.material.needsUpdate = true;
+        }
+      }
+
+      // 3D Photo Frames nestled in the flower garden
+      const photoGroup = new THREE.Group();
+      scene.add(photoGroup);
+      const photoMeshes = [];
+
+      function createDefaultArtCardCanvas(index) {
+        const c = document.createElement('canvas');
+        c.width = 360;
+        c.height = 440;
+        const g = c.getContext('2d');
+
+        // Frame border
+        g.fillStyle = '#fffdf9';
+        g.fillRect(0, 0, 360, 440);
+
+        const grad = g.createLinearGradient(18, 18, 342, 342);
+        if (index % 2 === 0) {
+          grad.addColorStop(0, '#0f5156');
+          grad.addColorStop(0.5, '#9d174d');
+          grad.addColorStop(1, '#f472b6');
+        } else {
+          grad.addColorStop(0, '#1e1b4b');
+          grad.addColorStop(0.5, '#047857');
+          grad.addColorStop(1, '#fde047');
+        }
+        g.fillStyle = grad;
+        g.fillRect(18, 18, 324, 324);
+
+        // Draw glowing botanical flower illustration inside frame
+        g.save();
+        g.translate(180, 180);
+        for (let i = 0; i < 8; i++) {
+          g.rotate(Math.PI / 4);
+          g.fillStyle = 'rgba(255, 240, 248, 0.78)';
+          g.beginPath();
+          g.ellipse(0, -52, 22, 48, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = '#fde047';
+        g.beginPath();
+        g.arc(0, 0, 24, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+
+        const labels = ['Rạng Rỡ Như Hoa 🌸', 'Xinh Đẹp & Hạnh Phúc 💖', 'Mãi Tươi Trẻ 🌷', 'Yêu Thương Trọn Vẹn ✨'];
+        g.fillStyle = '#831843';
+        g.font = '700 24px "Dancing Script", Georgia, cursive';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText(labels[index % labels.length], 180, 388);
+        return c;
+      }
+
+      function rebuild3DPhotoFrames() {
+        while (photoGroup.children.length > 0) {
+          const child = photoGroup.children.pop();
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (child.material.map) child.material.map.dispose();
+            child.material.dispose();
+          }
+        }
+        photoMeshes.length = 0;
+
+        const slots = [
+          { x: -3.2, z: -1.8, rotY: 0.28 },
+          { x: 3.2, z: -3.2, rotY: -0.28 },
+          { x: -4.1, z: -7.5, rotY: 0.22 },
+          { x: 4.1, z: -8.8, rotY: -0.22 },
+          { x: -2.8, z: -12.5, rotY: 0.18 },
+          { x: 2.9, z: -13.5, rotY: -0.18 }
+        ];
+
+        const hasUserPhotos = appState.photos.length > 0;
+        const count = hasUserPhotos ? Math.min(appState.photos.length, slots.length) : 4;
+
+        for (let idx = 0; idx < count; idx++) {
+          const slot = slots[idx];
+          const baseY = getTerrainHeight(slot.x, slot.z) + 1.45;
+
+          const addFrameMeshFromCanvas = (canvasEl) => {
+            const tex = new THREE.CanvasTexture(canvasEl);
+            tex.encoding = THREE.sRGBEncoding;
+            const mat = new THREE.MeshBasicMaterial({
+              map: tex,
+              side: THREE.DoubleSide,
+              toneMapped: false
+            });
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 2.14), mat);
+            mesh.position.set(slot.x, baseY, slot.z);
+            mesh.rotation.y = slot.rotY;
+            mesh.userData = { baseY, phase: idx * 1.3, index: idx };
+            photoGroup.add(mesh);
+            mesh.updateMatrixWorld(true);
+            photoMeshes.push(mesh);
+          };
+
+          if (!hasUserPhotos) {
+            addFrameMeshFromCanvas(createDefaultArtCardCanvas(idx));
+          } else {
+            const item = appState.photos[idx];
+            const src = typeof item === 'string' ? item : item.url;
+            if (!src) continue;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              const c = document.createElement('canvas');
+              c.width = 360;
+              c.height = 440;
+              const g = c.getContext('2d');
+              g.fillStyle = '#fffdf9';
+              g.fillRect(0, 0, 360, 440);
+
+              const iw = img.width || 300;
+              const ih = img.height || 300;
+              const tw = 324;
+              const th = 324;
+              const sc = Math.max(tw / iw, th / ih);
+              const dw = iw * sc;
+              const dh = ih * sc;
+              g.save();
+              g.beginPath();
+              g.rect(18, 18, tw, th);
+              g.clip();
+              g.drawImage(img, 18 + (tw - dw) / 2, 18 + (th - dh) / 2, dw, dh);
+              g.restore();
+
+              g.fillStyle = '#9d174d';
+              g.font = '700 24px "Dancing Script", Georgia, cursive';
+              g.textAlign = 'center';
+              g.textBaseline = 'middle';
+              g.fillText(`Kỷ niệm #${idx + 1} ✨`, 180, 388);
+              addFrameMeshFromCanvas(c);
+            };
+            img.src = src;
+          }
+        }
+      }
+
+      // Apply Color Theme
+      function applyThemePalette(themeKey) {
+        if (!THEMES[themeKey]) themeKey = 'rose_emerald';
+        appState.theme = themeKey;
+        const pal = THEMES[themeKey];
+
+        document.documentElement.style.setProperty('--bg-top', pal.bgTop);
+        document.documentElement.style.setProperty('--bg-mid', pal.bgMid);
+
+        outerPetalMat.color.set(pal.petalOuter);
+        outerPetalMat.emissive.set(pal.petalOuter);
+        innerPetalMat.color.set(pal.petalInner);
+        innerPetalMat.emissive.set(pal.petalOuter);
+        coreMat.color.set(pal.coreGlow);
+
+        grassUniforms.uTipColor.value.set(pal.grassTip);
+        grassUniforms.uWaveGlowColor.value.set(pal.waveLight);
+        warmWaveLight.color.set(pal.waveLight);
+        waveRibbonMat.color.set(pal.waveLight);
+
+        const colAttr = fireflyGeo.getAttribute('color');
+        const cA = new THREE.Color(pal.fireflyA);
+        const cB = new THREE.Color(pal.fireflyB);
+        for (let i = 0; i < FIREFLY_COUNT; i++) {
+          const c = i % 2 === 0 ? cA : cB;
+          colAttr.array[i * 3] = c.r;
+          colAttr.array[i * 3 + 1] = c.g;
+          colAttr.array[i * 3 + 2] = c.b;
+        }
+        colAttr.needsUpdate = true;
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === themeKey);
+        });
+      }
+
+      // ==================== 7. INTERACTION: RAYCAST PLANT FLOWER & CAMERA TILT ====================
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let isDragging = false;
+      let dragDist = 0;
+      let prevPointer = { x: 0, y: 0 };
+      let camYawOffset = 0;
+      let camPitchOffset = 0;
+
+      function spawnFloatingWishChip(screenX, screenY) {
+        const layer = document.getElementById('floating-wishes-layer');
+        const chip = document.createElement('div');
+        chip.className = 'floating-wish-chip';
+        chip.textContent = SHORT_WISH_BUBBLES[appState.plantedCount % SHORT_WISH_BUBBLES.length];
+        const safeX = Math.max(95, Math.min(cw - 95, screenX));
+        const safeY = Math.max(110, Math.min(ch - 110, screenY));
+        chip.style.left = `${safeX}px`;
+        chip.style.top = `${safeY}px`;
+        layer.appendChild(chip);
+        setTimeout(() => {
+          if (chip.parentNode) chip.parentNode.removeChild(chip);
+        }, 2350);
+      }
+
+      webglCanvas.addEventListener('pointerdown', (e) => {
+        AudioEngine.autoUnlock();
+        isDragging = true;
+        dragDist = 0;
+        prevPointer = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevPointer.x;
+        const dy = e.clientY - prevPointer.y;
+        dragDist += Math.hypot(dx, dy);
+        prevPointer = { x: e.clientX, y: e.clientY };
+        camYawOffset = Math.max(-1.8, Math.min(1.8, camYawOffset - dx * 0.0045));
+        camPitchOffset = Math.max(-0.55, Math.min(0.65, camPitchOffset + dy * 0.003));
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (dragDist <= 6) {
+          pointerNDC.x = (e.clientX / cw) * 2 - 1;
+          pointerNDC.y = -(e.clientY / ch) * 2 + 1;
+          raycaster.setFromCamera(pointerNDC, camera);
+
+          // 1. Check if user tapped a 3D photo frame
+          const photoHits = raycaster.intersectObjects(photoMeshes, false);
+          if (photoHits.length > 0) {
+            openWishViewerModal();
+            return;
+          }
+
+          // 2. Check if user tapped on the 3D grass terrain -> plant & bloom a new glowing flower!
+          const terrainHits = raycaster.intersectObject(terrainMesh, false);
+          if (terrainHits.length > 0) {
+            const pt = terrainHits[0].point;
+            // Keep planted flower count bounded for 60fps performance
+            if (flowers.length > 96) {
+              const oldest = flowers.shift();
+              if (oldest && oldest.root) flowersGroup.remove(oldest.root);
+            }
+            const newFlower = createFlowerInstance(pt.x, pt.z, 1.05 + Math.random() * 0.25, 0.15, true);
+            newFlower.targetBloom = 1.0;
+            newFlower.wavePulse = 1.0;
+            spawnGroundRipple(pt.x, pt.y, pt.z);
+            emitPollenBurst(pt.x, pt.y + 0.9, pt.z, 22);
+            appState.plantedCount++;
+            spawnFloatingWishChip(e.clientX, e.clientY);
+            AudioEngine.playBloomChime();
+          }
+        }
+      });
+
+      // Mobile tilt parallax
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma != null && e.beta != null && !isDragging) {
+          const gx = Math.max(-25, Math.min(25, e.gamma)) / 25;
+          const by = Math.max(-25, Math.min(25, e.beta - 45)) / 25;
+          camYawOffset += (gx * 0.85 - camYawOffset) * 0.06;
+          camPitchOffset += (by * 0.35 - camPitchOffset) * 0.06;
+        }
+      });
+
+      // ==================== 8. BLOOM WAVE TIMELINE & RENDER LOOP ====================
+      const clock = new THREE.Clock();
+      let waveCycleElapsed = 0;
+      let waveCycleCount = 0;
+      const WAVE_DURATION = 9.0; // Sweeps vertically from foreground (z=+9.0) to background (z=-29.5)
+
+      function restartBloomWave() {
+        waveCycleElapsed = 0;
+        waveCycleCount++;
+        flowers.forEach((f) => {
+          f.bloom = 0.06;
+          f.targetBloom = 0.06;
+          f.wavePulse = 0;
+          f.lastTriggeredCycle = -1;
+        });
+        AudioEngine.playBloomChime();
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const elapsed = clock.elapsedTime;
+
+        grassUniforms.uTime.value = elapsed;
+
+        // 1. Update Bloom Wave sweeping vertically from foreground (z=+9.2) to horizon (z=-29.5)
+        waveCycleElapsed += dt;
+        if (waveCycleElapsed >= WAVE_DURATION) {
+          waveCycleElapsed -= WAVE_DURATION;
+          waveCycleCount++;
+          // Gently close back to semi-buds before the next wave sweeps up
+          flowers.forEach((f) => {
+            f.targetBloom = 0.25;
+          });
+        }
+
+        const waveFrac = waveCycleElapsed / WAVE_DURATION;
+        const currentWaveZ = 9.2 - waveFrac * 38.7;
+        grassUniforms.uWaveZ.value = currentWaveZ;
+
+        warmWaveLight.position.set(Math.sin(elapsed * 0.8) * 2.5, 2.6, currentWaveZ);
+        waveRibbonMesh.position.set(0, getTerrainHeight(0, currentWaveZ) + 0.12, currentWaveZ);
+        waveRibbonMesh.scale.set(1.3 + waveFrac * 1.4, 1, 0.38);
+        waveRibbonMat.opacity = Math.sin(waveFrac * Math.PI) * 0.42;
+
+        // 2. Update all 3D Glowing Flowers
+        for (let i = 0; i < flowers.length; i++) {
+          const f = flowers[i];
+
+          // Trigger bloom when wave reaches flower's Z coordinate
+          if (f.z >= currentWaveZ && f.lastTriggeredCycle !== waveCycleCount) {
+            f.lastTriggeredCycle = waveCycleCount;
+            f.targetBloom = 1.0;
+            f.wavePulse = 1.0;
+            if (Math.random() < 0.45) {
+              emitPollenBurst(f.x, f.y, f.z, 5);
+            }
+          }
+
+          if (f.growProgress < 1.0) {
+            f.growProgress = Math.min(1.0, f.growProgress + dt * 2.2);
+          }
+
+          f.bloom += (f.targetBloom - f.bloom) * Math.min(1, dt * 3.4);
+          f.wavePulse = Math.max(0, f.wavePulse - dt * 0.85);
+
+          // Breathing open/close rhythm + wind sway
+          const breath = Math.sin(elapsed * 1.8 + f.swayPhase) * 0.045;
+          const effBloom = Math.max(0.05, Math.min(1.08, f.bloom + breath));
+
+          const openOuterAngle = 0.22 + effBloom * 0.96;
+          const openInnerAngle = 0.14 + effBloom * 0.68;
+          const petalScale = (0.45 + effBloom * 0.55) * f.baseScale;
+
+          for (let p = 0; p < f.outerPivots.length; p++) {
+            const piv = f.outerPivots[p];
+            piv.rotation.x = openOuterAngle;
+            piv.children[0].scale.setScalar(petalScale);
+          }
+          for (let p = 0; p < f.innerPivots.length; p++) {
+            const piv = f.innerPivots[p];
+            piv.rotation.x = openInnerAngle;
+            piv.children[0].scale.setScalar(petalScale * 0.92);
+          }
+
+          const haloScale = (0.65 + effBloom * 0.85 + f.wavePulse * 0.55) * f.baseScale;
+          f.haloSprite.scale.setScalar(haloScale);
+          f.haloSprite.material.opacity = 0.35 + effBloom * 0.52;
+
+          // Gentle wind sway on flower stem
+          const swayX = Math.sin(elapsed * 1.9 + f.x * 0.3 + f.z * 0.2 + f.swayPhase) * 0.065;
+          const swayZ = Math.cos(elapsed * 1.5 + f.z * 0.25 + f.swayPhase) * 0.045;
+          f.root.rotation.z = swayX;
+          f.root.rotation.x = swayZ;
+          f.root.scale.setScalar(f.growProgress);
+        }
+
+        // 3. Update Fireflies & Rising Pollen
+        const posAttr = fireflyGeo.getAttribute('position');
+        for (let i = 0; i < FIREFLY_COUNT; i++) {
+          const i3 = i * 3;
+          posAttr.array[i3] += (ffVel[i3] + Math.sin(elapsed * 1.5 + ffPhase[i]) * 0.18) * dt;
+          posAttr.array[i3 + 1] += ffVel[i3 + 1] * dt;
+          posAttr.array[i3 + 2] += ffVel[i3 + 2] * dt;
+
+          // Dampen burst velocity back to gentle drift
+          ffVel[i3] *= Math.pow(0.95, dt * 60);
+          ffVel[i3 + 1] = 0.26 + (ffVel[i3 + 1] - 0.26) * Math.pow(0.96, dt * 60);
+          ffVel[i3 + 2] *= Math.pow(0.95, dt * 60);
+
+          if (posAttr.array[i3 + 1] > 6.5) {
+            posAttr.array[i3] = (Math.random() - 0.5) * 24;
+            posAttr.array[i3 + 1] = 0.15;
+            posAttr.array[i3 + 2] = 8.0 - Math.random() * 34.0;
+          }
+        }
+        posAttr.needsUpdate = true;
+
+        // 4. Update Ground Ripples
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rp = ripples[i];
+          rp.age += dt;
+          if (rp.age >= rp.maxAge) {
+            scene.remove(rp.mesh);
+            rp.mesh.material.dispose();
+            ripples.splice(i, 1);
+            continue;
+          }
+          const prog = rp.age / rp.maxAge;
+          rp.mesh.scale.setScalar(1 + prog * 9.5);
+          rp.mesh.material.opacity = (1 - prog) * 0.78;
+        }
+
+        // 5. Float 3D Photo Frames gently
+        for (let i = 0; i < photoMeshes.length; i++) {
+          const pm = photoMeshes[i];
+          pm.position.y = pm.userData.baseY + Math.sin(elapsed * 1.6 + pm.userData.phase) * 0.12;
+        }
+
+        // 6. Camera gentle breathing + drag/tilt offset
+        camera.position.x += (baseCamPos.x + camYawOffset - camera.position.x) * Math.min(1, dt * 5);
+        camera.position.y += (baseCamPos.y + camPitchOffset - camera.position.y) * Math.min(1, dt * 5);
+        camera.lookAt(camera.position.x * 0.35, 1.05, -9.5);
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 9. UI, CUSTOMIZATION & PAYMENT QR KIT ====================
+      function syncUIAndBanners() {
+        const is2010 = appState.occasionType === '20/10';
+        const fullOccasion = is2010
+          ? '💐 Chúc Mừng Ngày Phụ Nữ Việt Nam 20/10'
+          : '🌸 Chúc Mừng Ngày Quốc Tế Phụ Nữ 8/3';
+        const shortOccasion = is2010 ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+
+        document.getElementById('header-occasion-badge').textContent = fullOccasion;
+        document.getElementById('header-receiver-title').textContent = `Gửi ${appState.receiver || 'Bạn Yêu Thương'} ✨`;
+        document.getElementById('banner-wish').textContent = appState.wish;
+        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${shortOccasion} (Chạm để mở thư & ảnh 💌)`;
+
+        document.querySelectorAll('.occasion-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.occasion === appState.occasionType);
+        });
+
+        rebuildSkyBannerTexture();
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add('open');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+      }
+
+      function openWishViewerModal() {
+        const shortOccasion = appState.occasionType === '20/10'
+          ? 'Chúc mừng Ngày Phụ Nữ Việt Nam 20/10'
+          : 'Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3';
+        document.getElementById('viewer-title').textContent = `💌 Gửi ${appState.receiver}`;
+        document.getElementById('viewer-meta').textContent = `Từ ${appState.sender} • ${shortOccasion}`;
+        document.getElementById('viewer-wish-text').textContent = appState.wish;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p) => {
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          img.alt = 'Ảnh kỷ niệm';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const div = document.createElement('div');
+          div.className = 'photo-thumb';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.textContent = '✕';
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          div.appendChild(img);
+          div.appendChild(del);
+          grid.appendChild(div);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        return {
+          templateId: appState.templateId,
+          templateType: 'women_glowing_flower_garden',
+          emoji: '🌷',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Vườn Hoa Ánh Sáng 3D',
+          successTitle: 'Vườn Hoa Ánh Sáng 3D Đã Sẵn Sàng!',
+          cardTitle: '🌷 VƯỜN HOA ÁNH SÁNG 3D ✨',
+          scanLabel: 'Quét QR để Mở Vườn Hoa & Lời Chúc',
+          footerHint: 'Chạm vào thảm cỏ để gieo hoa sáng & xem album 3D',
+          gradientStops: ['#07191e', '#0f5156', '#831843'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: occLabel,
+          message: appState.wish,
+          payload: {
+            occasionType: appState.occasionType,
+            theme: appState.theme,
+            photos: appState.photos
+          }
+        };
+      }
+
+      // Bind DOM Events
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        restartBloomWave();
+      });
+
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        const nextIdx = (THEME_KEYS.indexOf(appState.theme) + 1) % THEME_KEYS.length;
+        applyThemePalette(THEME_KEYS[nextIdx]);
+        AudioEngine.playBloomChime();
+      });
+
+      document.getElementById('wish-banner').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-open-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-wish').value = appState.wish;
+        renderCreatorPhotoThumbs();
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.querySelectorAll('.occasion-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          appState.occasionType = chip.dataset.occasion;
+          document.querySelectorAll('.occasion-chip').forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          applyThemePalette(chip.dataset.theme);
+        });
+      });
+
+      document.querySelectorAll('.preset-wish-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.getElementById('input-wish').value = btn.dataset.preset;
+        });
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        appState.receiver = document.getElementById('input-receiver').value.trim() || 'Minh Anh';
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        restartBloomWave();
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        updateCameraResponsive();
+      });
+
+      // ==================== 10. INIT & VIEWER HYDRATION (?id=) ====================
+      async function init() {
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            rebuildSkyBannerTexture();
+            rebuild3DPhotoFrames();
+          });
+        }
+        animate();
+
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.occasionType === '20/10' || (o.occasion && o.occasion.includes('20/10'))) {
+                appState.occasionType = '20/10';
+              }
+              if (p.theme && THEMES[p.theme]) {
+                applyThemePalette(p.theme);
+              }
+              if (Array.isArray(p.photos)) {
+                appState.photos = p.photos;
+              }
+              syncUIAndBanners();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

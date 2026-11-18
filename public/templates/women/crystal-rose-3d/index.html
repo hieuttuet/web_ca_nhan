@@ -1,0 +1,2452 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bông Hồng Thủy Tinh 3D • Nụ Hồng Pha Lê Hé Nở 8/3 & 20/10 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <style>
+    :root {
+      --bg-top: #1f0518;
+      --bg-mid: #0e030d;
+      --bg-deep: #060208;
+      --glass-bg: rgba(24, 6, 22, 0.76);
+      --glass-border: rgba(244, 114, 182, 0.38);
+      --accent-primary: #ff2a85;
+      --accent-secondary: #fde047;
+      --accent-crystal: #f472b6;
+      --text-main: #fff1f5;
+      --text-sub: #fbcfe8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 30%, var(--bg-top) 0%, var(--bg-mid) 54%, var(--bg-deep) 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    #stage-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #webgl-canvas:active {
+      cursor: grabbing;
+    }
+
+    #floating-wishes-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 14;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .floating-wish-chip {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(28, 7, 25, 0.88);
+      border: 1px solid rgba(253, 224, 71, 0.72);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 20px rgba(244, 114, 182, 0.5);
+      color: #fffbeb;
+      font-size: 0.84rem;
+      font-weight: 700;
+      line-height: 1.5;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: crystalWishFloat 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes crystalWishFloat {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -15%) scale(0.72);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -65%) scale(1.04);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -140%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -190%) scale(0.92);
+      }
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: max(10px, env(safe-area-inset-top));
+      left: 10px;
+      right: 10px;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .top-hud-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+
+    .hud-btn,
+    .bloom-status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.45;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .hud-btn {
+      cursor: pointer;
+    }
+
+    .hud-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(253, 224, 71, 0.75);
+      background: rgba(44, 10, 38, 0.9);
+    }
+
+    .bloom-status-pill {
+      color: #fde047;
+      border-color: rgba(253, 224, 71, 0.45);
+      background: rgba(32, 8, 28, 0.82);
+      cursor: pointer;
+    }
+
+    /* ==================== HEADER & WISH BANNER (NO TEXT CLIPPING) ==================== */
+    .rose-header {
+      position: fixed;
+      top: max(54px, calc(env(safe-area-inset-top) + 46px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 16;
+      width: calc(100vw - 24px);
+      max-width: 540px;
+      padding: 9px 16px 11px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(28, 7, 26, 0.78) 0%, rgba(14, 3, 14, 0.62) 100%);
+      border: 1px solid rgba(244, 114, 182, 0.34);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+      pointer-events: none;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .rose-occasion-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(244, 114, 182, 0.18);
+      border: 1px solid rgba(253, 224, 71, 0.48);
+      color: #fde047;
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: 0.02em;
+      margin-bottom: 3px;
+    }
+
+    .rose-receiver-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.4rem, 4.2vw, 2.02rem);
+      font-weight: 700;
+      line-height: 1.45;
+      padding: 4px 6px 6px;
+      color: #fffbeb;
+      text-shadow: 0 2px 14px rgba(255, 42, 133, 0.7), 0 0 24px rgba(253, 224, 71, 0.35);
+      word-break: break-word;
+    }
+
+    .rose-hint-line {
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #fbcfe8;
+      padding-top: 2px;
+      white-space: normal;
+    }
+
+    .wish-banner {
+      position: fixed;
+      left: 50%;
+      bottom: calc(max(12px, env(safe-area-inset-bottom)) + 56px);
+      transform: translateX(-50%);
+      z-index: 18;
+      width: calc(100vw - 24px);
+      max-width: 540px;
+      padding: 10px 16px 12px;
+      border-radius: 18px;
+      background: rgba(24, 6, 22, 0.84);
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.58);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .wish-banner:hover {
+      transform: translateX(-50%) translateY(-2px);
+      border-color: rgba(253, 224, 71, 0.72);
+    }
+
+    .wish-banner-text {
+      font-size: 0.84rem;
+      line-height: 1.55;
+      padding: 3px 2px 4px;
+      color: #fff1f5;
+      word-break: break-word;
+    }
+
+    .wish-banner-meta {
+      margin-top: 3px;
+      padding-top: 2px;
+      font-size: 0.74rem;
+      line-height: 1.45;
+      color: #fde047;
+      font-weight: 700;
+    }
+
+    /* ==================== BOTTOM DOCK (1 ROW ALWAYS, FITS 375PX) ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      max-width: calc(100vw - 10px);
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(20, 5, 19, 0.9);
+      border: 1px solid rgba(244, 114, 182, 0.42);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.68);
+    }
+
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 36px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff1f5;
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.4;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .dock-btn.primary {
+      background: linear-gradient(135deg, #be185d 0%, #ff2a85 52%, #f59e0b 100%);
+      border-color: rgba(253, 224, 71, 0.78);
+      color: #fffbeb;
+      box-shadow: 0 6px 20px rgba(255, 42, 133, 0.45);
+    }
+
+    @media (max-width: 520px) {
+      .top-hud {
+        left: 6px;
+        right: 6px;
+        gap: 3px;
+      }
+      .top-hud-group {
+        gap: 3px;
+      }
+      .hud-btn,
+      .bloom-status-pill {
+        min-height: 29px;
+        padding: 3px 5px;
+        font-size: 0.56rem;
+        gap: 2px;
+      }
+      .rose-header {
+        top: max(46px, calc(env(safe-area-inset-top) + 40px));
+        padding: 6px 10px 8px;
+      }
+      .rose-occasion-badge {
+        font-size: 0.67rem;
+        padding: 2px 9px;
+      }
+      .rose-hint-line {
+        font-size: 0.67rem;
+      }
+      .wish-banner {
+        bottom: calc(max(8px, env(safe-area-inset-bottom)) + 48px);
+        padding: 7px 11px 9px;
+      }
+      .wish-banner-text {
+        font-size: 0.74rem;
+      }
+      .wish-banner-meta {
+        font-size: 0.67rem;
+      }
+      .bottom-dock {
+        gap: 3px;
+        padding: 4px 5px;
+        max-width: calc(100vw - 8px);
+      }
+      .dock-btn {
+        min-height: 31px;
+        padding: 4px 6px;
+        font-size: 0.61rem;
+        gap: 2px;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(10, 2, 12, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 490px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      padding: 22px 20px;
+      background: linear-gradient(165deg, rgba(36, 8, 32, 0.98), rgba(14, 3, 15, 0.99));
+      border: 1.5px solid rgba(244, 114, 182, 0.48);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.88);
+      color: #fff1f5;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fbcfe8;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.12rem;
+      line-height: 1.45;
+      color: #fde047;
+      margin-bottom: 6px;
+      padding-right: 34px;
+    }
+
+    .modal-sub {
+      font-size: 0.81rem;
+      color: #fbcfe8;
+      opacity: 0.92;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #fde68a;
+      margin-bottom: 5px;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 114, 182, 0.38);
+      background: rgba(12, 3, 12, 0.85);
+      color: #fff1f5;
+      font-family: inherit;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      border-color: #fde047;
+    }
+
+    .form-textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .chip-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .option-chip {
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 114, 182, 0.34);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fce7f3;
+      font-family: inherit;
+      font-size: 0.81rem;
+      font-weight: 700;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-chip.active {
+      background: linear-gradient(135deg, rgba(190, 24, 93, 0.65), rgba(245, 158, 11, 0.45));
+      border-color: #fde047;
+      color: #fffbeb;
+      box-shadow: 0 4px 14px rgba(244, 114, 182, 0.35);
+    }
+
+    .preset-wishes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .preset-wish-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 114, 182, 0.4);
+      background: rgba(244, 114, 182, 0.14);
+      color: #fbcfe8;
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .preset-wish-btn:hover {
+      border-color: #fde047;
+      color: #fffbeb;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(253, 224, 71, 0.5);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-thumb button {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.76);
+      color: #fff;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .upload-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(253, 224, 71, 0.58);
+      background: rgba(253, 224, 71, 0.08);
+      color: #fde68a;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+      cursor: pointer;
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(253, 224, 71, 0.8);
+      background: linear-gradient(135deg, #be185d 0%, #ff2a85 52%, #f59e0b 100%);
+      color: #fffbeb;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.45;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Viewer Modal */
+    .viewer-wish-box {
+      padding: 15px 16px;
+      border-radius: 14px;
+      background: rgba(14, 3, 14, 0.78);
+      border: 1px solid rgba(244, 114, 182, 0.38);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #fff1f5;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    .viewer-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .viewer-photos-grid img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(253, 224, 71, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <div id="floating-wishes-layer"></div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="/" class="hud-btn" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <div class="bloom-status-pill" id="bloom-status-pill" title="Chạm để đổi sắc thái pha lê">🌹 Nụ hồng e ấp</div>
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Nở Hoa Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Tắt Tiếng</button>
+    </div>
+  </header>
+
+  <!-- Header Banner (Không cắt dấu tiếng Việt hay nét dưới g, y, p, q) -->
+  <section class="rose-header" id="rose-header">
+    <div class="rose-occasion-badge" id="header-occasion-badge">🌸 Quốc Tế Phụ Nữ 8/3</div>
+    <h1 class="rose-receiver-title" id="header-receiver-title">Gửi Minh Anh Yêu Thương ✨</h1>
+    <div class="rose-hint-line" id="header-hint-line">🌹 Chạm vào bông hồng thủy tinh để kích nở ánh sáng pha lê • Kéo xoay 360°</div>
+  </section>
+
+  <!-- Bottom Wish Banner -->
+  <section class="wish-banner" id="wish-banner" title="Chạm để đọc trọn vẹn tâm thư & xem ảnh kỷ niệm">
+    <div class="wish-banner-text" id="banner-wish">Chúc em luôn kiêu sa, rạng rỡ và thuần khiết như đóa hồng pha lê vĩnh cửu, luôn xinh đẹp, giỏi giang và ngập tràn hạnh phúc mỗi ngày!</div>
+    <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • Chúc mừng 8/3 (Chạm để mở thư & ảnh 💌)</div>
+  </section>
+
+  <!-- Bottom Dock (1 hàng ngang trên mọi màn hình, vừa khít 375px) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-bloom-burst">🌹 Kích Nở Hoa</button>
+    <button type="button" class="dock-btn" id="btn-open-wish">💌 Đọc Thư & Ảnh</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">✏️ Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- Modal Tùy Chỉnh Bông Hồng Thủy Tinh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">🌹 Cá Nhân Hóa Bông Hồng Thủy Tinh 3D</h2>
+      <p class="modal-sub">Tùy chỉnh dịp lễ 8/3 hoặc 20/10, tên người nhận, lời chúc yêu thương, sắc thái pha lê và khung ảnh kỷ niệm 3D.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Dịp Tôn Vinh Phái Đẹp</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip occasion-chip active" data-occasion="8/3">🌸 Quốc Tế Phụ Nữ 8/3</button>
+          <button type="button" class="option-chip occasion-chip" data-occasion="20/10">🌷 Phụ Nữ Việt Nam 20/10</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sắc Thái Pha Lê (Crystal Themes)</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="ruby_rose">🌹 Hồng Ruby</button>
+          <button type="button" class="option-chip theme-chip" data-theme="champagne_gold">🥂 Vàng Champagne</button>
+          <button type="button" class="option-chip theme-chip" data-theme="sapphire_blue">💎 Xanh Sapphire</button>
+          <button type="button" class="option-chip theme-chip" data-theme="amethyst_purple">🔮 Tím Amethyst</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu, Cô Giáo..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Con Trai, Tập Thể Lớp..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Chúc Ngọt Ngào</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời chúc gửi tới người phụ nữ tuyệt vời..."></textarea>
+        <div class="preset-wishes-row">
+          <button type="button" class="preset-wish-btn" data-preset="Chúc em luôn kiêu sa, rạng rỡ và thuần khiết như đóa hồng pha lê vĩnh cửu, luôn xinh đẹp, giỏi giang và ngập tràn hạnh phúc mỗi ngày!">💖 Tặng Người Yêu / Vợ</button>
+          <button type="button" class="preset-wish-btn" data-preset="Con kính chúc Mẹ yêu luôn mạnh khỏe, bình an, tươi trẻ và mãi là đóa hồng quý giá, ấm áp nhất trong trái tim chúng con!">🌷 Kính Tặng Mẹ</button>
+          <button type="button" class="preset-wish-btn" data-preset="Chúc bạn luôn tỏa sáng lấp lánh như pha lê, tự tin, thành công rực rỡ và luôn được yêu thương trọn vẹn mỗi ngày!">✨ Tặng Bạn / Đồng Nghiệp</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Khung Ảnh Kỷ Niệm 3D Bay Quanh Lồng Kính (Tối đa 6 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🌹 Áp Dụng & Hé Nở Hoa Pha Lê</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Thư & Xem Album Ảnh -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Anh Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. STATE & 4 CRYSTAL THEMES ====================
+      const THEMES = {
+        ruby_rose: {
+          name: 'Hồng Ruby',
+          crystalDeep: '#be123c',
+          crystalMid: '#ff2a85',
+          crystalRim: '#fda4af',
+          coreGold: '#fde047',
+          causticA: '#ff2a85',
+          causticB: '#fde047',
+          dustA: '#fbcfe8',
+          dustB: '#fde047',
+          bgTop: '#1f0518',
+          bgMid: '#0c020a',
+          bgDeep: '#060208'
+        },
+        champagne_gold: {
+          name: 'Vàng Champagne',
+          crystalDeep: '#b45309',
+          crystalMid: '#fbbf24',
+          crystalRim: '#ffffff',
+          coreGold: '#fef08a',
+          causticA: '#fbbf24',
+          causticB: '#fffbeb',
+          dustA: '#fef08a',
+          dustB: '#ffffff',
+          bgTop: '#1f1205',
+          bgMid: '#0d0702',
+          bgDeep: '#080401'
+        },
+        sapphire_blue: {
+          name: 'Xanh Sapphire',
+          crystalDeep: '#1d4ed8',
+          crystalMid: '#38bdf8',
+          crystalRim: '#e0f2fe',
+          coreGold: '#fde047',
+          causticA: '#38bdf8',
+          causticB: '#818cf8',
+          dustA: '#bae6fd',
+          dustB: '#fde047',
+          bgTop: '#041428',
+          bgMid: '#030a16',
+          bgDeep: '#02050d'
+        },
+        amethyst_purple: {
+          name: 'Tím Amethyst',
+          crystalDeep: '#6d28d9',
+          crystalMid: '#c084fc',
+          crystalRim: '#fbcfe8',
+          coreGold: '#fde047',
+          causticA: '#c084fc',
+          causticB: '#f472b6',
+          dustA: '#e9d5ff',
+          dustB: '#fbcfe8',
+          bgTop: '#170629',
+          bgMid: '#0b0315',
+          bgDeep: '#05020a'
+        }
+      };
+
+      const THEME_KEYS = Object.keys(THEMES);
+
+      const CRYSTAL_WISH_CHIPS = [
+        '✨ Mãi rạng rỡ như pha lê!',
+        '🌹 Kiêu sa & Hạnh phúc!',
+        '💖 Luôn được yêu thương trọn vẹn!',
+        '👑 Người phụ nữ tuyệt vời nhất!',
+        '💎 Thuần khiết & Tỏa sáng vĩnh cửu!',
+        '🌷 Ngàn điều ước tốt đẹp nhất!'
+      ];
+
+      const appState = {
+        templateId: 'women_crystal_rose_3d',
+        occasionType: '8/3',
+        theme: 'ruby_rose',
+        sender: 'Bảo Nam',
+        receiver: 'Minh Anh',
+        wish: 'Chúc em luôn kiêu sa, rạng rỡ và thuần khiết như đóa hồng pha lê vĩnh cửu, luôn xinh đẹp, giỏi giang và ngập tràn hạnh phúc mỗi ngày!',
+        photos: [],
+        isViewerMode: false,
+        burstTapCount: 0
+      };
+
+      // ==================== 2. WEB AUDIO API: GRAND PIANO & CRYSTAL SHIMMER ====================
+      const AudioEngine = (() => {
+        let ctx = null;
+        let masterGain = null;
+        let reverbDelayA = null;
+        let reverbDelayB = null;
+        let isEnabled = false;
+        let pianoTimer = null;
+        let stepIdx = 0;
+
+        // Romantic progression: Fmaj7 -> G6 -> Em7 -> Am7 -> Dm7 -> G7 -> Cmaj7 -> Cmaj9
+        const PIANO_SEQUENCE = [
+          // Fmaj7: F3, C4, E4, A4 | Melody: C5, A4, G4, E4
+          { bass: 174.61, arp: [261.63, 329.63, 440.00, 523.25], mel: [659.25, 587.33, 523.25, 440.00] },
+          // G6: G3, D4, E4, B4 | Melody: D5, B4, G4, E4
+          { bass: 196.00, arp: [293.66, 329.63, 392.00, 493.88], mel: [587.33, 493.88, 392.00, 493.88] },
+          // Em7: E3, B3, D4, G4 | Melody: B4, G4, E4, D4
+          { bass: 164.81, arp: [246.94, 293.66, 392.00, 493.88], mel: [783.99, 659.25, 587.33, 493.88] },
+          // Am7: A3, E4, G4, C5 | Melody: E5, C5, A4, G4
+          { bass: 220.00, arp: [329.63, 392.00, 523.25, 659.25], mel: [659.25, 523.25, 440.00, 392.00] },
+          // Dm7: D3, A3, C4, F4 | Melody: A4, F4, D5, C5
+          { bass: 146.83, arp: [220.00, 261.63, 349.23, 440.00], mel: [587.33, 523.25, 440.00, 349.23] },
+          // G7: G3, B3, D4, F4 | Melody: B4, D5, G5, F5
+          { bass: 196.00, arp: [246.94, 293.66, 349.23, 493.88], mel: [493.88, 587.33, 783.99, 659.25] },
+          // Cmaj7: C3, G3, B3, E4 | Melody: E5, G5, B5, G5
+          { bass: 130.81, arp: [196.00, 246.94, 329.63, 392.00], mel: [523.25, 659.25, 783.99, 659.25] },
+          // Cmaj9: C3, E3, G3, D4 | Melody: D5, E5, G5, C5
+          { bass: 130.81, arp: [261.63, 329.63, 392.00, 587.33], mel: [587.33, 659.25, 783.99, 1046.50] }
+        ];
+
+        function ensureContext() {
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            ctx = new AudioCtx();
+            masterGain = ctx.createGain();
+            masterGain.gain.value = 0.48;
+
+            // Concert-hall dual stereo reverb delay network
+            reverbDelayA = ctx.createDelay(1.0);
+            reverbDelayA.delayTime.value = 0.27;
+            const fbA = ctx.createGain();
+            fbA.gain.value = 0.28;
+            const lpA = ctx.createBiquadFilter();
+            lpA.type = 'lowpass';
+            lpA.frequency.value = 2300;
+            reverbDelayA.connect(lpA);
+            lpA.connect(fbA);
+            fbA.connect(reverbDelayA);
+            lpA.connect(masterGain);
+
+            reverbDelayB = ctx.createDelay(1.0);
+            reverbDelayB.delayTime.value = 0.41;
+            const fbB = ctx.createGain();
+            fbB.gain.value = 0.22;
+            const lpB = ctx.createBiquadFilter();
+            lpB.type = 'lowpass';
+            lpB.frequency.value = 1850;
+            reverbDelayB.connect(lpB);
+            lpB.connect(fbB);
+            fbB.connect(reverbDelayB);
+            lpB.connect(masterGain);
+
+            masterGain.connect(ctx.destination);
+          }
+          if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+          }
+          return ctx;
+        }
+
+        // Synthesize warm Grand Piano note (fundamental sine + warm triangle + 2nd & 3rd harmonics + hammer filter envelope)
+        function playGrandPianoNote(freq, velocity = 0.08, duration = 2.1) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+
+          const voiceGain = ctx.createGain();
+          voiceGain.gain.setValueAtTime(0.0001, now);
+          voiceGain.gain.linearRampToValueAtTime(velocity, now + 0.012);
+          voiceGain.gain.exponentialRampToValueAtTime(velocity * 0.36, now + 0.28);
+          voiceGain.gain.exponentialRampToValueAtTime(0.0005, now + duration);
+
+          // Velocity-sensitive lowpass filter simulating piano felt hammer brightness
+          const hammerFilter = ctx.createBiquadFilter();
+          hammerFilter.type = 'lowpass';
+          hammerFilter.frequency.setValueAtTime(Math.min(5200, freq * 6.5), now);
+          hammerFilter.frequency.exponentialRampToValueAtTime(Math.max(680, freq * 2.1), now + duration * 0.75);
+
+          // Fundamental sine
+          const osc1 = ctx.createOscillator();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          // Warm body triangle (slightly detuned for acoustic piano unison string chorus)
+          const osc2 = ctx.createOscillator();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 1.0007, now);
+          const g2 = ctx.createGain();
+          g2.gain.value = 0.35;
+
+          // 2nd & 3rd harmonics with faster decay
+          const osc3 = ctx.createOscillator();
+          osc3.type = 'sine';
+          osc3.frequency.setValueAtTime(freq * 2, now);
+          const g3 = ctx.createGain();
+          g3.gain.setValueAtTime(0.16, now);
+          g3.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+
+          const osc4 = ctx.createOscillator();
+          osc4.type = 'sine';
+          osc4.frequency.setValueAtTime(freq * 3, now);
+          const g4 = ctx.createGain();
+          g4.gain.setValueAtTime(0.055, now);
+          g4.gain.exponentialRampToValueAtTime(0.0008, now + 0.22);
+
+          osc1.connect(hammerFilter);
+          osc2.connect(g2);
+          g2.connect(hammerFilter);
+          osc3.connect(g3);
+          g3.connect(hammerFilter);
+          osc4.connect(g4);
+          g4.connect(hammerFilter);
+
+          hammerFilter.connect(voiceGain);
+          voiceGain.connect(masterGain);
+          if (reverbDelayA) voiceGain.connect(reverbDelayA);
+          if (reverbDelayB) voiceGain.connect(reverbDelayB);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc3.start(now);
+          osc4.start(now);
+
+          const stopAt = now + duration + 0.05;
+          osc1.stop(stopAt);
+          osc2.stop(stopAt);
+          osc3.stop(now + 0.46);
+          osc4.stop(now + 0.25);
+        }
+
+        // High-pitched Crystal Shimmer Chime when rose blooms or user taps
+        function playCrystalShimmer() {
+          if (!ctx || !isEnabled) return;
+          const shimmerNotes = [1046.50, 1318.51, 1567.98, 1975.53, 2637.02];
+          shimmerNotes.forEach((f, idx) => {
+            setTimeout(() => {
+              if (!ctx || !isEnabled) return;
+              const now = ctx.currentTime;
+              const osc = ctx.createOscillator();
+              const over = ctx.createOscillator();
+              const g = ctx.createGain();
+
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(f, now);
+              over.type = 'triangle';
+              over.frequency.setValueAtTime(f * 2.002, now);
+
+              const overGain = ctx.createGain();
+              overGain.gain.setValueAtTime(0.14, now);
+              overGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.35);
+
+              g.gain.setValueAtTime(0.0001, now);
+              g.gain.linearRampToValueAtTime(0.042, now + 0.01);
+              g.gain.exponentialRampToValueAtTime(0.0005, now + 1.45);
+
+              osc.connect(g);
+              over.connect(overGain);
+              overGain.connect(g);
+              g.connect(masterGain);
+              if (reverbDelayA) g.connect(reverbDelayA);
+
+              osc.start(now);
+              over.start(now);
+              osc.stop(now + 1.5);
+              over.stop(now + 0.4);
+            }, idx * 62);
+          });
+        }
+
+        function tickPianoArpeggio() {
+          if (!isEnabled) return;
+          const barIndex = Math.floor(stepIdx / 8) % PIANO_SEQUENCE.length;
+          const stepInBar = stepIdx % 8;
+          const bar = PIANO_SEQUENCE[barIndex];
+
+          // Beat 0: Warm left-hand bass note
+          if (stepInBar === 0) {
+            playGrandPianoNote(bar.bass, 0.088, 3.1);
+          }
+
+          // Flowing left-hand arpeggio
+          const arpFreq = bar.arp[stepInBar % bar.arp.length];
+          playGrandPianoNote(arpFreq, stepInBar % 2 === 0 ? 0.056 : 0.042, 1.85);
+
+          // Expressive right-hand melody on odd/highlighted beats
+          if (stepInBar % 2 === 1) {
+            const melFreq = bar.mel[Math.floor(stepInBar / 2) % bar.mel.length];
+            playGrandPianoNote(melFreq, 0.078, 2.35);
+          }
+
+          stepIdx++;
+        }
+
+        function setEnabled(next) {
+          isEnabled = next;
+          const btn = document.getElementById('btn-sound');
+          if (isEnabled) {
+            ensureContext();
+            if (!pianoTimer) {
+              tickPianoArpeggio();
+              pianoTimer = setInterval(tickPianoArpeggio, 410);
+            }
+            btn.textContent = '🔊 Âm Thanh';
+          } else {
+            if (pianoTimer) {
+              clearInterval(pianoTimer);
+              pianoTimer = null;
+            }
+            btn.textContent = '🔇 Tắt Tiếng';
+          }
+        }
+
+        function autoUnlock() {
+          if (!isEnabled) setEnabled(true);
+        }
+
+        return {
+          setEnabled,
+          toggle: () => setEnabled(!isEnabled),
+          autoUnlock,
+          playCrystalShimmer,
+          playGrandPianoNote
+        };
+      })();
+
+      // ==================== 3. THREE.JS SCENE, CAMERA & 3-POINT LIGHTING ====================
+      const webglCanvas = document.getElementById('webgl-canvas');
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: webglCanvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x060208, 0.025);
+
+      const camera = new THREE.PerspectiveCamera(45, cw / ch, 0.1, 120);
+      let orbitYaw = 0.0;
+      let orbitPitch = 0.16;
+      let orbitRadius = 8.4;
+      let baseOrbitRadius = 8.4;
+
+      function updateCameraResponsive() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        const aspect = cw / ch;
+        const isMobile = cw < 768 || aspect < 0.8;
+        camera.aspect = aspect;
+        baseOrbitRadius = isMobile ? (aspect < 0.58 ? 10.6 : 9.6) : 7.8;
+        orbitRadius = baseOrbitRadius;
+        camera.updateProjectionMatrix();
+        renderer.setSize(cw, ch, false);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      }
+
+      // 3-Point Lighting + Warm/Cool Contrast (3d-visual.md)
+      const ambientLight = new THREE.AmbientLight(0xfce7f3, 0.68);
+      scene.add(ambientLight);
+
+      const roseHeartLight = new THREE.PointLight(0xffaa00, 2.8, 18);
+      roseHeartLight.position.set(0, 0.55, 0);
+      scene.add(roseHeartLight);
+
+      const warmKeyLight = new THREE.PointLight(0xff5ca8, 2.1, 28);
+      warmKeyLight.position.set(4.2, 5.2, 5.5);
+      scene.add(warmKeyLight);
+
+      const coolRimLight = new THREE.DirectionalLight(0x38bdf8, 1.15);
+      coolRimLight.position.set(-7.5, 6.8, -6.5);
+      scene.add(coolRimLight);
+
+      // Procedural Glow Sprite Texture (sRGBEncoding)
+      function createGlowSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        grad.addColorStop(0.28, 'rgba(253, 224, 71, 0.92)');
+        grad.addColorStop(0.65, 'rgba(244, 114, 182, 0.35)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const glowSpriteTex = createGlowSpriteTexture();
+
+      // ==================== 4. ROYAL PEDESTAL & CAUSTICS LIGHT PROJECTION ====================
+      const worldGroup = new THREE.Group();
+      scene.add(worldGroup);
+
+      // 4.1 Royal Black Marble & Gold Pedestal
+      const pedestalGroup = new THREE.Group();
+      pedestalGroup.position.set(0, -1.78, 0);
+      worldGroup.add(pedestalGroup);
+
+      const marbleMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#0f0712'),
+        roughness: 0.18,
+        metalness: 0.65
+      });
+
+      const royalGoldMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#fbbf24'),
+        emissive: new THREE.Color('#92400e'),
+        emissiveIntensity: 0.42,
+        roughness: 0.22,
+        metalness: 0.92
+      });
+
+      const baseTopCyl = new THREE.Mesh(new THREE.CylinderGeometry(1.88, 2.04, 0.28, 48), marbleMat);
+      baseTopCyl.position.y = -0.14;
+      pedestalGroup.add(baseTopCyl);
+
+      const baseBottomCyl = new THREE.Mesh(new THREE.CylinderGeometry(2.14, 2.38, 0.26, 48), marbleMat);
+      baseBottomCyl.position.y = -0.41;
+      pedestalGroup.add(baseBottomCyl);
+
+      const goldRingTop = new THREE.Mesh(new THREE.TorusGeometry(1.90, 0.042, 16, 64), royalGoldMat);
+      goldRingTop.rotation.x = Math.PI / 2;
+      goldRingTop.position.y = 0.0;
+      pedestalGroup.add(goldRingTop);
+
+      const goldRingMid = new THREE.Mesh(new THREE.TorusGeometry(2.08, 0.035, 16, 64), royalGoldMat);
+      goldRingMid.rotation.x = Math.PI / 2;
+      goldRingMid.position.y = -0.28;
+      pedestalGroup.add(goldRingMid);
+
+      const goldRingBot = new THREE.Mesh(new THREE.TorusGeometry(2.35, 0.045, 16, 64), royalGoldMat);
+      goldRingBot.rotation.x = Math.PI / 2;
+      goldRingBot.position.y = -0.53;
+      pedestalGroup.add(goldRingBot);
+
+      // 4.2 Procedural Caustics Light Projection Texture (cast by the crystal rose onto pedestal & floor)
+      function createCausticsTexture() {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 512;
+        const g = c.getContext('2d');
+        g.clearRect(0, 0, 512, 512);
+
+        const cx = 256;
+        const cy = 256;
+
+        // Soft glowing center
+        const baseGrad = g.createRadialGradient(cx, cy, 8, cx, cy, 245);
+        baseGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        baseGrad.addColorStop(0.25, 'rgba(253, 224, 71, 0.65)');
+        baseGrad.addColorStop(0.62, 'rgba(244, 114, 182, 0.38)');
+        baseGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = baseGrad;
+        g.fillRect(0, 0, 512, 512);
+
+        // Refracted rose-petal caustic arcs & filaments
+        g.save();
+        g.translate(cx, cy);
+        for (let layer = 0; layer < 3; layer++) {
+          const petals = 8 + layer * 4;
+          const rInner = 34 + layer * 42;
+          const rOuter = 82 + layer * 54;
+          for (let i = 0; i < petals; i++) {
+            const a0 = (i / petals) * Math.PI * 2 + layer * 0.25;
+            const a1 = ((i + 0.5) / petals) * Math.PI * 2 + layer * 0.25;
+            const a2 = ((i + 1) / petals) * Math.PI * 2 + layer * 0.25;
+
+            g.strokeStyle = layer % 2 === 0
+              ? 'rgba(255, 250, 220, 0.62)'
+              : 'rgba(255, 182, 225, 0.52)';
+            g.lineWidth = 3.2 - layer * 0.6;
+            g.beginPath();
+            g.moveTo(Math.cos(a0) * rInner, Math.sin(a0) * rInner);
+            g.quadraticCurveTo(
+              Math.cos(a1) * rOuter,
+              Math.sin(a1) * rOuter,
+              Math.cos(a2) * rInner,
+              Math.sin(a2) * rInner
+            );
+            g.stroke();
+          }
+        }
+        g.restore();
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const causticsTex = createCausticsTexture();
+
+      const causticsMatA = new THREE.MeshBasicMaterial({
+        map: causticsTex,
+        color: new THREE.Color('#ff2a85'),
+        transparent: true,
+        opacity: 0.72,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        toneMapped: false
+      });
+
+      const causticsMatB = new THREE.MeshBasicMaterial({
+        map: causticsTex,
+        color: new THREE.Color('#fde047'),
+        transparent: true,
+        opacity: 0.58,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        toneMapped: false
+      });
+
+      const causticsGeo = new THREE.PlaneGeometry(3.65, 3.65);
+      causticsGeo.rotateX(-Math.PI / 2);
+
+      const causticsDiskA = new THREE.Mesh(causticsGeo, causticsMatA);
+      causticsDiskA.position.y = 0.012;
+      pedestalGroup.add(causticsDiskA);
+
+      const causticsDiskB = new THREE.Mesh(causticsGeo, causticsMatB);
+      causticsDiskB.position.y = 0.018;
+      pedestalGroup.add(causticsDiskB);
+
+      // Wide ambient caustics reflection on the royal floor beneath pedestal
+      const floorCausticsGeo = new THREE.PlaneGeometry(9.2, 9.2);
+      floorCausticsGeo.rotateX(-Math.PI / 2);
+      const floorCausticsMat = new THREE.MeshBasicMaterial({
+        map: causticsTex,
+        color: new THREE.Color('#ff2a85'),
+        transparent: true,
+        opacity: 0.28,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        toneMapped: false
+      });
+      const floorCausticsMesh = new THREE.Mesh(floorCausticsGeo, floorCausticsMat);
+      floorCausticsMesh.position.y = -0.54;
+      pedestalGroup.add(floorCausticsMesh);
+
+      // ==================== 5. CRYSTAL ROSE 3D (MULTI-LAYERED PETALS, GOLDEN CORE, STEM, LEAVES & DOME) ====================
+      const roseRootGroup = new THREE.Group();
+      worldGroup.add(roseRootGroup);
+
+      // 5.1 Custom Crystal / Glass ShaderMaterial for Rose Petals (Fresnel Rim + Specular + Dispersion + Internal Glow)
+      const crystalPetalUniforms = {
+        uTime: { value: 0 },
+        uBloom: { value: 0.0 },
+        uBurst: { value: 0.0 },
+        uColorDeep: { value: new THREE.Color('#be123c') },
+        uColorMid: { value: new THREE.Color('#ff2a85') },
+        uColorRim: { value: new THREE.Color('#fda4af') },
+        uCoreGold: { value: new THREE.Color('#fde047') }
+      };
+
+      const crystalPetalMat = new THREE.ShaderMaterial({
+        uniforms: crystalPetalUniforms,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+            vWorldPos = worldPosition.xyz;
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * viewMatrix * worldPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uBloom;
+          uniform float uBurst;
+          uniform vec3 uColorDeep;
+          uniform vec3 uColorMid;
+          uniform vec3 uColorRim;
+          uniform vec3 uCoreGold;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          varying vec2 vUv;
+
+          void main() {
+            vec3 N = normalize(vNormal);
+            if (!gl_FrontFacing) N = -N;
+            vec3 V = normalize(cameraPosition - vWorldPos);
+
+            // Fresnel rim refraction & reflection
+            float fresnel = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 2.2);
+
+            // Multi-point specular highlights (Key + Cool Rim + Heart)
+            vec3 L1 = normalize(vec3(4.2, 5.8, 5.5) - vWorldPos);
+            vec3 H1 = normalize(L1 + V);
+            float spec1 = pow(max(dot(N, H1), 0.0), 42.0);
+
+            vec3 L2 = normalize(vec3(-6.0, 6.5, -5.0) - vWorldPos);
+            vec3 H2 = normalize(L2 + V);
+            float spec2 = pow(max(dot(N, H2), 0.0), 28.0);
+
+            // Faceted crystal vein shimmer
+            float facetPattern = sin(vUv.x * 26.0 + vUv.y * 12.0 + uTime * 1.6) * 0.5 + 0.5;
+            float causticRipple = sin(vUv.y * 18.0 - uTime * 2.8) * 0.5 + 0.5;
+
+            // Base translucent crystal gradient from golden base to jewel tip
+            vec3 baseCrystal = mix(uColorDeep, uColorMid, smoothstep(0.05, 0.82, vUv.y));
+            // Golden heart glow radiating from base of petal (vUv.y near 0)
+            float coreProximity = pow(1.0 - clamp(vUv.y, 0.0, 1.0), 2.1) * (0.45 + uBloom * 0.65);
+            baseCrystal = mix(baseCrystal, uCoreGold, coreProximity * 0.68);
+
+            // Iridescent dispersion along petal edge
+            vec3 dispersion = vec3(
+              sin(fresnel * 6.0 + uTime) * 0.5 + 0.5,
+              cos(fresnel * 5.0 - uTime * 0.8) * 0.5 + 0.5,
+              sin(fresnel * 7.0 + 1.5) * 0.5 + 0.5
+            );
+
+            vec3 col = baseCrystal;
+            col = mix(col, uColorRim, fresnel * 0.82);
+            col += dispersion * fresnel * 0.25;
+            col += uCoreGold * (spec1 * 0.95 + facetPattern * causticRipple * 0.14 * (0.5 + uBloom));
+            col += vec3(0.82, 0.95, 1.0) * (spec2 * 0.55);
+            col += uCoreGold * uBurst * 0.55;
+
+            // Glass translucency: clear body + luminous rim & speculars
+            float alpha = 0.34 + fresnel * 0.52 + spec1 * 0.45 + coreProximity * 0.22 + uBurst * 0.18;
+            alpha = clamp(alpha, 0.26, 0.94);
+
+            gl_FragColor = vec4(col, alpha);
+          }
+        `
+      });
+
+      // 5.2 Sculpted Rose Petal Geometry (Cupped bowl + recurved top lip + organic edge wave)
+      function createRosePetalGeometry(width = 0.78, height = 0.98, curlAmount = 0.24) {
+        const segX = 12;
+        const segY = 14;
+        const geo = new THREE.PlaneGeometry(width, height, segX, segY);
+        geo.translate(0, height * 0.5, 0);
+
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const vx = pos.getX(i);
+          const vy = pos.getY(i);
+          const u = vx / (width * 0.5); // -1 to 1
+          const v = Math.max(0, Math.min(1, vy / height)); // 0 to 1
+
+          // Rose petal silhouette: narrow base, broad rounded upper belly, delicate tip
+          const widthProfile = Math.sin(Math.pow(v, 0.72) * Math.PI) * 0.95 + 0.18 * (1.0 - v);
+          const nx = vx * widthProfile;
+
+          // Deep cup curve across width + outward lip curl near top (v > 0.65)
+          const cupDepth = (1.0 - u * u) * Math.sin(v * Math.PI) * 0.26;
+          const topLipCurl = Math.pow(Math.max(0, v - 0.58) / 0.42, 2.0) * curlAmount;
+          const edgeRuffle = Math.sin(u * Math.PI * 2.0) * Math.pow(v, 2.0) * 0.035;
+
+          const nz = cupDepth - topLipCurl + edgeRuffle;
+          pos.setX(i, nx);
+          pos.setZ(i, nz);
+        }
+        geo.computeVertexNormals();
+        return geo;
+      }
+
+      // 5.3 Build Curved Stem, Thorns, Sepals & Faceted Crystal Leaves
+      const stemCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -1.76, 0),
+        new THREE.Vector3(0.08, -1.18, 0.04),
+        new THREE.Vector3(-0.06, -0.52, -0.03),
+        new THREE.Vector3(0, 0.18, 0)
+      ]);
+      const stemGeo = new THREE.TubeGeometry(stemCurve, 28, 0.055, 12, false);
+      const crystalStemMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#10b981'),
+        emissive: new THREE.Color('#065f46'),
+        emissiveIntensity: 0.45,
+        roughness: 0.18,
+        metalness: 0.55,
+        transparent: true,
+        opacity: 0.88
+      });
+      const stemMesh = new THREE.Mesh(stemGeo, crystalStemMat);
+      roseRootGroup.add(stemMesh);
+
+      // Faceted Crystal Leaves along the stem
+      function createCrystalLeafGeometry(len = 0.72, wid = 0.34) {
+        const geo = new THREE.PlaneGeometry(wid, len, 6, 8);
+        geo.translate(0, len * 0.5, 0);
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          const v = Math.max(0, Math.min(1, y / len));
+          const leafProfile = Math.sin(v * Math.PI) * (1.0 - 0.25 * v);
+          const nx = x * leafProfile;
+          const foldZ = Math.abs(nx) * 0.38 - Math.sin(v * Math.PI) * 0.12;
+          pos.setX(i, nx);
+          pos.setZ(i, foldZ);
+        }
+        geo.computeVertexNormals();
+        return geo;
+      }
+
+      const leafGeo = createCrystalLeafGeometry(0.76, 0.36);
+      const crystalLeafMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#34d399'),
+        emissive: new THREE.Color('#047857'),
+        emissiveIntensity: 0.5,
+        roughness: 0.16,
+        metalness: 0.68,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.86
+      });
+
+      const leafConfigs = [
+        { pos: [0.06, -0.95, 0.03], rot: [0.42, 0.35, -0.85], scale: 1.0 },
+        { pos: [-0.05, -0.58, -0.02], rot: [0.38, -2.4, 0.82], scale: 0.92 },
+        { pos: [0.04, -1.28, -0.02], rot: [0.48, 1.85, -0.78], scale: 0.82 }
+      ];
+      leafConfigs.forEach((cfg) => {
+        const leaf = new THREE.Mesh(leafGeo, crystalLeafMat);
+        leaf.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
+        leaf.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
+        leaf.scale.setScalar(cfg.scale);
+        roseRootGroup.add(leaf);
+      });
+
+      // 5.4 Rose Head Container & 5 Concentric Tiers of Crystal Petals (30 Petals Total)
+      const roseHeadGroup = new THREE.Group();
+      roseHeadGroup.position.set(0, 0.20, 0);
+      roseRootGroup.add(roseHeadGroup);
+
+      // Golden Sepals under the rose cup
+      const sepalGeo = createCrystalLeafGeometry(0.46, 0.18);
+      for (let s = 0; s < 5; s++) {
+        const piv = new THREE.Group();
+        piv.rotation.y = (s / 5) * Math.PI * 2;
+        const sepal = new THREE.Mesh(sepalGeo, royalGoldMat);
+        sepal.rotation.x = 1.18;
+        piv.add(sepal);
+        roseHeadGroup.add(piv);
+      }
+
+      // Golden Glowing Core & Stamen Filaments at the heart of the rose
+      const coreGroup = new THREE.Group();
+      coreGroup.position.set(0, 0.22, 0);
+      roseHeadGroup.add(coreGroup);
+
+      const coreSphereMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#fde047'),
+        toneMapped: false
+      });
+      const coreSphere = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), coreSphereMat);
+      coreGroup.add(coreSphere);
+
+      const stamenTipGeo = new THREE.SphereGeometry(0.024, 8, 8);
+      for (let i = 0; i < 16; i++) {
+        const angle = (i / 16) * Math.PI * 2;
+        const ringR = i % 2 === 0 ? 0.11 : 0.16;
+        const tip = new THREE.Mesh(stamenTipGeo, coreSphereMat);
+        tip.position.set(
+          Math.cos(angle) * ringR,
+          0.12 + (i % 2) * 0.05,
+          Math.sin(angle) * ringR
+        );
+        coreGroup.add(tip);
+      }
+
+      const coreHaloMat = new THREE.SpriteMaterial({
+        map: glowSpriteTex,
+        color: new THREE.Color('#fde047'),
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const coreHaloSprite = new THREE.Sprite(coreHaloMat);
+      coreHaloSprite.scale.setScalar(1.45);
+      coreHaloSprite.position.set(0, 0.15, 0);
+      coreGroup.add(coreHaloSprite);
+
+      // Build 5 concentric tiers of crystal petals (30 petals total)
+      const petalPivots = [];
+      const TIER_SPECS = [
+        { count: 4, width: 0.46, height: 0.66, curl: 0.12, radius: 0.07, yOffset: 0.08, closedTilt: 0.08, openTilt: 0.34, delay: 0.42 },
+        { count: 5, width: 0.58, height: 0.78, curl: 0.18, radius: 0.12, yOffset: 0.06, closedTilt: 0.14, openTilt: 0.56, delay: 0.30 },
+        { count: 6, width: 0.70, height: 0.88, curl: 0.24, radius: 0.17, yOffset: 0.04, closedTilt: 0.20, openTilt: 0.78, delay: 0.18 },
+        { count: 7, width: 0.82, height: 0.98, curl: 0.30, radius: 0.22, yOffset: 0.02, closedTilt: 0.26, openTilt: 1.02, delay: 0.08 },
+        { count: 8, width: 0.94, height: 1.08, curl: 0.36, radius: 0.27, yOffset: 0.00, closedTilt: 0.32, openTilt: 1.24, delay: 0.00 }
+      ];
+
+      TIER_SPECS.forEach((spec, tierIdx) => {
+        const tierGeo = createRosePetalGeometry(spec.width, spec.height, spec.curl);
+        const goldenAngleOffset = tierIdx * 0.68;
+        for (let i = 0; i < spec.count; i++) {
+          const azimuth = (i / spec.count) * Math.PI * 2 + goldenAngleOffset;
+          const pivot = new THREE.Group();
+          pivot.position.set(
+            Math.cos(azimuth) * spec.radius,
+            spec.yOffset,
+            Math.sin(azimuth) * spec.radius
+          );
+          pivot.rotation.y = -azimuth + Math.PI / 2;
+
+          const petalMesh = new THREE.Mesh(tierGeo, crystalPetalMat);
+          petalMesh.renderOrder = 10 + tierIdx * 2;
+          pivot.add(petalMesh);
+          roseHeadGroup.add(pivot);
+
+          petalPivots.push({
+            pivot,
+            petalMesh,
+            tierIdx,
+            closedTilt: spec.closedTilt + (i % 2) * 0.025,
+            openTilt: spec.openTilt + (i % 2) * 0.04,
+            delay: spec.delay,
+            swaySeed: i * 1.1 + tierIdx * 0.7
+          });
+        }
+      });
+
+      // 4 Fallen Crystal Petals resting on the pedestal
+      const fallenPetalGeo = createRosePetalGeometry(0.48, 0.62, 0.22);
+      const fallenCoords = [
+        { x: 0.68, z: 0.55, ry: 0.8 },
+        { x: -0.75, z: 0.42, ry: 2.3 },
+        { x: 0.42, z: -0.78, ry: 4.1 },
+        { x: -0.52, z: -0.62, ry: 5.2 }
+      ];
+      fallenCoords.forEach((fc) => {
+        const fp = new THREE.Mesh(fallenPetalGeo, crystalPetalMat);
+        fp.position.set(fc.x, -1.73, fc.z);
+        fp.rotation.set(Math.PI / 2 - 0.18, fc.ry, 0.12);
+        fp.renderOrder = 8;
+        roseRootGroup.add(fp);
+      });
+
+      // 5.5 Enchanted Royal Glass Dome (Lồng Kính Vòm Hoàng Gia)
+      const domePoints = [];
+      const domeRadius = 1.72;
+      const domeCylinderH = 1.95;
+      domePoints.push(new THREE.Vector2(domeRadius, 0));
+      domePoints.push(new THREE.Vector2(domeRadius, domeCylinderH));
+      const domeArcSteps = 20;
+      for (let i = 1; i <= domeArcSteps; i++) {
+        const theta = (i / domeArcSteps) * (Math.PI / 2);
+        domePoints.push(new THREE.Vector2(
+          Math.cos(theta) * domeRadius,
+          domeCylinderH + Math.sin(theta) * domeRadius * 0.92
+        ));
+      }
+      const domeGeo = new THREE.LatheGeometry(domePoints, 48);
+
+      const glassDomeMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uRimColor: { value: new THREE.Color('#fda4af') }
+        },
+        transparent: true,
+        depthWrite: false,
+        side: THREE.FrontSide,
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            vec4 wp = modelMatrix * vec4(position, 1.0);
+            vWorldPos = wp.xyz;
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * viewMatrix * wp;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uRimColor;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            vec3 N = normalize(vNormal);
+            vec3 V = normalize(cameraPosition - vWorldPos);
+            float fresnel = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 3.2);
+            vec3 L = normalize(vec3(5.0, 8.0, 6.0) - vWorldPos);
+            vec3 H = normalize(L + V);
+            float spec = pow(max(dot(N, H), 0.0), 64.0);
+            vec3 col = mix(uRimColor, vec3(1.0), 0.45) + vec3(1.0) * spec;
+            float alpha = fresnel * 0.36 + spec * 0.55 + 0.02;
+            gl_FragColor = vec4(col, clamp(alpha, 0.02, 0.68));
+          }
+        `
+      });
+
+      const glassDomeMesh = new THREE.Mesh(domeGeo, glassDomeMat);
+      glassDomeMesh.position.set(0, -1.78, 0);
+      glassDomeMesh.renderOrder = 30;
+      worldGroup.add(glassDomeMesh);
+
+      // Faceted Crystal Finial Knob on top of the Glass Dome
+      const finialMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.18, 1), crystalPetalMat);
+      finialMesh.position.set(0, 1.92, 0);
+      finialMesh.renderOrder = 31;
+      worldGroup.add(finialMesh);
+
+      // ==================== 6. DIAMOND DUST PARTICLES, FLOATING PETALS & BURST WAVES ====================
+      const DUST_COUNT = 520;
+      const dustGeo = new THREE.BufferGeometry();
+      const dustPos = new Float32Array(DUST_COUNT * 3);
+      const dustCol = new Float32Array(DUST_COUNT * 3);
+      const dustAngle = new Float32Array(DUST_COUNT);
+      const dustRadius = new Float32Array(DUST_COUNT);
+      const dustSpeed = new Float32Array(DUST_COUNT);
+
+      for (let i = 0; i < DUST_COUNT; i++) {
+        const insideDome = i < 280;
+        const r = insideDome ? (0.18 + Math.random() * 1.38) : (1.85 + Math.random() * 3.8);
+        const a = Math.random() * Math.PI * 2;
+        const y = -1.65 + Math.random() * 3.8;
+        dustAngle[i] = a;
+        dustRadius[i] = r;
+        dustSpeed[i] = 0.25 + Math.random() * 0.55;
+
+        dustPos[i * 3] = Math.cos(a) * r;
+        dustPos[i * 3 + 1] = y;
+        dustPos[i * 3 + 2] = Math.sin(a) * r;
+
+        const c = new THREE.Color(i % 2 === 0 ? '#fde047' : '#fbcfe8');
+        dustCol[i * 3] = c.r;
+        dustCol[i * 3 + 1] = c.g;
+        dustCol[i * 3 + 2] = c.b;
+      }
+
+      dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+      dustGeo.setAttribute('color', new THREE.BufferAttribute(dustCol, 3));
+
+      const dustMat = new THREE.PointsMaterial({
+        size: 0.24,
+        map: glowSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.92,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+
+      const dustPoints = new THREE.Points(dustGeo, dustMat);
+      worldGroup.add(dustPoints);
+
+      // Drifting 3D Crystal Petals floating in slow vortex around the dome
+      const floatingPetals = [];
+      const miniPetalGeo = createRosePetalGeometry(0.28, 0.38, 0.2);
+      for (let i = 0; i < 16; i++) {
+        const fpMesh = new THREE.Mesh(miniPetalGeo, crystalPetalMat);
+        const angle = (i / 16) * Math.PI * 2;
+        const radius = 1.95 + (i % 3) * 0.55;
+        const y = -1.4 + (i / 16) * 3.2;
+        fpMesh.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+        fpMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+        fpMesh.renderOrder = 25;
+        worldGroup.add(fpMesh);
+        floatingPetals.push({
+          mesh: fpMesh,
+          angle,
+          radius,
+          y,
+          speed: 0.22 + (i % 4) * 0.08,
+          rotSpeedX: 0.6 + (i % 3) * 0.3,
+          rotSpeedZ: 0.5 + (i % 2) * 0.4
+        });
+      }
+
+      // Crystal Burst Shockwave Rings when user taps the rose
+      const burstRings = [];
+      const burstRingGeo = new THREE.RingGeometry(0.22, 0.34, 48);
+      burstRingGeo.rotateX(-Math.PI / 2);
+
+      function spawnCrystalBurstWave() {
+        const pal = THEMES[appState.theme];
+        const mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(pal.coreGold),
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          toneMapped: false
+        });
+        const ring = new THREE.Mesh(burstRingGeo, mat);
+        ring.position.set(0, 0.25, 0);
+        worldGroup.add(ring);
+        burstRings.push({ mesh: ring, age: 0, maxAge: 1.25 });
+      }
+
+      // ==================== 7. 3D SKY BANNER & ORBITING 3D PHOTO FRAMES ====================
+      let skyBannerMesh = null;
+
+      function rebuildSkyBannerTexture() {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 512;
+        const g = c.getContext('2d');
+        g.clearRect(0, 0, c.width, c.height);
+
+        // Soft royal aura behind the crystal dome & 3D floating crown title
+        const rad = g.createRadialGradient(512, 256, 16, 512, 256, 420);
+        rad.addColorStop(0, 'rgba(253, 224, 71, 0.34)');
+        rad.addColorStop(0.45, 'rgba(244, 114, 182, 0.22)');
+        rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = rad;
+        g.fillRect(0, 0, c.width, c.height);
+
+        // Draw 3D floating golden title with >40% vertical padding (y=215 & y=295 out of 512px) so Vietnamese diacritics/descenders never clip
+        const occText = appState.occasionType === '20/10' ? '✨ Chúc Mừng 20/10 ✨' : '✨ Chúc Mừng 8/3 ✨';
+        const recText = `🌹 ${appState.receiver || 'Minh Anh'} 🌹`;
+
+        g.save();
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.shadowColor = 'rgba(255, 42, 133, 0.85)';
+        g.shadowBlur = 18;
+        g.fillStyle = '#fde047';
+        g.font = '700 32px "Plus Jakarta Sans", sans-serif';
+        g.fillText(occText, 512, 210);
+
+        g.fillStyle = '#fffbeb';
+        g.font = '700 52px "Dancing Script", Georgia, cursive';
+        g.fillText(recText, 512, 290);
+        g.restore();
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+
+        if (!skyBannerMesh) {
+          const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            toneMapped: false
+          });
+          skyBannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 2.8), mat);
+          skyBannerMesh.position.set(0, 2.55, -0.8);
+          scene.add(skyBannerMesh);
+        } else {
+          if (skyBannerMesh.material.map) skyBannerMesh.material.map.dispose();
+          skyBannerMesh.material.map = tex;
+          skyBannerMesh.material.needsUpdate = true;
+        }
+      }
+
+      // Orbiting 3D Polaroid Photo Frames (viền vàng kim)
+      const photoOrbitGroup = new THREE.Group();
+      worldGroup.add(photoOrbitGroup);
+      const photoMeshes = [];
+
+      function createDefaultCrystalArtCard(index) {
+        const c = document.createElement('canvas');
+        c.width = 360;
+        c.height = 440;
+        const g = c.getContext('2d');
+
+        // Polaroid gold-trimmed card
+        g.fillStyle = '#fffdf9';
+        g.fillRect(0, 0, 360, 440);
+        g.strokeStyle = '#f59e0b';
+        g.lineWidth = 6;
+        g.strokeRect(6, 6, 348, 428);
+
+        const grad = g.createLinearGradient(20, 20, 340, 340);
+        if (index % 2 === 0) {
+          grad.addColorStop(0, '#3b0722');
+          grad.addColorStop(0.55, '#be185d');
+          grad.addColorStop(1, '#f472b6');
+        } else {
+          grad.addColorStop(0, '#1e1b4b');
+          grad.addColorStop(0.55, '#7e22ce');
+          grad.addColorStop(1, '#fde047');
+        }
+        g.fillStyle = grad;
+        g.fillRect(20, 20, 320, 320);
+
+        // Draw stylized crystal rose emblem inside card
+        g.save();
+        g.translate(180, 180);
+        for (let i = 0; i < 10; i++) {
+          g.rotate((Math.PI * 2) / 10);
+          g.fillStyle = 'rgba(255, 240, 248, 0.72)';
+          g.beginPath();
+          g.ellipse(0, -48, 22, 46, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = '#fde047';
+        g.beginPath();
+        g.arc(0, 0, 22, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+
+        // Generous vertical space at y=390 so Vietnamese diacritics & descenders (g, y, p, q) never clip
+        const captions = ['Đóa Hồng Pha Lê 🌹', 'Kiêu Sa & Rạng Rỡ ✨', 'Hạnh Phúc Vĩnh Cửu 💖', 'Yêu Thương Trọn Vẹn 👑'];
+        g.fillStyle = '#831843';
+        g.font = '700 24px "Dancing Script", Georgia, cursive';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText(captions[index % captions.length], 180, 390);
+        return c;
+      }
+
+      function rebuild3DPhotoFrames() {
+        while (photoOrbitGroup.children.length > 0) {
+          const child = photoOrbitGroup.children.pop();
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (child.material.map) child.material.map.dispose();
+            child.material.dispose();
+          }
+        }
+        photoMeshes.length = 0;
+
+        const hasUserPhotos = appState.photos.length > 0;
+        const count = hasUserPhotos ? Math.min(appState.photos.length, 6) : 4;
+        const orbitR = 2.75;
+
+        for (let idx = 0; idx < count; idx++) {
+          const angle = (idx / count) * Math.PI * 2 + 0.45;
+          const baseY = -0.32 + (idx % 2 === 0 ? 0.22 : -0.22);
+
+          const addFrameMeshFromCanvas = (canvasEl) => {
+            const tex = new THREE.CanvasTexture(canvasEl);
+            tex.encoding = THREE.sRGBEncoding;
+            const mat = new THREE.MeshBasicMaterial({
+              map: tex,
+              side: THREE.DoubleSide,
+              toneMapped: false
+            });
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.64, 0.78), mat);
+            mesh.position.set(Math.cos(angle) * orbitR, baseY, Math.sin(angle) * orbitR);
+            mesh.userData = { orbitAngle: angle, orbitR, baseY, phase: idx * 1.4, index: idx };
+            photoOrbitGroup.add(mesh);
+            mesh.updateMatrixWorld(true);
+            photoMeshes.push(mesh);
+          };
+
+          if (!hasUserPhotos) {
+            addFrameMeshFromCanvas(createDefaultCrystalArtCard(idx));
+          } else {
+            const item = appState.photos[idx];
+            const src = typeof item === 'string' ? item : item.url;
+            if (!src) continue;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              const c = document.createElement('canvas');
+              c.width = 360;
+              c.height = 440;
+              const g = c.getContext('2d');
+              g.fillStyle = '#fffdf9';
+              g.fillRect(0, 0, 360, 440);
+              g.strokeStyle = '#f59e0b';
+              g.lineWidth = 6;
+              g.strokeRect(6, 6, 348, 428);
+
+              const iw = img.width || 300;
+              const ih = img.height || 300;
+              const tw = 320;
+              const th = 320;
+              const sc = Math.max(tw / iw, th / ih);
+              const dw = iw * sc;
+              const dh = ih * sc;
+              g.save();
+              g.beginPath();
+              g.rect(20, 20, tw, th);
+              g.clip();
+              g.drawImage(img, 20 + (tw - dw) / 2, 20 + (th - dh) / 2, dw, dh);
+              g.restore();
+
+              g.fillStyle = '#9d174d';
+              g.font = '700 24px "Dancing Script", Georgia, cursive';
+              g.textAlign = 'center';
+              g.textBaseline = 'middle';
+              g.fillText(`Kỷ niệm #${idx + 1} ✨`, 180, 390);
+              addFrameMeshFromCanvas(c);
+            };
+            img.src = src;
+          }
+        }
+      }
+
+      // Apply Crystal Theme Palette
+      function applyThemePalette(themeKey) {
+        if (!THEMES[themeKey]) themeKey = 'ruby_rose';
+        appState.theme = themeKey;
+        const pal = THEMES[themeKey];
+
+        document.documentElement.style.setProperty('--bg-top', pal.bgTop);
+        document.documentElement.style.setProperty('--bg-mid', pal.bgMid);
+        document.documentElement.style.setProperty('--bg-deep', pal.bgDeep);
+
+        crystalPetalUniforms.uColorDeep.value.set(pal.crystalDeep);
+        crystalPetalUniforms.uColorMid.value.set(pal.crystalMid);
+        crystalPetalUniforms.uColorRim.value.set(pal.crystalRim);
+        crystalPetalUniforms.uCoreGold.value.set(pal.coreGold);
+
+        glassDomeMat.uniforms.uRimColor.value.set(pal.crystalRim);
+        warmKeyLight.color.set(pal.crystalMid);
+        causticsMatA.color.set(pal.causticA);
+        causticsMatB.color.set(pal.causticB);
+        floorCausticsMat.color.set(pal.causticA);
+
+        const colAttr = dustGeo.getAttribute('color');
+        const cA = new THREE.Color(pal.dustA);
+        const cB = new THREE.Color(pal.dustB);
+        for (let i = 0; i < DUST_COUNT; i++) {
+          const c = i % 2 === 0 ? cA : cB;
+          colAttr.array[i * 3] = c.r;
+          colAttr.array[i * 3 + 1] = c.g;
+          colAttr.array[i * 3 + 2] = c.b;
+        }
+        colAttr.needsUpdate = true;
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === themeKey);
+        });
+      }
+
+      // ==================== 8. INTERACTION: ORBIT 360°, RAYCASTER & CRYSTAL BURST ====================
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let isDragging = false;
+      let dragDist = 0;
+      let prevPointer = { x: 0, y: 0 };
+
+      function spawnFloatingWishChip(screenX, screenY) {
+        const layer = document.getElementById('floating-wishes-layer');
+        while (layer.children.length >= 3) {
+          layer.removeChild(layer.firstChild);
+        }
+        const slot = appState.burstTapCount % 3;
+        const offsetX = (slot - 1) * 22;
+        const offsetY = -(slot * 38);
+        const chip = document.createElement('div');
+        chip.className = 'floating-wish-chip';
+        chip.textContent = CRYSTAL_WISH_CHIPS[appState.burstTapCount % CRYSTAL_WISH_CHIPS.length];
+        const safeX = Math.max(95, Math.min(cw - 95, screenX + offsetX));
+        const safeY = Math.max(115, Math.min(ch - 125, screenY + offsetY));
+        chip.style.left = `${safeX}px`;
+        chip.style.top = `${safeY}px`;
+        layer.appendChild(chip);
+        setTimeout(() => {
+          if (chip.parentNode) chip.parentNode.removeChild(chip);
+        }, 2400);
+      }
+
+      let bloomProgress = 0.0;
+      let targetBloomProgress = 1.0;
+      let burstIntensity = 0.0;
+      const BLOOM_DURATION = 6.8; // Seconds from closed crystal bud to full royal bloom
+
+      function triggerCrystalRoseBurst(screenX, screenY) {
+        AudioEngine.autoUnlock();
+        burstIntensity = 1.0;
+        if (bloomProgress < 0.95) {
+          bloomProgress = Math.min(1.0, bloomProgress + 0.24);
+        }
+        spawnCrystalBurstWave();
+        appState.burstTapCount++;
+        spawnFloatingWishChip(screenX || cw * 0.5, screenY || ch * 0.45);
+        AudioEngine.playCrystalShimmer();
+      }
+
+      function restartRoseBloom() {
+        bloomProgress = 0.0;
+        targetBloomProgress = 1.0;
+        burstIntensity = 0.85;
+        spawnCrystalBurstWave();
+        AudioEngine.playCrystalShimmer();
+      }
+
+      webglCanvas.addEventListener('pointerdown', (e) => {
+        AudioEngine.autoUnlock();
+        isDragging = true;
+        dragDist = 0;
+        prevPointer = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevPointer.x;
+        const dy = e.clientY - prevPointer.y;
+        dragDist += Math.hypot(dx, dy);
+        prevPointer = { x: e.clientX, y: e.clientY };
+
+        orbitYaw -= dx * 0.0075;
+        orbitPitch = Math.max(-0.22, Math.min(0.62, orbitPitch + dy * 0.0055));
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (dragDist <= 6) {
+          pointerNDC.x = (e.clientX / cw) * 2 - 1;
+          pointerNDC.y = -(e.clientY / ch) * 2 + 1;
+          raycaster.setFromCamera(pointerNDC, camera);
+
+          // 1. Check if user tapped an orbiting 3D photo frame
+          const photoHits = raycaster.intersectObjects(photoMeshes, false);
+          if (photoHits.length > 0) {
+            openWishViewerModal();
+            return;
+          }
+
+          // 2. Check if user tapped the Crystal Rose or Glass Dome
+          const roseHits = raycaster.intersectObjects([glassDomeMesh, ...roseHeadGroup.children], true);
+          if (roseHits.length > 0) {
+            triggerCrystalRoseBurst(e.clientX, e.clientY);
+          } else {
+            triggerCrystalRoseBurst(e.clientX, e.clientY);
+          }
+        }
+      });
+
+      webglCanvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        orbitRadius = Math.max(baseOrbitRadius * 0.72, Math.min(baseOrbitRadius * 1.32, orbitRadius + e.deltaY * 0.004));
+      }, { passive: false });
+
+      // ==================== 9. BLOOMING CHOREOGRAPHY & RENDER LOOP ====================
+      const clock = new THREE.Clock();
+      let lastStatusStage = -1;
+
+      function updateBloomStatusPill(prog) {
+        let stage = 0;
+        let label = '🌹 Nụ hồng e ấp';
+        if (prog >= 0.80) {
+          stage = 2;
+          label = '👑 Hồng mãn khai ✨';
+        } else if (prog >= 0.25) {
+          stage = 1;
+          label = '✨ Đang hé nở...';
+        }
+        if (stage !== lastStatusStage) {
+          lastStatusStage = stage;
+          const pill = document.getElementById('bloom-status-pill');
+          if (pill) pill.textContent = label;
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const elapsed = clock.elapsedTime;
+
+        // 1. Advance Blooming Choreography (0 -> 1 over ~6.8s)
+        if (bloomProgress < targetBloomProgress) {
+          bloomProgress = Math.min(targetBloomProgress, bloomProgress + dt / BLOOM_DURATION);
+        }
+        burstIntensity = Math.max(0, burstIntensity - dt * 1.4);
+
+        updateBloomStatusPill(bloomProgress);
+
+        crystalPetalUniforms.uTime.value = elapsed;
+        crystalPetalUniforms.uBloom.value = bloomProgress;
+        crystalPetalUniforms.uBurst.value = burstIntensity;
+
+        // 2. Animate each petal layer from tight bud (Phase 1) -> layered unfurling (Phase 2) -> full bloom (Phase 3)
+        for (let i = 0; i < petalPivots.length; i++) {
+          const p = petalPivots[i];
+          const localProg = Math.max(0, Math.min(1, (bloomProgress - p.delay) / (1.0 - p.delay)));
+          // Smooth cubic ease-out unfurl
+          const eased = 1.0 - Math.pow(1.0 - localProg, 3.0);
+          const breath = Math.sin(elapsed * 1.7 + p.swaySeed) * 0.028 * (0.3 + eased * 0.7);
+          const burstOpen = burstIntensity * 0.08;
+
+          p.pivot.rotation.x = p.closedTilt + (p.openTilt - p.closedTilt) * eased + breath + burstOpen;
+          const sc = 0.78 + eased * 0.24;
+          p.petalMesh.scale.setScalar(sc);
+        }
+
+        // Slowly rotate the crystal rose & pulse golden heart
+        roseRootGroup.rotation.y = elapsed * 0.24;
+        const heartPulse = 1.0 + Math.sin(elapsed * 3.2) * 0.12 + burstIntensity * 0.45;
+        coreHaloSprite.scale.setScalar((0.95 + bloomProgress * 0.65) * heartPulse);
+        roseHeartLight.intensity = (1.6 + bloomProgress * 1.8) * heartPulse;
+
+        // 3. Animate Caustics Light Projection on pedestal & floor
+        causticsDiskA.rotation.y = elapsed * 0.38;
+        causticsDiskB.rotation.y = -elapsed * 0.29;
+        const causticScale = 0.65 + bloomProgress * 0.42 + Math.sin(elapsed * 2.2) * 0.04 + burstIntensity * 0.18;
+        causticsDiskA.scale.setScalar(causticScale);
+        causticsDiskB.scale.setScalar(causticScale * 0.92);
+        causticsMatA.opacity = (0.32 + bloomProgress * 0.48 + burstIntensity * 0.2);
+        causticsMatB.opacity = (0.24 + bloomProgress * 0.42 + burstIntensity * 0.2);
+        floorCausticsMesh.rotation.y = elapsed * 0.18;
+        floorCausticsMat.opacity = 0.14 + bloomProgress * 0.22 + burstIntensity * 0.15;
+
+        // 4. Swirl Diamond Dust Particles upward
+        const dPos = dustGeo.getAttribute('position');
+        const speedBoost = 1.0 + bloomProgress * 0.65 + burstIntensity * 2.5;
+        for (let i = 0; i < DUST_COUNT; i++) {
+          dustAngle[i] += dustSpeed[i] * 0.45 * speedBoost * dt;
+          const i3 = i * 3;
+          const r = dustRadius[i] + Math.sin(elapsed * 1.5 + i) * 0.06;
+          dPos.array[i3] = Math.cos(dustAngle[i]) * r;
+          dPos.array[i3 + 1] += dustSpeed[i] * 0.42 * speedBoost * dt;
+          dPos.array[i3 + 2] = Math.sin(dustAngle[i]) * r;
+
+          if (dPos.array[i3 + 1] > 2.35) {
+            dPos.array[i3 + 1] = -1.68;
+          }
+        }
+        dPos.needsUpdate = true;
+
+        // 5. Update Floating 3D Crystal Petals & Burst Shockwave Rings
+        for (let i = 0; i < floatingPetals.length; i++) {
+          const fp = floatingPetals[i];
+          fp.angle += fp.speed * dt * (1.0 + burstIntensity * 1.5);
+          fp.y += fp.speed * 0.45 * dt;
+          if (fp.y > 2.15) fp.y = -1.55;
+          fp.mesh.position.set(
+            Math.cos(fp.angle) * fp.radius,
+            fp.y,
+            Math.sin(fp.angle) * fp.radius
+          );
+          fp.mesh.rotation.x += fp.rotSpeedX * dt;
+          fp.mesh.rotation.z += fp.rotSpeedZ * dt;
+        }
+
+        if (skyBannerMesh) {
+          skyBannerMesh.material.opacity = 0.25 + bloomProgress * 0.72;
+          skyBannerMesh.lookAt(camera.position.x, skyBannerMesh.position.y, camera.position.z);
+        }
+
+        for (let i = burstRings.length - 1; i >= 0; i--) {
+          const br = burstRings[i];
+          br.age += dt;
+          if (br.age >= br.maxAge) {
+            worldGroup.remove(br.mesh);
+            br.mesh.material.dispose();
+            burstRings.splice(i, 1);
+            continue;
+          }
+          const t = br.age / br.maxAge;
+          br.mesh.scale.setScalar(1.0 + t * 8.5);
+          br.mesh.material.opacity = (1.0 - t) * 0.85;
+        }
+
+        // 6. Orbit 3D Polaroid Photo Frames smoothly around the crystal dome (dip lower when passing in front so the Crystal Rose is never occluded)
+        for (let i = 0; i < photoMeshes.length; i++) {
+          const pm = photoMeshes[i];
+          const ud = pm.userData;
+          const curAngle = ud.orbitAngle + elapsed * 0.22;
+          const px = Math.cos(curAngle) * ud.orbitR;
+          const pz = Math.sin(curAngle) * ud.orbitR;
+          // Smoothstep dip when frame is in the front hemisphere towards camera
+          const camDirDot = (px * camera.position.x + pz * camera.position.z) / (ud.orbitR * Math.max(0.001, Math.hypot(camera.position.x, camera.position.z)));
+          const frontT = Math.max(0, Math.min(1, (camDirDot - 0.15) / 0.85));
+          const frontSmooth = frontT * frontT * (3.0 - 2.0 * frontT);
+          const dipY = frontSmooth * 0.82;
+
+          pm.position.x = px;
+          pm.position.z = pz;
+          pm.position.y = ud.baseY + Math.sin(elapsed * 1.6 + ud.phase) * 0.10 - dipY;
+          pm.lookAt(camera.position.x, pm.position.y, camera.position.z);
+        }
+
+        // 7. Update Orbit Camera Position
+        const camX = Math.sin(orbitYaw) * Math.cos(orbitPitch) * orbitRadius;
+        const camY = Math.sin(orbitPitch) * orbitRadius + 0.15;
+        const camZ = Math.cos(orbitYaw) * Math.cos(orbitPitch) * orbitRadius;
+        camera.position.set(camX, camY, camZ);
+        camera.lookAt(0, -0.05, 0);
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 10. UI, CUSTOMIZATION & PAYMENT QR KIT ====================
+      function syncUIAndBanners() {
+        const is2010 = appState.occasionType === '20/10';
+        const badgeOccasion = is2010
+          ? '🌷 Phụ Nữ Việt Nam 20/10'
+          : '🌸 Quốc Tế Phụ Nữ 8/3';
+        const shortOccasion = is2010 ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+
+        document.getElementById('header-occasion-badge').textContent = badgeOccasion;
+        document.getElementById('header-receiver-title').textContent = `Gửi ${appState.receiver || 'Bạn Yêu Thương'} ✨`;
+        document.getElementById('banner-wish').textContent = appState.wish;
+        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${shortOccasion} (Chạm để mở thư & ảnh 💌)`;
+
+        document.querySelectorAll('.occasion-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.occasion === appState.occasionType);
+        });
+
+        rebuildSkyBannerTexture();
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add('open');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+      }
+
+      function openWishViewerModal() {
+        const shortOccasion = appState.occasionType === '20/10'
+          ? 'Chúc mừng Ngày Phụ Nữ Việt Nam 20/10'
+          : 'Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3';
+        document.getElementById('viewer-title').textContent = `💌 Gửi ${appState.receiver}`;
+        document.getElementById('viewer-meta').textContent = `Từ ${appState.sender} • ${shortOccasion}`;
+        document.getElementById('viewer-wish-text').textContent = appState.wish;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p) => {
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          img.alt = 'Ảnh kỷ niệm';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const div = document.createElement('div');
+          div.className = 'photo-thumb';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.textContent = '✕';
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          div.appendChild(img);
+          div.appendChild(del);
+          grid.appendChild(div);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        return {
+          templateId: appState.templateId,
+          templateType: 'women_crystal_rose_3d',
+          emoji: '🌹',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Bông Hồng Thủy Tinh 3D',
+          successTitle: 'Bông Hồng Thủy Tinh 3D Đã Sẵn Sàng!',
+          cardTitle: '🌹 BÔNG HỒNG THỦY TINH 3D ✨',
+          scanLabel: 'Quét QR để Mở Hoa Hồng Pha Lê & Lời Chúc',
+          footerHint: 'Chạm vào bông hồng pha lê để kích nở ánh sáng & xem album 3D',
+          gradientStops: ['#1a051d', '#831843', '#be185d'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: occLabel,
+          message: appState.wish,
+          payload: {
+            occasionType: appState.occasionType,
+            theme: appState.theme,
+            photos: appState.photos
+          }
+        };
+      }
+
+      // Bind DOM Events
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        restartRoseBloom();
+      });
+
+      document.getElementById('bloom-status-pill').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        const nextIdx = (THEME_KEYS.indexOf(appState.theme) + 1) % THEME_KEYS.length;
+        applyThemePalette(THEME_KEYS[nextIdx]);
+        triggerCrystalRoseBurst(cw * 0.5, ch * 0.45);
+      });
+
+      document.getElementById('btn-bloom-burst').addEventListener('click', () => {
+        triggerCrystalRoseBurst(cw * 0.5, ch * 0.45);
+      });
+
+      document.getElementById('wish-banner').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-open-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-wish').value = appState.wish;
+        renderCreatorPhotoThumbs();
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.querySelectorAll('.occasion-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          appState.occasionType = chip.dataset.occasion;
+          document.querySelectorAll('.occasion-chip').forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          applyThemePalette(chip.dataset.theme);
+        });
+      });
+
+      document.querySelectorAll('.preset-wish-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.getElementById('input-wish').value = btn.dataset.preset;
+        });
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        appState.receiver = document.getElementById('input-receiver').value.trim() || 'Minh Anh';
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        restartRoseBloom();
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        updateCameraResponsive();
+      });
+
+      // ==================== 11. INIT & VIEWER HYDRATION (?id=) ====================
+      async function init() {
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            rebuildSkyBannerTexture();
+            rebuild3DPhotoFrames();
+          });
+        }
+        animate();
+
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.occasionType === '20/10' || (o.occasion && o.occasion.includes('20/10'))) {
+                appState.occasionType = '20/10';
+              }
+              if (p.theme && THEMES[p.theme]) {
+                applyThemePalette(p.theme);
+              }
+              if (Array.isArray(p.photos)) {
+                appState.photos = p.photos;
+              }
+              syncUIAndBanners();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

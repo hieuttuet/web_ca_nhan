@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ngàn Lời Chúc • Pháo Hoa Morphing Text 8/3 & 20/10 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <style>
+    :root {
+      --bg-top: #2b0618;
+      --bg-mid: #140414;
+      --bg-deep: #07020a;
+      --glass-bg: rgba(24, 8, 20, 0.72);
+      --glass-border: rgba(244, 114, 182, 0.32);
+      --gold: #fde047;
+      --rose: #f472b6;
+      --text-main: #fff1f5;
+      --text-sub: #fbcfe8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 38%, var(--bg-top) 0%, var(--bg-mid) 48%, var(--bg-deep) 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    #stage-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #trails-canvas,
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #trails-canvas {
+      z-index: 1;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    #webgl-canvas {
+      z-index: 2;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #webgl-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: max(14px, env(safe-area-inset-top));
+      left: 14px;
+      right: 14px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .top-hud-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .hud-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(253, 224, 71, 0.65);
+      background: rgba(44, 12, 34, 0.85);
+    }
+
+    /* ==================== PHASE & WISH BANNER ==================== */
+    .phase-pill {
+      position: fixed;
+      top: max(62px, calc(env(safe-area-inset-top) + 48px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(20, 6, 18, 0.6);
+      border: 1px solid rgba(253, 224, 71, 0.3);
+      backdrop-filter: blur(10px);
+      color: #fde68a;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .wish-banner {
+      position: fixed;
+      left: 50%;
+      bottom: calc(max(18px, env(safe-area-inset-bottom)) + 64px);
+      transform: translateX(-50%) translateY(12px);
+      z-index: 16;
+      width: min(92vw, 520px);
+      padding: 12px 18px;
+      border-radius: 18px;
+      background: rgba(28, 8, 24, 0.76);
+      border: 1px solid rgba(244, 114, 182, 0.42);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .wish-banner.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .wish-banner-receiver {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.45rem;
+      color: #fde047;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .wish-banner-text {
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: #ffe4ef;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .wish-banner-meta {
+      margin-top: 6px;
+      font-size: 0.74rem;
+      color: #f9a8d4;
+      font-weight: 600;
+    }
+
+    /* ==================== BOTTOM DOCK (1 ROW ALWAYS) ==================== */
+    .bottom-dock {
+      position: fixed;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 22;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      max-width: calc(100vw - 20px);
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(22, 7, 19, 0.84);
+      border: 1px solid rgba(244, 114, 182, 0.36);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+    }
+
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff1f5;
+      font-family: inherit;
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .dock-btn.primary {
+      background: linear-gradient(135deg, #db2777 0%, #be185d 50%, #f59e0b 100%);
+      border-color: rgba(253, 224, 71, 0.65);
+      color: #fffbeb;
+      box-shadow: 0 6px 20px rgba(219, 39, 119, 0.45);
+    }
+
+    @media (max-width: 520px) {
+      .hud-btn {
+        height: 34px;
+        padding: 0 11px;
+        font-size: 0.76rem;
+      }
+      .bottom-dock {
+        gap: 6px;
+        padding: 6px 8px;
+      }
+      .dock-btn {
+        height: 36px;
+        padding: 0 11px;
+        font-size: 0.75rem;
+        gap: 4px;
+      }
+      .wish-banner {
+        bottom: calc(max(14px, env(safe-area-inset-bottom)) + 58px);
+        padding: 10px 14px;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(8, 2, 10, 0.82);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 22px;
+      padding: 22px 20px;
+      background: linear-gradient(165deg, rgba(44, 10, 32, 0.98), rgba(16, 4, 14, 0.99));
+      border: 1.5px solid rgba(244, 114, 182, 0.45);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.8);
+      color: #fff1f5;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(244, 114, 182, 0.4);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fbcfe8;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      color: #fde047;
+      margin-bottom: 6px;
+      padding-right: 32px;
+    }
+
+    .modal-sub {
+      font-size: 0.82rem;
+      color: #fbcfe8;
+      opacity: 0.86;
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fde68a;
+      margin-bottom: 5px;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 114, 182, 0.35);
+      background: rgba(12, 3, 10, 0.78);
+      color: #fff1f5;
+      font-family: inherit;
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      border-color: #fde047;
+    }
+
+    .form-textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    .occasion-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .occasion-chip {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 114, 182, 0.35);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fbcfe8;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .occasion-chip.active {
+      background: linear-gradient(135deg, rgba(219, 39, 119, 0.45), rgba(245, 158, 11, 0.35));
+      border-color: #fde047;
+      color: #fffbeb;
+      box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(253, 224, 71, 0.4);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-thumb button {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .upload-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(253, 224, 71, 0.55);
+      background: rgba(253, 224, 71, 0.08);
+      color: #fde68a;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(253, 224, 71, 0.75);
+      background: linear-gradient(135deg, #db2777, #be185d 55%, #f59e0b);
+      color: #fffbeb;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Wish & Album Viewer Modal */
+    .viewer-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .viewer-photos-grid img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(253, 224, 71, 0.4);
+    }
+
+    .viewer-wish-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(12, 3, 10, 0.65);
+      border: 1px solid rgba(244, 114, 182, 0.3);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #fff1f5;
+      white-space: pre-line;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="trails-canvas"></canvas>
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="/index.html" class="hud-btn creator-only" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Âm Thanh</button>
+    </div>
+  </header>
+
+  <div class="phase-pill" id="phase-pill">✨ Chạm bầu trời để bắn pháo hoa • Kéo để xoay 3D</div>
+
+  <!-- Wish Banner (hiện ở Pha 3) -->
+  <section class="wish-banner" id="wish-banner">
+    <div class="wish-banner-receiver" id="banner-receiver">Gửi Minh Anh Yêu Thương</div>
+    <div class="wish-banner-text" id="banner-wish">Chúc em luôn xinh đẹp, giỏi giang, rạng rỡ như những đóa hoa và hạnh phúc mỗi ngày!</div>
+    <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • Chúc mừng 8/3</div>
+  </section>
+
+  <!-- Bottom Dock (1 hàng ngang) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn creator-only" id="btn-customize">✨ Tùy Chỉnh</button>
+    <button type="button" class="dock-btn" id="btn-open-wish">💌 Lời Chúc</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">🎁 Tạo Link & QR</button>
+  </nav>
+
+  <!-- Modal Tùy Chỉnh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">✨ Cá Nhân Hóa Thiệp Pháo Hoa</h2>
+      <p class="modal-sub">Chọn dịp lễ, nhập tên người nhận, lời chúc và tải lên tối đa 6 ảnh kỷ niệm bay quanh pháo hoa 3D.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Dịp Chúc Mừng</label>
+        <div class="occasion-toggle">
+          <button type="button" class="occasion-chip active" data-occasion="8/3" id="chip-83">🌸 Ngày 8/3</button>
+          <button type="button" class="occasion-chip" data-occasion="20/10" id="chip-2010">💐 Ngày 20/10</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="28" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="28" placeholder="VD: Bảo Nam, Con Trai..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Chúc Ngọt Ngào</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="320" placeholder="Nhập lời chúc gửi tới người phụ nữ tuyệt vời..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Album Ảnh Kỷ Niệm (Tối đa 6 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🎆 Áp Dụng & Chạy Pháo Hoa</button>
+    </div>
+  </div>
+
+  <!-- Modal Xem Lời Chúc & Album Ảnh -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Lời Chúc Dành Riêng Cho Bạn</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Chúc mừng 8/3</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. APP STATE ====================
+      const appState = {
+        templateId: 'women_thousand_wishes',
+        occasionType: '8/3',
+        sender: 'Bảo Nam',
+        receiver: 'Minh Anh',
+        wish: 'Chúc em luôn xinh đẹp, giỏi giang, rạng rỡ như những đóa hoa và hạnh phúc mỗi ngày!',
+        photos: [],
+        isViewerMode: false,
+        timelineElapsed: 0,
+        phaseIndex: 0 // 0: explode, 1: Xinh đẹp, 2: Giỏi giang, 3: Hạnh phúc, 4: Chúc mừng 8/3 + Tên
+      };
+
+      const PHRASES = ['Xinh đẹp', 'Giỏi giang', 'Hạnh phúc'];
+
+      // ==================== 2. WEB AUDIO API (LOFI POP + FIREWORK SFX) ====================
+      const AudioEngine = (() => {
+        let ctx = null;
+        let masterGain = null;
+        let isEnabled = false;
+        let stepTimer = null;
+        let stepIdx = 0;
+
+        const CHORDS = [
+          [261.63, 329.63, 392.00, 493.88], // Cmaj7
+          [220.00, 261.63, 329.63, 392.00], // Am7
+          [174.61, 220.00, 261.63, 329.63], // Fmaj7
+          [196.00, 246.94, 293.66, 349.23]  // G6 / G7sus
+        ];
+        const MELODY = [
+          523.25, 659.25, 783.99, 659.25, 587.33, 523.25, 659.25, 783.99,
+          880.00, 783.99, 659.25, 587.33, 523.25, 587.33, 659.25, 523.25
+        ];
+
+        function ensureContext() {
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            ctx = new AudioCtx();
+            masterGain = ctx.createGain();
+            masterGain.gain.value = 0.42;
+            masterGain.connect(ctx.destination);
+          }
+          if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+          }
+          return ctx;
+        }
+
+        function playPadChord(freqs, duration) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1150, now);
+          filter.connect(masterGain);
+
+          freqs.forEach((f) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now);
+
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.055, now + 0.08);
+            g.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(g);
+            g.connect(filter);
+            osc.start(now);
+            osc.stop(now + duration + 0.05);
+          });
+        }
+
+        function playPluck(freq) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.linearRampToValueAtTime(0.085, now + 0.015);
+          g.gain.exponentialRampToValueAtTime(0.0008, now + 0.55);
+
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        }
+
+        function playSoftDrum(type) {
+          if (!ctx || !isEnabled) return;
+          const now = ctx.currentTime;
+          if (type === 'kick') {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(115, now);
+            osc.frequency.exponentialRampToValueAtTime(42, now + 0.14);
+            g.gain.setValueAtTime(0.16, now);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start(now);
+            osc.stop(now + 0.18);
+          } else {
+            const bufSize = Math.floor(ctx.sampleRate * 0.05);
+            const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data = buf.getChannelData(0);
+            for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = type === 'hat' ? 5200 : 1800;
+            const g = ctx.createGain();
+            g.gain.value = type === 'hat' ? 0.03 : 0.06;
+            src.connect(filter);
+            filter.connect(g);
+            g.connect(masterGain);
+            src.start(now);
+          }
+        }
+
+        function tickSequencer() {
+          if (!isEnabled) return;
+          const barStep = stepIdx % 8;
+          if (barStep === 0) {
+            const chord = CHORDS[Math.floor(stepIdx / 8) % CHORDS.length];
+            playPadChord(chord, 2.5);
+          }
+          if (barStep % 2 === 0) {
+            playPluck(MELODY[stepIdx % MELODY.length]);
+          }
+          if (barStep === 0 || barStep === 3) playSoftDrum('kick');
+          if (barStep === 4) playSoftDrum('snare');
+          if (barStep % 2 === 1) playSoftDrum('hat');
+          stepIdx++;
+        }
+
+        function playFireworkLaunch() {
+          if (!isEnabled || !ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(280, now);
+          osc.frequency.exponentialRampToValueAtTime(920, now + 0.32);
+          g.gain.setValueAtTime(0.001, now);
+          g.gain.linearRampToValueAtTime(0.035, now + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0005, now + 0.34);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 0.36);
+        }
+
+        function playFireworkBurst(power = 1) {
+          if (!isEnabled || !ctx) return;
+          const now = ctx.currentTime;
+          const duration = 0.45 * power;
+          const bufSize = Math.floor(ctx.sampleRate * duration);
+          const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < bufSize; i++) {
+            const env = Math.pow(1 - i / bufSize, 1.8);
+            data[i] = (Math.random() * 2 - 1) * env;
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(650, now);
+          filter.Q.value = 0.8;
+
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.14 * power, now);
+          g.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+          src.connect(filter);
+          filter.connect(g);
+          g.connect(masterGain);
+          src.start(now);
+        }
+
+        function setEnabled(next) {
+          isEnabled = next;
+          const btn = document.getElementById('btn-sound');
+          if (isEnabled) {
+            ensureContext();
+            if (!stepTimer) {
+              tickSequencer();
+              stepTimer = setInterval(tickSequencer, 340); // ~88 BPM 8th notes
+            }
+            btn.textContent = '🔊 Âm Thanh';
+          } else {
+            if (stepTimer) {
+              clearInterval(stepTimer);
+              stepTimer = null;
+            }
+            btn.textContent = '🔇 Tắt Tiếng';
+          }
+        }
+
+        function autoUnlock() {
+          if (!isEnabled) setEnabled(true);
+        }
+
+        return {
+          setEnabled,
+          toggle: () => setEnabled(!isEnabled),
+          autoUnlock,
+          playFireworkLaunch,
+          playFireworkBurst,
+          isEnabled: () => isEnabled
+        };
+      })();
+
+      // ==================== 3. DUAL-CANVAS 2D FIREWORKS (TRAILS) ====================
+      const trailsCanvas = document.getElementById('trails-canvas');
+      const trailsCtx = trailsCanvas.getContext('2d');
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const FW_PALETTE = [
+        '#ff6ec7', // rose pink
+        '#fde047', // champagne gold
+        '#f472b6', // pastel rose
+        '#c084fc', // lavender
+        '#fda4af', // soft coral
+        '#38bdf8'  // cool diamond accent
+      ];
+
+      const rockets = [];
+      const sparks2d = [];
+
+      function resizeTrailsCanvas() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        trailsCanvas.width = Math.floor(cw * dpr);
+        trailsCanvas.height = Math.floor(ch * dpr);
+        trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function spawnRocket(targetX, targetY, colorHex, opts = {}) {
+        const safeCw = Number.isFinite(cw) && cw > 0 ? cw : window.innerWidth || 390;
+        const safeCh = Number.isFinite(ch) && ch > 0 ? ch : window.innerHeight || 844;
+        const rawTx = targetX ?? safeCw * (0.18 + Math.random() * 0.64);
+        const rawTy = targetY ?? safeCh * (0.16 + Math.random() * 0.42);
+        const tx = Number.isFinite(rawTx) ? rawTx : safeCw * 0.5;
+        const ty = Number.isFinite(rawTy) ? rawTy : safeCh * 0.48;
+        const rawStartX = opts.startX ?? (Number.isFinite(targetX) ? tx + (Math.random() - 0.5) * 36 : safeCw * (0.2 + Math.random() * 0.6));
+        const startX = Number.isFinite(rawStartX) ? rawStartX : tx;
+        const startY = safeCh + 10;
+        const color = colorHex || FW_PALETTE[Math.floor(Math.random() * FW_PALETTE.length)];
+        const dist = Math.hypot(tx - startX, ty - startY);
+        const duration = opts.duration ?? (0.55 + Math.random() * 0.22);
+        rockets.push({
+          x: startX,
+          y: startY,
+          prevX: startX,
+          prevY: startY,
+          vx: (tx - startX) / duration,
+          vy: (ty - startY) / duration,
+          tx,
+          ty,
+          age: 0,
+          duration,
+          color,
+          dist,
+          burstCount: opts.burstCount ?? 68,
+          onExplode: opts.onExplode || null
+        });
+        AudioEngine.playFireworkLaunch();
+      }
+
+      function explode2D(x, y, color, count = 64) {
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        AudioEngine.playFireworkBurst(count > 75 ? 1.15 : 0.85);
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.25;
+          const speed = 90 + Math.random() * 240;
+          sparks2d.push({
+            x,
+            y,
+            prevX: x,
+            prevY: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 0,
+            maxLife: 0.75 + Math.random() * 0.65,
+            color,
+            size: 1.5 + Math.random() * 2.2
+          });
+        }
+        // Flash core
+        trailsCtx.globalCompositeOperation = 'lighten';
+        const grad = trailsCtx.createRadialGradient(x, y, 0, x, y, 65);
+        grad.addColorStop(0, 'rgba(255, 250, 230, 0.9)');
+        grad.addColorStop(0.35, color + '88');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        trailsCtx.fillStyle = grad;
+        trailsCtx.beginPath();
+        trailsCtx.arc(x, y, 65, 0, Math.PI * 2);
+        trailsCtx.fill();
+      }
+
+      function updateAndDrawTrails(dt) {
+        // Fade trails smoothly
+        trailsCtx.globalCompositeOperation = 'source-over';
+        trailsCtx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.35, 0.175 * (dt * 60))})`;
+        trailsCtx.fillRect(0, 0, cw, ch);
+
+        trailsCtx.globalCompositeOperation = 'lighten';
+
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          const r = rockets[i];
+          r.prevX = r.x;
+          r.prevY = r.y;
+          r.age += dt;
+          r.x += r.vx * dt;
+          r.y += r.vy * dt;
+
+          trailsCtx.strokeStyle = r.color;
+          trailsCtx.lineWidth = 2.6;
+          trailsCtx.beginPath();
+          trailsCtx.moveTo(r.prevX, r.prevY);
+          trailsCtx.lineTo(r.x, r.y);
+          trailsCtx.stroke();
+
+          if (r.age >= r.duration) {
+            rockets.splice(i, 1);
+            try {
+              explode2D(r.tx, r.ty, r.color, r.burstCount);
+              if (typeof r.onExplode === 'function') r.onExplode();
+            } catch (err) {
+              console.error('Firework explode error:', err);
+            }
+          }
+        }
+
+        for (let i = sparks2d.length - 1; i >= 0; i--) {
+          const s = sparks2d[i];
+          s.prevX = s.x;
+          s.prevY = s.y;
+          s.life += dt;
+          if (s.life >= s.maxLife) {
+            sparks2d.splice(i, 1);
+            continue;
+          }
+          s.vx *= Math.pow(0.96, dt * 60);
+          s.vy = s.vy * Math.pow(0.96, dt * 60) + 125 * dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+
+          const alpha = Math.max(0, 1 - s.life / s.maxLife);
+          trailsCtx.strokeStyle = s.color;
+          trailsCtx.globalAlpha = alpha;
+          trailsCtx.lineWidth = s.size;
+          trailsCtx.beginPath();
+          trailsCtx.moveTo(s.prevX, s.prevY);
+          trailsCtx.lineTo(s.x, s.y);
+          trailsCtx.stroke();
+        }
+        trailsCtx.globalAlpha = 1;
+      }
+
+      // ==================== 4. THREE.JS 3D MORPHING TEXT & PHOTO ORBIT ====================
+      const webglCanvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas: webglCanvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, cw / ch, 0.1, 200);
+
+      function updateCameraResponsive() {
+        const aspect = cw / ch;
+        const isMobile = cw < 768 || aspect < 0.8;
+        camera.aspect = aspect;
+        camera.position.z = isMobile ? (aspect < 0.6 ? 42 : 33) : 23;
+        camera.position.y = isMobile ? 0.6 : 0.4;
+        camera.lookAt(0, 0, 0);
+        camera.updateProjectionMatrix();
+        camera.updateMatrixWorld(true);
+        renderer.setSize(cw, ch, false);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      }
+
+      // 3-Point Lighting (chuẩn 3d-visual.md)
+      const ambientLight = new THREE.AmbientLight(0xffd6e7, 0.65);
+      scene.add(ambientLight);
+
+      const warmPointLight = new THREE.PointLight(0xffaa00, 1.8, 90);
+      warmPointLight.position.set(0, 4, 12);
+      scene.add(warmPointLight);
+
+      const coolRimLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+      coolRimLight.position.set(-14, 10, -12);
+      scene.add(coolRimLight);
+
+      const roseAccentLight = new THREE.PointLight(0xff7eb3, 1.2, 70);
+      roseAccentLight.position.set(10, -4, 10);
+      scene.add(roseAccentLight);
+
+      // Procedural Glow Sprite Texture (sRGBEncoding)
+      function createGlowTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        grad.addColorStop(0.28, 'rgba(255, 225, 240, 0.85)');
+        grad.addColorStop(0.65, 'rgba(244, 114, 182, 0.25)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const PARTICLE_COUNT = 4200;
+      const mainGeo = new THREE.BufferGeometry();
+      const positions = new Float32Array(PARTICLE_COUNT * 3);
+      const colors = new Float32Array(PARTICLE_COUNT * 3);
+      const targetColors = new Float32Array(PARTICLE_COUNT * 3);
+      const phases = new Float32Array(PARTICLE_COUNT);
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        phases[i] = Math.random() * Math.PI * 2;
+        positions[i * 3] = (Math.random() - 0.5) * 20;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+        colors[i * 3] = 1;
+        colors[i * 3 + 1] = 0.7;
+        colors[i * 3 + 2] = 0.85;
+      }
+
+      mainGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      mainGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      mainGeo.userData = {};
+
+      const mainMat = new THREE.PointsMaterial({
+        size: 0.42,
+        map: createGlowTexture(),
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+
+      const morphGroup = new THREE.Group();
+      const mainPoints = new THREE.Points(mainGeo, mainMat);
+      morphGroup.add(mainPoints);
+      scene.add(morphGroup);
+
+      // Ambient Starfield / Petals
+      const STAR_COUNT = 420;
+      const starGeo = new THREE.BufferGeometry();
+      const starPos = new Float32Array(STAR_COUNT * 3);
+      const starCol = new Float32Array(STAR_COUNT * 3);
+      for (let i = 0; i < STAR_COUNT; i++) {
+        starPos[i * 3] = (Math.random() - 0.5) * 52;
+        starPos[i * 3 + 1] = (Math.random() - 0.5) * 34;
+        starPos[i * 3 + 2] = (Math.random() - 0.5) * 36 - 6;
+        const c = new THREE.Color().setHSL(0.88 + Math.random() * 0.14, 0.8, 0.72);
+        starCol[i * 3] = c.r;
+        starCol[i * 3 + 1] = c.g;
+        starCol[i * 3 + 2] = c.b;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      starGeo.setAttribute('color', new THREE.BufferAttribute(starCol, 3));
+      const starPoints = new THREE.Points(
+        starGeo,
+        new THREE.PointsMaterial({
+          size: 0.28,
+          map: createGlowTexture(),
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        })
+      );
+      scene.add(starPoints);
+
+      // Offscreen Canvas Text Sampler -> 3D Coordinates
+      function sampleTextToPositions(lines, opts = {}) {
+        const off = document.createElement('canvas');
+        off.width = 1024;
+        off.height = 480;
+        const ctx = off.getContext('2d');
+        ctx.clearRect(0, 0, off.width, off.height);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = '#ffffff';
+
+        const drawCenteredLine = (text, centerY, maxW, maxH, startSize, minSize, fontSpecFn) => {
+          let size = startSize;
+          let metrics;
+          while (size >= minSize) {
+            ctx.font = fontSpecFn(size);
+            metrics = ctx.measureText(text);
+            const asc = metrics.actualBoundingBoxAscent ?? size * 0.78;
+            const desc = metrics.actualBoundingBoxDescent ?? size * 0.25;
+            if (metrics.width <= maxW && (asc + desc) <= maxH) break;
+            size -= 2;
+          }
+          const asc = metrics.actualBoundingBoxAscent ?? size * 0.78;
+          const desc = metrics.actualBoundingBoxDescent ?? size * 0.25;
+          const baselineY = centerY + (asc - desc) / 2;
+          ctx.fillText(text, off.width / 2, baselineY);
+        };
+
+        if (lines.length === 1) {
+          // Leave >= 25% top and >= 25% bottom margin (maxH = 240 out of 480)
+          drawCenteredLine(
+            lines[0],
+            off.height * 0.5,
+            880,
+            240,
+            opts.fontSize || 132,
+            48,
+            (s) => `800 ${s}px "Plus Jakarta Sans", sans-serif`
+          );
+        } else {
+          drawCenteredLine(
+            lines[0],
+            off.height * 0.36,
+            880,
+            125,
+            102,
+            42,
+            (s) => `800 ${s}px "Plus Jakarta Sans", sans-serif`
+          );
+          drawCenteredLine(
+            lines[1],
+            off.height * 0.66,
+            860,
+            120,
+            76,
+            34,
+            (s) => `700 ${s}px "Dancing Script", Georgia, cursive`
+          );
+        }
+
+        const imgData = ctx.getImageData(0, 0, off.width, off.height).data;
+        const pts = [];
+        const step = 3;
+        const worldScale = 22.0 / off.width; // Uniform scale preserves 1:1 glyph proportions
+        for (let y = 0; y < off.height; y += step) {
+          for (let x = 0; x < off.width; x += step) {
+            const alpha = imgData[(y * off.width + x) * 4 + 3];
+            if (alpha > 110) {
+              pts.push({
+                x: (x - off.width / 2) * worldScale,
+                y: (off.height / 2 - y) * worldScale
+              });
+            }
+          }
+        }
+
+        // Fisher-Yates shuffle so particles distribute evenly across all strokes, ascenders & descenders
+        for (let i = pts.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = pts[i];
+          pts[i] = pts[j];
+          pts[j] = tmp;
+        }
+
+        const textParticleCount = Math.floor(PARTICLE_COUNT * 0.90);
+        const out = new Float32Array(PARTICLE_COUNT * 3);
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          if (pts.length > 0 && i < textParticleCount) {
+            const idx = pts.length >= textParticleCount
+              ? Math.floor((i * pts.length) / textParticleCount)
+              : (i % pts.length);
+            const p = pts[idx];
+            out[i * 3] = p.x + (Math.random() - 0.5) * 0.06;
+            out[i * 3 + 1] = p.y + (Math.random() - 0.5) * 0.06;
+            out[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
+          } else {
+            // Ambient halo around the text
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 8.5 + Math.random() * 8;
+            out[i * 3] = Math.cos(angle) * radius;
+            out[i * 3 + 1] = Math.sin(angle) * radius * 0.55;
+            out[i * 3 + 2] = (Math.random() - 0.5) * 5;
+          }
+        }
+        return out;
+      }
+
+      function buildAllMorphTargets() {
+        const explodeArr = new Float32Array(PARTICLE_COUNT * 3);
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 4.5 + Math.random() * 9.5;
+          explodeArr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          explodeArr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.72;
+          explodeArr[i * 3 + 2] = r * Math.cos(phi) * 0.65;
+        }
+        mainGeo.userData.explode = explodeArr;
+        mainGeo.userData.phrase_0 = sampleTextToPositions([PHRASES[0]], { fontSize: 132 });
+        mainGeo.userData.phrase_1 = sampleTextToPositions([PHRASES[1]], { fontSize: 132 });
+        mainGeo.userData.phrase_2 = sampleTextToPositions([PHRASES[2]], { fontSize: 132 });
+
+        const titleLine = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        const recLine = appState.receiver ? `${appState.receiver} ✨` : 'Phái Đẹp Tuyệt Vời ✨';
+        mainGeo.userData.finale = sampleTextToPositions([titleLine, recLine]);
+      }
+
+      function setTargetPalette(mode) {
+        const c1 = new THREE.Color();
+        const c2 = new THREE.Color();
+        if (mode === 1) {
+          c1.set('#ff6ec7'); c2.set('#fde047'); // Xinh đẹp: rose + gold
+        } else if (mode === 2) {
+          c1.set('#fde047'); c2.set('#fb923c'); // Giỏi giang: gold + amber
+        } else if (mode === 3) {
+          c1.set('#c084fc'); c2.set('#f472b6'); // Hạnh phúc: lavender + pink
+        } else if (mode === 4) {
+          c1.set('#fde047'); c2.set('#ff4d94'); // Finale: champagne + vivid rose
+        } else {
+          c1.set('#f472b6'); c2.set('#38bdf8'); // Explode
+        }
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const mix = (Math.sin(i * 0.17) + 1) * 0.5;
+          const col = c1.clone().lerp(c2, mix);
+          targetColors[i * 3] = col.r;
+          targetColors[i * 3 + 1] = col.g;
+          targetColors[i * 3 + 2] = col.b;
+        }
+      }
+
+      // 3D Orbiting Photo Cards (for uploaded album)
+      const photoGroup = new THREE.Group();
+      scene.add(photoGroup);
+      const photoMeshes = [];
+
+      function rebuild3DPhotoFrames() {
+        while (photoGroup.children.length > 0) {
+          const child = photoGroup.children.pop();
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (child.material.map) child.material.map.dispose();
+            child.material.dispose();
+          }
+        }
+        photoMeshes.length = 0;
+
+        appState.photos.forEach((item, idx) => {
+          const src = typeof item === 'string' ? item : item.url;
+          if (!src) return;
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = 360;
+            c.height = 420;
+            const g = c.getContext('2d');
+            g.fillStyle = '#fff5f8';
+            g.fillRect(0, 0, 360, 420);
+
+            // Cover crop
+            const iw = img.width;
+            const ih = img.height;
+            const targetW = 324;
+            const targetH = 324;
+            const scale = Math.max(targetW / iw, targetH / ih);
+            const dw = iw * scale;
+            const dh = ih * scale;
+            g.save();
+            g.beginPath();
+            g.rect(18, 18, targetW, targetH);
+            g.clip();
+            g.drawImage(img, 18 + (targetW - dw) / 2, 18 + (targetH - dh) / 2, dw, dh);
+            g.restore();
+
+            g.fillStyle = '#9d174d';
+            g.font = '700 22px "Dancing Script", cursive';
+            g.textAlign = 'center';
+            g.fillText(`Kỷ niệm #${idx + 1} ✨`, 180, 384);
+
+            const tex = new THREE.CanvasTexture(c);
+            tex.encoding = THREE.sRGBEncoding;
+            const mat = new THREE.MeshBasicMaterial({
+              map: tex,
+              side: THREE.DoubleSide,
+              toneMapped: false
+            });
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 2.68), mat);
+            const angle = (idx / Math.max(1, appState.photos.length)) * Math.PI * 2;
+            mesh.userData = { angle, index: idx };
+            mesh.position.set(Math.cos(angle) * 9.5, Math.sin(angle * 2) * 1.4 - 0.8, Math.sin(angle) * 5.2);
+            photoGroup.add(mesh);
+            photoMeshes.push(mesh);
+          };
+          img.src = src;
+        });
+      }
+
+      // ==================== 5. INTERACTION (ORBIT DRAG vs TAP FIREWORK) ====================
+      let isDragging = false;
+      let dragDist = 0;
+      let prevPointer = { x: 0, y: 0 };
+      let targetRotY = 0;
+      let targetRotX = 0;
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+
+      webglCanvas.addEventListener('pointerdown', (e) => {
+        AudioEngine.autoUnlock();
+        isDragging = true;
+        dragDist = 0;
+        prevPointer = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevPointer.x;
+        const dy = e.clientY - prevPointer.y;
+        dragDist += Math.hypot(dx, dy);
+        prevPointer = { x: e.clientX, y: e.clientY };
+        targetRotY += dx * 0.0055;
+        targetRotX = Math.max(-0.45, Math.min(0.45, targetRotX + dy * 0.004));
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (dragDist <= 6) {
+          // Check if tapped a 3D photo frame
+          pointerNDC.x = (e.clientX / cw) * 2 - 1;
+          pointerNDC.y = -(e.clientY / ch) * 2 + 1;
+          raycaster.setFromCamera(pointerNDC, camera);
+          const hits = raycaster.intersectObjects(photoMeshes, false);
+          if (hits.length > 0) {
+            openWishViewerModal();
+          } else {
+            spawnRocket(e.clientX, e.clientY);
+          }
+        }
+      });
+
+      // ==================== 6. TIMELINE & RENDER LOOP ====================
+      const clock = new THREE.Clock();
+      let currentTargetKey = 'explode';
+      let lastBurstPhase = -1;
+      let finaleSettled = false;
+
+      function getMorphCenter2D() {
+        camera.updateMatrixWorld();
+        const v = new THREE.Vector3(0, 0, 0);
+        v.project(camera);
+        const x = (v.x * 0.5 + 0.5) * cw;
+        const y = (-v.y * 0.5 + 0.5) * ch;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+          return { x: cw * 0.5, y: ch * 0.48 };
+        }
+        return { x, y };
+      }
+
+      function burst3DParticles(spread = 5.2) {
+        const posAttr = mainGeo.getAttribute('position');
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const i3 = i * 3;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 0.6 + Math.random() * spread;
+          posAttr.array[i3] = r * Math.sin(phi) * Math.cos(theta);
+          posAttr.array[i3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.72;
+          posAttr.array[i3 + 2] = r * Math.cos(phi) * 0.55;
+        }
+        posAttr.needsUpdate = true;
+      }
+
+      function launchPhaseRocket(targetKey, phaseMode, colorHex, pillText, isFinale = false) {
+        const center = getMorphCenter2D();
+        const banner = document.getElementById('wish-banner');
+        const pill = document.getElementById('phase-pill');
+        spawnRocket(center.x, center.y, colorHex, {
+          startX: center.x + (Math.random() - 0.5) * 28,
+          duration: 0.52,
+          burstCount: isFinale ? 88 : 74,
+          onExplode: () => {
+            currentTargetKey = targetKey;
+            setTargetPalette(phaseMode);
+            burst3DParticles(isFinale ? 6.0 : 4.8);
+            pill.textContent = pillText;
+            if (isFinale) {
+              banner.classList.add('visible');
+              finaleSettled = true;
+            }
+          }
+        });
+      }
+
+      function updateTimeline(dt) {
+        appState.timelineElapsed += dt;
+        const t = appState.timelineElapsed;
+        const banner = document.getElementById('wish-banner');
+        const pill = document.getElementById('phase-pill');
+
+        let nextPhase = 0;
+        if (t < 3.0) nextPhase = 0;
+        else if (t < 6.8) nextPhase = 1;
+        else if (t < 10.6) nextPhase = 2;
+        else if (t < 14.4) nextPhase = 3;
+        else nextPhase = 4;
+
+        if (nextPhase !== lastBurstPhase) {
+          lastBurstPhase = nextPhase;
+          appState.phaseIndex = nextPhase;
+
+          if (nextPhase === 0) {
+            finaleSettled = false;
+            currentTargetKey = 'explode';
+            setTargetPalette(0);
+            banner.classList.remove('visible');
+            pill.textContent = '🎆 Khai màn pháo hoa rực rỡ...';
+            const center = getMorphCenter2D();
+            spawnRocket(center.x - cw * 0.14, center.y - ch * 0.04, '#ff6ec7');
+            spawnRocket(center.x + cw * 0.14, center.y - ch * 0.06, '#fde047');
+          } else if (nextPhase === 1) {
+            launchPhaseRocket('phrase_0', 1, '#ff6ec7', '✨ Ngàn lời chúc gửi đến bạn: Xinh đẹp');
+          } else if (nextPhase === 2) {
+            launchPhaseRocket('phrase_1', 2, '#fde047', '🌟 Ngàn lời chúc gửi đến bạn: Giỏi giang');
+          } else if (nextPhase === 3) {
+            launchPhaseRocket('phrase_2', 3, '#c084fc', '💖 Ngàn lời chúc gửi đến bạn: Hạnh phúc');
+          } else {
+            launchPhaseRocket('finale', 4, '#ff4d94', '✨ Chạm bầu trời để bắn pháo hoa • Kéo để xoay 3D', true);
+          }
+        }
+
+        // Only allow ambient fireworks in opening phase or after finale has settled
+        if (nextPhase === 0 && Math.random() < dt * 1.6) {
+          spawnRocket();
+        } else if (nextPhase === 4 && finaleSettled && t > 16.5 && Math.random() < dt * 0.42) {
+          spawnRocket();
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const elapsed = clock.elapsedTime;
+
+        updateTimeline(dt);
+        updateAndDrawTrails(dt);
+
+        // Morph 3D particles smoothly
+        const targetArr = mainGeo.userData[currentTargetKey] || mainGeo.userData.explode;
+        const posAttr = mainGeo.getAttribute('position');
+        const colAttr = mainGeo.getAttribute('color');
+        const lerpRate = Math.min(1, dt * (currentTargetKey === 'explode' ? 2.8 : 4.2));
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const i3 = i * 3;
+          const wave = Math.sin(elapsed * 2.2 + phases[i]) * 0.045;
+          posAttr.array[i3] += (targetArr[i3] - posAttr.array[i3]) * lerpRate;
+          posAttr.array[i3 + 1] += (targetArr[i3 + 1] + wave - posAttr.array[i3 + 1]) * lerpRate;
+          posAttr.array[i3 + 2] += (targetArr[i3 + 2] - posAttr.array[i3 + 2]) * lerpRate;
+
+          colAttr.array[i3] += (targetColors[i3] - colAttr.array[i3]) * lerpRate;
+          colAttr.array[i3 + 1] += (targetColors[i3 + 1] - colAttr.array[i3 + 1]) * lerpRate;
+          colAttr.array[i3 + 2] += (targetColors[i3 + 2] - colAttr.array[i3 + 2]) * lerpRate;
+        }
+        posAttr.needsUpdate = true;
+        colAttr.needsUpdate = true;
+
+        // Gentle sway + orbit
+        morphGroup.rotation.y += (targetRotY + Math.sin(elapsed * 0.5) * 0.08 - morphGroup.rotation.y) * Math.min(1, dt * 5);
+        morphGroup.rotation.x += (targetRotX - morphGroup.rotation.x) * Math.min(1, dt * 5);
+
+        starPoints.rotation.y = elapsed * 0.025;
+        photoGroup.visible = appState.phaseIndex >= 4 && photoMeshes.length > 0;
+        if (photoGroup.visible) {
+          photoGroup.rotation.y = elapsed * 0.22;
+          photoMeshes.forEach((m) => {
+            m.lookAt(camera.position);
+          });
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 7. UI & PAYMENT QR KIT INTEGRATION ====================
+      function syncBannerAndLabels() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        document.getElementById('banner-receiver').textContent = `Gửi ${appState.receiver || 'Bạn Yêu Thương'}`;
+        document.getElementById('banner-wish').textContent = appState.wish;
+        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${occLabel}`;
+      }
+
+      function replayShow() {
+        appState.timelineElapsed = 0;
+        lastBurstPhase = -1;
+        finaleSettled = false;
+        rockets.length = 0;
+        sparks2d.length = 0;
+        document.getElementById('wish-banner').classList.remove('visible');
+        targetRotX = 0;
+        targetRotY = 0;
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add('open');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+      }
+
+      function openWishViewerModal() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        document.getElementById('viewer-title').textContent = `💌 Gửi ${appState.receiver}`;
+        document.getElementById('viewer-meta').textContent = `Từ ${appState.sender} • ${occLabel}`;
+        document.getElementById('viewer-wish-text').textContent = appState.wish;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p) => {
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          img.alt = 'Ảnh kỷ niệm';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const div = document.createElement('div');
+          div.className = 'photo-thumb';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.textContent = '✕';
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          div.appendChild(img);
+          div.appendChild(del);
+          grid.appendChild(div);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        return {
+          templateId: appState.templateId,
+          templateType: 'women_thousand_wishes',
+          emoji: '🎆',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Thiệp Pháo Hoa 3D',
+          successTitle: 'Thiệp Pháo Hoa 3D Đã Sẵn Sàng!',
+          cardTitle: '🎆 NGÀN LỜI CHÚC PHÁO HOA 3D ✨',
+          scanLabel: 'Quét QR để Ngắm Pháo Hoa & Lời Chúc',
+          footerHint: 'Chạm để mở thiệp pháo hoa morphing text & album 3D',
+          gradientStops: ['#2b0618', '#9d174d', '#140414'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: occLabel,
+          message: appState.wish,
+          payload: {
+            occasionType: appState.occasionType,
+            photos: appState.photos
+          }
+        };
+      }
+
+      // Bind DOM Events
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        replayShow();
+      });
+      document.getElementById('btn-open-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-wish').value = appState.wish;
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.querySelectorAll('.occasion-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.occasion-chip').forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+          appState.occasionType = chip.dataset.occasion;
+        });
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        appState.receiver = document.getElementById('input-receiver').value.trim() || 'Minh Anh';
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncBannerAndLabels();
+        buildAllMorphTargets();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        replayShow();
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        resizeTrailsCanvas();
+        updateCameraResponsive();
+      });
+
+      // ==================== 8. INIT & VIEWER HYDRATION ====================
+      async function init() {
+        resizeTrailsCanvas();
+        updateCameraResponsive();
+        syncBannerAndLabels();
+        buildAllMorphTargets();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            buildAllMorphTargets();
+          });
+        }
+        setTargetPalette(0);
+        animate();
+
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.occasionType === '20/10' || (o.occasion && o.occasion.includes('20/10'))) {
+                appState.occasionType = '20/10';
+              }
+              if (Array.isArray(p.photos)) {
+                appState.photos = p.photos;
+              }
+              syncBannerAndLabels();
+              buildAllMorphTargets();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

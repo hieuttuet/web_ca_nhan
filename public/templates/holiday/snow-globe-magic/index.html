@@ -641,8 +641,33 @@
   <div class="cabin-backdrop" aria-hidden="true">
     <div class="window-pane">
       <div class="window-moon"></div>
-      <svg class="window-sleigh" viewBox="0 0 220 60" fill="#fef08a">
-        <path d="M18,42 Q32,48 56,42 L68,28 L42,28 L34,18 L24,28 Z M76,34 L125,30 L152,22 L175,24 L196,12 L192,26 L205,20 L194,30 L176,34 L168,46 L162,46 L164,34 L145,35 L138,46 L132,46 L136,35 L82,38 Z" />
+      <svg class="window-sleigh" viewBox="0 0 330 96" style="width:195px; opacity:0.92;">
+        <!-- Green Gift Sack on Sleigh -->
+        <ellipse cx="32" cy="42" rx="12" ry="11" fill="#16a34a" stroke="#fde047" stroke-width="1.5" />
+        <!-- Sleigh Body (Crimson & Gold) -->
+        <path d="M18,56 L28,36 L44,36 L49,47 L72,47 L76,60 Z" fill="#dc2626" stroke="#fbbf24" stroke-width="1.8" />
+        <path d="M14,68 C24,76 66,76 80,65 L84,59 C68,67 28,67 18,59 Z" fill="#fbbf24" />
+        <!-- Santa (Red Suit, Peach Face, White Beard & Hat Trim) -->
+        <circle cx="48" cy="40" r="8" fill="#ef4444" />
+        <circle cx="48" cy="27" r="6.5" fill="#fed7aa" />
+        <path d="M42,29 Q48,37 54,29 Z" fill="#ffffff" />
+        <path d="M41,23 L48,12 L55,23 Z" fill="#ef4444" />
+        <rect x="41" y="21" width="14" height="3.5" rx="1.5" fill="#ffffff" />
+        <circle cx="48" cy="11" r="2.5" fill="#ffffff" />
+        <!-- Golden Harness -->
+        <line x1="74" y1="49" x2="245" y2="44" stroke="#fde047" stroke-width="1.8" opacity="0.85" />
+        <!-- Reindeer 1 (Warm Chestnut Brown) -->
+        <ellipse cx="152" cy="46" rx="17" ry="8.5" fill="#b45309" />
+        <path d="M163,43 L173,27 L183,28 L178,34 L168,46 Z" fill="#b45309" />
+        <path d="M173,27 L170,16 M173,22 L178,18 M176,27 L180,17" stroke="#fde68a" stroke-width="2" stroke-linecap="round" fill="none" />
+        <path d="M141,50 L130,65 M146,51 L142,67 M160,50 L169,65 M163,49 L176,59" stroke="#92400e" stroke-width="2.6" stroke-linecap="round" />
+        <circle cx="183" cy="29" r="2.2" fill="#fde047" />
+        <!-- Reindeer 2 (Lead Rudolph with Glowing Red Nose) -->
+        <ellipse cx="232" cy="41" rx="18" ry="9" fill="#d97706" />
+        <path d="M244,38 L255,21 L266,22 L261,29 L249,42 Z" fill="#d97706" />
+        <path d="M255,21 L252,10 M255,16 L260,12 M258,21 L263,11" stroke="#fde68a" stroke-width="2" stroke-linecap="round" fill="none" />
+        <path d="M220,45 L208,61 M226,46 L222,63 M241,45 L250,60 M244,44 L257,55" stroke="#92400e" stroke-width="2.6" stroke-linecap="round" />
+        <circle cx="266" cy="23" r="3.2" fill="#ef4444" />
       </svg>
     </div>
     <div class="bokeh-light" style="width:240px;height:240px;left:6%;top:18%;background:rgba(245,158,11,0.22);"></div>
@@ -694,7 +719,7 @@
 
   <!-- FLOATING GIFT UNVEIL PROMPT -->
   <button type="button" id="gift-tap-banner" class="gift-tap-banner hidden">
-    🎁 Chạm phong bì / hộp quà phát sáng để mở thư!
+    🎁 Chạm vào hộp quà để mở quà!
   </button>
 
   <!-- BOTTOM DOCK -->
@@ -1206,31 +1231,77 @@
       const trainDarkMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.6 });
       const trainGoldMat = brassMat;
 
-      // Locomotive + 2 Gift Carriages
+      // Sculpted Rounded Locomotive + 2 Cozy Carriages with Wheels
+      const wheelGeo = new THREE.CylinderGeometry(0.052, 0.052, 0.028, 16);
+      wheelGeo.rotateZ(Math.PI / 2);
+      const wheelHubGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.034, 12);
+      wheelHubGeo.rotateZ(Math.PI / 2);
+
+      function attachWheels(carGroup, zOffsets) {
+        zOffsets.forEach((zOff) => {
+          [-0.115, 0.115].forEach((xOff) => {
+            const w = new THREE.Mesh(wheelGeo, trainDarkMat);
+            w.position.set(xOff, -0.04, zOff);
+            carGroup.add(w);
+            const hub = new THREE.Mesh(wheelHubGeo, trainGoldMat);
+            hub.position.set(xOff, -0.04, zOff);
+            carGroup.add(hub);
+          });
+        });
+      }
+
       for (let cIdx = 0; cIdx < 3; cIdx++) {
         const car = new THREE.Group();
         if (cIdx === 0) {
-          // Steam Locomotive
-          car.add(new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.38), trainRedMat));
-          const boiler = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.24, 14), trainDarkMat);
+          // Rounded Steam Locomotive
+          const chassis = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.125, 0.36, 14), trainDarkMat);
+          chassis.rotation.x = Math.PI / 2;
+          chassis.scale.set(1.0, 1.0, 0.45);
+          chassis.position.set(0, 0.02, 0);
+          car.add(chassis);
+
+          const boiler = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.25, 18), trainRedMat);
           boiler.rotation.x = Math.PI / 2;
           boiler.position.set(0, 0.12, 0.05);
           car.add(boiler);
-          const cab = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.20, 0.16), trainRedMat);
-          cab.position.set(0, 0.15, -0.10);
+
+          // Brass boiler rings
+          [0.01, 0.12].forEach((bz) => {
+            const band = new THREE.Mesh(new THREE.TorusGeometry(0.098, 0.012, 8, 20), trainGoldMat);
+            band.position.set(0, 0.12, bz);
+            car.add(band);
+          });
+
+          // Curved cab + rounded roof
+          const cab = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.12, 0.20, 14), trainRedMat);
+          cab.position.set(0, 0.15, -0.11);
           car.add(cab);
-          const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.025, 0.12, 10), trainGoldMat);
-          funnel.position.set(0, 0.24, 0.11);
+          const cabRoof = new THREE.Mesh(new THREE.SphereGeometry(0.125, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5), trainGoldMat);
+          cabRoof.scale.set(1.05, 0.55, 1.05);
+          cabRoof.position.set(0, 0.25, -0.11);
+          car.add(cabRoof);
+
+          const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.026, 0.13, 14), trainGoldMat);
+          funnel.position.set(0, 0.25, 0.12);
           car.add(funnel);
-          const headLight = new THREE.Mesh(new THREE.SphereGeometry(0.036, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
-          headLight.position.set(0, 0.12, 0.19);
+          const headLight = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 10), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
+          headLight.position.set(0, 0.12, 0.185);
           car.add(headLight);
+          attachWheels(car, [-0.11, 0.09]);
         } else {
-          // Gift Carriage
-          car.add(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.11, 0.30), cIdx === 1 ? trainRedMat : new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.45 })));
-          const miniGift = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.14), cIdx === 1 ? trainGoldMat : trainRedMat);
-          miniGift.position.y = 0.11;
+          // Rounded Cozy Gift Carriage
+          const bodyMat = cIdx === 1 ? trainRedMat : new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.42 });
+          const wagon = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.28, 16), bodyMat);
+          wagon.rotation.x = Math.PI / 2;
+          wagon.scale.set(1.05, 1.0, 0.72);
+          wagon.position.y = 0.06;
+          car.add(wagon);
+
+          const miniGift = new THREE.Mesh(new THREE.SphereGeometry(0.078, 12, 12), cIdx === 1 ? trainGoldMat : trainRedMat);
+          miniGift.scale.set(1.1, 0.85, 1.1);
+          miniGift.position.y = 0.15;
           car.add(miniGift);
+          attachWheels(car, [-0.08, 0.08]);
         }
         snowGlobeGroup.add(car);
         trainCars.push(car);
@@ -1792,7 +1863,64 @@
       const pData = [];
       const textTargets = [];
 
+      const globeTextCanvas = document.createElement('canvas');
+      globeTextCanvas.width = 1024;
+      globeTextCanvas.height = 420;
+      const globeTextTex = new THREE.CanvasTexture(globeTextCanvas);
+      globeTextTex.encoding = THREE.sRGBEncoding;
+      const globeTextMat = new THREE.MeshBasicMaterial({
+        map: globeTextTex,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false
+      });
+      const globeTextMesh = new THREE.Mesh(new THREE.PlaneGeometry(3.05, 1.25), globeTextMat);
+      globeTextMesh.position.set(0, 1.06, 0.46);
+      snowGlobeGroup.add(globeTextMesh);
+
+      function renderCrispGlobeTextTexture(text) {
+        const ctx = globeTextCanvas.getContext('2d');
+        ctx.clearRect(0, 0, globeTextCanvas.width, globeTextCanvas.height);
+        const clean = (text || 'Merry Christmas').trim();
+        const words = clean.split(/\s+/);
+        let line1 = clean;
+        let line2 = '';
+        if (clean.length > 14 && words.length >= 3) {
+          const mid = Math.ceil(words.length / 2);
+          line1 = words.slice(0, mid).join(' ');
+          line2 = words.slice(mid).join(' ');
+        }
+
+        const isIce = appState.vibe === 'cyber_ice';
+        const mainColor = isIce ? '#e0f2fe' : '#fef08a';
+        const glowColor = isIce ? '#38bdf8' : '#f59e0b';
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineJoin = 'round';
+
+        const drawCrispLine = (str, y, fontStr) => {
+          ctx.font = fontStr;
+          ctx.shadowColor = glowColor;
+          ctx.shadowBlur = 18;
+          ctx.strokeStyle = 'rgba(20, 6, 6, 0.85)';
+          ctx.lineWidth = 10;
+          ctx.strokeText(str, 512, y);
+          ctx.fillStyle = mainColor;
+          ctx.fillText(str, 512, y);
+        };
+
+        if (line2) {
+          drawCrispLine(line1, 145, '700 66px "Cinzel", Georgia, serif');
+          drawCrispLine(line2, 275, '700 94px "Dancing Script", Georgia, serif');
+        } else {
+          drawCrispLine(line1, 210, '700 84px "Cinzel", Georgia, serif');
+        }
+        globeTextTex.needsUpdate = true;
+      }
+
       function buildTextTargets(text) {
+        renderCrispGlobeTextTexture(text);
         textTargets.length = 0;
         const c = document.createElement('canvas');
         c.width = 768;
@@ -1807,19 +1935,19 @@
         const words = clean.split(/\s+/);
         let line1 = clean;
         let line2 = '';
-        if (clean.length > 16 && words.length >= 3) {
+        if (clean.length > 14 && words.length >= 3) {
           const mid = Math.ceil(words.length / 2);
           line1 = words.slice(0, mid).join(' ');
           line2 = words.slice(mid).join(' ');
         }
 
         if (line2) {
-          ctx.font = 'bold 64px "Dancing Script", Georgia, serif';
-          ctx.fillText(line1, 384, 108);
-          ctx.font = 'bold 74px "Dancing Script", Georgia, serif';
-          ctx.fillText(line2, 384, 212);
+          ctx.font = '700 50px "Cinzel", Georgia, serif';
+          ctx.fillText(line1, 384, 110);
+          ctx.font = 'bold 72px "Dancing Script", Georgia, serif';
+          ctx.fillText(line2, 384, 210);
         } else {
-          ctx.font = 'bold 76px "Dancing Script", Georgia, serif';
+          ctx.font = '700 64px "Cinzel", Georgia, serif';
           ctx.fillText(line1, 384, 160);
         }
 
@@ -1828,9 +1956,9 @@
         for (let y = 0; y < c.height; y += step) {
           for (let x = 0; x < c.width; x += step) {
             if (img[(y * c.width + x) * 4 + 3] > 110) {
-              const wx = ((x / c.width) - 0.5) * 2.85;
-              const wy = (0.5 - (y / c.height)) * 1.12 + 1.06;
-              const wz = (Math.random() - 0.5) * 0.08 + 0.42;
+              const wx = ((x / c.width) - 0.5) * 2.95;
+              const wy = (0.5 - (y / c.height)) * 1.18 + 1.06;
+              const wz = (Math.random() - 0.5) * 0.06 + 0.42;
               if (Math.hypot(wx, wy - 0.05, wz) < 1.92) {
                 textTargets.push(new THREE.Vector3(wx, wy, wz));
               }
@@ -1875,11 +2003,11 @@
       snowGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
       snowGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
       const snowMat = new THREE.PointsMaterial({
-        size: 0.088,
+        size: 0.056,
         map: createSnowSpriteTexture(),
         vertexColors: true,
         transparent: true,
-        opacity: 0.96,
+        opacity: 0.94,
         blending: THREE.AdditiveBlending,
         depthWrite: false
       });
@@ -2064,8 +2192,8 @@
       function updateResponsiveLayout() {
         const aspect = window.innerWidth / window.innerHeight;
         const isMobile = aspect < 0.8;
-        snowGlobeGroup.scale.setScalar(isMobile ? 0.76 : 1.0);
-        snowGlobeGroup.position.y = isMobile ? 0.35 : 0.18;
+        snowGlobeGroup.scale.setScalar(isMobile ? 0.74 : 0.94);
+        snowGlobeGroup.position.y = isMobile ? 0.42 : 0.40;
         roomPropsGroup.visible = !isMobile;
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
@@ -2186,6 +2314,7 @@
           auroraUniforms.uColorB.value.setHex(0xfb7185);
           pondUniforms.uWindowGlow.value.setHex(0xfde047);
         }
+        renderCrispGlobeTextTexture(appState.globeText);
       }
 
       document.getElementById('btn-vibe-cycle').addEventListener('click', () => {
@@ -2290,7 +2419,7 @@
           raycaster.setFromCamera(pointer, camera);
 
           if (giftReady) {
-            const hitGift = raycaster.intersectObjects([giftBody, giftLid], true);
+            const hitGift = raycaster.intersectObjects([giftBoxGroup], true);
             if (hitGift.length > 0) {
               open3DGiftBox();
               return;
@@ -2510,6 +2639,10 @@
         snowGlobeGroup.rotation.z = Math.sin(t * 28) * 0.09 * shakeEnergy;
         snowGlobeGroup.rotation.x = orbitRotX + Math.cos(t * 24) * 0.05 * shakeEnergy;
         snowGlobeGroup.rotation.y = orbitRotY + Math.sin(t * 0.45) * 0.05;
+
+        // Crisp 3D Hologram Text fades in smoothly once particles gather
+        const targetTextOpacity = (globePhase === 'morphing' || globePhase === 'revealed' || globePhase === 'opening_gift') ? 0.96 : 0.0;
+        globeTextMat.opacity += (targetTextOpacity - globeTextMat.opacity) * (globePhase === 'swirl' || globePhase === 'intro' ? 0.18 : 0.06);
 
         // Phase transitions
         if (globePhase === 'swirl' && phaseTimer > 2.3) {

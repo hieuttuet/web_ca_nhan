@@ -210,23 +210,63 @@ const VALENTINE_TEMPLATES = [
 // ============================================================================
 const WOMEN_TEMPLATES = [
   {
-    id: 'women_day_galaxy_3d',
+    id: 'women_crystal_rose_3d',
     category: 'women',
-    salesCount: '890+ đã tạo',
-    title: 'Tinh Vân Hoa Hồng 8/3 & 20/10 3D',
-    subtitle: 'Món quà công nghệ 3D bất ngờ dành tặng Mẹ, Vợ, Người yêu nhân ngày 8/3 và 20/10',
-    badge: '🌸 Quà Phái Đẹp',
-    price: 35000,
-    oldPrice: 59000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #4a044e 0%, #a21caf 55%, #f472b6 100%)',
-    previewEmoji: '🌸',
-    features: ['Tặng Người yêu / Vợ / Mẹ', 'Tải 8 ảnh kỷ niệm', 'Xuất Thiệp QR in ấn'],
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Bông Hồng Thủy Tinh 3D • Nụ Hồng Pha Lê Hé Nở',
+    subtitle: 'Đóa hồng pha lê trong suốt từ từ hé nở từng lớp cánh trong lồng kính hoàng gia, phát sáng caustics lung linh kèm tiếng đàn Piano thanh khiết & khung ảnh kỷ niệm 3D',
+    badge: '🌹 Pha Lê Hoàng Gia',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/women/crystal-rose-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #1a051d 0%, #831843 50%, #f472b6 100%)',
+    previewEmoji: '🌹',
+    features: ['Đóa hồng pha lê 3D hé nở đa tầng', 'Ánh sáng Caustics & Khung ảnh 3D', 'Nhạc Grand Piano Web Audio + Thiệp QR'],
     preset: {
-      occasion: 'Chúc Mừng Ngày Phụ Nữ 8/3 & 20/10',
-      defaultShape: 'galaxy',
-      theme: 'pink',
-      melody: 'canon'
+      occasion: 'Chúc mừng 8/3',
+      occasionType: '8/3',
+      theme: 'ruby_rose'
+    }
+  },
+  {
+    id: 'women_thousand_wishes',
+    category: 'women',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Ngàn Lời Chúc • Pháo Hoa Morphing Text',
+    subtitle: 'Pháo hoa nở bung thành các cụm chữ "Xinh đẹp", "Giỏi giang", "Hạnh phúc" bay lượn rồi hút tụ lại thành "Chúc mừng 8/3" hoặc "20/10" cùng tên người nhận',
+    badge: '🎆 Hot 8/3 & 20/10',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/women/thousand-wishes-fireworks/index.html',
+    previewGradient: 'linear-gradient(135deg, #2b0618 0%, #9d174d 52%, #f472b6 100%)',
+    previewEmoji: '🎆',
+    features: ['Pháo hoa Morphing Text 3D', 'Chọn dịp 8/3 hoặc 20/10 + Album ảnh', 'Nhạc Lofi Pop Web Audio + Thiệp QR'],
+    preset: {
+      occasion: 'Chúc mừng 8/3',
+      occasionType: '8/3',
+      theme: 'rose_gold'
+    }
+  },
+  {
+    id: 'women_glowing_flower_garden',
+    category: 'women',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Vườn Hoa Ánh Sáng 3D • Trăm Hoa Đua Nở',
+    subtitle: 'Cánh đồng cỏ 3D đung đưa trong đêm huyền diệu, làn sóng ánh sáng đánh thức hàng trăm đóa hoa phát sáng bung nở dọc màn hình kèm tiếng chim xuân & giai điệu êm dịu',
+    badge: '🌸 Khu Vườn Phép Thuật',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/women/glowing-flower-garden/index.html',
+    previewGradient: 'linear-gradient(135deg, #07191e 0%, #0f5156 48%, #f472b6 100%)',
+    previewEmoji: '🌷',
+    features: ['Thảm cỏ & Hoa 3D bung nở liên hoàn', 'Chạm gieo hoa sáng & Khung ảnh 3D', 'Tiếng chim xuân + Nhạc dạo Web Audio'],
+    preset: {
+      occasion: 'Chúc mừng 8/3',
+      occasionType: '8/3',
+      theme: 'rose_emerald'
     }
   }
 ];

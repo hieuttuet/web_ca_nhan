@@ -90,9 +90,10 @@ Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng,
 ---
 
 ## 7. Chuẩn Giao Diện HUD & Thanh Toán / QR
-- **HUD Tối Giản (Glassmorphism)**:
-  - Trên cùng: `← Trang chủ` (trái), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh` (phải).
-  - Dưới cùng: `.bottom-dock` giữ các nút chính trên **1 hàng ngang** (`flex-wrap: nowrap`) ngay cả trên điện thoại nhỏ (`<= 520px`).
+- **HUD Tối Giản & Chống Trùng Lặp (Glassmorphism)**:
+  - Trên cùng: `← Trang chủ` (trái), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh` (phải). **Không** thêm pill/banner lặp lại `"Dành tặng [Tên]"` ở phía trên nếu Tên người nhận & Danh hiệu đã khắc nổi trong không gian 3D.
+  - Dưới cùng: `.bottom-dock` giữ các nút chính trên **1 hàng ngang** (`flex-wrap: nowrap`) ngay cả trên điện thoại nhỏ (`<= 520px`), gồm: `💌 Tâm Thư` (mở modal đọc trọn vẹn lời chúc), `🎨 Tùy Chỉnh` và **duy nhất 1 nút `✨ Tạo Link & QR`** (không đặt thêm thanh `#cro-hook-bar` hay nút `Tạo Link & QR` thứ hai).
+  - **Không** đặt hộp văn bản Tâm thư (`#wish-banner`) dài nhiều dòng đè lên vật thể/bảng tên 3D; toàn bộ nội dung tâm thư hiển thị sạch sẽ trong Modal khi bấm nút `💌 Tâm Thư`.
   - Khi mở kết quả 3D (ví dụ: thẻ quẻ, vật phẩm quay), không dùng nền tối che mất 3D; tách 2 bên trên desktop (3D trái – thẻ thông tin phải) hoặc trên/dưới trên mobile.
 - **Luồng Tạo Link & Thiệp QR chuẩn**:
   - Gửi đơn qua `/api/create-order`, kiểm tra qua `/api/check-order`, lưu đơn chờ vào `localStorage`/`sessionStorage`, tải ảnh QR qua `/api/download-qr` + raster PNG, và xuất **Thiệp QR Canvas (`600x780`)** sau khi thanh toán thành công.
@@ -102,10 +103,10 @@ Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng,
 ## 8. Chuẩn Cá Nhân Hóa 3D Sâu, Kịch Bản "Wow" & Tối Ưu Chuyển Đổi (CRO)
 Mỗi template không được dừng ở mức "cảnh 3D tĩnh/lặp lại như screensaver", mà phải mang lại cảm giác **"món quà độc bản được chế tác riêng cho đúng 1 người"** để thôi thúc người xem bấm **Tạo Link & QR**:
 
-1. **Kịch bản Trải nghiệm & Cao trào "Wow" tùy biến sáng tạo theo Sự kiện / Template**:
-   - Không áp đặt một công thức cố định cho mọi mẫu; thiết kế **mạch cảm xúc và cơ chế tương tác riêng biệt** phù hợp với từng dịp lễ và chủ đề 3D:
-     - *Ví dụ*: Pháo hoa bắn lên nổ tung rồi morphing thành tên người nhận; chạm thắp sáng chuỗi hoa dẫn lối tới khung ảnh kỷ niệm; giải phong ấn lồng kính pha lê để hoa nở rộ và bung dải ngân hà ảnh; lắc quả cầu tuyết; gieo quẻ/mở hộp nhạc; ghép các mảnh ký ức 3D...
-   - Luôn có **Ít nhất 1 khoảnh khắc Biến Hình / Cao trào Thị giác (Climax / Plot Twist)** kết hợp chuyển động camera điện ảnh (Cinematic Fly-in / Orbit Reveal) + âm thanh cao trào khiến người nhận vỡ òa.
+1. **Kịch bản Trải nghiệm Đa Bước (Multi-Step Interactive Story) & Cao trào "Wow"**:
+   - Không dồn toàn bộ nội dung ra hết chỉ sau 1 lần chạm, và không áp đặt một công thức cố định; mỗi template phải là **một câu chuyện có mở đầu – dẫn dắt qua nhiều thao tác/nhiều bước – cao trào kết thúc** phù hợp với từng dịp lễ và chủ đề 3D:
+     - *Ví dụ*: **Vén màn lụa từng bước** hé lộ lần lượt từng khung hình kỷ niệm, đến màn cuối tấm màn hóa thành **mảnh dải lụa ánh sáng uốn lượn tạo chữ** trên màn hình; pháo hoa dẫn dắt qua từng chương chữ rồi nổ đại lễ khắc tên người nhận; thắp sáng từng cụm hoa dẫn lối tới đài hoa trung tâm; giải từng lớp phong ấn lồng kính để hoa hé nở từng tầng...
+   - Luôn có **Ít nhất 1 khoảnh khắc Biến Hình / Cao trào Thị giác (Climax / Plot Twist)** ở chương cuối kết hợp chuyển động camera điện ảnh (Cinematic Fly-in / Orbit Reveal) + âm thanh cao trào khiến người nhận vỡ òa.
 
 2. **Đưa Dữ liệu Cá nhân hóa vào thẳng Trung tâm Cảnh 3D (Deep 3D Personalization)**:
    - **Tên người nhận & Danh hiệu trong không gian 3D**: Không chỉ hiện ở thẻ HTML overlay; phải xuất hiện trực tiếp trong cảnh 3D (khắc nổi ánh kim trên bảng tên/bệ pha lê 3D, kết từ hạt ánh sáng 3D trên bầu trời, hoặc dải ruy-băng/hào quang 3D gắn với chủ thể).
@@ -113,9 +114,9 @@ Mỗi template không được dừng ở mức "cảnh 3D tĩnh/lặp lại nh�
      - Các khung ảnh 3D (`PlaneGeometry` / Polaroid / Khung Pha Lê) phải có kích thước rõ nét, bố trí nổi bật quanh chủ thể hoặc bay ra ở khoảnh khắc cao trào (không để quá nhỏ hay trôi khuất ở rìa xa).
      - **Tương tác Chạm vào Ảnh 3D (`Raycaster`)**: Chạm vào bất kỳ khung ảnh 3D nào sẽ đưa bức ảnh đó ra tiêu điểm (zoom camera hoặc mở chế độ ngắm cận cảnh kèm dòng lời nhắn/ký ức gắn với bức ảnh).
    - **Bộ Preset Cá nhân hóa 1-chạm theo Đối tượng nhận**:
-     - Cung cấp các nút chọn nhanh đối tượng phù hợp với dịp lễ (ví dụ dịp 8/3 & 20/10: `👵 Tặng Mẹ`, `💍 Tặng Vợ`, `💕 Tặng Người Yêu / Crush`, `🌸 Tặng Cô Giáo / Chị Em`; dịp Sinh nhật / Tết / Giáng sinh tương ứng).
-     - Khi bấm chọn, tự động đổi ngay **Danh hiệu 3D**, **Lời chúc mẫu sâu sắc**, **Bảng màu ánh sáng** và **Âm hưởng nhạc nền** ngay trên màn hình Preview.
+     - Cung cấp các nút chọn nhanh đối tượng phù hợp với dịp lễ (ví dụ dịp 8/3 & 20/10 chỉ giữ đúng 4 preset gọn: `👵 Mẹ`, `💍 Vợ`, `💕 Người Yêu`, `🌸 Bạn Bè`; dịp Sinh nhật / Tết / Giáng sinh tương ứng).
+     - Khi bấm chọn, tự động đổi ngay **Danh hiệu 3D**, **Lời chúc mẫu ngọt ngào**, **Bảng màu ánh sáng** và **Âm hưởng nhạc nền** ngay trên màn hình Preview.
 
-3. **Mồi Chuyển Đổi Mua Hàng (Conversion Hook & Live Preview)**:
+3. **Mồi Chuyển Đổi Mua Hàng (Live Climax Preview — Không Lặp Nút CTA)**:
    - Khi người dùng nhập thử Tên người nhận + tải ảnh trong modal **Tùy Chỉnh** và bấm **Áp dụng & Xem thử**, tự động tái hiện ngay khoảnh khắc cao trào 3D với đúng tên và ảnh vừa nhập.
-   - Ở đỉnh cao cảm xúc (khi tên & ảnh người nhận tỏa sáng rực rỡ nhất), hiển thị gợi ý chuyển đổi tinh tế hướng người dùng tới nút **✨ Tạo Link & QR** (ví dụ: *"✨ Món quà dành riêng cho [Tên] đã sẵn sàng — Tạo Link & Mã QR gửi tặng ngay!"*).
+   - Ở đỉnh cao cảm xúc (khi tên & ảnh người nhận tỏa sáng rực rỡ nhất), chỉ tạo hiệu ứng phát sáng/nhấn nhẹ (glow/pulse) ngay trên **nút `✨ Tạo Link & QR` duy nhất ở `.bottom-dock`** — tuyệt đối **không** sinh thêm thanh banner hay nút `Tạo Link & QR` thứ hai đè lên cảnh 3D.

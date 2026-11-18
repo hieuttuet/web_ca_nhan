@@ -154,7 +154,7 @@
       background: rgba(12, 40, 48, 0.9);
     }
 
-    /* ==================== TOP STACK: GARDEN HEADER + QUICK PRESETS (NO OVERLAP, NO CLIPPING) ==================== */
+    /* ==================== TOP STACK: QUICK PRESETS (NO OVERLAP, NO CLIPPING) ==================== */
     .top-center-stack {
       position: fixed;
       top: max(50px, calc(env(safe-area-inset-top) + 42px));
@@ -168,35 +168,6 @@
       align-items: center;
       gap: 6px;
       pointer-events: none;
-    }
-
-    .garden-header {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      max-width: 100%;
-      padding: 4px 14px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(6, 26, 32, 0.78) 0%, rgba(4, 16, 22, 0.66) 100%);
-      border: 1px solid rgba(110, 231, 183, 0.34);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      text-align: center;
-      pointer-events: none;
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
-    }
-
-    .garden-occasion-badge {
-      display: inline-block;
-      color: #fde047;
-      font-size: 0.76rem;
-      font-weight: 700;
-      line-height: 1.45;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: calc(100vw - 56px);
     }
 
     /* ==================== QUICK 1-TAP RECIPIENT PRESET BAR ==================== */
@@ -248,137 +219,6 @@
       border-color: #fde047;
       color: #fffbeb;
       box-shadow: 0 4px 14px rgba(244, 114, 182, 0.4);
-    }
-
-    /* ==================== BOTTOM STACK: CRO HOOK BAR + WISH BANNER (NO OVERLAP) ==================== */
-    .bottom-center-stack {
-      position: fixed;
-      left: 50%;
-      bottom: calc(max(10px, env(safe-area-inset-bottom)) + 54px);
-      transform: translateX(-50%);
-      z-index: 22;
-      width: calc(100vw - 20px);
-      max-width: 540px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      pointer-events: none;
-    }
-
-    .cro-hook-bar {
-      width: 100%;
-      padding: 7px 12px;
-      border-radius: 15px;
-      background: linear-gradient(135deg, rgba(12, 42, 48, 0.95) 0%, rgba(76, 17, 48, 0.95) 100%);
-      border: 1.5px solid rgba(253, 224, 71, 0.82);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.62), 0 0 22px rgba(244, 114, 182, 0.35);
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      pointer-events: auto;
-    }
-
-    .cro-hook-bar.visible {
-      display: flex;
-    }
-
-    .cro-hook-text {
-      flex: 1;
-      min-width: 0;
-      font-size: 0.75rem;
-      font-weight: 700;
-      line-height: 1.45;
-      color: #fffbeb;
-      text-align: left;
-      padding: 2px 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .cro-hook-text strong {
-      color: #fde047;
-    }
-
-    .cro-hook-cta {
-      flex-shrink: 0;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #fef08a;
-      background: linear-gradient(135deg, #f59e0b 0%, #db2777 100%);
-      color: #fffbeb;
-      font-family: inherit;
-      font-size: 0.73rem;
-      font-weight: 800;
-      line-height: 1.4;
-      white-space: nowrap;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
-      animation: croPulse 2s infinite ease-in-out;
-    }
-
-    @keyframes croPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.04); }
-    }
-
-    .cro-hook-close {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(0, 0, 0, 0.35);
-      color: #fde68a;
-      font-size: 0.72rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ==================== WISH BANNER ==================== */
-    .wish-banner {
-      width: 100%;
-      padding: 8px 14px 10px;
-      border-radius: 16px;
-      background: rgba(7, 25, 31, 0.85);
-      border: 1px solid rgba(244, 114, 182, 0.44);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      text-align: center;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
-      pointer-events: auto;
-      cursor: pointer;
-      transition: transform 0.25s ease, border-color 0.25s ease;
-    }
-
-    .wish-banner:hover {
-      transform: translateY(-2px);
-      border-color: rgba(253, 224, 71, 0.68);
-    }
-
-    .wish-banner-text {
-      font-size: 0.82rem;
-      line-height: 1.52;
-      padding: 2px 2px 3px;
-      color: #fff1f5;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .wish-banner-meta {
-      margin-top: 3px;
-      padding-top: 2px;
-      font-size: 0.73rem;
-      line-height: 1.45;
-      color: #fde047;
-      font-weight: 700;
     }
 
     /* ==================== BOTTOM DOCK (1 ROW ALWAYS) ==================== */
@@ -434,6 +274,21 @@
       border-color: rgba(253, 224, 71, 0.76);
       color: #fffbeb;
       box-shadow: 0 6px 20px rgba(219, 39, 119, 0.45);
+    }
+
+    .dock-btn.primary.climax-glow {
+      animation: payClimaxGlow 2.2s infinite ease-in-out;
+    }
+
+    @keyframes payClimaxGlow {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 6px 20px rgba(219, 39, 119, 0.45), 0 0 0 0 rgba(253, 224, 71, 0);
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 8px 26px rgba(245, 158, 11, 0.68), 0 0 18px 2px rgba(253, 224, 71, 0.55);
+      }
     }
 
     /* ==================== 3D PHOTO SPOTLIGHT OVERLAY (NON-BLACKOUT) ==================== */
@@ -576,12 +431,6 @@
         width: calc(100vw - 14px);
         gap: 4px;
       }
-      .garden-header {
-        padding: 4px 11px;
-      }
-      .garden-occasion-badge {
-        font-size: 0.69rem;
-      }
       .quick-preset-bar {
         padding: 4px 5px;
         gap: 3px;
@@ -590,31 +439,6 @@
         padding: 4px 4px;
         font-size: 0.64rem;
         gap: 2px;
-      }
-      .bottom-center-stack {
-        bottom: calc(max(8px, env(safe-area-inset-bottom)) + 48px);
-        width: calc(100vw - 14px);
-        gap: 5px;
-      }
-      .cro-hook-bar {
-        padding: 6px 9px;
-        gap: 6px;
-      }
-      .cro-hook-text {
-        font-size: 0.67rem;
-      }
-      .cro-hook-cta {
-        padding: 5px 9px;
-        font-size: 0.66rem;
-      }
-      .wish-banner {
-        padding: 7px 10px 8px;
-      }
-      .wish-banner-text {
-        font-size: 0.74rem;
-      }
-      .wish-banner-meta {
-        font-size: 0.67rem;
       }
       .bottom-dock {
         gap: 4px;
@@ -905,12 +729,8 @@
     </div>
   </header>
 
-  <!-- Top Center Stack: Compact Garden Pill + Quick 1-Tap Recipient Presets Bar -->
+  <!-- Top Center Stack: Quick 1-Tap Recipient Presets Bar -->
   <div class="top-center-stack">
-    <div class="garden-header" id="garden-header">
-      <span class="garden-occasion-badge" id="header-occasion-badge">🌸 8/3 • Dành tặng Minh Anh</span>
-    </div>
-
     <nav class="quick-preset-bar creator-only" id="quick-preset-bar" aria-label="Chọn nhanh đối tượng nhận quà">
       <button type="button" class="quick-preset-btn" data-recipient-preset="mother">👵 Mẹ</button>
       <button type="button" class="quick-preset-btn" data-recipient-preset="wife">💍 Vợ</button>
@@ -919,26 +739,10 @@
     </nav>
   </div>
 
-  <!-- Bottom Center Stack: Floating CRO Hook Bar + Wish Banner -->
-  <div class="bottom-center-stack">
-    <aside class="cro-hook-bar creator-only" id="cro-hook-bar">
-      <div class="cro-hook-text" id="cro-hook-text">
-        ✨ Quà cho <strong id="cro-hook-name">Minh Anh</strong> đã sẵn sàng
-      </div>
-      <button type="button" class="cro-hook-cta" id="btn-cro-pay">Tạo Link & QR</button>
-      <button type="button" class="cro-hook-close" id="btn-cro-close" aria-label="Thu gọn">✕</button>
-    </aside>
-
-    <section class="wish-banner" id="wish-banner" title="Chạm để đọc trọn vẹn tâm thư & xem ảnh kỷ niệm">
-      <div class="wish-banner-text" id="banner-wish">Chúc cô gái anh thương luôn xinh đẹp, rạng rỡ và bình yên mỗi ngày. Cảm ơn em đã đến, làm thế giới của anh trở nên dịu dàng và rực rỡ hơn rất nhiều!</div>
-      <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • 8/3 • Chạm xem thư 💌</div>
-    </section>
-  </div>
-
   <!-- Bottom Dock (1 hàng ngang trên mọi màn hình) -->
   <nav class="bottom-dock">
-    <button type="button" class="dock-btn" id="btn-open-wish">💌 Thư & Ảnh</button>
-    <button type="button" class="dock-btn creator-only" id="btn-customize">✏️ Tùy Chỉnh</button>
+    <button type="button" class="dock-btn" id="btn-open-wish">💌 Tâm Thư</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">🎨 Tùy Chỉnh</button>
     <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
   </nav>
 
@@ -1193,8 +997,7 @@
         photos: [],
         isViewerMode: false,
         plantedCount: 0,
-        activeSpotlightIdx: -1,
-        croDismissed: false
+        activeSpotlightIdx: -1
       };
 
       // ==================== 2. WEB AUDIO API (SPRING HARP MELODY + AWAKENING FANFARE + BIRDS) ====================
@@ -2547,25 +2350,26 @@
       let cinematicGlideProgress = 0;
       let climaxReachedInCycle = false;
 
-      function showCroHookBar() {
-        if (appState.isViewerMode || appState.croDismissed) return;
-        const bar = document.getElementById('cro-hook-bar');
-        const nameEl = document.getElementById('cro-hook-name');
-        if (nameEl) {
-          nameEl.textContent = appState.receiver || 'Người Thương';
-        }
-        if (bar) {
-          bar.classList.add('visible');
+      function triggerPayClimaxGlow() {
+        if (appState.isViewerMode) return;
+        const payBtn = document.getElementById('btn-pay');
+        if (payBtn) {
+          payBtn.classList.add('climax-glow');
         }
       }
 
-      function restartBloomWave(triggerCroImmediately = false) {
+      function restartBloomWave(triggerClimaxImmediately = false) {
         waveCycleElapsed = 0;
         waveCycleCount++;
         cinematicGlideProgress = 0;
         climaxReachedInCycle = false;
         camYawOffset = 0;
         camPitchOffset = 0;
+
+        const payBtn = document.getElementById('btn-pay');
+        if (payBtn && !triggerClimaxImmediately) {
+          payBtn.classList.remove('climax-glow');
+        }
 
         flowers.forEach((f) => {
           f.bloom = 0.08;
@@ -2577,9 +2381,8 @@
         emitPollenBurst(0, sanctuaryBaseY + 2.0, SANCTUARY_Z, 28);
         AudioEngine.playAwakeningFanfare();
 
-        if (triggerCroImmediately) {
-          appState.croDismissed = false;
-          showCroHookBar();
+        if (triggerClimaxImmediately) {
+          triggerPayClimaxGlow();
         }
       }
 
@@ -2614,7 +2417,7 @@
         if (!climaxReachedInCycle && currentWaveZ <= SANCTUARY_Z) {
           climaxReachedInCycle = true;
           emitPollenBurst(0, sanctuaryBaseY + 2.2, SANCTUARY_Z, 36);
-          showCroHookBar();
+          triggerPayClimaxGlow();
         }
 
         warmWaveLight.position.set(Math.sin(elapsed * 0.8) * 2.5, 2.6, currentWaveZ);
@@ -2740,23 +2543,6 @@
 
       // ==================== 10. UI, 1-TAP RECIPIENT PRESETS & PAYMENT QR KIT ====================
       function syncUIAndBanners() {
-        const is2010 = appState.occasionType === '20/10';
-        const occIcon = is2010 ? '💐' : '🌸';
-        const occDate = is2010 ? '20/10' : '8/3';
-        const receiverLabel = appState.receiver || 'Bạn Yêu Thương';
-
-        const headerBadge = document.getElementById('header-occasion-badge');
-        if (headerBadge) {
-          headerBadge.textContent = `${occIcon} ${occDate} • Dành tặng ${receiverLabel}`;
-        }
-        document.getElementById('banner-wish').textContent = appState.wish;
-        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${occDate} • Chạm xem thư 💌`;
-
-        const croName = document.getElementById('cro-hook-name');
-        if (croName) {
-          croName.textContent = receiverLabel;
-        }
-
         document.querySelectorAll('.occasion-chip').forEach((chip) => {
           chip.classList.toggle('active', chip.dataset.occasion === appState.occasionType);
         });
@@ -2913,16 +2699,6 @@
         openWishViewerModal();
       });
 
-      // Bind CRO Hook Controls
-      document.getElementById('btn-cro-pay').addEventListener('click', () => {
-        document.getElementById('btn-pay').click();
-      });
-      document.getElementById('btn-cro-close').addEventListener('click', () => {
-        appState.croDismissed = true;
-        document.getElementById('cro-hook-bar').classList.remove('visible');
-      });
-
-      document.getElementById('wish-banner').addEventListener('click', openWishViewerModal);
       document.getElementById('btn-open-wish').addEventListener('click', openWishViewerModal);
       document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
 

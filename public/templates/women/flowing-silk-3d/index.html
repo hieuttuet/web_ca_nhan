@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dải Lụa Bay 3D • Vén Màn Kỷ Niệm 8/3 & 20/10 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <style>
+    :root {
+      --bg-top: #24071c;
+      --bg-mid: #110410;
+      --bg-deep: #060208;
+      --glass-bg: rgba(28, 7, 24, 0.78);
+      --glass-border: rgba(244, 114, 182, 0.42);
+      --accent-primary: #ec4899;
+      --accent-secondary: #fde047;
+      --accent-soft: #fbcfe8;
+      --text-main: #fff1f5;
+      --text-sub: #fbcfe8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 32%, var(--bg-top) 0%, var(--bg-mid) 55%, var(--bg-deep) 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    #stage-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 2;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #webgl-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* ==================== TOP HUD ==================== */
+    .top-hud {
+      position: fixed;
+      top: max(10px, env(safe-area-inset-top));
+      left: 10px;
+      right: 10px;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .top-hud-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.45;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .hud-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(253, 224, 71, 0.72);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ==================== 4 PRESETS HEADER ==================== */
+    .silk-header {
+      position: fixed;
+      top: calc(max(10px, env(safe-area-inset-top)) + 44px);
+      left: 10px;
+      right: 10px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      pointer-events: none;
+    }
+
+    .quick-presets-bar {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .recipient-preset-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(24, 6, 22, 0.76);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text-sub);
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .recipient-preset-btn:hover {
+      border-color: rgba(253, 224, 71, 0.65);
+      color: #fff;
+    }
+
+    .recipient-preset-btn.active {
+      background: linear-gradient(135deg, var(--accent-primary), #be185d);
+      border-color: rgba(253, 224, 71, 0.85);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(236, 72, 153, 0.45);
+    }
+
+    /* ==================== SWIPE HINT PILL ==================== */
+    .swipe-hint-pill {
+      position: fixed;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, -50%);
+      z-index: 18;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(24, 6, 22, 0.84);
+      border: 1px solid rgba(253, 224, 71, 0.75);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 24px rgba(236, 72, 153, 0.45);
+      color: #fffbeb;
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.5;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      animation: silkHintPulse 2.2s ease-in-out infinite;
+    }
+
+    .swipe-hint-pill.hidden-hint {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -44%) scale(0.92);
+    }
+
+    .swipe-hint-pill.step-mode {
+      top: auto;
+      bottom: calc(max(10px, env(safe-area-inset-bottom)) + 56px);
+      transform: translateX(-50%);
+      animation: silkHintStepPulse 2.2s ease-in-out infinite;
+    }
+
+    .swipe-hint-pill.step-mode.hidden-hint {
+      transform: translateX(-50%) translateY(8px) scale(0.92);
+    }
+
+    @keyframes silkHintPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -54%) scale(1.04); }
+    }
+
+    @keyframes silkHintStepPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.03); }
+    }
+
+    /* ==================== STORY CAPTION PILL ==================== */
+    .story-caption-pill {
+      position: fixed;
+      left: 50%;
+      bottom: calc(max(10px, env(safe-area-inset-bottom)) + 106px);
+      transform: translateX(-50%);
+      z-index: 18;
+      max-width: min(460px, calc(100vw - 24px));
+      padding: 8px 16px;
+      border-radius: 16px;
+      background: rgba(24, 6, 22, 0.84);
+      border: 1px solid rgba(253, 224, 71, 0.55);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff1f5;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.45;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .story-caption-pill .caption-step-tag {
+      color: #fde047;
+      font-weight: 800;
+      margin-right: 4px;
+    }
+
+    .story-caption-pill.hidden-caption {
+      opacity: 0;
+      transform: translateX(-50%) translateY(8px);
+    }
+
+    /* ==================== BOTTOM DOCK ==================== */
+    .bottom-dock {
+      position: fixed;
+      left: 50%;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      width: max-content;
+      max-width: calc(100vw - 20px);
+    }
+
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.4;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(253, 224, 71, 0.75);
+    }
+
+    .dock-btn.primary {
+      background: linear-gradient(135deg, #ec4899, #be185d);
+      border-color: rgba(253, 224, 71, 0.82);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45);
+    }
+
+    .dock-btn.primary.climax-glow {
+      animation: dockPayPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes dockPayPulse {
+      0%, 100% {
+        box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45), 0 0 0 0 rgba(253, 224, 71, 0.55);
+      }
+      50% {
+        box-shadow: 0 8px 28px rgba(236, 72, 153, 0.78), 0 0 18px 4px rgba(253, 224, 71, 0.65);
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==================== PHOTO SPOTLIGHT OVERLAY ==================== */
+    .photo-spotlight-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(8, 2, 10, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .photo-spotlight-overlay.open {
+      display: flex;
+    }
+
+    .photo-spotlight-card {
+      position: relative;
+      width: min(440px, 100%);
+      padding: 20px;
+      border-radius: 22px;
+      background: linear-gradient(160deg, rgba(38, 10, 32, 0.96), rgba(16, 4, 14, 0.98));
+      border: 1px solid rgba(253, 224, 71, 0.55);
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.7);
+      text-align: center;
+    }
+
+    .spotlight-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(253, 224, 71, 0.14);
+      border: 1px solid rgba(253, 224, 71, 0.45);
+      color: #fde047;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .spotlight-frame {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid rgba(253, 224, 71, 0.6);
+      background: #140512;
+      margin-bottom: 12px;
+    }
+
+    .spotlight-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .spotlight-receiver {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fde047;
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    .spotlight-caption {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .spotlight-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .spotlight-btn {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .spotlight-btn.gold {
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+      color: #3b0722;
+      border-color: transparent;
+    }
+
+    /* ==================== MODALS ==================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(6, 2, 8, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      position: relative;
+      width: min(520px, 100%);
+      max-height: min(88vh, 760px);
+      overflow-y: auto;
+      padding: 22px 20px;
+      border-radius: 22px;
+      background: linear-gradient(165deg, rgba(36, 9, 30, 0.97), rgba(14, 4, 14, 0.98));
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.72);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      line-height: 1.45;
+      color: #fff;
+      padding-right: 36px;
+      margin-bottom: 6px;
+    }
+
+    .modal-sub {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fde047;
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(244, 114, 182, 0.35);
+      background: rgba(10, 3, 10, 0.65);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      border-color: #fde047;
+    }
+
+    .form-textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .chip-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .option-chip {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-sub);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-chip.active {
+      background: linear-gradient(135deg, var(--accent-primary), #be185d);
+      border-color: rgba(253, 224, 71, 0.85);
+      color: #fff;
+    }
+
+    .upload-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px dashed rgba(253, 224, 71, 0.6);
+      background: rgba(253, 224, 71, 0.08);
+      color: #fde047;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .photo-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(253, 224, 71, 0.45);
+    }
+
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-thumb button {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #ec4899, #be185d);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.45);
+    }
+
+    .viewer-wish-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(253, 224, 71, 0.3);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: #fff;
+      white-space: pre-wrap;
+      margin-bottom: 14px;
+    }
+
+    .viewer-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .viewer-photos-grid img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(253, 224, 71, 0.45);
+    }
+
+    /* ==================== MOBILE 375px TUNING ==================== */
+    @media (max-width: 520px) {
+      .hud-btn {
+        min-height: 33px;
+        padding: 5px 10px;
+        font-size: 0.73rem;
+      }
+
+      .silk-header {
+        top: calc(max(10px, env(safe-area-inset-top)) + 40px);
+        gap: 5px;
+      }
+
+      .quick-presets-bar {
+        gap: 4px;
+      }
+
+      .recipient-preset-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+      }
+
+      .swipe-hint-pill {
+        font-size: 0.76rem;
+        padding: 8px 14px;
+      }
+
+      .swipe-hint-pill.step-mode {
+        bottom: calc(max(10px, env(safe-area-inset-bottom)) + 50px);
+      }
+
+      .story-caption-pill {
+        bottom: calc(max(10px, env(safe-area-inset-bottom)) + 94px);
+        font-size: 0.75rem;
+        padding: 7px 12px;
+      }
+
+      .bottom-dock {
+        gap: 6px;
+      }
+
+      .dock-btn {
+        min-height: 36px;
+        padding: 7px 11px;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="/" class="hud-btn" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Vén Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Tắt Tiếng</button>
+    </div>
+  </header>
+
+  <!-- 4 Recipient Presets -->
+  <section class="silk-header" id="silk-header">
+    <div class="quick-presets-bar creator-only" id="quick-presets-bar" aria-label="Chọn nhanh đối tượng nhận">
+      <button type="button" class="recipient-preset-btn" data-recipient="mom">👵 Mẹ</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="wife">💍 Vợ</button>
+      <button type="button" class="recipient-preset-btn active" data-recipient="lover">💕 Người Yêu</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="friend">🌸 Bạn Bè</button>
+    </div>
+  </section>
+
+  <!-- Story Caption Pill (steps 1..N) -->
+  <div class="story-caption-pill hidden-caption" id="story-caption-pill"></div>
+
+  <!-- Swipe / Tap Prompt -->
+  <button type="button" class="swipe-hint-pill" id="swipe-hint-pill">✨ Vuốt hoặc Chạm để Vén Màn Kỷ Niệm (1/6)</button>
+
+  <!-- Bottom Dock -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-viewer-wish">💌 Tâm Thư</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">🎨 Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- 3D Photo Spotlight Overlay -->
+  <div class="photo-spotlight-overlay" id="photo-spotlight-overlay">
+    <div class="photo-spotlight-card">
+      <button type="button" class="modal-close" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="spotlight-badge" id="spotlight-badge">🎀 Khung Ảnh Lụa Kỷ Niệm #1</div>
+      <div class="spotlight-frame">
+        <img id="spotlight-img" src="" alt="Ảnh kỷ niệm 3D" />
+      </div>
+      <div class="spotlight-receiver" id="spotlight-receiver">💕 Cô Gái Anh Thương • Minh Anh</div>
+      <p class="spotlight-caption" id="spotlight-caption">Khoảnh khắc dịu dàng nhất được lưu giữ phía sau dải lụa satin.</p>
+      <div class="spotlight-actions">
+        <button type="button" class="spotlight-btn" id="btn-spotlight-prev">◀ Trước</button>
+        <button type="button" class="spotlight-btn gold" id="btn-spotlight-album">💌 Mở Thư & Album</button>
+        <button type="button" class="spotlight-btn" id="btn-spotlight-next">Tiếp ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tùy Chỉnh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">🎀 Cá Nhân Hóa Dải Lụa Bay 3D</h2>
+      <p class="modal-sub">Chọn đối tượng nhận, khắc tên lên bảng vàng 3D và gắn tới 6 ảnh kỷ niệm phía sau màn lụa satin.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Nhanh Đối Tượng Nhận (Đổi Danh Hiệu, Lời Chúc & Sắc Lụa)</label>
+        <div class="chip-grid-2" id="modal-presets-bar">
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="mom">👵 Tặng Mẹ</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="wife">💍 Tặng Vợ</button>
+          <button type="button" class="option-chip recipient-preset-btn active" data-recipient="lover">💕 Tặng Người Yêu</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="friend">🌸 Tặng Bạn Bè</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Dịp Tôn Vinh</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip occasion-chip active" data-occasion="8/3">🌸 Quốc Tế Phụ Nữ 8/3</button>
+          <button type="button" class="option-chip occasion-chip" data-occasion="20/10">🌷 Phụ Nữ Việt Nam 20/10</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sắc Thái Lụa Satin 3D</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="rose_silk">🎀 Hồng Lụa Đào</button>
+          <button type="button" class="option-chip theme-chip" data-theme="champagne_gold">🥂 Vàng Champagne</button>
+          <button type="button" class="option-chip theme-chip" data-theme="crimson_velvet">🌹 Nhung Đỏ Ruby</button>
+          <button type="button" class="option-chip theme-chip" data-theme="lavender_mist">💜 Tím Oải Hương</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-honorific">Danh Hiệu Khắc Trên Bảng Vàng 3D</label>
+        <input id="input-honorific" type="text" class="form-input" maxlength="36" placeholder="VD: Cô Gái Anh Thương, Mẹ Yêu Kính Mến..." value="Cô Gái Anh Thương" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Con Của Mẹ..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Chúc Ngọt Ngào</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời chúc gửi tới người phụ nữ tuyệt vời..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ảnh Kỷ Niệm 3D (Tối đa 6 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🎀 Áp Dụng & Xem Thử Vén Lụa 3D</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Thư & Xem Album Ảnh -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Anh Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. THEMES, 4 PRESETS & APP STATE ====================
+      const THEMES = {
+        rose_silk: {
+          name: 'Hồng Lụa Đào',
+          bgTop: '#24071c',
+          bgMid: '#110410',
+          bgDeep: '#060208',
+          accentPrimary: '#ec4899',
+          accentSecondary: '#fde047',
+          silkBase: 0x9d174d,
+          silkSheen: 0xf9a8d4,
+          silkRim: 0xfde047,
+          pointLight: 0xffd18c,
+          rimLight: 0xf472b6,
+          particleColors: [0xfde047, 0xf9a8d4, 0xffffff]
+        },
+        champagne_gold: {
+          name: 'Vàng Champagne',
+          bgTop: '#261808',
+          bgMid: '#130b04',
+          bgDeep: '#070402',
+          accentPrimary: '#d97706',
+          accentSecondary: '#fef08a',
+          silkBase: 0x92400e,
+          silkSheen: 0xfde68a,
+          silkRim: 0xffffff,
+          pointLight: 0xffe4a0,
+          rimLight: 0xfbbf24,
+          particleColors: [0xfef08a, 0xfbbf24, 0xffffff]
+        },
+        crimson_velvet: {
+          name: 'Nhung Đỏ Ruby',
+          bgTop: '#2b060d',
+          bgMid: '#150307',
+          bgDeep: '#070103',
+          accentPrimary: '#e11d48',
+          accentSecondary: '#fde047',
+          silkBase: 0x881337,
+          silkSheen: 0xfb7185,
+          silkRim: 0xfde047,
+          pointLight: 0xffc978,
+          rimLight: 0xfda4af,
+          particleColors: [0xfde047, 0xfb7185, 0xfff1f2]
+        },
+        lavender_mist: {
+          name: 'Tím Oải Hương',
+          bgTop: '#1c0b2e',
+          bgMid: '#0e051a',
+          bgDeep: '#05020a',
+          accentPrimary: '#a855f7',
+          accentSecondary: '#f5d0fe',
+          silkBase: 0x581c87,
+          silkSheen: 0xd8b4fe,
+          silkRim: 0xfde047,
+          pointLight: 0xf5d0fe,
+          rimLight: 0xc084fc,
+          particleColors: [0xe9d5ff, 0xfde047, 0xffffff]
+        }
+      };
+
+      const RECIPIENT_PRESETS = {
+        mom: {
+          honorific: 'Kính Tặng Mẹ Yêu',
+          defaultReceiver: 'Mẹ Yêu Dấu',
+          defaultSender: 'Con Của Mẹ',
+          theme: 'champagne_gold',
+          wish: 'Chúc Mẹ luôn mạnh khỏe, bình an và nở nụ cười hiền hậu mỗi ngày. Cảm ơn Mẹ đã dành cả thanh xuân dịu dàng che chở cho con!',
+          captions: [
+            'Ánh mắt dịu hiền của Mẹ là bình yên lớn nhất đời con.',
+            'Cảm ơn Mẹ vì những bữa cơm ấm áp và vòng tay bao dung.',
+            'Mong Mẹ luôn khỏe mạnh, an nhiên và thật nhiều niềm vui.',
+            'Mỗi bước con đi đều có tình thương của Mẹ dõi theo.',
+            'Mẹ mãi là bông hoa đẹp nhất trong trái tim con.',
+            'Chúc Mẹ một ngày lễ thật rạng rỡ và tràn đầy hạnh phúc.'
+          ]
+        },
+        wife: {
+          honorific: 'Nữ Hoàng Gia Đình',
+          defaultReceiver: 'Vợ Yêu',
+          defaultSender: 'Ông Xã Của Em',
+          theme: 'crimson_velvet',
+          wish: 'Cảm ơn Vợ đã luôn đồng hành, vun vén tổ ấm và yêu thương gia đình nhỏ của chúng ta. Chúc em mãi trẻ trung, rạng rỡ và hạnh phúc bên anh!',
+          captions: [
+            'Khoảnh khắc bên em luôn là những trang đẹp nhất cuộc đời anh.',
+            'Cảm ơn em đã biến ngôi nhà nhỏ thành tổ ấm ngập tràn tiếng cười.',
+            'Chúc Vợ yêu luôn xinh đẹp, dịu dàng và bình an mỗi ngày.',
+            'Tay nắm tay đi qua năm tháng, tình yêu anh dành cho em vẫn vẹn nguyên.',
+            'Mọi vất vả của em đều xứng đáng được nâng niu và trân trọng.',
+            'Hạnh phúc nhất của anh là mỗi sáng thức dậy được thấy em cười.'
+          ]
+        },
+        lover: {
+          honorific: 'Cô Gái Anh Thương',
+          defaultReceiver: 'Minh Anh',
+          defaultSender: 'Bảo Nam',
+          theme: 'rose_silk',
+          wish: 'Chúc cô gái anh thương luôn rạng rỡ, dịu dàng và bình yên mỗi ngày. Cảm ơn em đã đến, làm thế giới của anh ngập tràn ánh sáng!',
+          captions: [
+            'Khoảnh khắc dịu dàng nhất được lưu giữ phía sau dải lụa satin.',
+            'Nụ cười của em khiến mọi ngày bình thường đều trở nên lấp lánh.',
+            'Cảm ơn em đã mang đến những ký ức ngọt ngào không thể nào quên.',
+            'Mong mọi điều tốt đẹp và dịu êm nhất sẽ luôn mỉm cười với em.',
+            'Giữa muôn vàn ánh sao, em vẫn là điều rực rỡ nhất anh trân quý.',
+            'Chúc em một ngày thật đặc biệt, ngập tràn hoa và yêu thương.'
+          ]
+        },
+        friend: {
+          honorific: 'Cô Bạn Tuyệt Vời',
+          defaultReceiver: 'Bạn Thân Yêu',
+          defaultSender: 'Hội Bạn Thân',
+          theme: 'lavender_mist',
+          wish: 'Chúc cô bạn xinh đẹp luôn tự tin, rực rỡ, công việc thuận lợi và gặp thật nhiều may mắn. Mãi giữ nụ cười tươi tắn như thế nhé!',
+          captions: [
+            'Thanh xuân rực rỡ hơn rất nhiều vì có cậu đồng hành cùng tụi mình.',
+            'Chúc cậu luôn xinh đẹp, tự tin và tỏa sáng theo cách riêng nhất.',
+            'Cảm ơn vì những buổi hẹn hò cười thả ga và chia sẻ mọi buồn vui.',
+            'Mong mọi dự định của cậu trong năm nay đều suôn sẻ và thành công.',
+            'Mãi là cô gái tràn đầy năng lượng tích cực và đáng yêu nhé!',
+            'Chúc mừng ngày tôn vinh phái đẹp — luôn rạng ngời và hạnh phúc!'
+          ]
+        }
+      };
+
+      const DEFAULT_RECEIVER_SET = new Set(Object.values(RECIPIENT_PRESETS).map((p) => p.defaultReceiver));
+
+      const appState = {
+        templateId: 'women_flowing_silk_3d',
+        recipientPreset: 'lover',
+        occasionType: '8/3',
+        theme: 'rose_silk',
+        honorific: RECIPIENT_PRESETS.lover.honorific,
+        receiver: RECIPIENT_PRESETS.lover.defaultReceiver,
+        sender: RECIPIENT_PRESETS.lover.defaultSender,
+        wish: RECIPIENT_PRESETS.lover.wish,
+        photos: [],
+        hasCustomReceiver: false,
+        isViewerMode: false,
+        curtainsOpened: false,
+        storyStep: 0,
+        totalStorySteps: 6,
+        activeSpotlightIdx: 0
+      };
+
+      // ==================== 2. PURE WEB AUDIO ENGINE (WIND + CHILLOUT + SILK WHOOSH) ====================
+      const AudioEngine = (() => {
+        let ctx = null;
+        let masterGain = null;
+        let windGain = null;
+        let windFilter = null;
+        let isPlaying = false;
+        let unlocked = false;
+        let chordTimer = null;
+        let chordStep = 0;
+
+        // Warm Chillout progression: Fmaj7 -> Em7 -> Dm7 -> Cmaj7
+        const CHORDS = [
+          [174.61, 220.00, 261.63, 329.63, 440.00], // Fmaj7
+          [164.81, 196.00, 246.94, 293.66, 392.00], // Em7
+          [146.83, 174.61, 220.00, 261.63, 349.23], // Dm7
+          [130.81, 164.81, 196.00, 246.94, 329.63]  // Cmaj7
+        ];
+
+        function ensureContext() {
+          if (ctx) return true;
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return false;
+          ctx = new AudioCtx();
+          masterGain = ctx.createGain();
+          masterGain.gain.value = 0.0;
+          masterGain.connect(ctx.destination);
+
+          // Wind noise buffer + bandpass LFO (350-700Hz)
+          const bufSize = ctx.sampleRate * 3;
+          const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+          const data = noiseBuf.getChannelData(0);
+          let lastOut = 0;
+          for (let i = 0; i < bufSize; i++) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (lastOut + 0.04 * white) / 1.04;
+            lastOut = data[i];
+          }
+          const windSrc = ctx.createBufferSource();
+          windSrc.buffer = noiseBuf;
+          windSrc.loop = true;
+
+          windFilter = ctx.createBiquadFilter();
+          windFilter.type = 'bandpass';
+          windFilter.frequency.value = 520;
+          windFilter.Q.value = 1.6;
+
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.14;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 175; // sweeps 345Hz - 695Hz
+          lfo.connect(lfoGain);
+          lfoGain.connect(windFilter.frequency);
+
+          windGain = ctx.createGain();
+          windGain.gain.value = 0.12;
+
+          windSrc.connect(windFilter);
+          windFilter.connect(windGain);
+          windGain.connect(masterGain);
+
+          windSrc.start();
+          lfo.start();
+          return true;
+        }
+
+        function playPadChord() {
+          if (!ctx || !isPlaying) return;
+          const notes = CHORDS[chordStep % CHORDS.length];
+          chordStep++;
+          const now = ctx.currentTime;
+
+          // Warm electric piano / pad layer
+          notes.forEach((freq, idx) => {
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const filter = ctx.createBiquadFilter();
+            const gain = ctx.createGain();
+
+            osc1.type = 'sine';
+            osc2.type = 'triangle';
+            osc1.frequency.value = freq;
+            osc2.frequency.value = freq * 1.002;
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1100, now);
+            filter.frequency.exponentialRampToValueAtTime(520, now + 3.2);
+
+            const startT = now + idx * 0.14;
+            gain.gain.setValueAtTime(0.0001, startT);
+            gain.gain.linearRampToValueAtTime(idx === 0 ? 0.055 : 0.036, startT + 0.25);
+            gain.gain.exponentialRampToValueAtTime(0.0008, startT + 3.4);
+
+            osc1.connect(filter);
+            osc2.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+
+            osc1.start(startT);
+            osc2.start(startT);
+            osc1.stop(startT + 3.5);
+            osc2.stop(startT + 3.5);
+          });
+        }
+
+        function playSilkWhoosh() {
+          if (!ctx || !isPlaying) return;
+          const now = ctx.currentTime;
+
+          // Soft silk rustle sweep
+          const bufLen = Math.floor(ctx.sampleRate * 1.1);
+          const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+          const ch = buf.getChannelData(0);
+          for (let i = 0; i < bufLen; i++) {
+            ch[i] = (Math.random() * 2 - 1) * Math.sin((i / bufLen) * Math.PI);
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+
+          const filt = ctx.createBiquadFilter();
+          filt.type = 'bandpass';
+          filt.frequency.setValueAtTime(420, now);
+          filt.frequency.exponentialRampToValueAtTime(1600, now + 0.45);
+          filt.frequency.exponentialRampToValueAtTime(600, now + 1.05);
+          filt.Q.value = 2.2;
+
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.001, now);
+          g.gain.linearRampToValueAtTime(0.16, now + 0.25);
+          g.gain.exponentialRampToValueAtTime(0.001, now + 1.05);
+
+          src.connect(filt);
+          filt.connect(g);
+          g.connect(masterGain);
+          src.start(now);
+
+          // Delicate crystal chime
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const cg = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = now + 0.12 + i * 0.08;
+            cg.gain.setValueAtTime(0.0001, t);
+            cg.gain.linearRampToValueAtTime(0.045, t + 0.03);
+            cg.gain.exponentialRampToValueAtTime(0.0005, t + 1.4);
+            osc.connect(cg);
+            cg.connect(masterGain);
+            osc.start(t);
+            osc.stop(t + 1.45);
+          });
+        }
+
+        function playFinaleChord() {
+          if (!ctx || !isPlaying) return;
+          const now = ctx.currentTime;
+          // Lush rising shimmer arpeggio (Fmaj9)
+          const notes = [261.63, 329.63, 392.00, 440.00, 523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const tri = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            tri.type = 'triangle';
+            osc.frequency.value = freq;
+            tri.frequency.value = freq * 1.003;
+            const t = now + i * 0.09;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(0.052, t + 0.08);
+            g.gain.exponentialRampToValueAtTime(0.0006, t + 2.8);
+            osc.connect(g);
+            tri.connect(g);
+            g.connect(masterGain);
+            osc.start(t);
+            tri.start(t);
+            osc.stop(t + 2.9);
+            tri.stop(t + 2.9);
+          });
+        }
+
+        function start() {
+          if (!ensureContext()) return;
+          if (ctx.state === 'suspended') ctx.resume();
+          isPlaying = true;
+          masterGain.gain.cancelScheduledValues(ctx.currentTime);
+          masterGain.gain.linearRampToValueAtTime(0.85, ctx.currentTime + 0.6);
+          if (!chordTimer) {
+            playPadChord();
+            chordTimer = setInterval(playPadChord, 3400);
+          }
+          updateSoundButton();
+        }
+
+        function stop() {
+          isPlaying = false;
+          if (ctx && masterGain) {
+            masterGain.gain.cancelScheduledValues(ctx.currentTime);
+            masterGain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.3);
+          }
+          if (chordTimer) {
+            clearInterval(chordTimer);
+            chordTimer = null;
+          }
+          updateSoundButton();
+        }
+
+        function toggle() {
+          unlocked = true;
+          if (isPlaying) stop();
+          else start();
+        }
+
+        function autoUnlock() {
+          if (!unlocked) {
+            unlocked = true;
+            start();
+          }
+        }
+
+        function updateSoundButton() {
+          const btn = document.getElementById('btn-sound');
+          if (!btn) return;
+          btn.textContent = isPlaying ? '🔊 Âm Thanh' : '🔇 Tắt Tiếng';
+        }
+
+        return { toggle, autoUnlock, playSilkWhoosh, playFinaleChord };
+      })();
+
+      // ==================== 3. THREE.JS SCENE & RESPONSIVE CAMERA ====================
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 100);
+
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+      let isMobileLayout = cw < 768 || (cw / Math.max(1, ch)) < 0.85;
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      const centerPointLight = new THREE.PointLight(0xffd18c, 1.5, 22);
+      centerPointLight.position.set(0, 1.5, 3.8);
+      scene.add(centerPointLight);
+
+      const rimDirLight = new THREE.DirectionalLight(0xf472b6, 1.05);
+      rimDirLight.position.set(-4.5, 4.0, -3.5);
+      scene.add(rimDirLight);
+
+      const stageGroup = new THREE.Group();
+      scene.add(stageGroup);
+
+      // Camera target & cinematic fly-in state
+      const cameraBase = { x: 0, y: 0.25, z: 7.4 };
+      const cameraTarget = { rotX: 0, rotY: 0, zoomOffset: 0 };
+      let cinematicFlyTimer = 0;
+
+      function updateCameraResponsive() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        const aspect = cw / Math.max(1, ch);
+        isMobileLayout = cw < 768 || aspect < 0.85;
+
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+        renderer.setSize(cw, ch, false);
+
+        if (isMobileLayout) {
+          cameraBase.z = aspect < 0.56 ? 9.6 : 8.7;
+          cameraBase.y = 0.22;
+          stageGroup.scale.setScalar(0.86);
+        } else {
+          cameraBase.z = 7.2;
+          cameraBase.y = 0.28;
+          stageGroup.scale.setScalar(1.0);
+        }
+      }
+
+      // ==================== 4. FLOWING SATIN SILK CURTAINS (CUSTOM SHADER) ====================
+      const silkUniforms = {
+        uTime: { value: 0 },
+        uOpen: { value: 0 },
+        uDissolve: { value: 0 },
+        uColorBase: { value: new THREE.Color(THEMES.rose_silk.silkBase) },
+        uColorSheen: { value: new THREE.Color(THEMES.rose_silk.silkSheen) },
+        uColorRim: { value: new THREE.Color(THEMES.rose_silk.silkRim) }
+      };
+
+      const silkVertexShader = `
+        uniform float uTime;
+        uniform float uOpen;
+        uniform float uDissolve;
+        uniform float uSide;
+        varying vec2 vUv;
+        varying vec3 vNormalView;
+        varying vec3 vViewPos;
+
+        void main() {
+          vUv = uv;
+          vec3 pos = position;
+
+          // Edge coordinate: 0 at outer wall, 1 at center seam
+          float seamFactor = (uSide < 0.0) ? uv.x : (1.0 - uv.x);
+
+          // Multi-layered wind waves
+          float wave1 = sin(pos.y * 1.4 + uTime * 1.85 + pos.x * 0.7) * 0.28;
+          float wave2 = cos(pos.x * 2.3 - uTime * 1.35 + pos.y * 0.9) * 0.16;
+          float pleat = sin(uv.x * 18.0 + uTime * 1.1) * 0.12 * (0.25 + uOpen * 0.75);
+
+          pos.z += (wave1 + wave2) * (0.4 + 0.6 * seamFactor) + pleat;
+
+          // Parting & gathering toward outer edges when opened
+          float gatherX = uSide * (uOpen * 4.45);
+          float compressX = mix(1.0, 0.42, uOpen);
+          float anchorX = uSide * 2.6;
+          pos.x = anchorX + (pos.x - anchorX) * compressX + gatherX;
+
+          // Gentle inward sway at bottom hem
+          pos.x += sin(uTime * 1.2 + uv.y * 2.8) * 0.14 * (1.0 - uv.y) * (1.0 - uOpen * 0.5);
+          pos.z += uOpen * (0.65 * seamFactor);
+
+          // Grand Finale: swirl into floating silk ribbons and disperse inward/upward
+          if (uDissolve > 0.001) {
+            float swirlAngle = uDissolve * 3.8 + uv.y * 4.2 + uSide * 1.2;
+            pos.x += -uSide * uDissolve * 2.4 + sin(swirlAngle + uTime * 2.2) * uDissolve * 1.45;
+            pos.y += cos(swirlAngle * 0.7) * uDissolve * 1.15;
+            pos.z -= uDissolve * 1.85;
+          }
+
+          // Approximate perturbed normal for satin specular sheen
+          float dWaveY = cos(pos.y * 1.4 + uTime * 1.85 + pos.x * 0.7) * 0.39;
+          float dWaveX = -sin(pos.x * 2.3 - uTime * 1.35 + pos.y * 0.9) * 0.36 + cos(uv.x * 18.0 + uTime * 1.1) * 0.55;
+          vec3 n = normalize(vec3(-dWaveX, -dWaveY, 1.0));
+
+          vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+          vViewPos = -mvPos.xyz;
+          vNormalView = normalize(normalMatrix * n);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `;
+
+      const silkFragmentShader = `
+        uniform vec3 uColorBase;
+        uniform vec3 uColorSheen;
+        uniform vec3 uColorRim;
+        uniform float uOpen;
+        uniform float uDissolve;
+        varying vec2 vUv;
+        varying vec3 vNormalView;
+        varying vec3 vViewPos;
+
+        void main() {
+          vec3 N = normalize(vNormalView);
+          if (!gl_FrontFacing) N = -N;
+          vec3 V = normalize(vViewPos);
+
+          // Primary & secondary light directions for satin anisotropy
+          vec3 L1 = normalize(vec3(0.45, 0.65, 0.8));
+          vec3 L2 = normalize(vec3(-0.6, 0.3, 0.7));
+          vec3 H1 = normalize(L1 + V);
+          vec3 H2 = normalize(L2 + V);
+
+          float diff = max(dot(N, L1), 0.0) * 0.65 + 0.35;
+          float spec1 = pow(max(dot(N, H1), 0.0), 18.0);
+          float spec2 = pow(max(dot(N, H2), 0.0), 10.0) * 0.55;
+          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 2.6);
+
+          // Subtle silk weave shimmer
+          float weave = sin(vUv.x * 160.0) * 0.02 + sin(vUv.y * 220.0) * 0.015;
+
+          vec3 col = uColorBase * (diff + weave);
+          col = mix(col, uColorSheen, clamp(spec1 * 0.78 + spec2 * 0.45, 0.0, 0.92));
+          col += uColorRim * fresnel * 0.55;
+          col += uColorRim * uDissolve * 0.85;
+
+          float alpha = mix(0.92, 0.84, fresnel * 0.45);
+          alpha *= (1.0 - smoothstep(0.05, 0.98, uDissolve));
+          if (alpha < 0.01) discard;
+          gl_FragColor = vec4(col, alpha);
+        }
+      `;
+
+      function createSilkCurtain(sideSign) {
+        const geo = new THREE.PlaneGeometry(5.6, 9.2, 48, 36);
+        const mat = new THREE.ShaderMaterial({
+          uniforms: {
+            uTime: silkUniforms.uTime,
+            uOpen: silkUniforms.uOpen,
+            uDissolve: silkUniforms.uDissolve,
+            uSide: { value: sideSign },
+            uColorBase: silkUniforms.uColorBase,
+            uColorSheen: silkUniforms.uColorSheen,
+            uColorRim: silkUniforms.uColorRim
+          },
+          vertexShader: silkVertexShader,
+          fragmentShader: silkFragmentShader,
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(sideSign * 2.55, 0.2, 2.35);
+        mesh.renderOrder = 10;
+        return mesh;
+      }
+
+      const leftCurtain = createSilkCurtain(-1);
+      const rightCurtain = createSilkCurtain(1);
+      scene.add(leftCurtain);
+      scene.add(rightCurtain);
+
+      // ==================== 5. FLOATING WIND PARTICLES (500 GOLDEN/PEARL DUST) ====================
+      const PARTICLE_COUNT = 500;
+      const pPositions = new Float32Array(PARTICLE_COUNT * 3);
+      const pColors = new Float32Array(PARTICLE_COUNT * 3);
+      const pSpeeds = new Float32Array(PARTICLE_COUNT);
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        pPositions[i * 3] = (Math.random() - 0.5) * 14;
+        pPositions[i * 3 + 1] = (Math.random() - 0.5) * 9;
+        pPositions[i * 3 + 2] = (Math.random() - 0.5) * 7;
+        pSpeeds[i] = 0.25 + Math.random() * 0.65;
+      }
+
+      const particleGeo = new THREE.BufferGeometry();
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+      particleGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+
+      function createGlowSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.35, 'rgba(255,245,210,0.75)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const particleMat = new THREE.PointsMaterial({
+        size: 0.14,
+        map: createGlowSpriteTexture(),
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const windParticles = new THREE.Points(particleGeo, particleMat);
+      scene.add(windParticles);
+
+      function updateParticlePalette(themeKey) {
+        const t = THEMES[themeKey] || THEMES.rose_silk;
+        const cols = t.particleColors.map((hex) => new THREE.Color(hex));
+        const attr = particleGeo.getAttribute('color');
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const c = cols[i % cols.length];
+          attr.setXYZ(i, c.r, c.g, c.b);
+        }
+        attr.needsUpdate = true;
+      }
+
+      // ==================== 6. 3D ENGRAVED GOLD NAMEPLATE (SAFE VIETNAMESE PADDING) ====================
+      const nameplateCanvas = document.createElement('canvas');
+      nameplateCanvas.width = 1024;
+      nameplateCanvas.height = 480;
+      const nameplateCtx = nameplateCanvas.getContext('2d');
+      const nameplateTex = new THREE.CanvasTexture(nameplateCanvas);
+      nameplateTex.encoding = THREE.sRGBEncoding;
+
+      const nameplateGeo = new THREE.PlaneGeometry(3.4, 1.6);
+      const nameplateMat = new THREE.MeshBasicMaterial({
+        map: nameplateTex,
+        transparent: true,
+        toneMapped: false
+      });
+      const nameplateMesh = new THREE.Mesh(nameplateGeo, nameplateMat);
+      nameplateMesh.position.set(0, -1.2, 0.42);
+      nameplateMesh.scale.setScalar(0.86);
+      stageGroup.add(nameplateMesh);
+
+      function roundRectPath(ctx2d, x, y, w, h, r) {
+        ctx2d.beginPath();
+        ctx2d.moveTo(x + r, y);
+        ctx2d.lineTo(x + w - r, y);
+        ctx2d.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx2d.lineTo(x + w, y + h - r);
+        ctx2d.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx2d.lineTo(x + r, y + h);
+        ctx2d.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx2d.lineTo(x, y + r);
+        ctx2d.quadraticCurveTo(x, y, x + r, y);
+        ctx2d.closePath();
+      }
+
+      function rebuildNameplateTexture() {
+        const c = nameplateCtx;
+        const W = nameplateCanvas.width;
+        const H = nameplateCanvas.height;
+        c.clearRect(0, 0, W, H);
+
+        // Luxury dark satin plaque with gold border
+        roundRectPath(c, 28, 28, W - 56, H - 56, 40);
+        const bgGrad = c.createLinearGradient(0, 28, W, H - 28);
+        bgGrad.addColorStop(0, 'rgba(36, 8, 28, 0.94)');
+        bgGrad.addColorStop(0.5, 'rgba(58, 12, 42, 0.96)');
+        bgGrad.addColorStop(1, 'rgba(28, 6, 22, 0.94)');
+        c.fillStyle = bgGrad;
+        c.fill();
+
+        const goldGrad = c.createLinearGradient(28, 28, W - 28, H - 28);
+        goldGrad.addColorStop(0, '#fde047');
+        goldGrad.addColorStop(0.5, '#fffbeb');
+        goldGrad.addColorStop(1, '#f59e0b');
+        c.lineWidth = 6;
+        c.strokeStyle = goldGrad;
+        c.stroke();
+
+        // Inner hairline frame
+        roundRectPath(c, 44, 44, W - 88, H - 88, 28);
+        c.lineWidth = 2;
+        c.strokeStyle = 'rgba(253, 224, 71, 0.42)';
+        c.stroke();
+
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+
+        // Line 1: Honorific + Occasion (generous top padding >= 30%)
+        const occLabel = appState.occasionType === '20/10' ? '20/10' : '8/3';
+        c.font = '700 32px "Plus Jakarta Sans", sans-serif';
+        c.fillStyle = '#fde047';
+        c.fillText(`🎀 ${appState.honorific || 'Dành Tặng'} • ${occLabel}`, W / 2, 122, W - 140);
+
+        // Line 2: Receiver Name (large gold gradient, generous vertical space for Vietnamese diacritics & g,y,p,q)
+        const recName = appState.receiver || 'Minh Anh';
+        const fontSize = recName.length > 18 ? 64 : 80;
+        c.font = `800 ${fontSize}px "Plus Jakarta Sans", sans-serif`;
+        c.shadowColor = 'rgba(236, 72, 153, 0.55)';
+        c.shadowBlur = 18;
+        c.fillStyle = '#ffffff';
+        c.fillText(recName, W / 2, 248, W - 140);
+        c.shadowBlur = 0;
+
+        // Line 3: Sender meta (generous bottom padding)
+        c.font = '600 30px "Plus Jakarta Sans", sans-serif';
+        c.fillStyle = '#fbcfe8';
+        c.fillText(`Từ: ${appState.sender || 'Người thương'}`, W / 2, 366, W - 140);
+
+        nameplateTex.needsUpdate = true;
+      }
+
+      // ==================== 6B. GRAND FINALE: SILK RIBBON PARTICLES FORMING 3D TEXT ====================
+      const TEXT_PARTICLE_COUNT = 2100;
+      const textPositions = new Float32Array(TEXT_PARTICLE_COUNT * 3);
+      const textColors = new Float32Array(TEXT_PARTICLE_COUNT * 3);
+      const textTargets = new Float32Array(TEXT_PARTICLE_COUNT * 3);
+      const textSwirlOrigins = new Float32Array(TEXT_PARTICLE_COUNT * 3);
+      const textPhases = new Float32Array(TEXT_PARTICLE_COUNT);
+
+      for (let i = 0; i < TEXT_PARTICLE_COUNT; i++) {
+        textPhases[i] = Math.random() * Math.PI * 2;
+      }
+
+      const textParticleGeo = new THREE.BufferGeometry();
+      textParticleGeo.setAttribute('position', new THREE.BufferAttribute(textPositions, 3));
+      textParticleGeo.setAttribute('color', new THREE.BufferAttribute(textColors, 3));
+
+      const textParticleMat = new THREE.PointsMaterial({
+        size: 0.115,
+        map: createGlowSpriteTexture(),
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const silkTextParticles = new THREE.Points(textParticleGeo, textParticleMat);
+      silkTextParticles.visible = false;
+      stageGroup.add(silkTextParticles);
+
+      const silkTextOffscreen = document.createElement('canvas');
+      silkTextOffscreen.width = 1280;
+      silkTextOffscreen.height = 420;
+      const silkTextCtx = silkTextOffscreen.getContext('2d');
+
+      function rebuildSilkTextTargets() {
+        const c = silkTextCtx;
+        const W = silkTextOffscreen.width;
+        const H = silkTextOffscreen.height;
+        c.clearRect(0, 0, W, H);
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+
+        const occLabel = appState.occasionType === '20/10' ? '20/10' : '8/3';
+        const honorText = `${appState.honorific || 'Dành Tặng'} • ${occLabel}`;
+        const recName = appState.receiver || 'Minh Anh';
+
+        // Generous >= 30% vertical padding so Vietnamese diacritics & descenders (g, y, p, q) never clip
+        c.fillStyle = '#fde047';
+        c.font = '700 44px "Plus Jakarta Sans", sans-serif';
+        c.fillText(honorText, W / 2, 128, W - 120);
+
+        const mainSize = recName.length > 16 ? 88 : 112;
+        c.fillStyle = '#ffffff';
+        c.font = `800 ${mainSize}px "Plus Jakarta Sans", sans-serif`;
+        c.fillText(recName, W / 2, 268, W - 100);
+
+        const imgData = c.getImageData(0, 0, W, H).data;
+        const sampled = [];
+        const step = 3;
+        for (let y = 0; y < H; y += step) {
+          for (let x = 0; x < W; x += step) {
+            const idx = (y * W + x) * 4;
+            const alpha = imgData[idx + 3];
+            if (alpha > 110) {
+              const isGoldLine = y < 178;
+              sampled.push({
+                x: ((x - W / 2) / W) * 5.2,
+                y: ((H / 2 - y) / H) * 1.95 + 0.58,
+                z: 0.45 + (Math.random() - 0.5) * 0.08,
+                isGoldLine
+              });
+            }
+          }
+        }
+
+        // Fisher-Yates shuffle for even particle distribution
+        for (let i = sampled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = sampled[i];
+          sampled[i] = sampled[j];
+          sampled[j] = tmp;
+        }
+
+        const t = THEMES[appState.theme] || THEMES.rose_silk;
+        const goldCol = new THREE.Color(0xfde047);
+        const sheenCol = new THREE.Color(t.silkSheen);
+        const whiteCol = new THREE.Color(0xffffff);
+        const colAttr = textParticleGeo.getAttribute('color');
+
+        for (let i = 0; i < TEXT_PARTICLE_COUNT; i++) {
+          const pt = sampled.length > 0 ? sampled[i % sampled.length] : { x: 0, y: 0.58, z: 0.45, isGoldLine: false };
+          textTargets[i * 3] = pt.x + (Math.random() - 0.5) * 0.015;
+          textTargets[i * 3 + 1] = pt.y + (Math.random() - 0.5) * 0.015;
+          textTargets[i * 3 + 2] = pt.z;
+
+          // Swirling ribbon origin from left/right silk curtains
+          const side = (i % 2 === 0) ? -1 : 1;
+          const u = (i / TEXT_PARTICLE_COUNT) * Math.PI * 3.0;
+          textSwirlOrigins[i * 3] = side * (2.8 + Math.cos(u) * 1.4);
+          textSwirlOrigins[i * 3 + 1] = Math.sin(u * 1.3) * 2.1 + 0.4;
+          textSwirlOrigins[i * 3 + 2] = 1.6 + Math.sin(u) * 0.8;
+
+          const cPick = pt.isGoldLine ? goldCol : (i % 3 === 0 ? whiteCol : sheenCol);
+          colAttr.setXYZ(i, cPick.r, cPick.g, cPick.b);
+        }
+        colAttr.needsUpdate = true;
+      }
+
+      // 5 Glowing 3D Silk Ribbon Curves around the 3D text
+      const silkRibbonGroup = new THREE.Group();
+      silkRibbonGroup.visible = false;
+      stageGroup.add(silkRibbonGroup);
+      const ribbonMeshes = [];
+
+      function rebuildSilkRibbons() {
+        while (silkRibbonGroup.children.length > 0) {
+          silkRibbonGroup.remove(silkRibbonGroup.children[0]);
+        }
+        ribbonMeshes.length = 0;
+        const t = THEMES[appState.theme] || THEMES.rose_silk;
+
+        for (let r = 0; r < 5; r++) {
+          const pts = [];
+          const yOff = -0.35 + r * 0.42;
+          const phase = r * 1.1;
+          for (let s = 0; s <= 24; s++) {
+            const p = s / 24;
+            const x = (p - 0.5) * 6.4;
+            const y = yOff + Math.sin(p * Math.PI * 2.2 + phase) * 0.38;
+            const z = 0.25 + Math.cos(p * Math.PI * 2.0 + phase) * 0.55;
+            pts.push(new THREE.Vector3(x, y, z));
+          }
+          const curve = new THREE.CatmullRomCurve3(pts);
+          const tubeGeo = new THREE.TubeGeometry(curve, 56, 0.022 + (r % 2) * 0.01, 8, false);
+          const tubeMat = new THREE.MeshBasicMaterial({
+            color: r % 2 === 0 ? t.silkRim : t.silkSheen,
+            transparent: true,
+            opacity: 0.0,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+          const mesh = new THREE.Mesh(tubeGeo, tubeMat);
+          mesh.userData = { phase, baseY: 0 };
+          silkRibbonGroup.add(mesh);
+          ribbonMeshes.push(mesh);
+        }
+      }
+
+      // ==================== 7. 3D PHOTO FRAMES (1 CENTRAL HERO + 5 ARC FRAMES) ====================
+      const photoGroup = new THREE.Group();
+      stageGroup.add(photoGroup);
+      const photoMeshes = [];
+
+      function createArtisticPlaceholderUrl(idx) {
+        const c = document.createElement('canvas');
+        c.width = 640;
+        c.height = 480;
+        const g = c.getContext('2d');
+        const palettes = [
+          ['#3b0726', '#be185d', '#f9a8d4'],
+          ['#2c1507', '#b45309', '#fde68a'],
+          ['#3b0816', '#e11d48', '#fda4af'],
+          ['#220a38', '#7e22ce', '#d8b4fe'],
+          ['#2e0720', '#db2777', '#fbcfe8'],
+          ['#1c1124', '#9333ea', '#fde047']
+        ];
+        const pal = palettes[idx % palettes.length];
+        const bg = g.createLinearGradient(0, 0, 640, 480);
+        bg.addColorStop(0, pal[0]);
+        bg.addColorStop(0.55, pal[1]);
+        bg.addColorStop(1, pal[2]);
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 640, 480);
+
+        // Soft silk ribbons & bokeh circles
+        for (let k = 0; k < 14; k++) {
+          g.beginPath();
+          g.arc(
+            (k * 97 + idx * 53) % 640,
+            (k * 73 + idx * 41) % 480,
+            24 + (k % 5) * 14,
+            0,
+            Math.PI * 2
+          );
+          g.fillStyle = 'rgba(255, 255, 255, 0.11)';
+          g.fill();
+        }
+
+        g.strokeStyle = 'rgba(253, 224, 71, 0.55)';
+        g.lineWidth = 4;
+        g.strokeRect(24, 24, 592, 432);
+
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.font = '700 72px serif';
+        g.fillStyle = '#fffbeb';
+        g.fillText(['🎀', '🌸', '💖', '✨', '🌹', '💌'][idx % 6], 320, 205);
+
+        g.font = '700 28px "Plus Jakarta Sans", sans-serif';
+        g.fillStyle = '#fff1f5';
+        g.fillText(`Kỷ Niệm #${idx + 1}`, 320, 295);
+
+        return c.toDataURL('image/png');
+      }
+
+      function loadCoverTexture(url, onReady) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 640;
+          c.height = 480;
+          const g = c.getContext('2d');
+          const imgRatio = img.width / img.height;
+          const targetRatio = 640 / 480;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+          if (imgRatio > targetRatio) {
+            sw = img.height * targetRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / targetRatio;
+            sy = (img.height - sh) / 2;
+          }
+          g.drawImage(img, sx, sy, sw, sh, 0, 0, 640, 480);
+
+          // Subtle gold inner border
+          g.strokeStyle = 'rgba(253, 224, 71, 0.72)';
+          g.lineWidth = 8;
+          g.strokeRect(4, 4, 632, 472);
+
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          onReady(tex);
+        };
+        img.src = url;
+      }
+
+      const defaultPhotoUrls = Array.from({ length: 6 }, (_, i) => createArtisticPlaceholderUrl(i));
+
+      function getSpotlightItems() {
+        const preset = RECIPIENT_PRESETS[appState.recipientPreset] || RECIPIENT_PRESETS.lover;
+        const list = [];
+        for (let i = 0; i < 6; i++) {
+          const userPhoto = appState.photos[i];
+          const url = userPhoto ? (typeof userPhoto === 'string' ? userPhoto : userPhoto.url) : defaultPhotoUrls[i];
+          list.push({
+            url,
+            caption: preset.captions[i % preset.captions.length]
+          });
+        }
+        return list;
+      }
+
+      function rebuild3DPhotoFrames() {
+        while (photoGroup.children.length > 0) {
+          const child = photoGroup.children[0];
+          photoGroup.remove(child);
+        }
+        photoMeshes.length = 0;
+
+        const items = getSpotlightItems();
+        // Arc positions framing the central 3D silk text at Grand Finale
+        const layouts = [
+          { x: -2.78, y: 1.48, z: -0.55, w: 1.45, h: 1.09, ry: 0.36 },
+          { x: 2.78, y: 1.48, z: -0.55, w: 1.45, h: 1.09, ry: -0.36 },
+          { x: -2.52, y: -0.22, z: -0.75, w: 1.35, h: 1.01, ry: 0.32 },
+          { x: 2.52, y: -0.22, z: -0.75, w: 1.35, h: 1.01, ry: -0.32 },
+          { x: -1.35, y: 2.18, z: -0.95, w: 1.32, h: 0.99, ry: 0.16 },
+          { x: 1.35, y: 2.18, z: -0.95, w: 1.32, h: 0.99, ry: -0.16 }
+        ];
+
+        items.forEach((item, idx) => {
+          const lay = layouts[idx];
+          const frameGroup = new THREE.Group();
+          frameGroup.position.set(lay.x, lay.y, lay.z);
+          frameGroup.rotation.y = lay.ry;
+
+          // Gold backing plate
+          const borderGeo = new THREE.PlaneGeometry(lay.w + 0.14, lay.h + 0.14);
+          const borderMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047,
+            transparent: true,
+            opacity: 0.9,
+            side: THREE.DoubleSide
+          });
+          const borderMesh = new THREE.Mesh(borderGeo, borderMat);
+          borderMesh.position.z = -0.015;
+          frameGroup.add(borderMesh);
+
+          const photoGeo = new THREE.PlaneGeometry(lay.w, lay.h);
+          const photoMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 1.0,
+            toneMapped: false,
+            side: THREE.DoubleSide
+          });
+          const photoMesh = new THREE.Mesh(photoGeo, photoMat);
+          photoMesh.userData = { photoIdx: idx };
+          frameGroup.add(photoMesh);
+
+          frameGroup.userData = {
+            arcX: lay.x,
+            arcY: lay.y,
+            arcZ: lay.z,
+            arcRy: lay.ry,
+            baseY: lay.y,
+            phase: idx * 1.15,
+            photoIdx: idx,
+            caption: item.caption,
+            borderMat,
+            photoMat
+          };
+
+          loadCoverTexture(item.url, (tex) => {
+            photoMat.map = tex;
+            photoMat.needsUpdate = true;
+          });
+
+          photoGroup.add(frameGroup);
+          photoMeshes.push(photoMesh);
+        });
+      }
+
+      // ==================== 8. MULTI-STEP SILK STORY & GRAND FINALE ====================
+      let targetOpen = 0.0;
+      let currentOpen = 0.0;
+      let targetDissolve = 0.0;
+      let currentDissolve = 0.0;
+      let targetFinaleMorph = 0.0;
+      let currentFinaleMorph = 0.0;
+      let curtainSweepTimer = 0.0;
+
+      function updateStoryUI() {
+        const hintEl = document.getElementById('swipe-hint-pill');
+        const capEl = document.getElementById('story-caption-pill');
+        const N = appState.totalStorySteps;
+        const step = appState.storyStep;
+
+        if (!hintEl || !capEl) return;
+
+        if (step === 0) {
+          hintEl.classList.remove('hidden-hint', 'step-mode');
+          hintEl.textContent = `✨ Vuốt hoặc Chạm để Vén Màn Kỷ Niệm (1/${N})`;
+          capEl.classList.add('hidden-caption');
+          capEl.innerHTML = '';
+        } else if (step >= 1 && step <= N) {
+          hintEl.classList.remove('hidden-hint');
+          hintEl.classList.add('step-mode');
+          if (step < N) {
+            hintEl.textContent = `✨ Vuốt / Chạm vén tiếp kỷ niệm (${step + 1}/${N})`;
+          } else {
+            hintEl.textContent = '✨ Chạm để Vén Màn Cuối • Hóa Dải Lụa Tạo Chữ';
+          }
+          const items = getSpotlightItems();
+          const item = items[step - 1] || items[0];
+          capEl.innerHTML = `<span class="caption-step-tag">Kỷ niệm ${step}/${N}:</span> ${item.caption}`;
+          capEl.classList.remove('hidden-caption');
+        } else {
+          // Grand Finale (step === N + 1)
+          hintEl.classList.add('hidden-hint');
+          capEl.classList.add('hidden-caption');
+        }
+      }
+
+      function advanceStoryStep() {
+        AudioEngine.autoUnlock();
+        const N = appState.totalStorySteps;
+        if (appState.storyStep >= N + 1) return;
+
+        appState.storyStep += 1;
+        const step = appState.storyStep;
+        appState.curtainsOpened = step >= 1;
+
+        if (step >= 1 && step <= N) {
+          targetOpen = 1.0;
+          targetDissolve = 0.0;
+          targetFinaleMorph = 0.0;
+          if (step > 1) {
+            // Quick silk veil sweep before revealing next memory frame
+            curtainSweepTimer = 0.32;
+          }
+          cinematicFlyTimer = 1.15;
+          cameraTarget.rotX = 0;
+          cameraTarget.rotY = 0;
+          AudioEngine.playSilkWhoosh();
+        } else {
+          // Grand Finale: Silk curtains dissolve into 3D glowing ribbons & particle text
+          targetOpen = 1.0;
+          targetDissolve = 1.0;
+          targetFinaleMorph = 1.0;
+          curtainSweepTimer = 0.0;
+          cinematicFlyTimer = 1.8;
+          cameraTarget.rotX = 0;
+          cameraTarget.rotY = 0;
+          AudioEngine.playSilkWhoosh();
+          AudioEngine.playFinaleChord();
+          setTimeout(() => {
+            if (!appState.isViewerMode && appState.storyStep === N + 1) {
+              document.getElementById('btn-pay')?.classList.add('climax-glow');
+            }
+          }, 1100);
+        }
+
+        updateStoryUI();
+      }
+
+      function goToGrandFinale() {
+        AudioEngine.autoUnlock();
+        appState.storyStep = appState.totalStorySteps + 1;
+        appState.curtainsOpened = true;
+        targetOpen = 1.0;
+        currentOpen = 0.92;
+        targetDissolve = 1.0;
+        currentDissolve = 0.08;
+        targetFinaleMorph = 1.0;
+        currentFinaleMorph = 0.0;
+        curtainSweepTimer = 0.0;
+        cinematicFlyTimer = 1.8;
+        cameraTarget.rotX = 0;
+        cameraTarget.rotY = 0;
+        AudioEngine.playSilkWhoosh();
+        AudioEngine.playFinaleChord();
+        updateStoryUI();
+        setTimeout(() => {
+          if (!appState.isViewerMode && appState.storyStep === appState.totalStorySteps + 1) {
+            document.getElementById('btn-pay')?.classList.add('climax-glow');
+          }
+        }, 1100);
+      }
+
+      function replaySilkCurtains(fromLivePreview = false) {
+        currentOpen = 0.0;
+        targetOpen = 0.0;
+        currentDissolve = 0.0;
+        targetDissolve = 0.0;
+        currentFinaleMorph = 0.0;
+        targetFinaleMorph = 0.0;
+        curtainSweepTimer = 0.0;
+        appState.storyStep = 0;
+        appState.curtainsOpened = false;
+        silkUniforms.uOpen.value = 0.0;
+        silkUniforms.uDissolve.value = 0.0;
+        cameraTarget.rotX = 0;
+        cameraTarget.rotY = 0;
+        document.getElementById('btn-pay')?.classList.remove('climax-glow');
+        updateStoryUI();
+        if (fromLivePreview) {
+          setTimeout(() => {
+            goToGrandFinale();
+          }, 380);
+        }
+      }
+
+      // ==================== 9. POINTER / SWIPE / RAYCASTER INTERACTION ====================
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let isPointerDown = false;
+      let dragDist = 0;
+      let swipeDeltaX = 0;
+      let prevPointer = { x: 0, y: 0 };
+
+      canvas.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        dragDist = 0;
+        swipeDeltaX = 0;
+        prevPointer = { x: e.clientX, y: e.clientY };
+        AudioEngine.autoUnlock();
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        const dx = e.clientX - prevPointer.x;
+        const dy = e.clientY - prevPointer.y;
+        dragDist += Math.hypot(dx, dy);
+        swipeDeltaX += dx;
+        prevPointer = { x: e.clientX, y: e.clientY };
+
+        if (appState.storyStep <= appState.totalStorySteps && Math.abs(swipeDeltaX) > 40) {
+          advanceStoryStep();
+          isPointerDown = false;
+          return;
+        }
+
+        if (appState.storyStep > appState.totalStorySteps) {
+          cameraTarget.rotY = Math.max(-0.48, Math.min(0.48, cameraTarget.rotY + dx * 0.0032));
+          cameraTarget.rotX = Math.max(-0.24, Math.min(0.24, cameraTarget.rotX + dy * 0.0025));
+        }
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+
+        if (dragDist <= 6) {
+          if (appState.storyStep <= appState.totalStorySteps) {
+            advanceStoryStep();
+            return;
+          }
+          // In Grand Finale: Raycast 3D photo frames to open spotlight
+          const rect = canvas.getBoundingClientRect();
+          pointerNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          pointerNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointerNDC, camera);
+          const hits = raycaster.intersectObjects(photoMeshes, false);
+          if (hits.length > 0) {
+            const idx = hits[0].object.userData.photoIdx;
+            openPhotoSpotlight(idx);
+          }
+        }
+      });
+
+      document.getElementById('swipe-hint-pill').addEventListener('click', () => {
+        advanceStoryStep();
+      });
+
+      // ==================== 10. THEME, PRESETS & UI SYNC ====================
+      function applyThemePalette(themeKey) {
+        const t = THEMES[themeKey] || THEMES.rose_silk;
+        appState.theme = themeKey;
+        const root = document.documentElement.style;
+        root.setProperty('--bg-top', t.bgTop);
+        root.setProperty('--bg-mid', t.bgMid);
+        root.setProperty('--bg-deep', t.bgDeep);
+        root.setProperty('--accent-primary', t.accentPrimary);
+        root.setProperty('--accent-secondary', t.accentSecondary);
+
+        silkUniforms.uColorBase.value.setHex(t.silkBase);
+        silkUniforms.uColorSheen.value.setHex(t.silkSheen);
+        silkUniforms.uColorRim.value.setHex(t.silkRim);
+        centerPointLight.color.setHex(t.pointLight);
+        rimDirLight.color.setHex(t.rimLight);
+        updateParticlePalette(themeKey);
+        rebuildSilkRibbons();
+        rebuildSilkTextTargets();
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === themeKey);
+        });
+      }
+
+      function applyRecipientPreset(key, withSound = false) {
+        const p = RECIPIENT_PRESETS[key];
+        if (!p) return;
+        appState.recipientPreset = key;
+        appState.honorific = p.honorific;
+        if (!appState.hasCustomReceiver) {
+          appState.receiver = p.defaultReceiver;
+        }
+        appState.sender = p.defaultSender;
+        appState.wish = p.wish;
+        applyThemePalette(p.theme);
+
+        document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.recipient === key);
+        });
+
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        if (withSound) {
+          AudioEngine.autoUnlock();
+          AudioEngine.playSilkWhoosh();
+        }
+      }
+
+      function syncUIAndBanners() {
+        rebuildNameplateTexture();
+        rebuildSilkTextTargets();
+        updateStoryUI();
+      }
+
+      function openPhotoSpotlight(idx) {
+        const items = getSpotlightItems();
+        const safeIdx = ((idx % items.length) + items.length) % items.length;
+        appState.activeSpotlightIdx = safeIdx;
+        const item = items[safeIdx];
+
+        document.getElementById('spotlight-badge').textContent = `🎀 Khung Ảnh Lụa Kỷ Niệm #${safeIdx + 1}`;
+        document.getElementById('spotlight-img').src = item.url;
+        document.getElementById('spotlight-receiver').textContent = `✨ ${appState.honorific} • ${appState.receiver}`;
+        document.getElementById('spotlight-caption').textContent = item.caption;
+        document.getElementById('photo-spotlight-overlay').classList.add('open');
+      }
+
+      function closePhotoSpotlight() {
+        document.getElementById('photo-spotlight-overlay').classList.remove('open');
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add('open');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+      }
+
+      function openWishViewerModal() {
+        const shortOccasion = appState.occasionType === '20/10'
+          ? 'Chúc mừng Ngày Phụ Nữ Việt Nam 20/10'
+          : 'Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3';
+        document.getElementById('viewer-title').textContent = `💌 ${appState.honorific} • ${appState.receiver}`;
+        document.getElementById('viewer-meta').textContent = `Từ ${appState.sender} • ${shortOccasion}`;
+        document.getElementById('viewer-wish-text').textContent = appState.wish;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        getSpotlightItems().forEach((item) => {
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = 'Ảnh kỷ niệm';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const div = document.createElement('div');
+          div.className = 'photo-thumb';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.textContent = '✕';
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          div.appendChild(img);
+          div.appendChild(del);
+          grid.appendChild(div);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        const occLabel = appState.occasionType === '20/10' ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        return {
+          templateId: appState.templateId,
+          templateType: 'women_flowing_silk_3d',
+          emoji: '🎀',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Dải Lụa Bay 3D',
+          successTitle: 'Thiệp Dải Lụa Bay 3D Đã Sẵn Sàng!',
+          cardTitle: '🎀 DẢI LỤA BAY 3D • VÉN MÀN KỶ NIỆM ✨',
+          scanLabel: 'Quét QR để Vén Màn Lụa Satin & Đọc Lời Chúc',
+          footerHint: 'Vuốt vén dải lụa 3D để khám phá khung ảnh kỷ niệm & lời chúc',
+          gradientStops: ['#24071c', '#9d174d', '#ec4899'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: occLabel,
+          message: appState.wish,
+          payload: {
+            recipientPreset: appState.recipientPreset,
+            honorific: appState.honorific,
+            occasionType: appState.occasionType,
+            theme: appState.theme,
+            photos: appState.photos
+          }
+        };
+      }
+
+      // ==================== 11. EVENT BINDINGS ====================
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        replaySilkCurtains(false);
+      });
+
+      document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyRecipientPreset(btn.dataset.recipient, true);
+        });
+      });
+
+      document.getElementById('btn-close-spotlight').addEventListener('click', closePhotoSpotlight);
+      document.getElementById('photo-spotlight-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'photo-spotlight-overlay') closePhotoSpotlight();
+      });
+      document.getElementById('btn-spotlight-prev').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx - 1);
+      });
+      document.getElementById('btn-spotlight-next').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx + 1);
+      });
+      document.getElementById('btn-spotlight-album').addEventListener('click', () => {
+        closePhotoSpotlight();
+        openWishViewerModal();
+      });
+
+      document.getElementById('btn-viewer-wish')?.addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish')?.addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-honorific').value = appState.honorific;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-wish').value = appState.wish;
+        renderCreatorPhotoThumbs();
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.getElementById('input-receiver').addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val && !DEFAULT_RECEIVER_SET.has(val)) {
+          appState.hasCustomReceiver = true;
+        }
+      });
+
+      document.querySelectorAll('.occasion-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          appState.occasionType = chip.dataset.occasion;
+          document.querySelectorAll('.occasion-chip').forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          applyThemePalette(chip.dataset.theme);
+        });
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        const customHonorific = document.getElementById('input-honorific').value.trim();
+        const customReceiver = document.getElementById('input-receiver').value.trim();
+        appState.honorific = customHonorific || appState.honorific || 'Cô Gái Anh Thương';
+        if (customReceiver) {
+          appState.receiver = customReceiver;
+          if (!DEFAULT_RECEIVER_SET.has(customReceiver)) {
+            appState.hasCustomReceiver = true;
+          }
+        }
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        replaySilkCurtains(true);
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', updateCameraResponsive);
+
+      // ==================== 12. ANIMATION LOOP ====================
+      const clock = new THREE.Clock();
+      let elapsedTotal = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        elapsedTotal += dt;
+
+        // Curtain sweep transition between photo story steps
+        if (curtainSweepTimer > 0) {
+          curtainSweepTimer = Math.max(0, curtainSweepTimer - dt);
+          targetOpen = curtainSweepTimer > 0.14 ? 0.22 : 1.0;
+        }
+
+        silkUniforms.uTime.value = elapsedTotal;
+        currentOpen += (targetOpen - currentOpen) * Math.min(1, dt * 4.2);
+        currentDissolve += (targetDissolve - currentDissolve) * Math.min(1, dt * 2.2);
+        currentFinaleMorph += (targetFinaleMorph - currentFinaleMorph) * Math.min(1, dt * 1.85);
+        silkUniforms.uOpen.value = currentOpen;
+        silkUniforms.uDissolve.value = currentDissolve;
+
+        // Drift golden/pearl particles gently in wind
+        const pAttr = particleGeo.getAttribute('position');
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          let x = pAttr.getX(i) + Math.sin(elapsedTotal * 0.6 + i) * dt * 0.25;
+          let y = pAttr.getY(i) + pSpeeds[i] * dt * 0.38;
+          if (y > 4.6) y = -4.6;
+          if (x > 7.0) x = -7.0;
+          if (x < -7.0) x = 7.0;
+          pAttr.setXY(i, x, y);
+        }
+        pAttr.needsUpdate = true;
+
+        // Grand Finale: Silk ribbon particles swirl and morph into 3D text
+        const inFinale = currentFinaleMorph > 0.01;
+        silkTextParticles.visible = inFinale;
+        silkRibbonGroup.visible = inFinale;
+        if (inFinale) {
+          textParticleMat.opacity = Math.min(1.0, currentFinaleMorph * 1.35);
+          const easeT = 1 - Math.pow(1 - currentFinaleMorph, 3);
+          const tpAttr = textParticleGeo.getAttribute('position');
+          for (let i = 0; i < TEXT_PARTICLE_COUNT; i++) {
+            const ox = textSwirlOrigins[i * 3];
+            const oy = textSwirlOrigins[i * 3 + 1];
+            const oz = textSwirlOrigins[i * 3 + 2];
+            const tx = textTargets[i * 3];
+            const ty = textTargets[i * 3 + 1];
+            const tz = textTargets[i * 3 + 2];
+
+            const swirlArc = (1 - easeT) * Math.sin(elapsedTotal * 2.4 + textPhases[i]) * 0.45;
+            const shimmer = easeT * Math.sin(elapsedTotal * 2.0 + textPhases[i]) * 0.012;
+            const px = ox + (tx - ox) * easeT + swirlArc * 0.5;
+            const py = oy + (ty - oy) * easeT + swirlArc * 0.35 + shimmer;
+            const pz = oz + (tz - oz) * easeT;
+            tpAttr.setXYZ(i, px, py, pz);
+          }
+          tpAttr.needsUpdate = true;
+
+          ribbonMeshes.forEach((mesh, rIdx) => {
+            mesh.material.opacity = Math.min(0.42, currentFinaleMorph * 0.45);
+            mesh.position.y = Math.sin(elapsedTotal * 1.4 + rIdx * 0.9) * 0.09;
+            mesh.rotation.z = Math.sin(elapsedTotal * 0.7 + rIdx) * 0.04;
+          });
+        }
+
+        // Nameplate visibility & smooth scale-in during Grand Finale
+        const showNameplate = appState.storyStep > appState.totalStorySteps;
+        const targetNPScale = showNameplate ? 0.86 : 0.001;
+        const curNPScale = nameplateMesh.scale.x + (targetNPScale - nameplateMesh.scale.x) * Math.min(1, dt * 5.0);
+        nameplateMesh.scale.setScalar(curNPScale);
+        nameplateMesh.visible = curNPScale > 0.02;
+
+        // Multi-step Photo Frame choreography:
+        // Step 0: hidden behind closed curtains
+        // Step 1..N: active frame (step-1) spotlighted in center; earlier frames softly recessed
+        // Step N+1 (Grand Finale): all frames arranged in luminous arc around 3D silk text
+        const step = appState.storyStep;
+        const N = appState.totalStorySteps;
+        photoGroup.children.forEach((frame, idx) => {
+          const ud = frame.userData;
+          let tx = ud.arcX;
+          let ty = ud.arcY;
+          let tz = ud.arcZ;
+          let tryRot = ud.arcRy;
+          let tScale = 1.0;
+          let tOpacity = 1.0;
+          let tBorderOp = 0.88;
+
+          if (step === 0) {
+            tScale = 0.001;
+            tOpacity = 0.0;
+            tBorderOp = 0.0;
+          } else if (step >= 1 && step <= N) {
+            const activeIdx = step - 1;
+            if (idx === activeIdx) {
+              tx = 0;
+              ty = 0.56;
+              tz = 1.15;
+              tryRot = 0;
+              tScale = isMobileLayout ? 1.38 : 1.56;
+              tOpacity = 1.0;
+              tBorderOp = 1.0;
+            } else if (idx < activeIdx) {
+              tx = ud.arcX * 1.04;
+              ty = ud.arcY;
+              tz = ud.arcZ - 0.55;
+              tryRot = ud.arcRy;
+              tScale = 0.78;
+              tOpacity = 0.45;
+              tBorderOp = 0.4;
+            } else {
+              tScale = 0.001;
+              tOpacity = 0.0;
+              tBorderOp = 0.0;
+            }
+          } else {
+            // Grand Finale arc
+            tx = ud.arcX;
+            ty = ud.arcY;
+            tz = ud.arcZ;
+            tryRot = ud.arcRy;
+            tScale = 1.0;
+            tOpacity = 1.0;
+            tBorderOp = 0.92;
+          }
+
+          const lerpK = Math.min(1, dt * 5.2);
+          frame.position.x += (tx - frame.position.x) * lerpK;
+          frame.position.y += (ty + Math.sin(elapsedTotal * 1.15 + ud.phase) * 0.045 - frame.position.y) * lerpK;
+          frame.position.z += (tz - frame.position.z) * lerpK;
+          frame.rotation.y += (tryRot - frame.rotation.y) * lerpK;
+          const nextS = frame.scale.x + (tScale - frame.scale.x) * lerpK;
+          frame.scale.setScalar(nextS);
+          frame.visible = nextS > 0.02;
+
+          if (ud.photoMat) {
+            ud.photoMat.opacity += (tOpacity - ud.photoMat.opacity) * lerpK;
+          }
+          if (ud.borderMat) {
+            ud.borderMat.opacity += (tBorderOp - ud.borderMat.opacity) * lerpK;
+          }
+        });
+
+        // Cinematic fly-in on step advance / finale + subtle orbit
+        if (cinematicFlyTimer > 0) {
+          cinematicFlyTimer = Math.max(0, cinematicFlyTimer - dt);
+        }
+        const flyZoom = cinematicFlyTimer > 0 ? Math.sin((cinematicFlyTimer / 1.8) * Math.PI) * -0.85 : 0;
+        const targetZ = cameraBase.z - currentOpen * 0.45 + flyZoom;
+        const camX = Math.sin(cameraTarget.rotY) * targetZ * 0.55;
+        const camY = cameraBase.y + cameraTarget.rotX * 2.1;
+
+        camera.position.x += (camX - camera.position.x) * Math.min(1, dt * 4.5);
+        camera.position.y += (camY - camera.position.y) * Math.min(1, dt * 4.5);
+        camera.position.z += (targetZ - camera.position.z) * Math.min(1, dt * 4.5);
+        camera.lookAt(0, 0.25, 0);
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 13. INIT & VIEWER HYDRATION (?id=) ====================
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const urlPreset = params.get('preset');
+        if (urlPreset && RECIPIENT_PRESETS[urlPreset]) {
+          applyRecipientPreset(urlPreset, false);
+        }
+
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            rebuildNameplateTexture();
+            rebuildSilkTextTargets();
+          });
+        }
+        animate();
+
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          document.querySelectorAll('.viewer-only').forEach((el) => el.classList.remove('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.recipientPreset && RECIPIENT_PRESETS[p.recipientPreset]) {
+                appState.recipientPreset = p.recipientPreset;
+              }
+              if (p.honorific) appState.honorific = p.honorific;
+              if (p.occasionType === '20/10' || (o.occasion && o.occasion.includes('20/10'))) {
+                appState.occasionType = '20/10';
+              }
+              if (p.theme && THEMES[p.theme]) {
+                applyThemePalette(p.theme);
+              }
+              if (Array.isArray(p.photos)) {
+                appState.photos = p.photos;
+              }
+              syncUIAndBanners();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

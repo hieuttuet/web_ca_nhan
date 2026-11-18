@@ -268,6 +268,26 @@ const WOMEN_TEMPLATES = [
       occasionType: '8/3',
       theme: 'rose_emerald'
     }
+  },
+  {
+    id: 'women_flowing_silk_3d',
+    category: 'women',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Dải Lụa Bay 3D • Vén Màn Kỷ Niệm',
+    subtitle: 'Dải lụa satin 3D mềm mại bay uốn lượn trong gió, vuốt vén màn lụa hé lộ vòng cung ảnh kỷ niệm & bảng tên khắc vàng kèm nhạc Chillout êm dịu',
+    badge: '🎀 Lụa Satin 3D',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/women/flowing-silk-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #24071c 0%, #9d174d 50%, #f9a8d4 100%)',
+    previewEmoji: '🎀',
+    features: ['Vén lụa satin 3D tương tác', 'Bảng tên khắc vàng & Vòng cung ảnh 3D', 'Nhạc Chillout + Tiếng gió Web Audio'],
+    preset: {
+      occasion: 'Chúc mừng 8/3',
+      occasionType: '8/3',
+      theme: 'rose_silk'
+    }
   }
 ];
 

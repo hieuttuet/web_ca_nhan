@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Vườn Hoa Ánh Sáng 3D • Trăm Hoa Đua Nở 8/3 & 20/10 ✨</title>
+  <title>Vườn Hoa Ánh Sáng 3D • Đánh Thức Khu Vườn Phép Thuật 8/3 & 20/10 ✨</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -14,8 +14,8 @@
       --bg-top: #071c24;
       --bg-mid: #040d14;
       --bg-deep: #02050a;
-      --glass-bg: rgba(6, 24, 30, 0.74);
-      --glass-border: rgba(110, 231, 183, 0.34);
+      --glass-bg: rgba(6, 24, 30, 0.76);
+      --glass-border: rgba(110, 231, 183, 0.36);
       --accent-primary: #f472b6;
       --accent-secondary: #fde047;
       --accent-emerald: #6ee7b7;
@@ -72,9 +72,9 @@
       transform: translate(-50%, -50%);
       padding: 8px 16px;
       border-radius: 999px;
-      background: rgba(8, 28, 34, 0.84);
-      border: 1px solid rgba(253, 224, 71, 0.65);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 18px rgba(244, 114, 182, 0.4);
+      background: rgba(8, 28, 34, 0.88);
+      border: 1px solid rgba(253, 224, 71, 0.72);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 18px rgba(244, 114, 182, 0.45);
       color: #fffbeb;
       font-size: 0.84rem;
       font-weight: 700;
@@ -106,7 +106,7 @@
     /* ==================== TOP HUD ==================== */
     .top-hud {
       position: fixed;
-      top: max(12px, env(safe-area-inset-top));
+      top: max(10px, env(safe-area-inset-top));
       left: 12px;
       right: 12px;
       z-index: 25;
@@ -120,7 +120,7 @@
     .top-hud-group {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       pointer-events: auto;
     }
 
@@ -128,9 +128,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      min-height: 38px;
-      padding: 6px 14px;
+      gap: 5px;
+      min-height: 36px;
+      padding: 5px 13px;
       border-radius: 999px;
       border: 1px solid var(--glass-border);
       background: var(--glass-bg);
@@ -138,9 +138,9 @@
       -webkit-backdrop-filter: blur(12px);
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      line-height: 1.4;
+      line-height: 1.45;
       text-decoration: none;
       cursor: pointer;
       white-space: nowrap;
@@ -150,102 +150,232 @@
 
     .hud-btn:hover {
       transform: translateY(-1px);
-      border-color: rgba(253, 224, 71, 0.7);
-      background: rgba(12, 40, 48, 0.88);
+      border-color: rgba(253, 224, 71, 0.75);
+      background: rgba(12, 40, 48, 0.9);
     }
 
-    /* ==================== GARDEN HEADER & WISH BANNER (NO TEXT CLIPPING) ==================== */
-    .garden-header {
+    /* ==================== TOP STACK: GARDEN HEADER + QUICK PRESETS (NO OVERLAP, NO CLIPPING) ==================== */
+    .top-center-stack {
       position: fixed;
-      top: max(56px, calc(env(safe-area-inset-top) + 46px));
+      top: max(50px, calc(env(safe-area-inset-top) + 42px));
       left: 50%;
       transform: translateX(-50%);
-      z-index: 16;
-      width: calc(100vw - 24px);
+      z-index: 20;
+      width: calc(100vw - 20px);
       max-width: 540px;
-      padding: 10px 16px 12px;
-      border-radius: 20px;
-      background: linear-gradient(180deg, rgba(6, 26, 32, 0.78) 0%, rgba(4, 16, 22, 0.64) 100%);
-      border: 1px solid rgba(110, 231, 183, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .garden-header {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(6, 26, 32, 0.78) 0%, rgba(4, 16, 22, 0.66) 100%);
+      border: 1px solid rgba(110, 231, 183, 0.34);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       text-align: center;
       pointer-events: none;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
     }
 
     .garden-occasion-badge {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: rgba(244, 114, 182, 0.18);
-      border: 1px solid rgba(244, 114, 182, 0.45);
       color: #fde047;
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       font-weight: 700;
       line-height: 1.45;
-      letter-spacing: 0.02em;
-      margin-bottom: 4px;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100vw - 56px);
     }
 
-    .garden-receiver-title {
-      font-family: 'Dancing Script', cursive;
-      font-size: clamp(1.42rem, 4.2vw, 2.02rem);
+    /* ==================== QUICK 1-TAP RECIPIENT PRESET BAR ==================== */
+    .quick-preset-bar {
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(5, 21, 27, 0.86);
+      border: 1px solid rgba(253, 224, 71, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42);
+      pointer-events: auto;
+    }
+
+    .quick-preset-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: #e2f8f0;
+      font-family: inherit;
+      font-size: 0.74rem;
       font-weight: 700;
       line-height: 1.45;
-      padding: 4px 6px 6px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-preset-btn:hover {
+      border-color: rgba(253, 224, 71, 0.65);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .quick-preset-btn.active {
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.72), rgba(219, 39, 119, 0.68));
+      border-color: #fde047;
       color: #fffbeb;
-      text-shadow: 0 2px 14px rgba(244, 114, 182, 0.65), 0 0 24px rgba(110, 231, 183, 0.35);
-      word-break: break-word;
+      box-shadow: 0 4px 14px rgba(244, 114, 182, 0.4);
     }
 
-    .garden-hint-line {
-      font-size: 0.75rem;
-      font-weight: 600;
-      line-height: 1.45;
-      color: #a7f3d0;
-      padding-top: 2px;
-      white-space: normal;
-    }
-
-    .wish-banner {
+    /* ==================== BOTTOM STACK: CRO HOOK BAR + WISH BANNER (NO OVERLAP) ==================== */
+    .bottom-center-stack {
       position: fixed;
       left: 50%;
-      bottom: calc(max(14px, env(safe-area-inset-bottom)) + 58px);
+      bottom: calc(max(10px, env(safe-area-inset-bottom)) + 54px);
       transform: translateX(-50%);
-      z-index: 18;
-      width: calc(100vw - 24px);
+      z-index: 22;
+      width: calc(100vw - 20px);
       max-width: 540px;
-      padding: 11px 16px 13px;
-      border-radius: 18px;
-      background: rgba(7, 25, 31, 0.82);
-      border: 1px solid rgba(244, 114, 182, 0.42);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .cro-hook-bar {
+      width: 100%;
+      padding: 7px 12px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, rgba(12, 42, 48, 0.95) 0%, rgba(76, 17, 48, 0.95) 100%);
+      border: 1.5px solid rgba(253, 224, 71, 0.82);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.62), 0 0 22px rgba(244, 114, 182, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .cro-hook-bar.visible {
+      display: flex;
+    }
+
+    .cro-hook-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #fffbeb;
+      text-align: left;
+      padding: 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cro-hook-text strong {
+      color: #fde047;
+    }
+
+    .cro-hook-cta {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #fef08a;
+      background: linear-gradient(135deg, #f59e0b 0%, #db2777 100%);
+      color: #fffbeb;
+      font-family: inherit;
+      font-size: 0.73rem;
+      font-weight: 800;
+      line-height: 1.4;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+      animation: croPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes croPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .cro-hook-close {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.35);
+      color: #fde68a;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==================== WISH BANNER ==================== */
+    .wish-banner {
+      width: 100%;
+      padding: 8px 14px 10px;
+      border-radius: 16px;
+      background: rgba(7, 25, 31, 0.85);
+      border: 1px solid rgba(244, 114, 182, 0.44);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       text-align: center;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
       pointer-events: auto;
       cursor: pointer;
       transition: transform 0.25s ease, border-color 0.25s ease;
     }
 
     .wish-banner:hover {
-      transform: translateX(-50%) translateY(-2px);
-      border-color: rgba(253, 224, 71, 0.65);
+      transform: translateY(-2px);
+      border-color: rgba(253, 224, 71, 0.68);
     }
 
     .wish-banner-text {
-      font-size: 0.85rem;
-      line-height: 1.55;
-      padding: 3px 2px 4px;
+      font-size: 0.82rem;
+      line-height: 1.52;
+      padding: 2px 2px 3px;
       color: #fff1f5;
       word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .wish-banner-meta {
-      margin-top: 4px;
+      margin-top: 3px;
       padding-top: 2px;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       line-height: 1.45;
       color: #fde047;
       font-weight: 700;
@@ -266,8 +396,8 @@
       max-width: calc(100vw - 12px);
       padding: 6px 9px;
       border-radius: 999px;
-      background: rgba(6, 22, 28, 0.88);
-      border: 1px solid rgba(110, 231, 183, 0.38);
+      background: rgba(6, 22, 28, 0.9);
+      border: 1px solid rgba(110, 231, 183, 0.4);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6);
@@ -301,11 +431,131 @@
 
     .dock-btn.primary {
       background: linear-gradient(135deg, #0d9488 0%, #db2777 52%, #f59e0b 100%);
-      border-color: rgba(253, 224, 71, 0.72);
+      border-color: rgba(253, 224, 71, 0.76);
       color: #fffbeb;
       box-shadow: 0 6px 20px rgba(219, 39, 119, 0.45);
     }
 
+    /* ==================== 3D PHOTO SPOTLIGHT OVERLAY (NON-BLACKOUT) ==================== */
+    .spotlight-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 48;
+      background: rgba(3, 12, 16, 0.42);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.26s ease;
+    }
+
+    .spotlight-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .spotlight-card {
+      position: relative;
+      width: 100%;
+      max-width: 390px;
+      border-radius: 22px;
+      padding: 16px 16px 18px;
+      background: linear-gradient(165deg, rgba(8, 34, 42, 0.94), rgba(18, 9, 28, 0.95));
+      border: 1.5px solid rgba(253, 224, 71, 0.72);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.78), 0 0 32px rgba(244, 114, 182, 0.35);
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.28s cubic-bezier(0.2, 0.85, 0.25, 1);
+    }
+
+    .spotlight-overlay.open .spotlight-card {
+      transform: scale(1);
+    }
+
+    .spotlight-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(253, 224, 71, 0.16);
+      border: 1px solid rgba(253, 224, 71, 0.55);
+      color: #fde047;
+      font-size: 0.73rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .spotlight-img-wrap {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid rgba(253, 224, 71, 0.65);
+      background: #06181e;
+      margin-bottom: 10px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    }
+
+    .spotlight-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .spotlight-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.48rem;
+      font-weight: 700;
+      line-height: 1.45;
+      padding: 2px 4px 4px;
+      color: #fffbeb;
+      text-shadow: 0 2px 12px rgba(244, 114, 182, 0.6);
+    }
+
+    .spotlight-caption {
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #fce7f3;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(244, 114, 182, 0.3);
+      margin-top: 4px;
+    }
+
+    .spotlight-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .spotlight-btn {
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(110, 231, 183, 0.42);
+      background: rgba(255, 255, 255, 0.09);
+      color: #f0fdf4;
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+
+    .spotlight-btn.primary {
+      border-color: #fde047;
+      background: linear-gradient(135deg, #0d9488, #db2777);
+      color: #fffbeb;
+    }
+
+    /* ==================== MOBILE 375PX RESPONSIVE ==================== */
     @media (max-width: 520px) {
       .top-hud {
         left: 8px;
@@ -316,31 +566,55 @@
         gap: 4px;
       }
       .hud-btn {
-        min-height: 32px;
+        min-height: 31px;
         padding: 4px 8px;
-        font-size: 0.68rem;
+        font-size: 0.67rem;
         gap: 3px;
       }
+      .top-center-stack {
+        top: max(44px, calc(env(safe-area-inset-top) + 38px));
+        width: calc(100vw - 14px);
+        gap: 4px;
+      }
       .garden-header {
-        top: max(48px, calc(env(safe-area-inset-top) + 42px));
-        padding: 7px 11px 9px;
+        padding: 4px 11px;
       }
       .garden-occasion-badge {
-        font-size: 0.68rem;
-        padding: 3px 9px;
-      }
-      .garden-hint-line {
         font-size: 0.69rem;
+      }
+      .quick-preset-bar {
+        padding: 4px 5px;
+        gap: 3px;
+      }
+      .quick-preset-btn {
+        padding: 4px 4px;
+        font-size: 0.64rem;
+        gap: 2px;
+      }
+      .bottom-center-stack {
+        bottom: calc(max(8px, env(safe-area-inset-bottom)) + 48px);
+        width: calc(100vw - 14px);
+        gap: 5px;
+      }
+      .cro-hook-bar {
+        padding: 6px 9px;
+        gap: 6px;
+      }
+      .cro-hook-text {
+        font-size: 0.67rem;
+      }
+      .cro-hook-cta {
+        padding: 5px 9px;
+        font-size: 0.66rem;
       }
       .wish-banner {
-        bottom: calc(max(10px, env(safe-area-inset-bottom)) + 52px);
-        padding: 8px 11px 10px;
+        padding: 7px 10px 8px;
       }
       .wish-banner-text {
-        font-size: 0.76rem;
+        font-size: 0.74rem;
       }
       .wish-banner-meta {
-        font-size: 0.69rem;
+        font-size: 0.67rem;
       }
       .bottom-dock {
         gap: 4px;
@@ -383,11 +657,11 @@
     .modal-card {
       position: relative;
       width: 100%;
-      max-width: 490px;
+      max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
       border-radius: 22px;
-      padding: 22px 20px;
+      padding: 20px 18px;
       background: linear-gradient(165deg, rgba(8, 34, 42, 0.98), rgba(4, 15, 20, 0.99));
       border: 1.5px solid rgba(110, 231, 183, 0.45);
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
@@ -410,29 +684,29 @@
 
     .modal-title {
       font-family: 'Cinzel', serif;
-      font-size: 1.14rem;
+      font-size: 1.1rem;
       line-height: 1.45;
       color: #fde047;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       padding-right: 34px;
     }
 
     .modal-sub {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: #a7f3d0;
-      opacity: 0.9;
-      margin-bottom: 14px;
+      opacity: 0.92;
+      margin-bottom: 12px;
       line-height: 1.5;
     }
 
     .form-group {
-      margin-bottom: 12px;
+      margin-bottom: 11px;
       text-align: left;
     }
 
     .form-label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.77rem;
       font-weight: 700;
       line-height: 1.45;
       color: #fde68a;
@@ -442,13 +716,13 @@
     .form-input,
     .form-textarea {
       width: 100%;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 12px;
       border: 1px solid rgba(110, 231, 183, 0.35);
       background: rgba(3, 12, 16, 0.82);
       color: #f0fdf4;
       font-family: inherit;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       line-height: 1.5;
       outline: none;
     }
@@ -459,24 +733,24 @@
     }
 
     .form-textarea {
-      min-height: 82px;
+      min-height: 78px;
       resize: vertical;
     }
 
     .chip-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 7px;
     }
 
     .option-chip {
-      padding: 9px 12px;
+      padding: 8px 10px;
       border-radius: 12px;
       border: 1px solid rgba(110, 231, 183, 0.32);
       background: rgba(255, 255, 255, 0.05);
       color: #d1fae5;
       font-family: inherit;
-      font-size: 0.82rem;
+      font-size: 0.79rem;
       font-weight: 700;
       line-height: 1.45;
       cursor: pointer;
@@ -484,7 +758,7 @@
     }
 
     .option-chip.active {
-      background: linear-gradient(135deg, rgba(13, 148, 136, 0.5), rgba(219, 39, 119, 0.45));
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.55), rgba(219, 39, 119, 0.5));
       border-color: #fde047;
       color: #fffbeb;
       box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
@@ -504,7 +778,7 @@
       background: rgba(244, 114, 182, 0.12);
       color: #fbcfe8;
       font-family: inherit;
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       font-weight: 600;
       line-height: 1.4;
       cursor: pointer;
@@ -562,7 +836,7 @@
       border: 1px dashed rgba(253, 224, 71, 0.55);
       background: rgba(253, 224, 71, 0.08);
       color: #fde68a;
-      font-size: 0.82rem;
+      font-size: 0.81rem;
       font-weight: 700;
       line-height: 1.45;
       cursor: pointer;
@@ -576,7 +850,7 @@
       background: linear-gradient(135deg, #0d9488 0%, #db2777 52%, #f59e0b 100%);
       color: #fffbeb;
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       line-height: 1.45;
       cursor: pointer;
@@ -589,7 +863,7 @@
       border-radius: 14px;
       background: rgba(3, 12, 16, 0.72);
       border: 1px solid rgba(110, 231, 183, 0.34);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       line-height: 1.65;
       color: #f0fdf4;
       white-space: pre-line;
@@ -631,18 +905,35 @@
     </div>
   </header>
 
-  <!-- Garden Header (Không cắt dấu tiếng Việt hay nét dưới g, y, p, q) -->
-  <section class="garden-header" id="garden-header">
-    <div class="garden-occasion-badge" id="header-occasion-badge">🌸 Chúc Mừng Ngày Quốc Tế Phụ Nữ 8/3</div>
-    <h1 class="garden-receiver-title" id="header-receiver-title">Gửi Minh Anh Yêu Thương ✨</h1>
-    <div class="garden-hint-line" id="header-hint-line">🌷 Chạm vào thảm cỏ để gieo thêm hoa ánh sáng • Kéo nhẹ để ngắm vườn 3D</div>
-  </section>
+  <!-- Top Center Stack: Compact Garden Pill + Quick 1-Tap Recipient Presets Bar -->
+  <div class="top-center-stack">
+    <div class="garden-header" id="garden-header">
+      <span class="garden-occasion-badge" id="header-occasion-badge">🌸 8/3 • Dành tặng Minh Anh</span>
+    </div>
 
-  <!-- Bottom Wish Banner -->
-  <section class="wish-banner" id="wish-banner" title="Chạm để đọc trọn vẹn tâm thư & xem ảnh kỷ niệm">
-    <div class="wish-banner-text" id="banner-wish">Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!</div>
-    <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • Chúc mừng 8/3 (Chạm để mở thư & ảnh 💌)</div>
-  </section>
+    <nav class="quick-preset-bar creator-only" id="quick-preset-bar" aria-label="Chọn nhanh đối tượng nhận quà">
+      <button type="button" class="quick-preset-btn" data-recipient-preset="mother">👵 Mẹ</button>
+      <button type="button" class="quick-preset-btn" data-recipient-preset="wife">💍 Vợ</button>
+      <button type="button" class="quick-preset-btn active" data-recipient-preset="lover">💕 Người Yêu</button>
+      <button type="button" class="quick-preset-btn" data-recipient-preset="friend">🌸 Bạn Bè</button>
+    </nav>
+  </div>
+
+  <!-- Bottom Center Stack: Floating CRO Hook Bar + Wish Banner -->
+  <div class="bottom-center-stack">
+    <aside class="cro-hook-bar creator-only" id="cro-hook-bar">
+      <div class="cro-hook-text" id="cro-hook-text">
+        ✨ Quà cho <strong id="cro-hook-name">Minh Anh</strong> đã sẵn sàng
+      </div>
+      <button type="button" class="cro-hook-cta" id="btn-cro-pay">Tạo Link & QR</button>
+      <button type="button" class="cro-hook-close" id="btn-cro-close" aria-label="Thu gọn">✕</button>
+    </aside>
+
+    <section class="wish-banner" id="wish-banner" title="Chạm để đọc trọn vẹn tâm thư & xem ảnh kỷ niệm">
+      <div class="wish-banner-text" id="banner-wish">Chúc cô gái anh thương luôn xinh đẹp, rạng rỡ và bình yên mỗi ngày. Cảm ơn em đã đến, làm thế giới của anh trở nên dịu dàng và rực rỡ hơn rất nhiều!</div>
+      <div class="wish-banner-meta" id="banner-sender">Từ: Bảo Nam • 8/3 • Chạm xem thư 💌</div>
+    </section>
+  </div>
 
   <!-- Bottom Dock (1 hàng ngang trên mọi màn hình) -->
   <nav class="bottom-dock">
@@ -651,12 +942,40 @@
     <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
   </nav>
 
+  <!-- 3D Photo Spotlight Overlay (Opens when tapping any 3D Photo Frame in the Garden) -->
+  <div class="spotlight-overlay" id="photo-spotlight-overlay">
+    <div class="spotlight-card">
+      <button type="button" class="modal-close" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="spotlight-badge" id="spotlight-badge">🌸 Đóa Hoa Ký Ức #1 • Đài Hoa Ánh Sáng</div>
+      <div class="spotlight-img-wrap">
+        <img id="spotlight-img" src="" alt="Kỷ niệm khu vườn ánh sáng" />
+      </div>
+      <h3 class="spotlight-title" id="spotlight-title">Gửi Minh Anh Yêu Thương ✨</h3>
+      <p class="spotlight-caption" id="spotlight-caption">Mỗi đóa hoa nở rộ trong khu vườn đều lưu giữ một khoảnh khắc dịu dàng và rạng rỡ nhất của riêng em.</p>
+      <div class="spotlight-nav">
+        <button type="button" class="spotlight-btn" id="btn-spot-prev">← Ảnh trước</button>
+        <button type="button" class="spotlight-btn primary" id="btn-spot-all">💌 Đọc Tâm Thư</button>
+        <button type="button" class="spotlight-btn" id="btn-spot-next">Ảnh tiếp →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Tùy Chỉnh Vườn Hoa -->
   <div class="modal-backdrop" id="modal-customize">
     <div class="modal-card">
       <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
-      <h2 class="modal-title">🌷 Cá Nhân Hóa Vườn Hoa Ánh Sáng 3D</h2>
-      <p class="modal-sub">Tùy chỉnh dịp lễ 8/3 hoặc 20/10, tên người nhận, lời chúc yêu thương, màu sắc hoa và ảnh kỷ niệm trong khu vườn.</p>
+      <h2 class="modal-title">🌷 Cá Nhân Hóa Đài Hoa & Vườn Ánh Sáng 3D</h2>
+      <p class="modal-sub">Chọn nhanh người nhận hoặc tự khắc Danh hiệu + Tên lên Đài Hoa Pha Lê Vàng 3D ở trung tâm khu vườn.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Nhanh Đối Tượng Nhận (Đổi Danh Hiệu 3D + Màu Hoa + Lời Chúc)</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip modal-preset-chip" data-recipient-preset="mother">👵 Tặng Mẹ</button>
+          <button type="button" class="option-chip modal-preset-chip" data-recipient-preset="wife">💍 Tặng Vợ</button>
+          <button type="button" class="option-chip modal-preset-chip active" data-recipient-preset="lover">💕 Tặng Người Yêu</button>
+          <button type="button" class="option-chip modal-preset-chip" data-recipient-preset="friend">🌸 Tặng Bạn Bè</button>
+        </div>
+      </div>
 
       <div class="form-group">
         <label class="form-label">Chọn Dịp Tôn Vinh Phái Đẹp</label>
@@ -677,33 +996,33 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
-        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu, Cô Giáo..." value="Minh Anh" />
+        <label class="form-label" for="input-honorific">Danh Hiệu Khắc Trên Đài Hoa 3D</label>
+        <input id="input-honorific" type="text" class="form-input" maxlength="36" placeholder="VD: Kính Tặng Mẹ Yêu, Cô Gái Anh Thương..." value="Cô Gái Anh Thương" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận (Khắc Vàng 3D Trung Tâm)</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Mẹ Yêu, Vợ Yêu, Bạn Thân..." value="Minh Anh" />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="input-sender">Tên Người Gửi</label>
-        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Con Trai, Tập Thể Lớp..." value="Bảo Nam" />
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Con Của Mẹ, Chồng Yêu..." value="Bảo Nam" />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="input-wish">Lời Chúc Ngọt Ngào</label>
         <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời chúc gửi tới người phụ nữ tuyệt vời..."></textarea>
-        <div class="preset-wishes-row">
-          <button type="button" class="preset-wish-btn" data-preset="Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!">💖 Tặng Người Yêu / Vợ</button>
-          <button type="button" class="preset-wish-btn" data-preset="Con kính chúc Mẹ yêu luôn mạnh khỏe, bình an, tươi trẻ như hoa mùa xuân và mãi là ánh sáng ấm áp nhất của gia đình mình!">🌷 Kính Tặng Mẹ</button>
-          <button type="button" class="preset-wish-btn" data-preset="Chúc bạn luôn tự tin, tỏa sáng rực rỡ, gặt hái thật nhiều thành công và luôn được yêu thương trọn vẹn mỗi ngày!">✨ Tặng Bạn / Đồng Nghiệp</button>
-        </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Album Ảnh Kỷ Niệm Mọc Giữa Vườn Hoa (Tối đa 6 ảnh)</label>
+        <label class="form-label">Album Ảnh Kỷ Niệm Nở Trên Đại Đóa Hoa 3D (Tối đa 6 ảnh)</label>
         <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
         <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
         <div class="photo-grid" id="photo-preview-grid"></div>
       </div>
 
-      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🌸 Áp Dụng & Đánh Thức Vườn Hoa</button>
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">🌸 Áp Dụng & Xem Thử Cao Trào 3D</button>
     </div>
   </div>
 
@@ -722,7 +1041,7 @@
     (function () {
       'use strict';
 
-      // ==================== 1. STATE & THEME PALETTES ====================
+      // ==================== 1. STATE, THEME PALETTES & RECIPIENT PRESETS ====================
       const THEMES = {
         rose_emerald: {
           name: 'Hồng Ngọc Lục Bảo',
@@ -733,6 +1052,7 @@
           waveLight: '#ff6ec7',
           fireflyA: '#fde047',
           fireflyB: '#f472b6',
+          archGold: '#fbbf24',
           bgTop: '#071c24',
           bgMid: '#040d14'
         },
@@ -745,6 +1065,7 @@
           waveLight: '#fbbf24',
           fireflyA: '#fde047',
           fireflyB: '#5eead4',
+          archGold: '#fde047',
           bgTop: '#161807',
           bgMid: '#090d06'
         },
@@ -757,6 +1078,7 @@
           waveLight: '#e879f9',
           fireflyA: '#f472b6',
           fireflyB: '#c084fc',
+          archGold: '#f472b6',
           bgTop: '#190b28',
           bgMid: '#0b0514'
         },
@@ -769,6 +1091,7 @@
           waveLight: '#38bdf8',
           fireflyA: '#7dd3fc',
           fireflyB: '#fde047',
+          archGold: '#7dd3fc',
           bgTop: '#061a2e',
           bgMid: '#030b14'
         }
@@ -776,28 +1099,105 @@
 
       const THEME_KEYS = Object.keys(THEMES);
 
+      const RECIPIENT_PRESETS = {
+        mother: {
+          key: 'mother',
+          label: '👵 Tặng Mẹ',
+          honorific: 'Kính Tặng Mẹ Yêu',
+          defaultReceiver: 'Mẹ Yêu',
+          defaultSender: 'Con Của Mẹ',
+          theme: 'starlight_gold',
+          wish: 'Cảm ơn Mẹ đã luôn là bến đỗ bình yên và ấm áp nhất đời con. Chúc Mẹ luôn khỏe mạnh, an vui và cười thật nhiều mỗi ngày bên gia đình mình!',
+          photoCaptions: [
+            'Nụ cười hiền hậu của Mẹ là ánh nắng dịu dàng nhất trong lòng con 🌸',
+            'Cảm ơn Mẹ vì đã luôn chăm lo và yêu thương con vô điều kiện 💛',
+            'Chỉ mong Mẹ lúc nào cũng khỏe mạnh, bình an và thật nhiều niềm vui 🌷',
+            'Nhà mình luôn ấm áp tiếng cười nhờ có bàn tay tảo tần của Mẹ ✨',
+            'Đi đâu xa con cũng nhớ vòng tay và những lời dặn dò của Mẹ 👑',
+            'Cả khu vườn hoa hôm nay nở rộ để chúc Mẹ một ngày thật hạnh phúc 💐'
+          ]
+        },
+        wife: {
+          key: 'wife',
+          label: '💍 Tặng Vợ',
+          honorific: 'Người Bạn Đời Tuyệt Vời',
+          defaultReceiver: 'Vợ Yêu',
+          defaultSender: 'Chồng Yêu',
+          theme: 'rose_emerald',
+          wish: 'Cảm ơn em đã biến ngôi nhà nhỏ của mình thành nơi bình yên nhất để trở về. Chúc vợ yêu luôn trẻ đẹp, rạng rỡ và hạnh phúc trọn vẹn bên anh!',
+          photoCaptions: [
+            'Cảm ơn em đã cùng anh đi qua biết bao ngày nắng mưa thật đẹp 💍',
+            'Về nhà thấy nụ cười của vợ là mọi mệt mỏi ngoài kia đều tan biến 🌷',
+            'Người phụ nữ vừa dịu dàng vừa đảm đang của riêng anh 💖',
+            'Mỗi chuyến đi cùng vợ yêu đều là kỷ niệm anh trân trọng nhất ✨',
+            'Chúc vợ yêu luôn tươi trẻ, rạng ngời và được anh cưng chiều mỗi ngày 👑',
+            'Mãi nắm tay nhau thật chặt qua thật nhiều mùa hoa nữa vợ nhé 🌹'
+          ]
+        },
+        lover: {
+          key: 'lover',
+          label: '💕 Tặng Người Yêu',
+          honorific: 'Cô Gái Anh Thương',
+          defaultReceiver: 'Minh Anh',
+          defaultSender: 'Bảo Nam',
+          theme: 'sakura_violet',
+          wish: 'Chúc cô gái anh thương luôn xinh đẹp, rạng rỡ và bình yên mỗi ngày. Cảm ơn em đã đến, làm thế giới của anh trở nên dịu dàng và rực rỡ hơn rất nhiều!',
+          photoCaptions: [
+            'Ánh mắt và nụ cười của em làm bừng sáng cả một góc trời trong anh 🌸',
+            'Mỗi buổi tối đi cùng em đều lung linh như ngàn ánh đom đóm ✨',
+            'Dành tặng cô gái anh thương những đóa hoa dịu dàng và ngọt ngào nhất 💕',
+            'Cảm ơn em đã đến, mang theo thật nhiều ấm áp vào thế giới của anh 🌷',
+            'Chúc em luôn giữ nét rạng rỡ, tự tin và nụ cười đáng yêu này nha 💖',
+            'Giữa cả khu vườn rực rỡ, em vẫn là điều đẹp đẽ nhất anh muốn giữ 👑'
+          ]
+        },
+        friend: {
+          key: 'friend',
+          label: '🌸 Tặng Bạn Bè',
+          honorific: 'Người Bạn Tuyệt Vời',
+          defaultReceiver: 'Bạn Thân',
+          defaultSender: 'Hội Bạn Thân',
+          theme: 'crystal_cyan',
+          wish: 'Chúc cô bạn tuyệt vời của tui luôn xinh đẹp, tự tin, làm gì cũng suôn sẻ và lúc nào cũng giữ mãi nụ cười rạng rỡ như hôm nay nha!',
+          photoCaptions: [
+            'Chúc cô bạn lúc nào cũng rạng rỡ, vui vẻ và tràn đầy năng lượng 💎',
+            'Cảm ơn vì đã luôn lắng nghe và đồng hành cùng nhau qua mọi chuyện 🌸',
+            'Mong tụi mình mãi giữ được sự vô tư và những trận cười giòn tan ✨',
+            'Chúc mọi dự định sắp tới của bạn đều thuận lợi và nở hoa rực rỡ 🌷',
+            'Luôn yêu thương bản thân, xinh đẹp và tự tin tỏa sáng mỗi ngày nha 👑',
+            'Hôm nay là ngày của bạn, cứ tận hưởng thật trọn vẹn và hạnh phúc nhé 💐'
+          ]
+        }
+      };
+
       const SHORT_WISH_BUBBLES = [
-        '🌸 Luôn rạng rỡ như hoa!',
-        '💖 Hạnh phúc ngập tràn!',
-        '✨ Xinh đẹp & Tự tin!',
-        '🌷 Mãi tươi trẻ & Yêu đời!',
-        '👑 Người phụ nữ tuyệt vời!',
-        '💐 Ngàn điều ước thành hiện thực!'
+        '🌸 Luôn rạng rỡ và bình yên nhé!',
+        '💖 Hạnh phúc ngập tràn mỗi ngày!',
+        '✨ Xinh đẹp, tự tin và thật vui!',
+        '🌷 Mãi tươi trẻ & nhiều tiếng cười!',
+        '👑 Điều tuyệt vời nhất dành cho bạn!',
+        '💐 Ngàn điều tốt đẹp sẽ đến bên bạn!'
       ];
 
       const appState = {
         templateId: 'women_glowing_flower_garden',
         occasionType: '8/3',
+        presetKey: 'lover',
         theme: 'rose_emerald',
+        honorific: 'Cô Gái Anh Thương',
         sender: 'Bảo Nam',
         receiver: 'Minh Anh',
-        wish: 'Chúc em luôn xinh đẹp, rạng rỡ như muôn đóa hoa ánh sáng trong khu vườn mùa xuân, luôn giỏi giang và ngập tràn hạnh phúc mỗi ngày!',
+        hasCustomReceiver: false,
+        hasCustomSender: false,
+        wish: 'Chúc cô gái anh thương luôn xinh đẹp, rạng rỡ và bình yên mỗi ngày. Cảm ơn em đã đến, làm thế giới của anh trở nên dịu dàng và rực rỡ hơn rất nhiều!',
         photos: [],
         isViewerMode: false,
-        plantedCount: 0
+        plantedCount: 0,
+        activeSpotlightIdx: -1,
+        croDismissed: false
       };
 
-      // ==================== 2. WEB AUDIO API (SPRING HARP MELODY + DISTANT BIRD CHIRPS) ====================
+      // ==================== 2. WEB AUDIO API (SPRING HARP MELODY + AWAKENING FANFARE + BIRDS) ====================
       const AudioEngine = (() => {
         let ctx = null;
         let masterGain = null;
@@ -808,7 +1208,6 @@
         let birdTimer = null;
         let stepIdx = 0;
 
-        // Bright Spring Lydian/Major progression: Fmaj7 -> G6 -> Em7 -> Am9 -> Dm7 -> G13 -> Cmaj9
         const SPRING_CHORDS = [
           [261.63, 329.63, 392.00, 493.88, 587.33], // Cmaj9
           [220.00, 329.63, 392.00, 493.88, 523.25], // Am9
@@ -831,7 +1230,6 @@
             masterGain = ctx.createGain();
             masterGain.gain.value = 0.44;
 
-            // Gentle garden echo delay for distant birds & harp
             delayNode = ctx.createDelay(1.0);
             delayNode.delayTime.value = 0.28;
             delayFeedback = ctx.createGain();
@@ -912,7 +1310,6 @@
           oscHarm.stop(now + 0.25);
         }
 
-        // Synthesize distant spring bird chirps (2-4 syllables with pitch glide + FM trill)
         function playDistantBirdChirp(intensity = 1.0) {
           if (!ctx || !isEnabled) return;
           const now = ctx.currentTime;
@@ -944,7 +1341,6 @@
             osc.frequency.exponentialRampToValueAtTime(fPeak, start + dur * 0.45);
             osc.frequency.exponentialRampToValueAtTime(fEnd, start + dur);
 
-            // Rapid gentle vibrato/trill
             mod.type = 'sine';
             mod.frequency.setValueAtTime(28 + Math.random() * 18, start);
             modGain.gain.setValueAtTime(65, start);
@@ -977,6 +1373,17 @@
             }, idx * 55);
           });
           playDistantBirdChirp(0.85);
+        }
+
+        function playAwakeningFanfare() {
+          if (!ctx || !isEnabled) return;
+          const run = [392.00, 523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51, 1567.98];
+          run.forEach((n, idx) => {
+            setTimeout(() => {
+              if (isEnabled) playHarpNote(n, 0.064);
+            }, idx * 65);
+          });
+          playWarmSpringPad([261.63, 329.63, 392.00, 523.25], 2.8);
         }
 
         function tickSpringMusic() {
@@ -1031,6 +1438,7 @@
           toggle: () => setEnabled(!isEnabled),
           autoUnlock,
           playBloomChime,
+          playAwakeningFanfare,
           playDistantBirdChirp
         };
       })();
@@ -1050,10 +1458,11 @@
       renderer.outputEncoding = THREE.sRGBEncoding;
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x030c12, 0.028);
+      scene.fog = new THREE.FogExp2(0x030c12, 0.025);
 
       const camera = new THREE.PerspectiveCamera(48, cw / ch, 0.1, 140);
-      let baseCamPos = { x: 0, y: 4.5, z: 11.8 };
+      let baseCamPos = { x: 0, y: 4.3, z: 11.2 };
+      let baseLookAt = { x: 0, y: 1.5, z: -8.2 };
 
       function updateCameraResponsive() {
         cw = window.innerWidth;
@@ -1061,32 +1470,31 @@
         const aspect = cw / ch;
         const isMobile = cw < 768 || aspect < 0.8;
         camera.aspect = aspect;
-        baseCamPos.y = isMobile ? 4.85 : 4.35;
-        baseCamPos.z = isMobile ? (aspect < 0.58 ? 14.6 : 13.4) : 11.4;
-        camera.position.set(baseCamPos.x, baseCamPos.y, baseCamPos.z);
-        camera.lookAt(0, 1.0, -9.5);
+        baseCamPos.y = isMobile ? 4.65 : 4.25;
+        baseCamPos.z = isMobile ? (aspect < 0.58 ? 13.8 : 12.6) : 10.6;
+        baseLookAt.y = isMobile ? 1.55 : 1.65;
+        baseLookAt.z = -8.2;
         camera.updateProjectionMatrix();
         renderer.setSize(cw, ch, false);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       }
 
       // 3-Point Lighting + Warm/Cool Contrast (3d-visual.md)
-      const ambientLight = new THREE.AmbientLight(0xd8f3dc, 0.68);
+      const ambientLight = new THREE.AmbientLight(0xd8f3dc, 0.72);
       scene.add(ambientLight);
 
-      const warmWaveLight = new THREE.PointLight(0xff6ec7, 2.5, 34);
+      const warmWaveLight = new THREE.PointLight(0xff6ec7, 2.5, 36);
       warmWaveLight.position.set(0, 2.8, 4);
       scene.add(warmWaveLight);
 
-      const goldCenterLight = new THREE.PointLight(0xffbe0b, 1.45, 50);
-      goldCenterLight.position.set(0, 6.5, -8);
-      scene.add(goldCenterLight);
+      const goldSanctuaryLight = new THREE.PointLight(0xffcf33, 2.1, 45);
+      goldSanctuaryLight.position.set(0, 5.2, -7.2);
+      scene.add(goldSanctuaryLight);
 
-      const coolRimLight = new THREE.DirectionalLight(0x38bdf8, 0.92);
+      const coolRimLight = new THREE.DirectionalLight(0x38bdf8, 0.95);
       coolRimLight.position.set(-14, 12, -16);
       scene.add(coolRimLight);
 
-      // Procedural Glow Sprite Texture (sRGBEncoding)
       function createGlowTexture(innerHex = '#ffffff', midHex = '#f472b6') {
         const c = document.createElement('canvas');
         c.width = 64;
@@ -1094,8 +1502,8 @@
         const g = c.getContext('2d');
         const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
         grad.addColorStop(0, innerHex);
-        grad.addColorStop(0.32, midHex);
-        grad.addColorStop(0.7, 'rgba(244, 114, 182, 0.18)');
+        grad.addColorStop(0.34, midHex);
+        grad.addColorStop(0.72, 'rgba(244, 114, 182, 0.18)');
         grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         g.fillStyle = grad;
         g.fillRect(0, 0, 64, 64);
@@ -1105,12 +1513,12 @@
       }
 
       const glowSpriteTex = createGlowTexture('#fffbeb', '#f472b6');
+      const goldGlowSpriteTex = createGlowTexture('#ffffff', '#fde047');
 
-      // Terrain height function: gentle rolling hills + central valley so flowers stretch vertically up the screen
       function getTerrainHeight(x, z) {
-        const valley = Math.min(1.4, (x * x) * 0.018);
-        const roll = Math.sin(x * 0.24) * 0.22 + Math.cos(z * 0.21) * 0.26;
-        const slopeUp = Math.max(0, (-z - 2) * 0.065); // Gently rises toward the distant horizon so back flowers are visible vertically!
+        const valley = Math.min(1.35, (x * x) * 0.016);
+        const roll = Math.sin(x * 0.24) * 0.18 + Math.cos(z * 0.21) * 0.22;
+        const slopeUp = Math.max(0, (-z - 2) * 0.058);
         return valley + roll + slopeUp - 0.65;
       }
 
@@ -1126,8 +1534,8 @@
         const vy = getTerrainHeight(vx, vz);
         tPos.setY(i, vy);
 
-        const pathGlow = Math.exp(-(vx * vx) * 0.08);
-        const c = new THREE.Color('#041519').lerp(new THREE.Color('#0c3b3e'), pathGlow * 0.75);
+        const pathGlow = Math.exp(-(vx * vx) * 0.12);
+        const c = new THREE.Color('#041519').lerp(new THREE.Color('#134e4a'), pathGlow * 0.85);
         tCols[i * 3] = c.r;
         tCols[i * 3 + 1] = c.g;
         tCols[i * 3 + 2] = c.b;
@@ -1143,7 +1551,7 @@
       scene.add(terrainMesh);
       terrainMesh.updateMatrixWorld(true);
 
-      // 3.2 3D Swaying Grass Meadow (4,500 3D blades in a custom ShaderMaterial BufferGeometry)
+      // 3.2 3D Swaying Grass Meadow (4,500 3D blades in 1 draw-call)
       const GRASS_COUNT = 4500;
       const grassGeo = new THREE.BufferGeometry();
       const gVerts = new Float32Array(GRASS_COUNT * 5 * 3);
@@ -1154,7 +1562,7 @@
 
       for (let i = 0; i < GRASS_COUNT; i++) {
         const gx = (Math.random() - 0.5) * 32;
-        const gz = 8.5 - Math.random() * 38.5; // z from +8.5 to -30
+        const gz = 8.5 - Math.random() * 38.5;
         const gy = getTerrainHeight(gx, gz);
         const h = 0.42 + Math.random() * 0.55;
         const w = 0.045 + Math.random() * 0.03;
@@ -1165,7 +1573,6 @@
         const leanZ = (Math.random() - 0.5) * 0.16;
         const phase = Math.random() * Math.PI * 2;
 
-        // 5 vertices per blade: [0: baseL, 1: baseR, 2: midL, 3: midR, 4: tip]
         const localPts = [
           [-dx, 0, -dz, 0.0],
           [dx, 0, dz, 0.0],
@@ -1230,7 +1637,7 @@
             pos.x += wind * bendFactor;
             pos.z += wind * 0.45 * bendFactor;
             float distToWave = abs(aBasePos.z - uWaveZ);
-            vWaveProx = smoothstep(4.2, 0.0, distToWave);
+            vWaveProx = smoothstep(4.5, 0.0, distToWave);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
           }
         `,
@@ -1242,7 +1649,7 @@
           varying float vWaveProx;
           void main() {
             vec3 col = mix(uBaseColor, uTipColor, pow(vUvY, 1.35));
-            col = mix(col, uWaveGlowColor, vWaveProx * vUvY * 0.65);
+            col = mix(col, uWaveGlowColor, vWaveProx * vUvY * 0.68);
             gl_FragColor = vec4(col, 1.0);
           }
         `
@@ -1256,7 +1663,6 @@
       scene.add(flowersGroup);
       const flowers = [];
 
-      // Shared sculpted 3D petal geometry (curved, cupped petal)
       function createSculptedPetalGeometry(length = 0.65, width = 0.28) {
         const geo = new THREE.PlaneGeometry(width, length, 5, 7);
         geo.translate(0, length * 0.5, 0);
@@ -1265,10 +1671,8 @@
           const x = pos.getX(i);
           const y = pos.getY(i);
           const t = Math.max(0, Math.min(1, y / length));
-          // Taper width at base and tip, wider in the middle
           const profile = Math.sin(t * Math.PI) * 0.92 + 0.14 * (1 - t);
           const nx = x * profile;
-          // Cup curve along width + graceful arch along length
           const cupZ = (nx * nx) * 1.4 - Math.sin(t * Math.PI) * 0.14;
           pos.setX(i, nx);
           pos.setZ(i, cupZ);
@@ -1324,7 +1728,6 @@
 
         const headGroup = new THREE.Group();
         headGroup.position.set(0, stemHeight, 0);
-        // Tilt slightly toward the camera so the blooming petals face the viewer clearly
         headGroup.rotation.x = 0.38 + (Math.random() - 0.5) * 0.14;
         headGroup.rotation.z = (Math.random() - 0.5) * 0.18;
         root.add(headGroup);
@@ -1394,20 +1797,23 @@
         return flowerObj;
       }
 
-      // Populate 64 flowers arranged from foreground (z = +7.6) to distant horizon (z = -28.0)
       function buildInitialFlowerGarden() {
         const rows = 16;
         for (let r = 0; r < rows; r++) {
           const t = r / (rows - 1);
-          const z = 7.6 - t * 35.6; // Runs vertically up the screen from z=+7.6 to z=-28.0
+          const z = 7.6 - t * 35.6;
           const rowCount = r < 5 ? 4 : 5;
           const spreadX = 3.4 + t * 9.8;
           for (let c = 0; c < rowCount; c++) {
             const frac = rowCount === 1 ? 0 : (c / (rowCount - 1)) * 2 - 1;
-            const jitterX = (Math.random() - 0.5) * 1.35;
-            const jitterZ = (Math.random() - 0.5) * 1.1;
-            const fx = frac * spreadX + jitterX;
+            const jitterX = (Math.random() - 0.5) * 1.25;
+            const jitterZ = (Math.random() - 0.5) * 1.0;
+            let fx = frac * spreadX + jitterX;
             const fz = z + jitterZ;
+            // Keep central sanctuary courtyard (|x| < 2.2, -9.5 < z < -6.5) clear so the 3D Engraved Nameplate stands out
+            if (Math.abs(fx) < 2.2 && fz < -6.2 && fz > -10.2) {
+              fx = fx >= 0 ? 2.5 : -2.5;
+            }
             const sc = 0.92 + Math.random() * 0.45;
             const initBloom = 0.55 + 0.45 * Math.cos(t * Math.PI * 1.5);
             createFlowerInstance(fx, fz, sc, initBloom, false);
@@ -1417,14 +1823,212 @@
 
       buildInitialFlowerGarden();
 
-      // ==================== 5. BLOOM WAVE RIBBON, POLLEN BURSTS & TAP RIPPLES ====================
-      // Glowing Wave Arc sweeping across the meadow
-      const waveRibbonGeo = new THREE.RingGeometry(4.2, 5.1, 48, 1, 0, Math.PI);
+      // ==================== 5. CENTRAL SANCTUARY SHRINE & 3D ENGRAVED GOLD/CRYSTAL NAMEPLATE ====================
+      const sanctuaryGroup = new THREE.Group();
+      const SANCTUARY_Z = -8.2;
+      const sanctuaryBaseY = getTerrainHeight(0, SANCTUARY_Z);
+      sanctuaryGroup.position.set(0, sanctuaryBaseY, SANCTUARY_Z);
+      scene.add(sanctuaryGroup);
+
+      const goldMetalMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#fbbf24'),
+        emissive: new THREE.Color('#d97706'),
+        emissiveIntensity: 0.48,
+        metalness: 0.85,
+        roughness: 0.2
+      });
+
+      const crystalPedestalMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#0f3d3e'),
+        emissive: new THREE.Color('#0d9488'),
+        emissiveIntensity: 0.35,
+        metalness: 0.25,
+        roughness: 0.18
+      });
+
+      // Stepped Sanctuary Pedestal Base
+      const step1 = new THREE.Mesh(new THREE.CylinderGeometry(2.65, 2.95, 0.24, 36), crystalPedestalMat);
+      step1.position.y = 0.12;
+      sanctuaryGroup.add(step1);
+
+      const step1Ring = new THREE.Mesh(new THREE.TorusGeometry(2.75, 0.045, 12, 48), goldMetalMat);
+      step1Ring.rotation.x = Math.PI / 2;
+      step1Ring.position.y = 0.24;
+      sanctuaryGroup.add(step1Ring);
+
+      const step2 = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.35, 0.26, 36), crystalPedestalMat);
+      step2.position.y = 0.36;
+      sanctuaryGroup.add(step2);
+
+      const step2Ring = new THREE.Mesh(new THREE.TorusGeometry(2.18, 0.045, 12, 48), goldMetalMat);
+      step2Ring.rotation.x = Math.PI / 2;
+      step2Ring.position.y = 0.49;
+      sanctuaryGroup.add(step2Ring);
+
+      // Glowing Floral Archway framing the 3D Engraved Nameplate
+      const archMesh = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.075, 16, 56, Math.PI), goldMetalMat);
+      archMesh.position.set(0, 1.35, -0.18);
+      sanctuaryGroup.add(archMesh);
+
+      const innerArchMesh = new THREE.Mesh(new THREE.TorusGeometry(2.32, 0.038, 12, 48, Math.PI), goldMetalMat);
+      innerArchMesh.position.set(0, 1.35, -0.18);
+      sanctuaryGroup.add(innerArchMesh);
+
+      // Add 7 ornamental glowing lotus buds along the golden arch
+      for (let a = 0; a <= 6; a++) {
+        const ang = (a / 6) * Math.PI;
+        const ax = Math.cos(ang) * 2.55;
+        const ay = 1.35 + Math.sin(ang) * 2.55;
+        const orb = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), coreMat);
+        orb.position.set(ax, ay, -0.18);
+        sanctuaryGroup.add(orb);
+
+        const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: goldGlowSpriteTex,
+          color: new THREE.Color('#fde047'),
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        }));
+        sp.scale.setScalar(0.85);
+        sp.position.set(ax, ay, -0.15);
+        sanctuaryGroup.add(sp);
+      }
+
+      // 3D Engraved Gold/Crystal Nameplate Backing + Front Plaque
+      const plaqueWidth = 3.85;
+      const plaqueHeight = 2.02;
+      const plaqueBacking = new THREE.Mesh(
+        new THREE.BoxGeometry(plaqueWidth + 0.16, plaqueHeight + 0.16, 0.12),
+        goldMetalMat
+      );
+      plaqueBacking.position.set(0, 1.72, 0.02);
+      sanctuaryGroup.add(plaqueBacking);
+
+      let nameplateMesh = null;
+      const sanctuaryHaloSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: goldGlowSpriteTex,
+        color: new THREE.Color('#fde047'),
+        transparent: true,
+        opacity: 0.68,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      }));
+      sanctuaryHaloSprite.scale.set(6.5, 4.4, 1);
+      sanctuaryHaloSprite.position.set(0, 1.85, -0.25);
+      sanctuaryGroup.add(sanctuaryHaloSprite);
+
+      // High-Resolution 3D Nameplate Canvas Texture (Generous vertical padding so Vietnamese diacritics & g, y, p, q never clip!)
+      function rebuild3DNameplateTexture() {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 540;
+        const g = c.getContext('2d');
+
+        // Deep Royal Emerald-Ruby Crystal background
+        const bgGrad = g.createLinearGradient(0, 0, 1024, 540);
+        bgGrad.addColorStop(0, '#051e24');
+        bgGrad.addColorStop(0.5, '#0b383d');
+        bgGrad.addColorStop(1, '#3b0a28');
+        g.fillStyle = bgGrad;
+        g.fillRect(0, 0, 1024, 540);
+
+        // Soft inner radial golden aura
+        const aura = g.createRadialGradient(512, 265, 20, 512, 265, 440);
+        aura.addColorStop(0, 'rgba(253, 224, 71, 0.26)');
+        aura.addColorStop(0.55, 'rgba(244, 114, 182, 0.14)');
+        aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = aura;
+        g.fillRect(0, 0, 1024, 540);
+
+        // Double ornamental gold border
+        g.strokeStyle = '#fde047';
+        g.lineWidth = 8;
+        g.strokeRect(18, 18, 988, 504);
+
+        g.strokeStyle = 'rgba(254, 240, 138, 0.55)';
+        g.lineWidth = 3;
+        g.strokeRect(32, 32, 960, 476);
+
+        // Corner diamond ornaments
+        const corners = [[46, 46], [978, 46], [46, 494], [978, 494]];
+        g.fillStyle = '#fde047';
+        corners.forEach(([cx, cy]) => {
+          g.beginPath();
+          g.arc(cx, cy, 8, 0, Math.PI * 2);
+          g.fill();
+        });
+
+        const occShort = appState.occasionType === '20/10' ? 'PHỤ NỮ VIỆT NAM 20/10' : 'QUỐC TẾ PHỤ NỮ 8/3';
+        const honorificText = (appState.honorific || 'Người Phụ Nữ Tuyệt Vời').toUpperCase();
+
+        // Line 1: Honorific + Occasion (y = 115, generous top padding >= 80px)
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.font = '700 30px "Plus Jakarta Sans", sans-serif';
+        g.fillStyle = '#fef08a';
+        g.shadowColor = 'rgba(253, 224, 71, 0.7)';
+        g.shadowBlur = 12;
+        g.fillText(`👑 ${honorificText} • ${occShort} ✨`, 512, 115, 900);
+
+        // Line 2: Receiver Name in large 3D gold-embossed calligraphy (y = 268, plenty of room above & below for diacritics and g, y, p, q descenders!)
+        const receiverName = appState.receiver || 'Minh Anh';
+        const fontSize = receiverName.length > 18 ? 78 : (receiverName.length > 12 ? 92 : 106);
+        g.font = `700 ${fontSize}px "Dancing Script", Georgia, cursive`;
+        g.shadowColor = 'rgba(244, 114, 182, 0.9)';
+        g.shadowBlur = 24;
+
+        const nameGrad = g.createLinearGradient(200, 195, 824, 340);
+        nameGrad.addColorStop(0, '#fffbeb');
+        nameGrad.addColorStop(0.45, '#fde047');
+        nameGrad.addColorStop(1, '#f9a8d4');
+        g.fillStyle = nameGrad;
+        g.fillText(receiverName, 512, 268, 910);
+
+        // Decorative divider line under receiver name (y = 368)
+        g.shadowBlur = 0;
+        g.strokeStyle = 'rgba(253, 224, 71, 0.55)';
+        g.lineWidth = 2.5;
+        g.beginPath();
+        g.moveTo(240, 368);
+        g.lineTo(784, 368);
+        g.stroke();
+
+        // Line 3: Sender dedication (y = 432, generous bottom margin 108px)
+        g.font = '700 28px "Plus Jakarta Sans", sans-serif';
+        g.fillStyle = '#a7f3d0';
+        g.shadowColor = 'rgba(16, 185, 129, 0.6)';
+        g.shadowBlur = 10;
+        g.fillText(`💌 Gửi trao yêu thương từ: ${appState.sender || 'Bảo Nam'}`, 512, 432, 900);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+
+        if (!nameplateMesh) {
+          const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            toneMapped: false
+          });
+          nameplateMesh = new THREE.Mesh(new THREE.PlaneGeometry(plaqueWidth, plaqueHeight), mat);
+          nameplateMesh.position.set(0, 1.72, 0.09);
+          nameplateMesh.userData = { isSanctuaryPlaque: true };
+          sanctuaryGroup.add(nameplateMesh);
+          nameplateMesh.updateMatrixWorld(true);
+        } else {
+          if (nameplateMesh.material.map) nameplateMesh.material.map.dispose();
+          nameplateMesh.material.map = tex;
+          nameplateMesh.material.needsUpdate = true;
+        }
+      }
+
+      // ==================== 6. BLOOM WAVE RIBBON, POLLEN BURSTS & TAP RIPPLES ====================
+      const waveRibbonGeo = new THREE.RingGeometry(4.2, 5.2, 48, 1, 0, Math.PI);
       waveRibbonGeo.rotateX(-Math.PI / 2);
       const waveRibbonMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color('#ff6ec7'),
         transparent: true,
-        opacity: 0.36,
+        opacity: 0.38,
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
         depthWrite: false
@@ -1432,7 +2036,6 @@
       const waveRibbonMesh = new THREE.Mesh(waveRibbonGeo, waveRibbonMat);
       scene.add(waveRibbonMesh);
 
-      // Fireflies & Rising Pollen Particles (THREE.Points + BufferGeometry)
       const FIREFLY_COUNT = 520;
       const fireflyGeo = new THREE.BufferGeometry();
       const ffPos = new Float32Array(FIREFLY_COUNT * 3);
@@ -1474,22 +2077,21 @@
       scene.add(fireflyPoints);
 
       let pollenCursor = 0;
-      function emitPollenBurst(x, y, z, count = 10) {
+      function emitPollenBurst(x, y, z, count = 12) {
         const posAttr = fireflyGeo.getAttribute('position');
         for (let i = 0; i < count; i++) {
           const idx = (pollenCursor++) % FIREFLY_COUNT;
           const i3 = idx * 3;
-          posAttr.array[i3] = x + (Math.random() - 0.5) * 0.45;
+          posAttr.array[i3] = x + (Math.random() - 0.5) * 0.5;
           posAttr.array[i3 + 1] = y + 0.1;
-          posAttr.array[i3 + 2] = z + (Math.random() - 0.5) * 0.45;
-          ffVel[i3] = (Math.random() - 0.5) * 1.4;
-          ffVel[i3 + 1] = 0.85 + Math.random() * 1.35;
-          ffVel[i3 + 2] = (Math.random() - 0.5) * 1.4;
+          posAttr.array[i3 + 2] = z + (Math.random() - 0.5) * 0.5;
+          ffVel[i3] = (Math.random() - 0.5) * 1.5;
+          ffVel[i3 + 1] = 0.9 + Math.random() * 1.45;
+          ffVel[i3 + 2] = (Math.random() - 0.5) * 1.5;
         }
         posAttr.needsUpdate = true;
       }
 
-      // Ground Ripples when tapping grass
       const ripples = [];
       const rippleGeo = new THREE.RingGeometry(0.18, 0.28, 32);
       rippleGeo.rotateX(-Math.PI / 2);
@@ -1509,8 +2111,7 @@
         ripples.push({ mesh, age: 0, maxAge: 1.15 });
       }
 
-      // ==================== 6. 3D SKY EMBLEM & 3D PHOTO FRAMES ====================
-      // 3D Sky Glowing Title Banner (Generous >38% vertical padding so Vietnamese text never clips!)
+      // ==================== 7. 3D SKY AURORA & 6 GIANT LOTUS PHOTO FRAMES ====================
       let skyBannerMesh = null;
 
       function rebuildSkyBannerTexture() {
@@ -1520,11 +2121,10 @@
         const g = c.getContext('2d');
         g.clearRect(0, 0, c.width, c.height);
 
-        // Soft glowing spring aurora & full moon over the horizon
         const rad = g.createRadialGradient(512, 260, 18, 512, 260, 440);
-        rad.addColorStop(0, 'rgba(253, 224, 71, 0.34)');
-        rad.addColorStop(0.38, 'rgba(244, 114, 182, 0.22)');
-        rad.addColorStop(0.7, 'rgba(16, 185, 129, 0.10)');
+        rad.addColorStop(0, 'rgba(253, 224, 71, 0.36)');
+        rad.addColorStop(0.38, 'rgba(244, 114, 182, 0.24)');
+        rad.addColorStop(0.7, 'rgba(16, 185, 129, 0.12)');
         rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         g.fillStyle = rad;
         g.fillRect(0, 0, c.width, c.height);
@@ -1540,8 +2140,8 @@
             depthWrite: false,
             toneMapped: false
           });
-          skyBannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(22.0, 11.0), mat);
-          skyBannerMesh.position.set(0, 4.2, -21.0);
+          skyBannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(24.0, 12.0), mat);
+          skyBannerMesh.position.set(0, 4.4, -21.0);
           scene.add(skyBannerMesh);
         } else {
           if (skyBannerMesh.material.map) skyBannerMesh.material.map.dispose();
@@ -1550,57 +2150,97 @@
         }
       }
 
-      // 3D Photo Frames nestled in the flower garden
+      // 3D Photo Frames blooming atop Giant Glowing Flowers in a semi-circular arc flanking the Central Sanctuary
       const photoGroup = new THREE.Group();
       scene.add(photoGroup);
       const photoMeshes = [];
+      const photoDisplayUrls = [];
 
       function createDefaultArtCardCanvas(index) {
         const c = document.createElement('canvas');
-        c.width = 360;
-        c.height = 440;
+        c.width = 420;
+        c.height = 500;
         const g = c.getContext('2d');
 
-        // Frame border
+        // Polaroid gold-rimmed card background
         g.fillStyle = '#fffdf9';
-        g.fillRect(0, 0, 360, 440);
+        g.fillRect(0, 0, 420, 500);
 
-        const grad = g.createLinearGradient(18, 18, 342, 342);
-        if (index % 2 === 0) {
-          grad.addColorStop(0, '#0f5156');
-          grad.addColorStop(0.5, '#9d174d');
-          grad.addColorStop(1, '#f472b6');
-        } else {
-          grad.addColorStop(0, '#1e1b4b');
-          grad.addColorStop(0.5, '#047857');
-          grad.addColorStop(1, '#fde047');
-        }
+        g.strokeStyle = '#f59e0b';
+        g.lineWidth = 6;
+        g.strokeRect(8, 8, 404, 484);
+
+        const palettes = [
+          ['#0f5156', '#9d174d', '#f472b6'],
+          ['#1e1b4b', '#047857', '#fde047'],
+          ['#3b0764', '#be185d', '#fbcfe8'],
+          ['#064e3b', '#0284c7', '#fde68a'],
+          ['#4c0519', '#b45309', '#fef08a'],
+          ['#172554', '#7e22ce', '#f9a8d4']
+        ];
+        const pal = palettes[index % palettes.length];
+        const grad = g.createLinearGradient(22, 22, 398, 386);
+        grad.addColorStop(0, pal[0]);
+        grad.addColorStop(0.52, pal[1]);
+        grad.addColorStop(1, pal[2]);
         g.fillStyle = grad;
-        g.fillRect(18, 18, 324, 324);
+        g.fillRect(22, 22, 376, 364);
 
-        // Draw glowing botanical flower illustration inside frame
+        // Glowing botanical lotus/rose illustration inside frame
         g.save();
-        g.translate(180, 180);
-        for (let i = 0; i < 8; i++) {
-          g.rotate(Math.PI / 4);
-          g.fillStyle = 'rgba(255, 240, 248, 0.78)';
+        g.translate(210, 204);
+        for (let i = 0; i < 10; i++) {
+          g.rotate((Math.PI * 2) / 10);
+          g.fillStyle = 'rgba(255, 245, 250, 0.82)';
           g.beginPath();
-          g.ellipse(0, -52, 22, 48, 0, 0, Math.PI * 2);
+          g.ellipse(0, -64, 24, 56, 0, 0, Math.PI * 2);
           g.fill();
         }
-        g.fillStyle = '#fde047';
+        for (let i = 0; i < 6; i++) {
+          g.rotate((Math.PI * 2) / 6);
+          g.fillStyle = 'rgba(253, 224, 71, 0.75)';
+          g.beginPath();
+          g.ellipse(0, -36, 16, 34, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = '#fffbeb';
         g.beginPath();
-        g.arc(0, 0, 24, 0, Math.PI * 2);
+        g.arc(0, 0, 22, 0, Math.PI * 2);
         g.fill();
         g.restore();
 
-        const labels = ['Rạng Rỡ Như Hoa 🌸', 'Xinh Đẹp & Hạnh Phúc 💖', 'Mãi Tươi Trẻ 🌷', 'Yêu Thương Trọn Vẹn ✨'];
+        const labels = [
+          'Đóa Hoa Rạng Rỡ 🌸',
+          'Khoảnh Khắc Diệu Kỳ 💖',
+          'Thanh Xuân Tươi Đẹp 🌷',
+          'Yêu Thương Trọn Vẹn ✨',
+          'Nụ Cười Tỏa Nắng 👑',
+          'Hạnh Phúc Ngập Tràn 💐'
+        ];
         g.fillStyle = '#831843';
-        g.font = '700 24px "Dancing Script", Georgia, cursive';
+        g.font = '700 28px "Dancing Script", Georgia, cursive';
         g.textAlign = 'center';
         g.textBaseline = 'middle';
-        g.fillText(labels[index % labels.length], 180, 388);
+        g.fillText(labels[index % labels.length], 210, 442, 370);
         return c;
+      }
+
+      function createGiantPedestalBlossom() {
+        const blossom = new THREE.Group();
+        for (let i = 0; i < 10; i++) {
+          const piv = new THREE.Group();
+          piv.rotation.y = (i / 10) * Math.PI * 2;
+          piv.rotation.x = 1.08;
+          const petal = new THREE.Mesh(outerPetalGeo, outerPetalMat);
+          petal.scale.setScalar(1.18);
+          piv.add(petal);
+          blossom.add(piv);
+        }
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.04, 10, 28), goldMetalMat);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = 0.08;
+        blossom.add(ring);
+        return blossom;
       }
 
       function rebuild3DPhotoFrames() {
@@ -1613,76 +2253,112 @@
           }
         }
         photoMeshes.length = 0;
+        photoDisplayUrls.length = 0;
 
+        // 6 prominent slots arranged in a semi-circular arc flanking the pathway & Central Sanctuary
         const slots = [
-          { x: -3.2, z: -1.8, rotY: 0.28 },
-          { x: 3.2, z: -3.2, rotY: -0.28 },
-          { x: -4.1, z: -7.5, rotY: 0.22 },
-          { x: 4.1, z: -8.8, rotY: -0.22 },
-          { x: -2.8, z: -12.5, rotY: 0.18 },
-          { x: 2.9, z: -13.5, rotY: -0.18 }
+          { x: -2.45, z: -2.2, rotY: 0.34 },
+          { x: 2.45, z: -2.2, rotY: -0.34 },
+          { x: -3.55, z: -5.2, rotY: 0.28 },
+          { x: 3.55, z: -5.2, rotY: -0.28 },
+          { x: -4.15, z: -8.3, rotY: 0.22 },
+          { x: 4.15, z: -8.3, rotY: -0.22 }
         ];
 
         const hasUserPhotos = appState.photos.length > 0;
-        const count = hasUserPhotos ? Math.min(appState.photos.length, slots.length) : 4;
+        const count = slots.length; // Always render 6 prominent 3D photo frames
 
         for (let idx = 0; idx < count; idx++) {
           const slot = slots[idx];
-          const baseY = getTerrainHeight(slot.x, slot.z) + 1.45;
+          const groundY = getTerrainHeight(slot.x, slot.z);
+          const baseY = groundY + 1.68;
 
-          const addFrameMeshFromCanvas = (canvasEl) => {
+          // Giant glowing flower cradle under each 3D photo frame
+          const cradle = createGiantPedestalBlossom();
+          cradle.position.set(slot.x, groundY + 0.42, slot.z);
+          photoGroup.add(cradle);
+
+          const addFrameMeshFromCanvas = (canvasEl, dataUrlForSpotlight) => {
+            photoDisplayUrls[idx] = dataUrlForSpotlight || canvasEl.toDataURL('image/jpeg', 0.88);
             const tex = new THREE.CanvasTexture(canvasEl);
             tex.encoding = THREE.sRGBEncoding;
+
             const mat = new THREE.MeshBasicMaterial({
               map: tex,
               side: THREE.DoubleSide,
               toneMapped: false
             });
-            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 2.14), mat);
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.68, 2.02), mat);
             mesh.position.set(slot.x, baseY, slot.z);
             mesh.rotation.y = slot.rotY;
-            mesh.userData = { baseY, phase: idx * 1.3, index: idx };
+            mesh.userData = {
+              baseY,
+              slotX: slot.x,
+              slotZ: slot.z,
+              rotY: slot.rotY,
+              phase: idx * 1.15,
+              index: idx
+            };
+
+            // Golden 3D frame border behind the photo plane
+            const goldBack = new THREE.Mesh(new THREE.PlaneGeometry(1.80, 2.14), goldMetalMat);
+            goldBack.position.set(0, 0, -0.02);
+            mesh.add(goldBack);
+
             photoGroup.add(mesh);
             mesh.updateMatrixWorld(true);
             photoMeshes.push(mesh);
           };
 
-          if (!hasUserPhotos) {
-            addFrameMeshFromCanvas(createDefaultArtCardCanvas(idx));
+          if (!hasUserPhotos || idx >= appState.photos.length) {
+            const defCanvas = createDefaultArtCardCanvas(idx);
+            addFrameMeshFromCanvas(defCanvas, defCanvas.toDataURL('image/png'));
           } else {
             const item = appState.photos[idx];
             const src = typeof item === 'string' ? item : item.url;
-            if (!src) continue;
+            if (!src) {
+              const defCanvas = createDefaultArtCardCanvas(idx);
+              addFrameMeshFromCanvas(defCanvas, defCanvas.toDataURL('image/png'));
+              continue;
+            }
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = () => {
               const c = document.createElement('canvas');
-              c.width = 360;
-              c.height = 440;
+              c.width = 420;
+              c.height = 500;
               const g = c.getContext('2d');
               g.fillStyle = '#fffdf9';
-              g.fillRect(0, 0, 360, 440);
+              g.fillRect(0, 0, 420, 500);
+
+              g.strokeStyle = '#f59e0b';
+              g.lineWidth = 6;
+              g.strokeRect(8, 8, 404, 484);
 
               const iw = img.width || 300;
               const ih = img.height || 300;
-              const tw = 324;
-              const th = 324;
+              const tw = 376;
+              const th = 364;
               const sc = Math.max(tw / iw, th / ih);
               const dw = iw * sc;
               const dh = ih * sc;
               g.save();
               g.beginPath();
-              g.rect(18, 18, tw, th);
+              g.rect(22, 22, tw, th);
               g.clip();
-              g.drawImage(img, 18 + (tw - dw) / 2, 18 + (th - dh) / 2, dw, dh);
+              g.drawImage(img, 22 + (tw - dw) / 2, 22 + (th - dh) / 2, dw, dh);
               g.restore();
 
               g.fillStyle = '#9d174d';
-              g.font = '700 24px "Dancing Script", Georgia, cursive';
+              g.font = '700 28px "Dancing Script", Georgia, cursive';
               g.textAlign = 'center';
               g.textBaseline = 'middle';
-              g.fillText(`Kỷ niệm #${idx + 1} ✨`, 180, 388);
-              addFrameMeshFromCanvas(c);
+              g.fillText(`Kỷ niệm #${idx + 1} • ${appState.receiver} ✨`, 210, 442, 376);
+              addFrameMeshFromCanvas(c, src);
+            };
+            img.onerror = () => {
+              const defCanvas = createDefaultArtCardCanvas(idx);
+              addFrameMeshFromCanvas(defCanvas, defCanvas.toDataURL('image/png'));
             };
             img.src = src;
           }
@@ -1703,6 +2379,7 @@
         innerPetalMat.color.set(pal.petalInner);
         innerPetalMat.emissive.set(pal.petalOuter);
         coreMat.color.set(pal.coreGlow);
+        goldMetalMat.color.set(pal.archGold);
 
         grassUniforms.uTipColor.value.set(pal.grassTip);
         grassUniforms.uWaveGlowColor.value.set(pal.waveLight);
@@ -1725,7 +2402,7 @@
         });
       }
 
-      // ==================== 7. INTERACTION: RAYCAST PLANT FLOWER & CAMERA TILT ====================
+      // ==================== 8. INTERACTION: RAYCAST 3D PHOTO SPOTLIGHT & PLANT FLOWER ====================
       const raycaster = new THREE.Raycaster();
       const pointerNDC = new THREE.Vector2();
       let isDragging = false;
@@ -1733,12 +2410,13 @@
       let prevPointer = { x: 0, y: 0 };
       let camYawOffset = 0;
       let camPitchOffset = 0;
+      let spotlightCamFocus = null;
 
-      function spawnFloatingWishChip(screenX, screenY) {
+      function spawnFloatingWishChip(screenX, screenY, customText) {
         const layer = document.getElementById('floating-wishes-layer');
         const chip = document.createElement('div');
         chip.className = 'floating-wish-chip';
-        chip.textContent = SHORT_WISH_BUBBLES[appState.plantedCount % SHORT_WISH_BUBBLES.length];
+        chip.textContent = customText || SHORT_WISH_BUBBLES[appState.plantedCount % SHORT_WISH_BUBBLES.length];
         const safeX = Math.max(95, Math.min(cw - 95, screenX));
         const safeY = Math.max(110, Math.min(ch - 110, screenY));
         chip.style.left = `${safeX}px`;
@@ -1747,6 +2425,38 @@
         setTimeout(() => {
           if (chip.parentNode) chip.parentNode.removeChild(chip);
         }, 2350);
+      }
+
+      function openPhotoSpotlight(index) {
+        if (photoMeshes.length === 0) return;
+        const normIdx = ((index % photoMeshes.length) + photoMeshes.length) % photoMeshes.length;
+        appState.activeSpotlightIdx = normIdx;
+
+        // Find mesh matching index
+        const targetMesh = photoMeshes.find((m) => m.userData && m.userData.index === normIdx) || photoMeshes[normIdx];
+        if (targetMesh) {
+          const wp = targetMesh.position;
+          emitPollenBurst(wp.x, wp.y, wp.z, 26);
+          spotlightCamFocus = { x: wp.x * 0.45, y: wp.y, z: wp.z };
+        }
+
+        const presetObj = RECIPIENT_PRESETS[appState.presetKey] || RECIPIENT_PRESETS.lover;
+        const captionList = presetObj.photoCaptions || RECIPIENT_PRESETS.lover.photoCaptions;
+        const captionText = captionList[normIdx % captionList.length];
+
+        document.getElementById('spotlight-badge').textContent = `🌸 Đóa Hoa Ký Ức #${normIdx + 1} • ${appState.honorific}`;
+        document.getElementById('spotlight-title').textContent = `Dành tặng ${appState.receiver} ✨`;
+        document.getElementById('spotlight-caption').textContent = captionText;
+        document.getElementById('spotlight-img').src = photoDisplayUrls[normIdx] || '';
+
+        document.getElementById('photo-spotlight-overlay').classList.add('open');
+        AudioEngine.playBloomChime();
+      }
+
+      function closePhotoSpotlight() {
+        appState.activeSpotlightIdx = -1;
+        spotlightCamFocus = null;
+        document.getElementById('photo-spotlight-overlay').classList.remove('open');
       }
 
       webglCanvas.addEventListener('pointerdown', (e) => {
@@ -1774,18 +2484,34 @@
           pointerNDC.y = -(e.clientY / ch) * 2 + 1;
           raycaster.setFromCamera(pointerNDC, camera);
 
-          // 1. Check if user tapped a 3D photo frame
-          const photoHits = raycaster.intersectObjects(photoMeshes, false);
+          // 1. Check if user tapped any 3D Photo Frame -> Open 3D Photo Spotlight & Zoom Camera!
+          const photoHits = raycaster.intersectObjects(photoMeshes, true);
           if (photoHits.length > 0) {
-            openWishViewerModal();
+            let hitObj = photoHits[0].object;
+            while (hitObj && hitObj.userData && hitObj.userData.index === undefined && hitObj.parent) {
+              hitObj = hitObj.parent;
+            }
+            const idx = (hitObj && hitObj.userData && typeof hitObj.userData.index === 'number') ? hitObj.userData.index : 0;
+            openPhotoSpotlight(idx);
             return;
           }
 
-          // 2. Check if user tapped on the 3D grass terrain -> plant & bloom a new glowing flower!
+          // 2. Check if user tapped the Central Sanctuary 3D Nameplate -> Trigger Golden Blessing & Open Wish Modal
+          if (nameplateMesh) {
+            const plaqueHits = raycaster.intersectObject(nameplateMesh, false);
+            if (plaqueHits.length > 0) {
+              emitPollenBurst(0, sanctuaryBaseY + 2.2, SANCTUARY_Z, 35);
+              AudioEngine.playAwakeningFanfare();
+              spawnFloatingWishChip(e.clientX, e.clientY, `👑 ${appState.honorific} • ${appState.receiver} ✨`);
+              openWishViewerModal();
+              return;
+            }
+          }
+
+          // 3. Check if user tapped on the 3D grass terrain -> plant & bloom a new glowing flower!
           const terrainHits = raycaster.intersectObject(terrainMesh, false);
           if (terrainHits.length > 0) {
             const pt = terrainHits[0].point;
-            // Keep planted flower count bounded for 60fps performance
             if (flowers.length > 96) {
               const oldest = flowers.shift();
               if (oldest && oldest.root) flowersGroup.remove(oldest.root);
@@ -1802,7 +2528,6 @@
         }
       });
 
-      // Mobile tilt parallax
       window.addEventListener('deviceorientation', (e) => {
         if (e.gamma != null && e.beta != null && !isDragging) {
           const gx = Math.max(-25, Math.min(25, e.gamma)) / 25;
@@ -1812,22 +2537,50 @@
         }
       });
 
-      // ==================== 8. BLOOM WAVE TIMELINE & RENDER LOOP ====================
+      // ==================== 9. AWAKENING CLIMAX TIMELINE, CINEMATIC GLIDE & RENDER LOOP ====================
       const clock = new THREE.Clock();
       let waveCycleElapsed = 0;
       let waveCycleCount = 0;
-      const WAVE_DURATION = 9.0; // Sweeps vertically from foreground (z=+9.0) to background (z=-29.5)
+      const WAVE_DURATION = 8.2;
 
-      function restartBloomWave() {
+      // Cinematic Camera Glide state (0 -> 1 over 3.2 seconds during garden awakening)
+      let cinematicGlideProgress = 0;
+      let climaxReachedInCycle = false;
+
+      function showCroHookBar() {
+        if (appState.isViewerMode || appState.croDismissed) return;
+        const bar = document.getElementById('cro-hook-bar');
+        const nameEl = document.getElementById('cro-hook-name');
+        if (nameEl) {
+          nameEl.textContent = appState.receiver || 'Người Thương';
+        }
+        if (bar) {
+          bar.classList.add('visible');
+        }
+      }
+
+      function restartBloomWave(triggerCroImmediately = false) {
         waveCycleElapsed = 0;
         waveCycleCount++;
+        cinematicGlideProgress = 0;
+        climaxReachedInCycle = false;
+        camYawOffset = 0;
+        camPitchOffset = 0;
+
         flowers.forEach((f) => {
-          f.bloom = 0.06;
-          f.targetBloom = 0.06;
+          f.bloom = 0.08;
+          f.targetBloom = 0.08;
           f.wavePulse = 0;
           f.lastTriggeredCycle = -1;
         });
-        AudioEngine.playBloomChime();
+
+        emitPollenBurst(0, sanctuaryBaseY + 2.0, SANCTUARY_Z, 28);
+        AudioEngine.playAwakeningFanfare();
+
+        if (triggerCroImmediately) {
+          appState.croDismissed = false;
+          showCroHookBar();
+        }
       }
 
       function animate() {
@@ -1837,14 +2590,19 @@
 
         grassUniforms.uTime.value = elapsed;
 
-        // 1. Update Bloom Wave sweeping vertically from foreground (z=+9.2) to horizon (z=-29.5)
+        // 1. Update Cinematic Camera Glide (flies along the flower path toward the Central Sanctuary)
+        if (cinematicGlideProgress < 1.0) {
+          cinematicGlideProgress = Math.min(1.0, cinematicGlideProgress + dt * 0.34);
+        }
+        const smoothGlide = 1 - Math.pow(1 - cinematicGlideProgress, 3); // Cubic ease-out
+
+        // 2. Update Bloom Wave sweeping from foreground (z=+9.2) through the Central Sanctuary (z=-8.2) to horizon (z=-29.5)
         waveCycleElapsed += dt;
         if (waveCycleElapsed >= WAVE_DURATION) {
           waveCycleElapsed -= WAVE_DURATION;
           waveCycleCount++;
-          // Gently close back to semi-buds before the next wave sweeps up
           flowers.forEach((f) => {
-            f.targetBloom = 0.25;
+            f.targetBloom = 0.32;
           });
         }
 
@@ -1852,16 +2610,27 @@
         const currentWaveZ = 9.2 - waveFrac * 38.7;
         grassUniforms.uWaveZ.value = currentWaveZ;
 
+        // Trigger Climax when the Awakening Wave reaches the Central Sanctuary (currentWaveZ <= SANCTUARY_Z)
+        if (!climaxReachedInCycle && currentWaveZ <= SANCTUARY_Z) {
+          climaxReachedInCycle = true;
+          emitPollenBurst(0, sanctuaryBaseY + 2.2, SANCTUARY_Z, 36);
+          showCroHookBar();
+        }
+
         warmWaveLight.position.set(Math.sin(elapsed * 0.8) * 2.5, 2.6, currentWaveZ);
         waveRibbonMesh.position.set(0, getTerrainHeight(0, currentWaveZ) + 0.12, currentWaveZ);
         waveRibbonMesh.scale.set(1.3 + waveFrac * 1.4, 1, 0.38);
-        waveRibbonMat.opacity = Math.sin(waveFrac * Math.PI) * 0.42;
+        waveRibbonMat.opacity = Math.sin(waveFrac * Math.PI) * 0.44;
 
-        // 2. Update all 3D Glowing Flowers
+        // Pulse Central Sanctuary Halo & Arch Light
+        const sanctuaryPulse = 1 + Math.sin(elapsed * 2.6) * 0.12 + (climaxReachedInCycle ? 0.15 : 0);
+        sanctuaryHaloSprite.scale.set(6.4 * sanctuaryPulse, 4.3 * sanctuaryPulse, 1);
+        goldSanctuaryLight.intensity = 1.9 + Math.sin(elapsed * 2.6) * 0.45;
+
+        // 3. Update all 3D Glowing Flowers
         for (let i = 0; i < flowers.length; i++) {
           const f = flowers[i];
 
-          // Trigger bloom when wave reaches flower's Z coordinate
           if (f.z >= currentWaveZ && f.lastTriggeredCycle !== waveCycleCount) {
             f.lastTriggeredCycle = waveCycleCount;
             f.targetBloom = 1.0;
@@ -1878,7 +2647,6 @@
           f.bloom += (f.targetBloom - f.bloom) * Math.min(1, dt * 3.4);
           f.wavePulse = Math.max(0, f.wavePulse - dt * 0.85);
 
-          // Breathing open/close rhythm + wind sway
           const breath = Math.sin(elapsed * 1.8 + f.swayPhase) * 0.045;
           const effBloom = Math.max(0.05, Math.min(1.08, f.bloom + breath));
 
@@ -1901,7 +2669,6 @@
           f.haloSprite.scale.setScalar(haloScale);
           f.haloSprite.material.opacity = 0.35 + effBloom * 0.52;
 
-          // Gentle wind sway on flower stem
           const swayX = Math.sin(elapsed * 1.9 + f.x * 0.3 + f.z * 0.2 + f.swayPhase) * 0.065;
           const swayZ = Math.cos(elapsed * 1.5 + f.z * 0.25 + f.swayPhase) * 0.045;
           f.root.rotation.z = swayX;
@@ -1909,7 +2676,7 @@
           f.root.scale.setScalar(f.growProgress);
         }
 
-        // 3. Update Fireflies & Rising Pollen
+        // 4. Update Fireflies & Rising Pollen
         const posAttr = fireflyGeo.getAttribute('position');
         for (let i = 0; i < FIREFLY_COUNT; i++) {
           const i3 = i * 3;
@@ -1917,7 +2684,6 @@
           posAttr.array[i3 + 1] += ffVel[i3 + 1] * dt;
           posAttr.array[i3 + 2] += ffVel[i3 + 2] * dt;
 
-          // Dampen burst velocity back to gentle drift
           ffVel[i3] *= Math.pow(0.95, dt * 60);
           ffVel[i3 + 1] = 0.26 + (ffVel[i3 + 1] - 0.26) * Math.pow(0.96, dt * 60);
           ffVel[i3 + 2] *= Math.pow(0.95, dt * 60);
@@ -1930,7 +2696,7 @@
         }
         posAttr.needsUpdate = true;
 
-        // 4. Update Ground Ripples
+        // 5. Update Ground Ripples
         for (let i = ripples.length - 1; i >= 0; i--) {
           const rp = ripples[i];
           rp.age += dt;
@@ -1945,38 +2711,92 @@
           rp.mesh.material.opacity = (1 - prog) * 0.78;
         }
 
-        // 5. Float 3D Photo Frames gently
+        // 6. Float 3D Photo Frames gently & update matrixWorld for reliable Raycasting
         for (let i = 0; i < photoMeshes.length; i++) {
           const pm = photoMeshes[i];
-          pm.position.y = pm.userData.baseY + Math.sin(elapsed * 1.6 + pm.userData.phase) * 0.12;
+          pm.position.y = pm.userData.baseY + Math.sin(elapsed * 1.6 + pm.userData.phase) * 0.11;
+          pm.updateMatrixWorld();
         }
 
-        // 6. Camera gentle breathing + drag/tilt offset
-        camera.position.x += (baseCamPos.x + camYawOffset - camera.position.x) * Math.min(1, dt * 5);
-        camera.position.y += (baseCamPos.y + camPitchOffset - camera.position.y) * Math.min(1, dt * 5);
-        camera.lookAt(camera.position.x * 0.35, 1.05, -9.5);
+        // 7. Camera Cinematic Glide + Spotlight Focus + Gentle Drag/Tilt
+        const glideStartZ = baseCamPos.z + 4.4;
+        const glideStartY = baseCamPos.y + 1.15;
+        const targetCamZ = glideStartZ + (baseCamPos.z - glideStartZ) * smoothGlide;
+        const targetCamY = glideStartY + (baseCamPos.y - glideStartY) * smoothGlide + camPitchOffset;
+        const targetCamX = baseCamPos.x + camYawOffset + (spotlightCamFocus ? spotlightCamFocus.x * 0.35 : 0);
+
+        camera.position.x += (targetCamX - camera.position.x) * Math.min(1, dt * 5.2);
+        camera.position.y += (targetCamY - camera.position.y) * Math.min(1, dt * 5.2);
+        camera.position.z += (targetCamZ - camera.position.z) * Math.min(1, dt * 4.5);
+
+        if (spotlightCamFocus) {
+          camera.lookAt(spotlightCamFocus.x, spotlightCamFocus.y, spotlightCamFocus.z);
+        } else {
+          camera.lookAt(camera.position.x * 0.32, baseLookAt.y, baseLookAt.z);
+        }
 
         renderer.render(scene, camera);
       }
 
-      // ==================== 9. UI, CUSTOMIZATION & PAYMENT QR KIT ====================
+      // ==================== 10. UI, 1-TAP RECIPIENT PRESETS & PAYMENT QR KIT ====================
       function syncUIAndBanners() {
         const is2010 = appState.occasionType === '20/10';
-        const fullOccasion = is2010
-          ? '💐 Chúc Mừng Ngày Phụ Nữ Việt Nam 20/10'
-          : '🌸 Chúc Mừng Ngày Quốc Tế Phụ Nữ 8/3';
-        const shortOccasion = is2010 ? 'Chúc mừng 20/10' : 'Chúc mừng 8/3';
+        const occIcon = is2010 ? '💐' : '🌸';
+        const occDate = is2010 ? '20/10' : '8/3';
+        const receiverLabel = appState.receiver || 'Bạn Yêu Thương';
 
-        document.getElementById('header-occasion-badge').textContent = fullOccasion;
-        document.getElementById('header-receiver-title').textContent = `Gửi ${appState.receiver || 'Bạn Yêu Thương'} ✨`;
+        const headerBadge = document.getElementById('header-occasion-badge');
+        if (headerBadge) {
+          headerBadge.textContent = `${occIcon} ${occDate} • Dành tặng ${receiverLabel}`;
+        }
         document.getElementById('banner-wish').textContent = appState.wish;
-        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${shortOccasion} (Chạm để mở thư & ảnh 💌)`;
+        document.getElementById('banner-sender').textContent = `Từ: ${appState.sender || 'Người Thân'} • ${occDate} • Chạm xem thư 💌`;
+
+        const croName = document.getElementById('cro-hook-name');
+        if (croName) {
+          croName.textContent = receiverLabel;
+        }
 
         document.querySelectorAll('.occasion-chip').forEach((chip) => {
           chip.classList.toggle('active', chip.dataset.occasion === appState.occasionType);
         });
 
+        document.querySelectorAll('[data-recipient-preset]').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.recipientPreset === appState.presetKey);
+        });
+
+        rebuild3DNameplateTexture();
         rebuildSkyBannerTexture();
+      }
+
+      function applyRecipientPreset(presetKey) {
+        const preset = RECIPIENT_PRESETS[presetKey];
+        if (!preset) return;
+        appState.presetKey = presetKey;
+        appState.honorific = preset.honorific;
+        if (!appState.hasCustomReceiver) {
+          appState.receiver = preset.defaultReceiver;
+        }
+        if (!appState.hasCustomSender) {
+          appState.sender = preset.defaultSender;
+        }
+        appState.wish = preset.wish;
+
+        // Sync form inputs if modal is open
+        const inHonor = document.getElementById('input-honorific');
+        const inRec = document.getElementById('input-receiver');
+        const inSen = document.getElementById('input-sender');
+        const inWish = document.getElementById('input-wish');
+        if (inHonor) inHonor.value = appState.honorific;
+        if (inRec) inRec.value = appState.receiver;
+        if (inSen) inSen.value = appState.sender;
+        if (inWish) inWish.value = appState.wish;
+
+        applyThemePalette(preset.theme);
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        AudioEngine.autoUnlock();
+        restartBloomWave(true);
       }
 
       function openModal(id) {
@@ -1991,13 +2811,14 @@
         const shortOccasion = appState.occasionType === '20/10'
           ? 'Chúc mừng Ngày Phụ Nữ Việt Nam 20/10'
           : 'Chúc mừng Ngày Quốc Tế Phụ Nữ 8/3';
-        document.getElementById('viewer-title').textContent = `💌 Gửi ${appState.receiver}`;
+        document.getElementById('viewer-title').textContent = `💌 ${appState.honorific} • ${appState.receiver}`;
         document.getElementById('viewer-meta').textContent = `Từ ${appState.sender} • ${shortOccasion}`;
         document.getElementById('viewer-wish-text').textContent = appState.wish;
 
         const grid = document.getElementById('viewer-photos-grid');
         grid.innerHTML = '';
-        appState.photos.forEach((p) => {
+        const list = appState.photos.length > 0 ? appState.photos : photoDisplayUrls.slice(0, 4);
+        list.forEach((p) => {
           const img = document.createElement('img');
           img.src = typeof p === 'string' ? p : p.url;
           img.alt = 'Ảnh kỷ niệm';
@@ -2037,8 +2858,8 @@
           waitTitle: 'Quét Mã Mở Khóa Vườn Hoa Ánh Sáng 3D',
           successTitle: 'Vườn Hoa Ánh Sáng 3D Đã Sẵn Sàng!',
           cardTitle: '🌷 VƯỜN HOA ÁNH SÁNG 3D ✨',
-          scanLabel: 'Quét QR để Mở Vườn Hoa & Lời Chúc',
-          footerHint: 'Chạm vào thảm cỏ để gieo hoa sáng & xem album 3D',
+          scanLabel: 'Quét QR để Mở Vườn Hoa & Đài Hoa 3D',
+          footerHint: 'Chạm vào khung ảnh 3D & thảm cỏ để đánh thức hoa sáng',
           gradientStops: ['#07191e', '#0f5156', '#831843'],
           senderName: appState.sender,
           receiverName: appState.receiver,
@@ -2046,6 +2867,8 @@
           message: appState.wish,
           payload: {
             occasionType: appState.occasionType,
+            presetKey: appState.presetKey,
+            honorific: appState.honorific,
             theme: appState.theme,
             photos: appState.photos
           }
@@ -2056,14 +2879,47 @@
       document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
       document.getElementById('btn-replay').addEventListener('click', () => {
         AudioEngine.autoUnlock();
-        restartBloomWave();
+        restartBloomWave(false);
       });
 
       document.getElementById('btn-theme').addEventListener('click', () => {
         AudioEngine.autoUnlock();
         const nextIdx = (THEME_KEYS.indexOf(appState.theme) + 1) % THEME_KEYS.length;
         applyThemePalette(THEME_KEYS[nextIdx]);
+        rebuild3DNameplateTexture();
         AudioEngine.playBloomChime();
+      });
+
+      // Bind 1-Tap Recipient Presets (both Quick Bar and Modal Chips)
+      document.querySelectorAll('[data-recipient-preset]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyRecipientPreset(btn.dataset.recipientPreset);
+        });
+      });
+
+      // Bind 3D Photo Spotlight Overlay Controls
+      document.getElementById('btn-close-spotlight').addEventListener('click', closePhotoSpotlight);
+      document.getElementById('photo-spotlight-overlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closePhotoSpotlight();
+      });
+      document.getElementById('btn-spot-prev').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx - 1);
+      });
+      document.getElementById('btn-spot-next').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx + 1);
+      });
+      document.getElementById('btn-spot-all').addEventListener('click', () => {
+        closePhotoSpotlight();
+        openWishViewerModal();
+      });
+
+      // Bind CRO Hook Controls
+      document.getElementById('btn-cro-pay').addEventListener('click', () => {
+        document.getElementById('btn-pay').click();
+      });
+      document.getElementById('btn-cro-close').addEventListener('click', () => {
+        appState.croDismissed = true;
+        document.getElementById('cro-hook-bar').classList.remove('visible');
       });
 
       document.getElementById('wish-banner').addEventListener('click', openWishViewerModal);
@@ -2071,6 +2927,7 @@
       document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
 
       document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-honorific').value = appState.honorific;
         document.getElementById('input-receiver').value = appState.receiver;
         document.getElementById('input-sender').value = appState.sender;
         document.getElementById('input-wish').value = appState.wish;
@@ -2078,6 +2935,17 @@
         openModal('modal-customize');
       });
       document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.getElementById('input-receiver').addEventListener('input', (e) => {
+        if (e.target.value.trim().length > 0) {
+          appState.hasCustomReceiver = true;
+        }
+      });
+      document.getElementById('input-sender').addEventListener('input', (e) => {
+        if (e.target.value.trim().length > 0) {
+          appState.hasCustomSender = true;
+        }
+      });
 
       document.querySelectorAll('.occasion-chip').forEach((chip) => {
         chip.addEventListener('click', () => {
@@ -2093,12 +2961,6 @@
         });
       });
 
-      document.querySelectorAll('.preset-wish-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          document.getElementById('input-wish').value = btn.dataset.preset;
-        });
-      });
-
       PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
         maxCount: 6,
         maxSide: 900,
@@ -2111,14 +2973,23 @@
       });
 
       document.getElementById('btn-apply-custom').addEventListener('click', () => {
-        appState.receiver = document.getElementById('input-receiver').value.trim() || 'Minh Anh';
-        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.honorific = document.getElementById('input-honorific').value.trim() || appState.honorific;
+        const recVal = document.getElementById('input-receiver').value.trim();
+        if (recVal) {
+          appState.receiver = recVal;
+          appState.hasCustomReceiver = true;
+        }
+        const senVal = document.getElementById('input-sender').value.trim();
+        if (senVal) {
+          appState.sender = senVal;
+          appState.hasCustomSender = true;
+        }
         appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
         syncUIAndBanners();
         rebuild3DPhotoFrames();
         closeModal('modal-customize');
         AudioEngine.autoUnlock();
-        restartBloomWave();
+        restartBloomWave(true);
       });
 
       document.getElementById('btn-pay').addEventListener('click', async () => {
@@ -2140,7 +3011,7 @@
         updateCameraResponsive();
       });
 
-      // ==================== 10. INIT & VIEWER HYDRATION (?id=) ====================
+      // ==================== 11. INIT & VIEWER HYDRATION (?id=) ====================
       async function init() {
         updateCameraResponsive();
         applyThemePalette(appState.theme);
@@ -2148,6 +3019,7 @@
         rebuild3DPhotoFrames();
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(() => {
+            rebuild3DNameplateTexture();
             rebuildSkyBannerTexture();
             rebuild3DPhotoFrames();
           });
@@ -2155,6 +3027,15 @@
         animate();
 
         const params = new URLSearchParams(window.location.search);
+        const presetParam = params.get('preset');
+        if (presetParam) {
+          const normalizedPreset = (presetParam === 'teacher' || presetParam === 'teacher_sister')
+            ? 'friend'
+            : (presetParam === 'mom' ? 'mother' : presetParam);
+          if (RECIPIENT_PRESETS[normalizedPreset]) {
+            applyRecipientPreset(normalizedPreset);
+          }
+        }
         const orderId = params.get('id');
         if (orderId) {
           appState.isViewerMode = true;
@@ -2171,6 +3052,13 @@
               if (p.occasionType === '20/10' || (o.occasion && o.occasion.includes('20/10'))) {
                 appState.occasionType = '20/10';
               }
+              const rawPresetKey = (p.presetKey === 'teacher' || p.presetKey === 'teacher_sister') ? 'friend' : p.presetKey;
+              if (rawPresetKey && RECIPIENT_PRESETS[rawPresetKey]) {
+                appState.presetKey = rawPresetKey;
+              }
+              if (p.honorific) {
+                appState.honorific = p.honorific;
+              }
               if (p.theme && THEMES[p.theme]) {
                 applyThemePalette(p.theme);
               }
@@ -2179,6 +3067,7 @@
               }
               syncUIAndBanners();
               rebuild3DPhotoFrames();
+              restartBloomWave(false);
             }
           } catch (_) {}
         } else {

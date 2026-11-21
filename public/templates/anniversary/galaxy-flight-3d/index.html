@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chuyến Bay Ngân Hà 3D • Dải Ngân Hà Kỷ Niệm 🌌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group top-right-group">
+      <button type="button" class="hud-btn" id="btn-replay" title="Xem lại chuyến bay" aria-label="Xem lại chuyến bay">
+        <span aria-hidden="true">🔄</span><span class="hud-btn-label"> Xem Lại</span>
+      </button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật / tắt âm thanh" aria-label="Bật hoặc tắt âm thanh">
+        <span id="sound-icon" aria-hidden="true">🔊</span><span class="hud-btn-label" id="sound-label"> Âm Thanh</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 1-Tap Anniversary Presets -->
+  <section class="galaxy-header" id="galaxy-header">
+    <div class="quick-presets-bar creator-only" id="quick-presets-bar" aria-label="Chọn nhanh chủ đề kỷ niệm">
+      <button type="button" class="recipient-preset-btn active" data-preset="lovers">💕 Yêu Nhau</button>
+      <button type="button" class="recipient-preset-btn" data-preset="married">💍 Vợ Chồng</button>
+      <button type="button" class="recipient-preset-btn" data-preset="long_distance">✈️ Yêu Xa</button>
+      <button type="button" class="recipient-preset-btn" data-preset="milestone">🥂 Cột Mốc</button>
+    </div>
+  </section>
+
+  <!-- Non-blocking Audio Unlock Pill -->
+  <button type="button" class="sound-unlock-pill hidden" id="sound-unlock-pill">🎵 Chạm màn hình để bật nhạc Lofi</button>
+
+  <!-- Story Narrative Caption -->
+  <div class="story-caption-pill hidden-caption" id="story-caption-pill"></div>
+
+  <!-- Flight Step Prompt -->
+  <button type="button" class="action-hint-pill" id="flight-hint-pill">🚀 Chạm để Khởi Hành Chuyến Bay Ngân Hà (1/4)</button>
+
+  <!-- Polaroid Camera Zoom HUD -->
+  <div id="frame-zoom-hud" class="frame-zoom-hud hidden">
+    <div class="frame-zoom-caption" id="frame-zoom-caption"></div>
+    <div class="frame-zoom-controls">
+      <button type="button" class="zoom-ctrl-btn" id="btn-zoom-prev" aria-label="Ảnh trước" title="Ảnh trước">
+        <span aria-hidden="true">‹</span><span class="zoom-label"> Ảnh trước</span>
+      </button>
+      <button type="button" class="zoom-ctrl-btn exit" id="btn-zoom-exit">✕ Bay tiếp</button>
+      <button type="button" class="zoom-ctrl-btn" id="btn-zoom-next" aria-label="Ảnh sau" title="Ảnh sau">
+        <span class="zoom-label">Ảnh sau </span><span aria-hidden="true">›</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Single-Row Bottom Dock (Anti-Duplication) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-viewer-wish">💌 Tâm Thư</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">🎨 Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- Modal Tùy Chỉnh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">🌌 Cá Nhân Hóa Chuyến Bay Ngân Hà</h2>
+      <p class="modal-sub">Chọn chủ đề kỷ niệm, khắc tên cặp đôi lên dải ngân hà 3D và gắn tới 8 khung ảnh Polaroid.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Nhanh Chủ Đề 1-Chạm</label>
+        <div class="chip-grid-2" id="modal-presets-bar">
+          <button type="button" class="option-chip modal-preset-btn active" data-preset="lovers">💕 Yêu Nhau</button>
+          <button type="button" class="option-chip modal-preset-btn" data-preset="married">💍 Vợ Chồng</button>
+          <button type="button" class="option-chip modal-preset-btn" data-preset="long_distance">✈️ Yêu Xa</button>
+          <button type="button" class="option-chip modal-preset-btn" data-preset="milestone">🥂 Cột Mốc</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bảng Màu Vũ Trụ 3D</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="galaxy_rose">🌌 Ngân Hà Hồng Tím</button>
+          <button type="button" class="option-chip theme-chip" data-theme="golden_stardust">✨ Bụi Sao Vàng Ấm</button>
+          <button type="button" class="option-chip theme-chip" data-theme="midnight_aurora">🌠 Cực Quang Đêm Sâu</button>
+          <button type="button" class="option-chip theme-chip" data-theme="sunset_nebula">🌅 Tinh Vân Hoàng Hôn</button>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="select-music-mood">Giai Điệu Lofi / Chillout</label>
+          <select id="select-music-mood" class="form-select">
+            <option value="lofi_stars">🎧 Lofi Đêm Sao</option>
+            <option value="chill_galaxy">🌌 Chillout Ngân Hà</option>
+            <option value="moonlight_piano">🎹 Piano Ánh Trăng</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-anniversary-date">Ngày Kỷ Niệm</label>
+          <input id="input-anniversary-date" type="date" class="form-input" style="color-scheme: dark;" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-honorific">Danh Hiệu Khắc Trong Ngân Hà 3D</label>
+        <input id="input-honorific" type="text" class="form-input" maxlength="40" placeholder="VD: Kỷ Niệm Yêu Thương, Kỷ Niệm 1 Năm..." />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="input-receiver">Tên người ấy</label>
+          <input id="input-receiver" type="text" class="form-input" maxlength="28" placeholder="VD: Minh Khuê" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-sender">Tên của bạn</label>
+          <input id="input-sender" type="text" class="form-input" maxlength="28" placeholder="VD: Gia Huy" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <label class="form-label" for="input-wish">Tâm Thư Kỷ Niệm</label>
+          <button type="button" class="btn-ai-wish" id="btn-ai-wish">🪄 Gợi ý lời chúc</button>
+        </div>
+        <textarea id="input-wish" class="form-textarea" maxlength="420" placeholder="Viết lời nhắn gửi kỷ niệm dành cho người thương..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="photo-count-label">Ảnh Polaroid Kỷ Niệm (Tối đa 8 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Tải Ảnh Cặp Đôi Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">✨ Áp Dụng & Xem Thử Cao Trào 3D</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Tâm Thư & Album Ảnh -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Khuê Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Thương gửi, Gia Huy ♥</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. THEMES, 1-TAP PRESETS & APP STATE ====================
+      const THEMES = {
+        galaxy_rose: {
+          name: 'Ngân Hà Hồng Tím',
+          bgTop: '#16082e',
+          bgMid: '#090418',
+          bgDeep: '#030108',
+          accentPrimary: '#ec4899',
+          accentSecondary: '#fde047',
+          coreColor: 0xfde047,
+          armColorA: 0xf472b6,
+          armColorB: 0xa855f7,
+          nebulaColor: 0xc084fc,
+          pointLight: 0xffd28a,
+          rimLight: 0x93c5fd,
+          ringColor: 0xfde047
+        },
+        golden_stardust: {
+          name: 'Bụi Sao Vàng Ấm',
+          bgTop: '#241406',
+          bgMid: '#100803',
+          bgDeep: '#050301',
+          accentPrimary: '#d97706',
+          accentSecondary: '#fef08a',
+          coreColor: 0xfffbeb,
+          armColorA: 0xfbbf24,
+          armColorB: 0xf97316,
+          nebulaColor: 0xfde68a,
+          pointLight: 0xffe29a,
+          rimLight: 0x38bdf8,
+          ringColor: 0xfef08a
+        },
+        midnight_aurora: {
+          name: 'Cực Quang Đêm Sâu',
+          bgTop: '#06182c',
+          bgMid: '#030a18',
+          bgDeep: '#01040a',
+          accentPrimary: '#0ea5e9',
+          accentSecondary: '#fde047',
+          coreColor: 0x7dd3fc,
+          armColorA: 0x38bdf8,
+          armColorB: 0x818cf8,
+          nebulaColor: 0x34d399,
+          pointLight: 0xffd480,
+          rimLight: 0x38bdf8,
+          ringColor: 0x7dd3fc
+        },
+        sunset_nebula: {
+          name: 'Tinh Vân Hoàng Hôn',
+          bgTop: '#26071c',
+          bgMid: '#110412',
+          bgDeep: '#050107',
+          accentPrimary: '#e11d48',
+          accentSecondary: '#fde047',
+          coreColor: 0xfde047,
+          armColorA: 0xfb7185,
+          armColorB: 0xc026d3,
+          nebulaColor: 0xfdba74,
+          pointLight: 0xffc878,
+          rimLight: 0x93c5fd,
+          ringColor: 0xfda4af
+        }
+      };
+
+      const ANNIVERSARY_PRESETS = {
+        lovers: {
+          label: 'Yêu Nhau',
+          honorific: 'Kỷ Niệm Yêu Thương',
+          defaultReceiver: 'Minh Khuê',
+          defaultSender: 'Gia Huy',
+          theme: 'galaxy_rose',
+          musicMood: 'lofi_stars',
+          wish: 'Cảm ơn vì đã bước vào cuộc đời nhau, biến những ngày bình thường thành dải ngân hà lấp lánh kỷ niệm. Mong hai ta sẽ cùng nắm tay đi qua thật nhiều mùa sao sáng nữa nhé!',
+          captions: [
+            'Ánh sao đầu tiên đưa hai ta đến bên nhau',
+            'Buổi hẹn bình yên chẳng muốn thời gian trôi',
+            'Cảm ơn vì luôn lắng nghe và dịu dàng bên nhau',
+            'Mỗi bức ảnh là một vì sao sáng trong hành trình',
+            'Đi qua những ngày nắng đẹp và cả cơn mưa rào',
+            'Ký ức ngọt ngào mãi vẹn nguyên giữa ngân hà',
+            'Hành trình tuyệt vời nhất là có hai đứa đồng hành',
+            'Chúc mừng kỷ niệm — mãi rạng rỡ như bầu trời sao'
+          ]
+        },
+        married: {
+          label: 'Vợ Chồng',
+          honorific: 'Kỷ Niệm Ngày Cưới',
+          defaultReceiver: 'Bạn Đời Yêu Dấu',
+          defaultSender: 'Tổ Ấm Nhỏ',
+          theme: 'golden_stardust',
+          musicMood: 'moonlight_piano',
+          wish: 'Cảm ơn bạn đời đã luôn đồng hành, sẻ chia và vun đắp mái nhà ngập tràn tiếng cười. Chúc tình yêu của gia đình nhỏ mãi bền chặt và ấm áp qua từng năm tháng!',
+          captions: [
+            'Khoảnh khắc thiêng liêng mở đầu mái ấm chung đôi',
+            'Bữa cơm tối ấm áp luôn là bình yên đẹp nhất',
+            'Cùng nhau chăm chút từng góc nhỏ của tổ ấm',
+            'Nụ cười rạng rỡ sau bao ngày bận rộn thường nhật',
+            'Tay nắm tay đi qua những cột mốc đáng nhớ',
+            'Mỗi năm trôi qua lại thêm thương và trân quý nhau',
+            'Cảm ơn vì đã biến ngôi nhà thành thiên đường nhỏ',
+            'Mãi đồng hành cùng nhau đến bạc đầu nhé bạn đời'
+          ]
+        },
+        long_distance: {
+          label: 'Yêu Xa',
+          honorific: 'Vượt Ngàn Cây Số',
+          defaultReceiver: 'Người Thương Phương Xa',
+          defaultSender: 'Một Nửa Đợi Chờ',
+          theme: 'midnight_aurora',
+          musicMood: 'chill_galaxy',
+          wish: 'Dù khoảng cách địa lý có xa xôi đến đâu, trái tim hai đứa vẫn luôn hướng về cùng một bầu trời sao. Cảm ơn vì đã kiên nhẫn chờ đợi và tin tưởng nhau mỗi ngày!',
+          captions: [
+            'Cùng ngắm chung một vầng trăng từ hai phương trời',
+            'Những cuộc gọi xuyên đêm xua tan mọi khoảng cách',
+            'Đếm từng ngày chờ khoảnh khắc được gặp lại nhau',
+            'Mỗi tấm vé máy bay là một nhịp tim háo hức',
+            'Khoảng cách chỉ làm tình cảm thêm sâu đậm hơn',
+            'Gửi ngàn ánh sao bình yên đến phương trời bên ấy',
+            'Hạnh phúc vỡ òa trong giây phút đoàn tụ cuối cùng',
+            'Khoảng cách nào rồi cũng sẽ khép lại bằng cái ôm'
+          ]
+        },
+        milestone: {
+          label: 'Cột Mốc',
+          honorific: 'Cột Mốc Đáng Nhớ',
+          defaultReceiver: 'Tri Kỷ Yêu Thương',
+          defaultSender: 'Người Đồng Hành',
+          theme: 'sunset_nebula',
+          musicMood: 'lofi_stars',
+          wish: 'Chúc mừng cột mốc thật đặc biệt của hai ta! Nhìn lại chặng đường đã qua, mỗi nụ cười và từng kỷ niệm bên nhau đều là món quà quý giá nhất cuộc đời.',
+          captions: [
+            'Khởi đầu giản dị cho một hành trình rực rỡ',
+            'Những lần đầu tiên cùng khám phá thế giới mới',
+            'Từng bước trưởng thành và thấu hiểu nhau hơn',
+            'Nụ cười rạng rỡ trong ngày kỷ niệm đáng nhớ',
+            'Lưu giữ thanh xuân tươi đẹp trong từng khung hình',
+            'Cột mốc vàng son đánh dấu chặng đường bên nhau',
+            'Hướng về tương lai với thật nhiều ước mơ chung',
+            'Cảm ơn vì đã trở thành mảnh ghép tuyệt vời nhất'
+          ]
+        }
+      };
+
+      const AI_WISH_POOL = [
+        'Gửi {{receiver}}, cảm ơn vì đã luôn là nguồn sáng ấm áp nhất trong vũ trụ nhỏ của chúng ta. Mong từng ngày sắp tới đều ngập tràn tiếng cười và bình yên bên nhau!',
+        'Chúc mừng kỷ niệm của hai ta! Dù thời gian có trôi qua bao lâu, {{sender}} vẫn luôn trân quý từng khoảnh khắc bình dị và ngọt ngào khi có {{receiver}} đồng hành.',
+        'Giữa hàng tỷ vì sao ngoài kia, gặp được {{receiver}} là điều kỳ diệu nhất. Chúc hành trình của hai đứa mãi rạng rỡ, thấu hiểu và gắn bó bền lâu!',
+        'Cảm ơn {{receiver}} đã kiên nhẫn, bao dung và cùng {{sender}} viết nên thật nhiều trang ký ức đẹp. Chúc chúng ta sẽ còn đón thật nhiều cột mốc đáng nhớ phía trước!',
+        'Mỗi bức ảnh trong dải ngân hà này là một lời nhắc về hạnh phúc khi hai ta chung bước. Thương chúc {{receiver}} luôn rạng rỡ, an nhiên và thật nhiều niềm vui!'
+      ];
+
+      const DEFAULT_NAME_SET = new Set(
+        Object.values(ANNIVERSARY_PRESETS).flatMap((p) => [p.defaultReceiver, p.defaultSender])
+      );
+
+      function getDefaultAnniversaryDate() {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() - 1);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      const appState = {
+        templateId: 'anniversary_galaxy_flight',
+        preset: 'lovers',
+        theme: 'galaxy_rose',
+        musicMood: 'lofi_stars',
+        honorific: ANNIVERSARY_PRESETS.lovers.honorific,
+        receiver: ANNIVERSARY_PRESETS.lovers.defaultReceiver,
+        sender: ANNIVERSARY_PRESETS.lovers.defaultSender,
+        anniversaryDate: getDefaultAnniversaryDate(),
+        wish: ANNIVERSARY_PRESETS.lovers.wish,
+        photos: [],
+        captions: [],
+        hasCustomNames: false,
+        isViewerMode: false,
+        isPreviewMode: false,
+        storyStep: 0,
+        totalStorySteps: 4, // 0: Launch, 1..3: Flight waypoints, 4: Climax
+        focusedPhotoIdx: -1,
+        aiWishCursor: 0
+      };
+
+      function computeDaysTogether(dateStr) {
+        if (!dateStr) return 0;
+        const parsed = new Date(dateStr + 'T00:00:00');
+        if (Number.isNaN(parsed.getTime())) return 0;
+        const now = new Date();
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffDays = Math.floor((todayMidnight.getTime() - parsed.getTime()) / 86400000);
+        return diffDays >= 0 ? Math.max(1, diffDays + 1) : 0;
+      }
+
+      // ==================== 2. PURE WEB AUDIO LOFI / CHILLOUT ENGINE ====================
+      const AudioEngine = (() => {
+        let ctx = null;
+        let masterGain = null;
+        let seqTimer = null;
+        let stepIdx = 0;
+        let enabled = true;
+        let muted = false;
+        let ambientNodesStarted = false;
+
+        const MOODS = {
+          lofi_stars: {
+            tempoMs: 370,
+            chords: [
+              [174.61, 220.00, 261.63, 329.63], // Fmaj7
+              [164.81, 196.00, 246.94, 293.66], // Em7
+              [146.83, 174.61, 220.00, 261.63], // Dm7
+              [130.81, 164.81, 196.00, 246.94]  // Cmaj7
+            ],
+            melody: [523.25, 659.25, 587.33, 440.00, 523.25, 659.25, 783.99, 659.25, 587.33, 523.25, 440.00, 392.00, 440.00, 523.25, 659.25, 523.25],
+            drums: true,
+            filterHz: 1050
+          },
+          chill_galaxy: {
+            tempoMs: 420,
+            chords: [
+              [130.81, 164.81, 196.00, 246.94], // Cmaj7
+              [220.00, 261.63, 329.63, 392.00], // Am7
+              [174.61, 220.00, 261.63, 329.63], // Fmaj7
+              [196.00, 246.94, 293.66, 329.63]  // G6
+            ],
+            melody: [659.25, 783.99, 987.77, 783.99, 659.25, 523.25, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33, 523.25, 659.25, 587.33, 493.88],
+            drums: false,
+            filterHz: 900
+          },
+          moonlight_piano: {
+            tempoMs: 400,
+            chords: [
+              [220.00, 261.63, 329.63, 493.88], // Am9
+              [174.61, 220.00, 261.63, 329.63], // Fmaj7
+              [130.81, 164.81, 196.00, 246.94], // Cmaj7
+              [196.00, 246.94, 293.66, 349.23]  // G7sus
+            ],
+            melody: [440.00, 523.25, 659.25, 523.25, 587.33, 659.25, 783.99, 659.25, 523.25, 493.88, 440.00, 392.00, 440.00, 523.25, 587.33, 440.00],
+            drums: true,
+            filterHz: 1200
+          }
+        };
+
+        function updateButtonUI() {
+          const btn = document.getElementById('btn-sound');
+          const icon = document.getElementById('sound-icon');
+          const label = document.getElementById('sound-label');
+          const unlockPill = document.getElementById('sound-unlock-pill');
+          if (!btn || !icon || !label) return;
+          const active = enabled && !muted;
+          icon.textContent = active ? '🔊' : '🔇';
+          label.textContent = active ? ' Âm Thanh' : ' Tắt Tiếng';
+          btn.classList.toggle('muted', !active);
+          if (unlockPill) {
+            const shouldShowUnlock = !appState.isPreviewMode && active && (!ctx || ctx.state === 'suspended');
+            unlockPill.classList.toggle('hidden', !shouldShowUnlock);
+          }
+        }
+
+        function ensureContext() {
+          if (ctx) return true;
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return false;
+          ctx = new AudioCtx();
+          masterGain = ctx.createGain();
+          masterGain.gain.value = enabled && !muted ? 0.42 : 0.0;
+          masterGain.connect(ctx.destination);
+          startCosmicPad();
+          return true;
+        }
+
+        function startCosmicPad() {
+          if (!ctx || ambientNodesStarted) return;
+          ambientNodesStarted = true;
+          const bufLen = ctx.sampleRate * 3;
+          const noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+          const ch = noiseBuf.getChannelData(0);
+          let lastOut = 0;
+          for (let i = 0; i < bufLen; i++) {
+            const white = Math.random() * 2 - 1;
+            ch[i] = (lastOut + 0.035 * white) / 1.035;
+            lastOut = ch[i];
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = noiseBuf;
+          src.loop = true;
+
+          const filt = ctx.createBiquadFilter();
+          filt.type = 'bandpass';
+          filt.frequency.value = 440;
+          filt.Q.value = 1.4;
+
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.12;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 140;
+          lfo.connect(lfoGain);
+          lfoGain.connect(filt.frequency);
+
+          const padGain = ctx.createGain();
+          padGain.gain.value = 0.085;
+
+          src.connect(filt);
+          filt.connect(padGain);
+          padGain.connect(masterGain);
+          src.start();
+          lfo.start();
+        }
+
+        function playChord(freqs, filterHz, duration) {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const now = ctx.currentTime;
+          const filt = ctx.createBiquadFilter();
+          filt.type = 'lowpass';
+          filt.frequency.setValueAtTime(filterHz, now);
+          filt.frequency.exponentialRampToValueAtTime(480, now + duration);
+          filt.connect(masterGain);
+
+          freqs.forEach((f, idx) => {
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc1.type = 'sine';
+            osc2.type = 'triangle';
+            osc1.frequency.setValueAtTime(f, now);
+            osc2.frequency.setValueAtTime(f * 1.0025, now);
+
+            const t0 = now + idx * 0.06;
+            g.gain.setValueAtTime(0.0001, t0);
+            g.gain.linearRampToValueAtTime(idx === 0 ? 0.062 : 0.04, t0 + 0.12);
+            g.gain.exponentialRampToValueAtTime(0.0008, t0 + duration);
+
+            osc1.connect(g);
+            osc2.connect(g);
+            g.connect(filt);
+            osc1.start(t0);
+            osc2.start(t0);
+            osc1.stop(t0 + duration + 0.06);
+            osc2.stop(t0 + duration + 0.06);
+          });
+        }
+
+        function playPluck(freq) {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.linearRampToValueAtTime(0.065, now + 0.018);
+          g.gain.exponentialRampToValueAtTime(0.0007, now + 0.65);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 0.7);
+        }
+
+        function playLofiDrum(kind) {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const now = ctx.currentTime;
+          if (kind === 'kick') {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(108, now);
+            osc.frequency.exponentialRampToValueAtTime(42, now + 0.13);
+            g.gain.setValueAtTime(0.14, now);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start(now);
+            osc.stop(now + 0.17);
+          } else {
+            const len = Math.floor(ctx.sampleRate * 0.045);
+            const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            const filt = ctx.createBiquadFilter();
+            filt.type = 'highpass';
+            filt.frequency.value = kind === 'hat' ? 5400 : 1900;
+            const g = ctx.createGain();
+            g.gain.value = kind === 'hat' ? 0.022 : 0.048;
+            src.connect(filt);
+            filt.connect(g);
+            g.connect(masterGain);
+            src.start(now);
+          }
+        }
+
+        function tick() {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const mood = MOODS[appState.musicMood] || MOODS.lofi_stars;
+          const barStep = stepIdx % 8;
+          if (barStep === 0) {
+            const chord = mood.chords[Math.floor(stepIdx / 8) % mood.chords.length];
+            playChord(chord, mood.filterHz, (mood.tempoMs * 7.6) / 1000);
+          }
+          if (barStep % 2 === 0) {
+            playPluck(mood.melody[stepIdx % mood.melody.length]);
+          }
+          if (mood.drums) {
+            if (barStep === 0 || barStep === 3) playLofiDrum('kick');
+            if (barStep === 4) playLofiDrum('snare');
+            if (barStep % 2 === 1) playLofiDrum('hat');
+          }
+          stepIdx++;
+        }
+
+        function startSequencer() {
+          stopSequencer();
+          const mood = MOODS[appState.musicMood] || MOODS.lofi_stars;
+          tick();
+          seqTimer = setInterval(tick, mood.tempoMs);
+        }
+
+        function stopSequencer() {
+          if (seqTimer) {
+            clearInterval(seqTimer);
+            seqTimer = null;
+          }
+        }
+
+        function applyGain() {
+          if (!ctx || !masterGain) return;
+          const target = enabled && !muted ? 0.42 : 0.0;
+          masterGain.gain.setTargetAtTime(target, ctx.currentTime, 0.08);
+        }
+
+        function tryBoot() {
+          if (appState.isPreviewMode) {
+            enabled = false;
+            muted = true;
+            updateButtonUI();
+            return;
+          }
+          ensureContext();
+          if (ctx && ctx.state === 'running' && enabled && !muted) {
+            applyGain();
+            if (!seqTimer) startSequencer();
+          }
+          updateButtonUI();
+        }
+
+        function unlockOnGesture() {
+          if (appState.isPreviewMode) return;
+          ensureContext();
+          if (!ctx) return;
+          if (enabled && !muted) {
+            ctx.resume().then(() => {
+              applyGain();
+              if (!seqTimer) startSequencer();
+              updateButtonUI();
+            }).catch(() => {});
+          }
+          updateButtonUI();
+        }
+
+        function setMuted(nextMuted) {
+          muted = !!nextMuted;
+          enabled = !muted;
+          if (!muted) {
+            ensureContext();
+            if (ctx && ctx.state === 'suspended') {
+              ctx.resume().then(() => {
+                applyGain();
+                if (!seqTimer) startSequencer();
+                updateButtonUI();
+              }).catch(() => {});
+            }
+            applyGain();
+            if (!seqTimer) startSequencer();
+          } else {
+            applyGain();
+            stopSequencer();
+          }
+          updateButtonUI();
+        }
+
+        function toggle() {
+          setMuted(enabled && !muted);
+        }
+
+        function refreshMood() {
+          if (enabled && !muted && ctx && ctx.state === 'running') {
+            startSequencer();
+          }
+        }
+
+        function playTransitionChime() {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const now = ctx.currentTime;
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            g.gain.setValueAtTime(0.0001, now + i * 0.06);
+            g.gain.linearRampToValueAtTime(0.048, now + i * 0.06 + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0006, now + i * 0.06 + 0.9);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.95);
+          });
+        }
+
+        function playFinaleArpeggio() {
+          if (!ctx || ctx.state !== 'running' || !enabled || muted) return;
+          const now = ctx.currentTime;
+          [261.63, 329.63, 392.00, 493.88, 587.33, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = i % 2 === 0 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            g.gain.setValueAtTime(0.0001, now + i * 0.08);
+            g.gain.linearRampToValueAtTime(0.055, now + i * 0.08 + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.0006, now + i * 0.08 + 1.8);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 1.85);
+          });
+        }
+
+        return {
+          tryBoot,
+          unlockOnGesture,
+          setMuted,
+          toggle,
+          refreshMood,
+          playTransitionChime,
+          playFinaleArpeggio,
+          updateButtonUI
+        };
+      })();
+
+      // ==================== 3. THREE.JS R128 GALAXY STAGE ====================
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(52, window.innerWidth / Math.max(window.innerHeight, 1), 0.1, 140);
+
+      const stageGroup = new THREE.Group();
+      scene.add(stageGroup);
+
+      // 3-Point Warm/Cool Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.68);
+      scene.add(ambientLight);
+
+      const corePointLight = new THREE.PointLight(0xffd28a, 2.2, 28);
+      corePointLight.position.set(0, 1.0, 2.5);
+      scene.add(corePointLight);
+
+      const rimDirLight = new THREE.DirectionalLight(0x93c5fd, 1.35);
+      rimDirLight.position.set(-4.5, 5.0, -5.0);
+      scene.add(rimDirLight);
+
+      // Responsive Camera State
+      let isMobileLayout = false;
+      let climaxBaseZ = 7.4;
+
+      function updateCameraResponsive() {
+        const w = window.innerWidth;
+        const h = Math.max(window.innerHeight, 1);
+        const aspect = w / h;
+        isMobileLayout = w < 768 || aspect < 0.85;
+
+        camera.aspect = aspect;
+        camera.fov = isMobileLayout ? 54 : 50;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h, false);
+
+        if (aspect < 0.56) {
+          stageGroup.scale.setScalar(0.74);
+          climaxBaseZ = 10.4;
+        } else if (isMobileLayout) {
+          stageGroup.scale.setScalar(0.82);
+          climaxBaseZ = 9.4;
+        } else {
+          stageGroup.scale.setScalar(1.0);
+          climaxBaseZ = 7.3;
+        }
+      }
+
+      function createStarSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        grad.addColorStop(0.28, 'rgba(255, 245, 225, 0.82)');
+        grad.addColorStop(0.65, 'rgba(255, 215, 240, 0.22)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const starSpriteTex = createStarSpriteTexture();
+
+      // ==================== 4. DEEP COSMIC STARFIELD + SPIRAL MILKY WAY + HEART MORPH ====================
+      const BG_STAR_COUNT = 1800;
+      const bgStarPositions = new Float32Array(BG_STAR_COUNT * 3);
+      const bgStarColors = new Float32Array(BG_STAR_COUNT * 3);
+      for (let i = 0; i < BG_STAR_COUNT; i++) {
+        const r = 6 + Math.random() * 26;
+        const theta = Math.random() * Math.PI * 2;
+        bgStarPositions[i * 3] = Math.cos(theta) * r;
+        bgStarPositions[i * 3 + 1] = Math.sin(theta) * r * 0.72 + (Math.random() - 0.5) * 4;
+        bgStarPositions[i * 3 + 2] = 10 - Math.random() * 44;
+
+        const tint = 0.72 + Math.random() * 0.28;
+        bgStarColors[i * 3] = tint;
+        bgStarColors[i * 3 + 1] = tint * (0.88 + Math.random() * 0.12);
+        bgStarColors[i * 3 + 2] = 1.0;
+      }
+      const bgStarGeo = new THREE.BufferGeometry();
+      bgStarGeo.setAttribute('position', new THREE.BufferAttribute(bgStarPositions, 3));
+      bgStarGeo.setAttribute('color', new THREE.BufferAttribute(bgStarColors, 3));
+      const bgStarMat = new THREE.PointsMaterial({
+        size: 0.14,
+        map: starSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.82,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const bgStars = new THREE.Points(bgStarGeo, bgStarMat);
+      scene.add(bgStars);
+
+      // Spiral Milky Way Arms -> Climax 3D Constellation Heart
+      const GALAXY_COUNT = 3200;
+      const galaxyPositions = new Float32Array(GALAXY_COUNT * 3);
+      const galaxyColors = new Float32Array(GALAXY_COUNT * 3);
+      const spiralTargets = new Float32Array(GALAXY_COUNT * 3);
+      const heartTargets = new Float32Array(GALAXY_COUNT * 3);
+      const galaxySeed = new Float32Array(GALAXY_COUNT);
+
+      for (let i = 0; i < GALAXY_COUNT; i++) {
+        galaxySeed[i] = Math.random() * Math.PI * 2;
+        // Spiral Milky Way coordinates
+        const arm = i % 3;
+        const dist = Math.pow(Math.random(), 0.72) * 8.6;
+        const angle = (arm * ((Math.PI * 2) / 3)) + dist * 0.62 + (Math.random() - 0.5) * (0.55 + dist * 0.08);
+        const sx = Math.cos(angle) * dist;
+        const sy = (Math.random() - 0.5) * (0.55 + dist * 0.08) + Math.sin(dist * 0.5) * 0.25;
+        const sz = Math.sin(angle) * dist - 4.2;
+
+        spiralTargets[i * 3] = sx;
+        spiralTargets[i * 3 + 1] = sy;
+        spiralTargets[i * 3 + 2] = sz;
+        galaxyPositions[i * 3] = sx;
+        galaxyPositions[i * 3 + 1] = sy;
+        galaxyPositions[i * 3 + 2] = sz;
+
+        // 3D Volumetric Heart coordinates for Climax
+        const t = (i / GALAXY_COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+        const fill = 0.72 + Math.random() * 0.34;
+        const hx = 16 * Math.pow(Math.sin(t), 3) * 0.115 * fill;
+        const hy = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.115 * fill + 0.55;
+        const hz = (Math.random() - 0.5) * 0.58 - 0.35;
+
+        heartTargets[i * 3] = hx;
+        heartTargets[i * 3 + 1] = hy;
+        heartTargets[i * 3 + 2] = hz;
+      }
+
+      const galaxyGeo = new THREE.BufferGeometry();
+      galaxyGeo.setAttribute('position', new THREE.BufferAttribute(galaxyPositions, 3));
+      galaxyGeo.setAttribute('color', new THREE.BufferAttribute(galaxyColors, 3));
+      galaxyGeo.userData = { spiral: spiralTargets, heart: heartTargets };
+
+      const galaxyMat = new THREE.PointsMaterial({
+        size: 0.17,
+        map: starSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.92,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const galaxyPoints = new THREE.Points(galaxyGeo, galaxyMat);
+      stageGroup.add(galaxyPoints);
+
+      // Nebula Soft Clouds
+      const NEBULA_COUNT = 320;
+      const nebulaPositions = new Float32Array(NEBULA_COUNT * 3);
+      const nebulaColors = new Float32Array(NEBULA_COUNT * 3);
+      for (let i = 0; i < NEBULA_COUNT; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const rad = 1.4 + Math.random() * 6.8;
+        nebulaPositions[i * 3] = Math.cos(ang) * rad;
+        nebulaPositions[i * 3 + 1] = (Math.random() - 0.5) * 2.8;
+        nebulaPositions[i * 3 + 2] = Math.sin(ang) * rad - 4.2;
+      }
+      const nebulaGeo = new THREE.BufferGeometry();
+      nebulaGeo.setAttribute('position', new THREE.BufferAttribute(nebulaPositions, 3));
+      nebulaGeo.setAttribute('color', new THREE.BufferAttribute(nebulaColors, 3));
+      const nebulaMat = new THREE.PointsMaterial({
+        size: 0.72,
+        map: starSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.18,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const nebulaPoints = new THREE.Points(nebulaGeo, nebulaMat);
+      stageGroup.add(nebulaPoints);
+
+      // Twin Orbital Rings (revealed at Climax)
+      const twinRingsGroup = new THREE.Group();
+      twinRingsGroup.position.set(0, 0.45, -0.35);
+      const ringGeo1 = new THREE.TorusGeometry(2.15, 0.018, 12, 96);
+      const ringMat1 = new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+      ring1.rotation.set(0.45, 0.25, 0.35);
+
+      const ringGeo2 = new THREE.TorusGeometry(2.42, 0.015, 12, 96);
+      const ringMat2 = new THREE.MeshBasicMaterial({
+        color: 0xf472b6,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+      ring2.rotation.set(-0.48, -0.3, -0.4);
+      twinRingsGroup.add(ring1, ring2);
+      stageGroup.add(twinRingsGroup);
+
+      function updateGalaxyColors(themeKey) {
+        const t = THEMES[themeKey] || THEMES.galaxy_rose;
+        const cCore = new THREE.Color(t.coreColor);
+        const cArmA = new THREE.Color(t.armColorA);
+        const cArmB = new THREE.Color(t.armColorB);
+        const cNeb = new THREE.Color(t.nebulaColor);
+
+        const gAttr = galaxyGeo.getAttribute('color');
+        for (let i = 0; i < GALAXY_COUNT; i++) {
+          const sx = spiralTargets[i * 3];
+          const sz = spiralTargets[i * 3 + 2] + 4.2;
+          const distRatio = Math.min(1, Math.hypot(sx, sz) / 7.5);
+          const armCol = i % 2 === 0 ? cArmA : cArmB;
+          const mixCol = cCore.clone().lerp(armCol, 0.22 + distRatio * 0.78);
+          gAttr.setXYZ(i, mixCol.r, mixCol.g, mixCol.b);
+        }
+        gAttr.needsUpdate = true;
+
+        const nAttr = nebulaGeo.getAttribute('color');
+        for (let i = 0; i < NEBULA_COUNT; i++) {
+          const c = i % 2 === 0 ? cNeb : cArmA;
+          nAttr.setXYZ(i, c.r, c.g, c.b);
+        }
+        nAttr.needsUpdate = true;
+
+        ringMat1.color.setHex(t.ringColor);
+        ringMat2.color.setHex(t.armColorA);
+      }
+
+      // ==================== 5. 3D ENGRAVED COUPLE NAMEPLATE & 3D PARTICLE SKY TEXT ====================
+      function roundRectPath(ctx2d, x, y, w, h, r) {
+        ctx2d.beginPath();
+        ctx2d.moveTo(x + r, y);
+        ctx2d.lineTo(x + w - r, y);
+        ctx2d.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx2d.lineTo(x + w, y + h - r);
+        ctx2d.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx2d.lineTo(x + r, y + h);
+        ctx2d.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx2d.lineTo(x, y + r);
+        ctx2d.quadraticCurveTo(x, y, x + r, y);
+        ctx2d.closePath();
+      }
+
+      const nameplateCanvas = document.createElement('canvas');
+      nameplateCanvas.width = 1280;
+      nameplateCanvas.height = 420;
+      const nameplateCtx = nameplateCanvas.getContext('2d');
+      const nameplateTex = new THREE.CanvasTexture(nameplateCanvas);
+      nameplateTex.encoding = THREE.sRGBEncoding;
+
+      const nameplateMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.2, 1.38),
+        new THREE.MeshBasicMaterial({
+          map: nameplateTex,
+          transparent: true,
+          toneMapped: false
+        })
+      );
+      nameplateMesh.position.set(0, -1.45, 0.35);
+      nameplateMesh.scale.setScalar(0.001);
+      nameplateMesh.visible = false;
+      stageGroup.add(nameplateMesh);
+
+      function fitTextSize(ctx2d, text, maxWidth, startSize, minSize, fontTemplate) {
+        let size = startSize;
+        while (size > minSize) {
+          ctx2d.font = fontTemplate.replace('{size}', String(size));
+          if (ctx2d.measureText(text).width <= maxWidth) break;
+          size -= 2;
+        }
+        return size;
+      }
+
+      function rebuildNameplateTexture() {
+        const c = nameplateCtx;
+        const W = nameplateCanvas.width;
+        const H = nameplateCanvas.height;
+        c.clearRect(0, 0, W, H);
+
+        // Cosmic glass & gold plaque (>=30% vertical padding for Vietnamese diacritics)
+        roundRectPath(c, 26, 22, W - 52, H - 44, 38);
+        const bgGrad = c.createLinearGradient(0, 22, W, H - 22);
+        bgGrad.addColorStop(0, 'rgba(24, 9, 44, 0.94)');
+        bgGrad.addColorStop(0.5, 'rgba(54, 14, 68, 0.96)');
+        bgGrad.addColorStop(1, 'rgba(20, 8, 38, 0.94)');
+        c.fillStyle = bgGrad;
+        c.fill();
+
+        const goldGrad = c.createLinearGradient(26, 22, W - 26, H - 22);
+        goldGrad.addColorStop(0, '#fde047');
+        goldGrad.addColorStop(0.5, '#fffbeb');
+        goldGrad.addColorStop(1, '#f472b6');
+        c.lineWidth = 6;
+        c.strokeStyle = goldGrad;
+        c.stroke();
+
+        roundRectPath(c, 42, 38, W - 84, H - 76, 26);
+        c.lineWidth = 2;
+        c.strokeStyle = 'rgba(253, 224, 71, 0.42)';
+        c.stroke();
+
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+
+        // Line 1: Honorific + Days Together Counter
+        const days = computeDaysTogether(appState.anniversaryDate);
+        const topLine = days > 0
+          ? `💑 ${appState.honorific || 'Kỷ Niệm Yêu'} • ${days.toLocaleString('vi-VN')} Ngày Bên Nhau`
+          : `💑 ${appState.honorific || 'Kỷ Niệm Yêu'}`;
+        const topSize = fitTextSize(c, topLine, W - 140, 32, 20, '700 {size}px "Plus Jakarta Sans", sans-serif');
+        c.font = `700 ${topSize}px "Plus Jakarta Sans", sans-serif`;
+        c.fillStyle = '#fde047';
+        c.fillText(topLine, W / 2, 114, W - 140);
+
+        // Line 2: Couple Names (auto-scaled)
+        const coupleLine = `${appState.receiver || 'Minh Khuê'}  ♥  ${appState.sender || 'Gia Huy'}`;
+        const mainSize = fitTextSize(c, coupleLine, W - 140, 74, 34, '800 {size}px "Plus Jakarta Sans", sans-serif');
+        c.font = `800 ${mainSize}px "Plus Jakarta Sans", sans-serif`;
+        c.shadowColor = 'rgba(236, 72, 153, 0.65)';
+        c.shadowBlur = 18;
+        c.fillStyle = '#ffffff';
+        c.fillText(coupleLine, W / 2, 224, W - 140);
+        c.shadowBlur = 0;
+
+        // Line 3: Flight Signature
+        c.font = '600 26px "Plus Jakarta Sans", sans-serif';
+        c.fillStyle = '#fbcfe8';
+        c.fillText('✨ Chuyến Bay Ngân Hà Kỷ Niệm ✨', W / 2, 328, W - 140);
+
+        nameplateTex.needsUpdate = true;
+      }
+
+      // 3D Particle Sky Text above the Constellation Heart
+      const SKY_TEXT_COUNT = 2100;
+      const skyTextPositions = new Float32Array(SKY_TEXT_COUNT * 3);
+      const skyTextColors = new Float32Array(SKY_TEXT_COUNT * 3);
+      const skyTextTargets = new Float32Array(SKY_TEXT_COUNT * 3);
+      const skyTextOrigins = new Float32Array(SKY_TEXT_COUNT * 3);
+      const skyTextPhases = new Float32Array(SKY_TEXT_COUNT);
+      for (let i = 0; i < SKY_TEXT_COUNT; i++) {
+        skyTextPhases[i] = Math.random() * Math.PI * 2;
+      }
+      const skyTextGeo = new THREE.BufferGeometry();
+      skyTextGeo.setAttribute('position', new THREE.BufferAttribute(skyTextPositions, 3));
+      skyTextGeo.setAttribute('color', new THREE.BufferAttribute(skyTextColors, 3));
+      const skyTextMat = new THREE.PointsMaterial({
+        size: 0.115,
+        map: starSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const skyTextPoints = new THREE.Points(skyTextGeo, skyTextMat);
+      skyTextPoints.visible = false;
+      stageGroup.add(skyTextPoints);
+
+      const skyOffscreen = document.createElement('canvas');
+      skyOffscreen.width = 1280;
+      skyOffscreen.height = 420;
+      const skyCtx = skyOffscreen.getContext('2d');
+
+      function rebuildSkyTextTargets() {
+        const c = skyCtx;
+        const W = skyOffscreen.width;
+        const H = skyOffscreen.height;
+        c.clearRect(0, 0, W, H);
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+
+        const days = computeDaysTogether(appState.anniversaryDate);
+        const topText = days > 0
+          ? `${appState.honorific || 'Kỷ Niệm Yêu'} • ${days} Ngày`
+          : (appState.honorific || 'Kỷ Niệm Yêu Thương');
+        const topSize = fitTextSize(c, topText, W - 120, 44, 24, '700 {size}px "Plus Jakarta Sans", sans-serif');
+        c.fillStyle = '#fde047';
+        c.font = `700 ${topSize}px "Plus Jakarta Sans", sans-serif`;
+        c.fillText(topText, W / 2, 134, W - 120);
+
+        const coupleText = `${appState.receiver || 'Minh Khuê'} ♥ ${appState.sender || 'Gia Huy'}`;
+        const coupleSize = fitTextSize(c, coupleText, W - 110, 96, 24, '800 {size}px "Plus Jakarta Sans", sans-serif');
+        c.fillStyle = '#ffffff';
+        c.font = `800 ${coupleSize}px "Plus Jakarta Sans", sans-serif`;
+        c.fillText(coupleText, W / 2, 268, W - 110);
+
+        const imgData = c.getImageData(0, 0, W, H).data;
+        const sampled = [];
+        const step = 3;
+        for (let y = 0; y < H; y += step) {
+          for (let x = 0; x < W; x += step) {
+            const a = imgData[(y * W + x) * 4 + 3];
+            if (a > 105) {
+              sampled.push({
+                x: ((x - W / 2) / W) * 5.1,
+                y: ((H / 2 - y) / H) * 1.85 + 2.38,
+                z: 0.2 + (Math.random() - 0.5) * 0.08,
+                isGold: y < 185
+              });
+            }
+          }
+        }
+
+        for (let i = sampled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = sampled[i];
+          sampled[i] = sampled[j];
+          sampled[j] = tmp;
+        }
+
+        const t = THEMES[appState.theme] || THEMES.galaxy_rose;
+        const goldCol = new THREE.Color(0xfde047);
+        const armCol = new THREE.Color(t.armColorA);
+        const whiteCol = new THREE.Color(0xffffff);
+        const colAttr = skyTextGeo.getAttribute('color');
+
+        for (let i = 0; i < SKY_TEXT_COUNT; i++) {
+          const pt = sampled.length > 0 ? sampled[i % sampled.length] : { x: 0, y: 2.38, z: 0.2, isGold: false };
+          skyTextTargets[i * 3] = pt.x + (Math.random() - 0.5) * 0.014;
+          skyTextTargets[i * 3 + 1] = pt.y + (Math.random() - 0.5) * 0.014;
+          skyTextTargets[i * 3 + 2] = pt.z;
+
+          const ang = (i / SKY_TEXT_COUNT) * Math.PI * 6;
+          const rad = 2.6 + (i % 7) * 0.38;
+          skyTextOrigins[i * 3] = Math.cos(ang) * rad;
+          skyTextOrigins[i * 3 + 1] = Math.sin(ang * 0.7) * 2.1 + 1.1;
+          skyTextOrigins[i * 3 + 2] = -2.4 + Math.sin(ang) * 1.6;
+
+          const cPick = pt.isGold ? goldCol : (i % 3 === 0 ? whiteCol : armCol);
+          colAttr.setXYZ(i, cPick.r, cPick.g, cPick.b);
+        }
+        colAttr.needsUpdate = true;
+      }
+
+      // ==================== 6. PROCEDURAL COUPLE POLAROID ILLUSTRATIONS & 3D POLAROID FRAMES ====================
+      function createDefaultCoupleIllustrationUrl(idx) {
+        const c = document.createElement('canvas');
+        c.width = 640;
+        c.height = 480;
+        const g = c.getContext('2d');
+
+        const skies = [
+          ['#1a0b38', '#6b1d6d', '#f472b6'],
+          ['#0b1d3a', '#1d4ed8', '#7dd3fc'],
+          ['#2c1024', '#be185d', '#fda4af'],
+          ['#1c112b', '#7e22ce', '#fde047'],
+          ['#0f1e2e', '#0f766e', '#99f6e4'],
+          ['#2e130c', '#c2410c', '#fde68a']
+        ];
+        const pal = skies[idx % skies.length];
+        const bg = g.createLinearGradient(0, 0, 0, 480);
+        bg.addColorStop(0, pal[0]);
+        bg.addColorStop(0.58, pal[1]);
+        bg.addColorStop(1, pal[2]);
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 640, 480);
+
+        // Twinkling cosmic stars
+        for (let s = 0; s < 48; s++) {
+          const sx = (s * 137 + idx * 61) % 640;
+          const sy = (s * 83 + idx * 37) % 340;
+          const sr = 1.2 + (s % 4) * 0.9;
+          g.beginPath();
+          g.arc(sx, sy, sr, 0, Math.PI * 2);
+          g.fillStyle = `rgba(255, 250, 225, ${0.4 + (s % 5) * 0.12})`;
+          g.fill();
+        }
+
+        // Glowing crescent / full moon
+        const moonX = 485 - (idx % 3) * 65;
+        const moonY = 122 + (idx % 2) * 28;
+        const moonGlow = g.createRadialGradient(moonX, moonY, 10, moonX, moonY, 96);
+        moonGlow.addColorStop(0, 'rgba(254, 249, 195, 0.95)');
+        moonGlow.addColorStop(0.45, 'rgba(253, 224, 71, 0.32)');
+        moonGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+        g.fillStyle = moonGlow;
+        g.beginPath();
+        g.arc(moonX, moonY, 96, 0, Math.PI * 2);
+        g.fill();
+
+        g.beginPath();
+        g.arc(moonX, moonY, 38, 0, Math.PI * 2);
+        g.fillStyle = '#fef9c3';
+        g.fill();
+
+        // Cosmic Milky Way ribbon curve
+        g.save();
+        g.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+        g.lineWidth = 28;
+        g.lineCap = 'round';
+        g.beginPath();
+        g.moveTo(-20, 260 - idx * 14);
+        g.bezierCurveTo(180, 140, 440, 290, 660, 160);
+        g.stroke();
+        g.restore();
+
+        // Romantic couple silhouette stargazing on hill
+        g.fillStyle = 'rgba(12, 6, 24, 0.92)';
+        g.beginPath();
+        g.moveTo(0, 480);
+        g.lineTo(0, 392);
+        g.quadraticCurveTo(320, 338, 640, 398);
+        g.lineTo(640, 480);
+        g.closePath();
+        g.fill();
+
+        // Couple silhouettes
+        g.fillStyle = '#120722';
+        // Left person
+        g.beginPath();
+        g.arc(288, 306, 17, 0, Math.PI * 2);
+        g.fill();
+        roundRectPath(g, 272, 324, 32, 68, 12);
+        g.fill();
+        // Right person leaning slightly
+        g.beginPath();
+        g.arc(334, 314, 16, 0, Math.PI * 2);
+        g.fill();
+        roundRectPath(g, 319, 331, 30, 62, 12);
+        g.fill();
+
+        // Floating golden heart constellation between them
+        g.font = '700 42px serif';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillStyle = '#fde047';
+        g.fillText(['✨', '💫', '🌙', '💖', '🌟', '🪐'][idx % 6], 312, 232);
+
+        // Stamp badge
+        g.font = '700 22px "Plus Jakarta Sans", sans-serif';
+        g.fillStyle = 'rgba(255, 251, 235, 0.88)';
+        g.fillText(`CHẶNG KỶ NIỆM #0${idx + 1}`, 320, 434);
+
+        return c.toDataURL('image/jpeg', 0.88);
+      }
+
+      const defaultIllustrationUrls = Array.from({ length: 6 }, (_, i) => createDefaultCoupleIllustrationUrl(i));
+
+      function getPolaroidItems() {
+        const preset = ANNIVERSARY_PRESETS[appState.preset] || ANNIVERSARY_PRESETS.lovers;
+        if (appState.photos.length > 0) {
+          return appState.photos.slice(0, 8).map((p, i) => {
+            const url = typeof p === 'string' ? p : p.url;
+            const cap = (typeof p === 'object' && p.caption)
+              ? p.caption
+              : (appState.captions[i] || preset.captions[i % preset.captions.length]);
+            return { url, caption: cap, isDefault: false };
+          });
+        }
+        return defaultIllustrationUrls.map((url, i) => ({
+          url,
+          caption: appState.captions[i] || preset.captions[i % preset.captions.length],
+          isDefault: true
+        }));
+      }
+
+      function createPolaroidTexture(item, idx, onReady) {
+        const c = document.createElement('canvas');
+        c.width = 440;
+        c.height = 530;
+        const g = c.getContext('2d');
+
+        function drawCardFrame(photoImg) {
+          g.clearRect(0, 0, 440, 530);
+          // Warm ivory Polaroid paper
+          roundRectPath(g, 8, 8, 424, 514, 22);
+          const paperGrad = g.createLinearGradient(0, 8, 0, 522);
+          paperGrad.addColorStop(0, '#fffdf9');
+          paperGrad.addColorStop(1, '#fdf2f8');
+          g.fillStyle = paperGrad;
+          g.fill();
+
+          g.lineWidth = 3;
+          g.strokeStyle = 'rgba(253, 224, 71, 0.72)';
+          g.stroke();
+
+          // Photo window (cover crop)
+          const px = 26;
+          const py = 26;
+          const pw = 388;
+          const ph = 376;
+          if (photoImg) {
+            g.save();
+            roundRectPath(g, px, py, pw, ph, 14);
+            g.clip();
+            const imgRatio = photoImg.width / Math.max(1, photoImg.height);
+            const targetRatio = pw / ph;
+            let sx = 0, sy = 0, sw = photoImg.width, sh = photoImg.height;
+            if (imgRatio > targetRatio) {
+              sw = photoImg.height * targetRatio;
+              sx = (photoImg.width - sw) / 2;
+            } else {
+              sh = photoImg.width / targetRatio;
+              sy = (photoImg.height - sh) / 2;
+            }
+            g.drawImage(photoImg, sx, sy, sw, sh, px, py, pw, ph);
+            g.restore();
+          } else {
+            g.fillStyle = '#3b0764';
+            roundRectPath(g, px, py, pw, ph, 14);
+            g.fill();
+          }
+
+          // Subtle inner photo border
+          roundRectPath(g, px, py, pw, ph, 14);
+          g.lineWidth = 2;
+          g.strokeStyle = 'rgba(157, 23, 77, 0.25)';
+          g.stroke();
+
+          // Handwritten caption with generous padding + shrink loop for Vietnamese diacritics
+          g.textAlign = 'center';
+          g.textBaseline = 'middle';
+          const capText = item.caption || `Kỷ niệm #${idx + 1}`;
+          const capSize = fitTextSize(g, capText, 384, 27, 12, '700 {size}px "Dancing Script", "Plus Jakarta Sans", cursive');
+          g.font = `700 ${capSize}px "Dancing Script", "Plus Jakarta Sans", cursive`;
+          g.fillStyle = '#831843';
+          g.fillText(capText, 220, 456, 384);
+
+          g.font = '600 13px "Plus Jakarta Sans", sans-serif';
+          g.fillStyle = '#9d174d';
+          g.fillText(`✦ Kỷ Niệm #0${idx + 1} ✦`, 220, 496);
+
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          onReady(tex);
+        }
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => drawCardFrame(img);
+        img.onerror = () => drawCardFrame(null);
+        img.src = item.url;
+      }
+
+      const polaroidGroup = new THREE.Group();
+      stageGroup.add(polaroidGroup);
+      const polaroidHitMeshes = [];
+
+      function getCorridorLayout(idx, total) {
+        const side = idx % 2 === 0 ? -1 : 1;
+        const spreadX = 1.65 + (idx % 3) * 0.35;
+        const yOff = ((idx % 3) - 1) * 0.58 + 0.32;
+        const zPos = 1.8 - idx * 1.95;
+        const ry = side * -0.26;
+        return { x: side * spreadX, y: yOff, z: zPos, ry };
+      }
+
+      function getClimaxArcLayout(idx, total) {
+        const presets = [
+          { x: -2.75, y: 1.55, z: -0.55, ry: 0.34 },
+          { x: 2.75, y: 1.55, z: -0.55, ry: -0.34 },
+          { x: -2.62, y: -0.22, z: -0.78, ry: 0.32 },
+          { x: 2.62, y: -0.22, z: -0.78, ry: -0.32 },
+          { x: -1.62, y: 2.38, z: -1.25, ry: 0.2 },
+          { x: 1.62, y: 2.38, z: -1.25, ry: -0.2 },
+          { x: -3.28, y: 0.68, z: -1.35, ry: 0.42 },
+          { x: 3.28, y: 0.68, z: -1.35, ry: -0.42 }
+        ];
+        if (idx < presets.length) return presets[idx];
+        const ang = (idx / Math.max(1, total)) * Math.PI * 2;
+        return { x: Math.cos(ang) * 3.1, y: Math.sin(ang) * 1.6 + 0.5, z: -1.1, ry: -Math.cos(ang) * 0.35 };
+      }
+
+      function rebuildPolaroids() {
+        while (polaroidGroup.children.length > 0) {
+          const oldGroup = polaroidGroup.children[0];
+          oldGroup.traverse((child) => {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+              const mats = Array.isArray(child.material) ? child.material : [child.material];
+              mats.forEach((mat) => {
+                if (mat.map && mat.map !== starSpriteTex) {
+                  mat.map.dispose();
+                }
+                mat.dispose();
+              });
+            }
+          });
+          polaroidGroup.remove(oldGroup);
+        }
+        polaroidHitMeshes.length = 0;
+
+        const items = getPolaroidItems();
+        items.forEach((item, idx) => {
+          const cor = getCorridorLayout(idx, items.length);
+          const arc = getClimaxArcLayout(idx, items.length);
+
+          const cardGroup = new THREE.Group();
+          cardGroup.position.set(cor.x, cor.y, cor.z);
+          cardGroup.rotation.y = cor.ry;
+
+          // Soft luminous cosmic halo behind Polaroid
+          const haloMat = new THREE.MeshBasicMaterial({
+            map: starSpriteTex,
+            color: 0xf472b6,
+            transparent: true,
+            opacity: 0.32,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+          const haloMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.4), haloMat);
+          haloMesh.position.z = -0.04;
+          cardGroup.add(haloMesh);
+
+          const cardMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 1.0,
+            toneMapped: false,
+            side: THREE.DoubleSide
+          });
+          const cardMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.26, 1.52), cardMat);
+          cardMesh.userData = { photoIdx: idx };
+          cardGroup.add(cardMesh);
+
+          cardGroup.userData = {
+            idx,
+            caption: item.caption,
+            cor,
+            arc,
+            phase: idx * 1.1 + 0.4,
+            cardMat,
+            haloMat
+          };
+
+          createPolaroidTexture(item, idx, (tex) => {
+            if (cardGroup.parent !== polaroidGroup) {
+              tex.dispose();
+              return;
+            }
+            cardMat.map = tex;
+            cardMat.needsUpdate = true;
+          });
+
+          polaroidGroup.add(cardGroup);
+          polaroidHitMeshes.push(cardMesh);
+        });
+      }
+
+      // ==================== 7. MULTI-STEP FLIGHT, SLOW CAMERA ZOOM & CLIMAX ====================
+      let galaxyMorphTarget = 0.0;
+      let galaxyMorphCurrent = 0.0;
+      let orbitYaw = 0.0;
+      let orbitPitch = 0.0;
+      let orbitZoomOffset = 0.0;
+
+      const camDesiredPos = new THREE.Vector3(0, 0.75, 8.2);
+      const camDesiredLook = new THREE.Vector3(0, 0.25, -2.5);
+      const camCurrentLook = new THREE.Vector3(0, 0.25, -2.5);
+      camera.position.copy(camDesiredPos);
+      camera.lookAt(camCurrentLook);
+
+      function updateFlightHUD() {
+        const hintEl = document.getElementById('flight-hint-pill');
+        const capEl = document.getElementById('story-caption-pill');
+        const zoomHud = document.getElementById('frame-zoom-hud');
+        const zoomCap = document.getElementById('frame-zoom-caption');
+        const items = getPolaroidItems();
+        const step = appState.storyStep;
+        const total = appState.totalStorySteps;
+
+        if (appState.focusedPhotoIdx >= 0 && items[appState.focusedPhotoIdx]) {
+          const item = items[appState.focusedPhotoIdx];
+          hintEl.classList.add('hidden-hint');
+          capEl.classList.add('hidden-caption');
+          zoomCap.textContent = `Kỷ niệm ${appState.focusedPhotoIdx + 1}/${items.length}: ${item.caption}`;
+          zoomHud.classList.remove('hidden');
+          return;
+        }
+
+        zoomHud.classList.add('hidden');
+
+        if (step === 0) {
+          hintEl.classList.remove('hidden-hint');
+          hintEl.textContent = `🚀 Chạm để Khởi Hành Chuyến Bay Ngân Hà (1/${total})`;
+          capEl.classList.add('hidden-caption');
+          capEl.innerHTML = '';
+        } else if (step >= 1 && step < total) {
+          hintEl.classList.remove('hidden-hint');
+          const logs = [
+            '',
+            'Những tia sao đầu tiên đưa hai ta đến bên nhau — chạm vào ảnh Polaroid bất kỳ để zoom chậm cận cảnh',
+            'Lướt qua vùng tinh vân ký ức — mỗi khung ảnh là một nhịp tim lưu giữ thanh xuân',
+            'Ánh sáng đang tụ về tâm ngân hà — chạm để hợp nhất trái tim kỷ niệm!'
+          ];
+          const prompts = [
+            '',
+            `✨ Chạm để Bay Qua Vùng Tinh Vân (${step + 1}/${total})`,
+            `✨ Chạm để Tiến Tới Đường Chân Trời (${step + 1}/${total})`,
+            `💫 Chạm để Bùng Nổ Cao Trào Ngân Hà (${step + 1}/${total})`
+          ];
+          hintEl.textContent = prompts[step] || '✨ Chạm để Bay Tiếp';
+          capEl.innerHTML = `<span class="caption-step-tag">Chặng ${step}/${total - 1}:</span> ${logs[step]}`;
+          capEl.classList.remove('hidden-caption');
+        } else {
+          hintEl.classList.add('hidden-hint');
+          capEl.classList.add('hidden-caption');
+        }
+      }
+
+      function focusPolaroid(idx) {
+        const items = getPolaroidItems();
+        if (!items.length) return;
+        appState.focusedPhotoIdx = ((idx % items.length) + items.length) % items.length;
+        AudioEngine.unlockOnGesture();
+        AudioEngine.playTransitionChime();
+        updateFlightHUD();
+      }
+
+      function exitPolaroidZoom() {
+        appState.focusedPhotoIdx = -1;
+        updateFlightHUD();
+      }
+
+      let replayClimaxTimer = null;
+
+      function clearReplayClimaxTimer() {
+        if (replayClimaxTimer) {
+          clearTimeout(replayClimaxTimer);
+          replayClimaxTimer = null;
+        }
+      }
+
+      function advanceStoryStep() {
+        clearReplayClimaxTimer();
+        AudioEngine.unlockOnGesture();
+        if (appState.focusedPhotoIdx >= 0) {
+          exitPolaroidZoom();
+          return;
+        }
+        if (appState.storyStep >= appState.totalStorySteps) return;
+
+        appState.storyStep += 1;
+        orbitYaw = 0;
+        orbitPitch = 0;
+        orbitZoomOffset = 0;
+
+        if (appState.storyStep >= appState.totalStorySteps) {
+          galaxyMorphTarget = 1.0;
+          AudioEngine.playTransitionChime();
+          AudioEngine.playFinaleArpeggio();
+          setTimeout(() => {
+            if (!appState.isViewerMode && appState.storyStep >= appState.totalStorySteps) {
+              document.getElementById('btn-pay')?.classList.add('climax-glow');
+            }
+          }, 1050);
+        } else {
+          galaxyMorphTarget = 0.0;
+          AudioEngine.playTransitionChime();
+        }
+        updateFlightHUD();
+      }
+
+      function goToClimax() {
+        clearReplayClimaxTimer();
+        appState.focusedPhotoIdx = -1;
+        appState.storyStep = appState.totalStorySteps;
+        galaxyMorphTarget = 1.0;
+        orbitYaw = 0;
+        orbitPitch = 0;
+        orbitZoomOffset = 0;
+        AudioEngine.playTransitionChime();
+        AudioEngine.playFinaleArpeggio();
+        updateFlightHUD();
+        setTimeout(() => {
+          if (!appState.isViewerMode && appState.storyStep >= appState.totalStorySteps) {
+            document.getElementById('btn-pay')?.classList.add('climax-glow');
+          }
+        }, 950);
+      }
+
+      function replayFlight(jumpToClimax = false) {
+        clearReplayClimaxTimer();
+        appState.focusedPhotoIdx = -1;
+        appState.storyStep = 0;
+        galaxyMorphTarget = 0.0;
+        galaxyMorphCurrent = 0.0;
+        orbitYaw = 0;
+        orbitPitch = 0;
+        orbitZoomOffset = 0;
+        document.getElementById('btn-pay')?.classList.remove('climax-glow');
+        updateFlightHUD();
+        if (jumpToClimax) {
+          replayClimaxTimer = setTimeout(() => {
+            replayClimaxTimer = null;
+            goToClimax();
+          }, 320);
+        }
+      }
+
+      // ==================== 8. POINTER / RAYCASTER / WHEEL / PINCH / GYRO ====================
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let isPointerDown = false;
+      let dragDist = 0;
+      let prevPointer = { x: 0, y: 0 };
+      let pinchStartDist = 0;
+      let gyroRequested = false;
+
+      function requestGyroIfNeeded() {
+        if (gyroRequested) return;
+        gyroRequested = true;
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission().catch(() => {});
+        }
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        dragDist = 0;
+        prevPointer = { x: e.clientX, y: e.clientY };
+        AudioEngine.unlockOnGesture();
+        requestGyroIfNeeded();
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        const dx = e.clientX - prevPointer.x;
+        const dy = e.clientY - prevPointer.y;
+        dragDist += Math.hypot(dx, dy);
+        prevPointer = { x: e.clientX, y: e.clientY };
+
+        if (dragDist > 6 && appState.focusedPhotoIdx < 0) {
+          orbitYaw = Math.max(-0.85, Math.min(0.85, orbitYaw + dx * 0.0045));
+          orbitPitch = Math.max(-0.38, Math.min(0.38, orbitPitch + dy * 0.0032));
+        }
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+
+        if (dragDist <= 6) {
+          const rect = canvas.getBoundingClientRect();
+          pointerNDC.x = ((e.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+          pointerNDC.y = -((e.clientY - rect.top) / Math.max(1, rect.height)) * 2 + 1;
+          raycaster.setFromCamera(pointerNDC, camera);
+          const hits = raycaster.intersectObjects(polaroidHitMeshes, false);
+
+          if (hits.length > 0) {
+            const hitIdx = hits[0].object.userData.photoIdx;
+            if (appState.focusedPhotoIdx === hitIdx) {
+              exitPolaroidZoom();
+            } else {
+              focusPolaroid(hitIdx);
+            }
+            return;
+          }
+
+          if (appState.focusedPhotoIdx >= 0) {
+            exitPolaroidZoom();
+          } else {
+            advanceStoryStep();
+          }
+        }
+      });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        orbitZoomOffset = Math.max(-2.2, Math.min(2.8, orbitZoomOffset + e.deltaY * 0.003));
+      }, { passive: false });
+
+      canvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          pinchStartDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, { passive: true });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && pinchStartDist > 0) {
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          orbitZoomOffset = Math.max(-2.2, Math.min(2.8, orbitZoomOffset - (dist - pinchStartDist) * 0.014));
+          pinchStartDist = dist;
+        }
+      }, { passive: true });
+
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma == null || e.beta == null || isPointerDown || appState.focusedPhotoIdx >= 0) return;
+        const gx = Math.max(-1, Math.min(1, e.gamma / 45)) * 0.14;
+        const gy = Math.max(-1, Math.min(1, (e.beta - 45) / 45)) * 0.09;
+        orbitYaw += (gx - orbitYaw) * 0.03;
+        orbitPitch += (gy - orbitPitch) * 0.03;
+      });
+
+      // ==================== 9. THEME, PRESETS, CUSTOMIZE & PAYMENT QR KIT ====================
+      function applyThemePalette(themeKey) {
+        const t = THEMES[themeKey] || THEMES.galaxy_rose;
+        appState.theme = themeKey;
+        const root = document.documentElement.style;
+        root.setProperty('--bg-top', t.bgTop);
+        root.setProperty('--bg-mid', t.bgMid);
+        root.setProperty('--bg-deep', t.bgDeep);
+        root.setProperty('--accent-primary', t.accentPrimary);
+        root.setProperty('--accent-secondary', t.accentSecondary);
+
+        corePointLight.color.setHex(t.pointLight);
+        rimDirLight.color.setHex(t.rimLight);
+        updateGalaxyColors(themeKey);
+        rebuildSkyTextTargets();
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === themeKey);
+        });
+      }
+
+      function applyAnniversaryPreset(key, withSound = false) {
+        const p = ANNIVERSARY_PRESETS[key];
+        if (!p) return;
+        appState.preset = key;
+        appState.honorific = p.honorific;
+        if (!appState.hasCustomNames) {
+          appState.receiver = p.defaultReceiver;
+          appState.sender = p.defaultSender;
+        }
+        appState.musicMood = p.musicMood;
+        appState.wish = p.wish;
+        applyThemePalette(p.theme);
+        AudioEngine.refreshMood();
+
+        document.querySelectorAll('.recipient-preset-btn, .modal-preset-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.preset === key);
+        });
+
+        const moodSelect = document.getElementById('select-music-mood');
+        if (moodSelect) moodSelect.value = appState.musicMood;
+
+        syncCustomizeInputs();
+        sync3DTextAndPolaroids();
+        if (withSound) {
+          AudioEngine.unlockOnGesture();
+          AudioEngine.playTransitionChime();
+        }
+      }
+
+      function sync3DTextAndPolaroids() {
+        rebuildNameplateTexture();
+        rebuildSkyTextTargets();
+        rebuildPolaroids();
+        updateFlightHUD();
+      }
+
+      function syncCustomizeInputs() {
+        document.getElementById('input-honorific').value = appState.honorific;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-anniversary-date').value = appState.anniversaryDate || '';
+        document.getElementById('input-wish').value = appState.wish;
+        const moodSel = document.getElementById('select-music-mood');
+        if (moodSel) moodSel.value = appState.musicMood;
+        renderCreatorPhotoThumbs();
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        const label = document.getElementById('photo-count-label');
+        if (label) {
+          label.textContent = appState.photos.length > 0
+            ? `Ảnh Polaroid Kỷ Niệm (${appState.photos.length}/8 ảnh)`
+            : 'Ảnh Polaroid Kỷ Niệm (Tối đa 8 ảnh)';
+        }
+        grid.innerHTML = '';
+        const preset = ANNIVERSARY_PRESETS[appState.preset] || ANNIVERSARY_PRESETS.lovers;
+
+        appState.photos.forEach((p, idx) => {
+          const card = document.createElement('div');
+          card.className = 'photo-thumb-card';
+
+          const imgWrap = document.createElement('div');
+          imgWrap.className = 'photo-thumb-img-wrap';
+          const img = document.createElement('img');
+          img.src = typeof p === 'string' ? p : p.url;
+          img.alt = `Ảnh kỷ niệm ${idx + 1}`;
+
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'photo-thumb-del';
+          del.textContent = '✕';
+          del.setAttribute('aria-label', 'Xóa ảnh');
+          del.onclick = () => {
+            appState.photos.splice(idx, 1);
+            appState.captions.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          };
+          imgWrap.appendChild(img);
+          imgWrap.appendChild(del);
+
+          const capInput = document.createElement('input');
+          capInput.type = 'text';
+          capInput.className = 'photo-caption-input';
+          capInput.maxLength = 42;
+          capInput.placeholder = preset.captions[idx % preset.captions.length];
+          capInput.value = (typeof p === 'object' && p.caption) ? p.caption : (appState.captions[idx] || '');
+          capInput.addEventListener('input', (ev) => {
+            const val = ev.target.value;
+            appState.captions[idx] = val;
+            if (typeof appState.photos[idx] === 'object') {
+              appState.photos[idx].caption = val;
+            }
+          });
+
+          card.appendChild(imgWrap);
+          card.appendChild(capInput);
+          grid.appendChild(card);
+        });
+      }
+
+      function openModal(id) {
+        document.getElementById(id)?.classList.add('open');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id)?.classList.remove('open');
+      }
+
+      function openCustomizeModal() {
+        // README §4.3: Auto-mute audio when opening Customize Studio
+        AudioEngine.setMuted(true);
+        syncCustomizeInputs();
+        openModal('modal-customize');
+      }
+
+      function openWishViewerModal() {
+        const days = computeDaysTogether(appState.anniversaryDate);
+        const daysText = days > 0 ? ` • ${days.toLocaleString('vi-VN')} ngày bên nhau` : '';
+        document.getElementById('viewer-title').textContent = `💌 Gửi ${appState.receiver} Yêu Thương`;
+        document.getElementById('viewer-meta').textContent = `Thương gửi, ${appState.sender} ♥ • ${appState.honorific}${daysText}`;
+        document.getElementById('viewer-wish-text').textContent = appState.wish;
+
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        getPolaroidItems().forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'viewer-photo-item';
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = `Kỷ niệm ${idx + 1}`;
+          const cap = document.createElement('div');
+          cap.className = 'viewer-photo-cap';
+          cap.textContent = item.caption;
+          card.appendChild(img);
+          card.appendChild(cap);
+          grid.appendChild(card);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function getPaymentKitConfig() {
+        const days = computeDaysTogether(appState.anniversaryDate);
+        const occasionLabel = days > 0
+          ? `${appState.honorific} • ${days} Ngày`
+          : (appState.honorific || 'Kỷ Niệm Yêu • Chuyến Bay Ngân Hà');
+
+        return {
+          templateId: appState.templateId,
+          templateType: 'anniversary_galaxy_flight',
+          emoji: '🌌',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Chuyến Bay Ngân Hà 3D',
+          successTitle: 'Thiệp Chuyến Bay Ngân Hà Đã Sẵn Sàng!',
+          cardTitle: '🌌 CHUYẾN BAY NGÂN HÀ • KỶ NIỆM YÊU ✨',
+          scanLabel: 'Quét QR để Lên Chuyến Bay Ngân Hà 3D',
+          footerHint: 'Chạm từng khung Polaroid 3D để zoom cận cảnh & đọc tâm thư',
+          gradientStops: ['#16082e', '#5b1462', '#ec4899'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: occasionLabel,
+          message: appState.wish,
+          payload: {
+            templateId: 'anniversary_galaxy_flight',
+            preset: appState.preset,
+            theme: appState.theme,
+            musicMood: appState.musicMood,
+            honorific: appState.honorific,
+            senderName: appState.sender,
+            receiverName: appState.receiver,
+            anniversaryDate: appState.anniversaryDate,
+            wish: appState.wish,
+            photos: appState.photos,
+            captions: appState.captions
+          }
+        };
+      }
+
+      // ==================== 10. EVENT BINDINGS ====================
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('sound-unlock-pill').addEventListener('click', () => AudioEngine.unlockOnGesture());
+
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.unlockOnGesture();
+        replayFlight(false);
+      });
+
+      document.getElementById('flight-hint-pill').addEventListener('click', () => advanceStoryStep());
+
+      document.getElementById('btn-zoom-prev').addEventListener('click', (e) => {
+        e.stopPropagation();
+        focusPolaroid(appState.focusedPhotoIdx - 1);
+      });
+      document.getElementById('btn-zoom-next').addEventListener('click', (e) => {
+        e.stopPropagation();
+        focusPolaroid(appState.focusedPhotoIdx + 1);
+      });
+      document.getElementById('btn-zoom-exit').addEventListener('click', (e) => {
+        e.stopPropagation();
+        exitPolaroidZoom();
+      });
+
+      document.querySelectorAll('.recipient-preset-btn, .modal-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyAnniversaryPreset(btn.dataset.preset, btn.classList.contains('recipient-preset-btn'));
+        });
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => applyThemePalette(chip.dataset.theme));
+      });
+
+      document.getElementById('select-music-mood').addEventListener('change', (e) => {
+        appState.musicMood = e.target.value;
+        AudioEngine.refreshMood();
+      });
+
+      document.getElementById('btn-viewer-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', openCustomizeModal);
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.getElementById('modal-customize').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-customize') closeModal('modal-customize');
+      });
+      document.getElementById('modal-wish-viewer').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-wish-viewer') closeModal('modal-wish-viewer');
+      });
+
+      document.getElementById('btn-ai-wish').addEventListener('click', () => {
+        const rec = document.getElementById('input-receiver').value.trim() || appState.receiver || 'bạn';
+        const snd = document.getElementById('input-sender').value.trim() || appState.sender || 'mình';
+        const tpl = AI_WISH_POOL[appState.aiWishCursor % AI_WISH_POOL.length];
+        appState.aiWishCursor++;
+        const wishText = tpl.split('{{receiver}}').join(rec).split('{{sender}}').join(snd);
+        document.getElementById('input-wish').value = wishText;
+      });
+
+      if (window.PaymentQrKit && typeof window.PaymentQrKit.bindPhotoUploader === 'function') {
+        window.PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+          maxCount: 8,
+          maxSide: 900,
+          quality: 0.8,
+          getList: () => appState.photos,
+          onPhotoReady: (dataUrl) => {
+            appState.photos.push({ url: dataUrl, caption: '' });
+            renderCreatorPhotoThumbs();
+          }
+        });
+      }
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        const recVal = document.getElementById('input-receiver').value.trim();
+        const sndVal = document.getElementById('input-sender').value.trim();
+        const honVal = document.getElementById('input-honorific').value.trim();
+        const dateVal = document.getElementById('input-anniversary-date').value;
+        const wishVal = document.getElementById('input-wish').value.trim();
+        const moodVal = document.getElementById('select-music-mood').value;
+
+        if (recVal) {
+          appState.receiver = recVal;
+          if (!DEFAULT_NAME_SET.has(recVal)) appState.hasCustomNames = true;
+        }
+        if (sndVal) {
+          appState.sender = sndVal;
+          if (!DEFAULT_NAME_SET.has(sndVal)) appState.hasCustomNames = true;
+        }
+        appState.honorific = honVal || appState.honorific;
+        appState.anniversaryDate = dateVal || '';
+        appState.wish = wishVal || appState.wish;
+        appState.musicMood = moodVal || appState.musicMood;
+
+        sync3DTextAndPolaroids();
+        closeModal('modal-customize');
+        replayFlight(true);
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await window.PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + (err && err.message ? err.message : 'Vui lòng thử lại'));
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', updateCameraResponsive);
+
+      // ==================== 11. ANIMATION LOOP ====================
+      const clock = new THREE.Clock();
+      let elapsedTotal = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        elapsedTotal += dt;
+
+        // Deep cosmic starfield slow forward flight parallax
+        const bgPos = bgStarGeo.getAttribute('position');
+        const flightRate = appState.storyStep < appState.totalStorySteps ? 1.35 : 0.45;
+        for (let i = 0; i < BG_STAR_COUNT; i++) {
+          let z = bgPos.getZ(i) + dt * flightRate;
+          if (z > 10) z = -34;
+          bgPos.setZ(i, z);
+        }
+        bgPos.needsUpdate = true;
+
+        // Morph Milky Way Galaxy -> 3D Constellation Heart at Climax
+        galaxyMorphCurrent += (galaxyMorphTarget - galaxyMorphCurrent) * Math.min(1, dt * 1.9);
+        const gAttr = galaxyGeo.getAttribute('position');
+        const easeM = 1 - Math.pow(1 - galaxyMorphCurrent, 3);
+        for (let i = 0; i < GALAXY_COUNT; i++) {
+          const sx = spiralTargets[i * 3];
+          const sy = spiralTargets[i * 3 + 1];
+          const sz = spiralTargets[i * 3 + 2];
+          const hx = heartTargets[i * 3];
+          const hy = heartTargets[i * 3 + 1];
+          const hz = heartTargets[i * 3 + 2];
+          const shimmer = Math.sin(elapsedTotal * 1.8 + galaxySeed[i]) * 0.025;
+          gAttr.setXYZ(
+            i,
+            sx + (hx - sx) * easeM + shimmer * 0.5,
+            sy + (hy - sy) * easeM + shimmer,
+            sz + (hz - sz) * easeM
+          );
+        }
+        gAttr.needsUpdate = true;
+        galaxyPoints.rotation.y = (1 - easeM) * Math.sin(elapsedTotal * 0.14) * 0.28 + easeM * Math.sin(elapsedTotal * 0.45) * 0.08;
+        nebulaPoints.rotation.y += dt * 0.04;
+
+        // Twin orbital rings & Nameplate & 3D Particle Sky Text during Climax
+        const inClimax = galaxyMorphCurrent > 0.02;
+        ringMat1.opacity = Math.min(0.75, galaxyMorphCurrent * 0.78);
+        ringMat2.opacity = Math.min(0.68, galaxyMorphCurrent * 0.72);
+        ring1.rotation.z += dt * 0.45;
+        ring2.rotation.z -= dt * 0.36;
+
+        skyTextPoints.visible = inClimax;
+        if (inClimax) {
+          skyTextMat.opacity = Math.min(1.0, galaxyMorphCurrent * 1.3);
+          const stAttr = skyTextGeo.getAttribute('position');
+          for (let i = 0; i < SKY_TEXT_COUNT; i++) {
+            const ox = skyTextOrigins[i * 3];
+            const oy = skyTextOrigins[i * 3 + 1];
+            const oz = skyTextOrigins[i * 3 + 2];
+            const tx = skyTextTargets[i * 3];
+            const ty = skyTextTargets[i * 3 + 1];
+            const tz = skyTextTargets[i * 3 + 2];
+            const arc = (1 - easeM) * Math.sin(elapsedTotal * 2.1 + skyTextPhases[i]) * 0.45;
+            const micro = easeM * Math.sin(elapsedTotal * 2.0 + skyTextPhases[i]) * 0.01;
+            stAttr.setXYZ(
+              i,
+              ox + (tx - ox) * easeM + arc * 0.35,
+              oy + (ty - oy) * easeM + arc * 0.25 + micro,
+              oz + (tz - oz) * easeM
+            );
+          }
+          stAttr.needsUpdate = true;
+        }
+
+        const targetNPScale = appState.storyStep >= appState.totalStorySteps ? 0.92 : 0.001;
+        const nextNPScale = nameplateMesh.scale.x + (targetNPScale - nameplateMesh.scale.x) * Math.min(1, dt * 4.2);
+        nameplateMesh.scale.setScalar(nextNPScale);
+        nameplateMesh.visible = nextNPScale > 0.02;
+
+        // Polaroid Frames choreography (Corridor flight -> Climax gallery arc)
+        const inClimaxStep = appState.storyStep >= appState.totalStorySteps;
+        const lerpK = Math.min(1, dt * 3.8);
+        polaroidGroup.children.forEach((card) => {
+          const ud = card.userData;
+          const base = inClimaxStep ? ud.arc : ud.cor;
+          const isFocused = appState.focusedPhotoIdx === ud.idx;
+          const bobY = isFocused ? 0 : Math.sin(elapsedTotal * 1.15 + ud.phase) * 0.065;
+          const bobRotZ = isFocused ? 0 : Math.sin(elapsedTotal * 0.8 + ud.phase) * 0.028;
+
+          card.position.x += (base.x - card.position.x) * lerpK;
+          card.position.y += (base.y + bobY - card.position.y) * lerpK;
+          card.position.z += (base.z - card.position.z) * lerpK;
+          card.rotation.y += (base.ry - card.rotation.y) * lerpK;
+          card.rotation.z += (bobRotZ - card.rotation.z) * lerpK;
+
+          const targetHalo = isFocused ? 0.65 : 0.3;
+          ud.haloMat.opacity += (targetHalo - ud.haloMat.opacity) * lerpK;
+        });
+
+        // Smooth Camera Flight / Slow Polaroid Zoom / Climax Orbit
+        if (appState.focusedPhotoIdx >= 0 && polaroidGroup.children[appState.focusedPhotoIdx]) {
+          const targetCard = polaroidGroup.children[appState.focusedPhotoIdx];
+          const base = inClimaxStep ? targetCard.userData.arc : targetCard.userData.cor;
+          const sc = stageGroup.scale.x;
+          const wx = base.x * sc;
+          const wy = base.y * sc;
+          const wz = base.z * sc;
+          const zoomDist = isMobileLayout ? 2.5 : 2.15;
+          const nx = Math.sin(base.ry) * zoomDist;
+          const nz = Math.cos(base.ry) * zoomDist;
+          camDesiredPos.set(wx + nx, wy - 0.04, wz + nz);
+          camDesiredLook.set(wx, wy - 0.1, wz);
+        } else {
+          const step = appState.storyStep;
+          if (step < appState.totalStorySteps) {
+            const configs = [
+              { look: [0, 0.25, -2.5], dist: 10.5, y: 0.78 },
+              { look: [0, 0.25, -1.6], dist: 5.9, y: 0.48 },
+              { look: [0, 0.25, -5.6], dist: 5.9, y: 0.48 },
+              { look: [0, 0.28, -9.8], dist: 6.3, y: 0.54 }
+            ];
+            const cfg = configs[step] || configs[0];
+            const d = Math.max(3.6, cfg.dist + orbitZoomOffset);
+            camDesiredLook.set(cfg.look[0], cfg.look[1], cfg.look[2]);
+            camDesiredPos.set(
+              cfg.look[0] + Math.sin(orbitYaw) * d * 0.65,
+              cfg.y + orbitPitch * 2.0,
+              cfg.look[2] + Math.cos(orbitYaw * 0.65) * d
+            );
+          } else {
+            const zDist = Math.max(4.4, climaxBaseZ + orbitZoomOffset);
+            camDesiredPos.set(
+              Math.sin(orbitYaw) * zDist * 0.58,
+              0.5 + orbitPitch * 2.4,
+              Math.cos(orbitYaw) * zDist
+            );
+            camDesiredLook.set(0, 0.28, -0.2);
+          }
+        }
+
+        const camLerp = appState.focusedPhotoIdx >= 0 ? Math.min(1, dt * 2.6) : Math.min(1, dt * 3.0);
+        camera.position.lerp(camDesiredPos, camLerp);
+        camCurrentLook.lerp(camDesiredLook, camLerp);
+        camera.lookAt(camCurrentLook);
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 12. INIT & URL HYDRATION ====================
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        appState.isPreviewMode = params.get('preview') === '1';
+        if (appState.isPreviewMode) {
+          document.body.classList.add('preview-mode');
+        }
+
+        const urlPreset = params.get('preset');
+        if (urlPreset && ANNIVERSARY_PRESETS[urlPreset]) {
+          applyAnniversaryPreset(urlPreset, false);
+        }
+
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        sync3DTextAndPolaroids();
+        AudioEngine.tryBoot();
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            rebuildNameplateTexture();
+            rebuildSkyTextTargets();
+            rebuildPolaroids();
+          });
+        }
+
+        animate();
+
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.status === 'PAID' && data.order) {
+              const o = data.order;
+              const p = o.payload || o.customData || {};
+              if (p.preset && ANNIVERSARY_PRESETS[p.preset]) {
+                appState.preset = p.preset;
+              }
+              appState.sender = o.sender_name || p.senderName || appState.sender;
+              appState.receiver = o.receiver_name || p.receiverName || appState.receiver;
+              appState.wish = o.message || p.wish || appState.wish;
+              if (p.honorific) appState.honorific = p.honorific;
+              if (p.anniversaryDate !== undefined) appState.anniversaryDate = p.anniversaryDate;
+              if (p.musicMood) appState.musicMood = p.musicMood;
+              if (Array.isArray(p.captions)) appState.captions = p.captions;
+              if (Array.isArray(p.photos)) appState.photos = p.photos;
+              if (p.theme && THEMES[p.theme]) {
+                applyThemePalette(p.theme);
+              }
+              sync3DTextAndPolaroids();
+              AudioEngine.refreshMood();
+            }
+          } catch (_) {}
+        } else if (!appState.isPreviewMode) {
+          if (window.PaymentQrKit && typeof window.PaymentQrKit.restorePendingIfAny === 'function') {
+            window.PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+          }
+          if (params.get('create') === '1') {
+            openCustomizeModal();
+          }
+        }
+      }
+
+      init();
+    })();
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

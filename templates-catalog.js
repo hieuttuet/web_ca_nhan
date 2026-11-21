@@ -26,27 +26,6 @@ const EVENT_CATEGORIES = [
 // ============================================================================
 const CONFESS_TEMPLATES = [
   {
-    id: 'galaxy_love_3d',
-    category: 'confess',
-    isHot: true,
-    salesCount: '1.8k+ đã tạo',
-    title: 'Dải Ngân Hà Kỷ Niệm 3D',
-    subtitle: '16.000 vì sao xoắn ốc 3D bay quanh trái tim pha lê & khung ảnh Polaroid',
-    badge: '🔥 Best Seller TikTok',
-    price: 39000,
-    oldPrice: 69000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #2e0854 0%, #9d174d 55%, #ff2a85 100%)',
-    previewEmoji: '🪐',
-    features: ['Ghép tới 8 ảnh 3D', 'Xoay 360° tương tác', 'Tâm thư + Nhạc nền'],
-    preset: {
-      occasion: 'Lời Tỏ Tình Từ Trái Tim',
-      defaultShape: 'galaxy',
-      theme: 'pink',
-      melody: 'romance'
-    }
-  },
-  {
     id: 'fireworks_confess',
     category: 'confess',
     isHot: true,
@@ -64,27 +43,6 @@ const CONFESS_TEMPLATES = [
       occasion: 'Lời Tỏ Tình Dưới Pháo Hoa',
       theme: 'pink'
     }
-  },
-  {
-    id: 'heart_universe_3d',
-    category: 'confess',
-    isHot: true,
-    salesCount: '1.5k+ đã tạo',
-    title: 'Trái Tim Hạt Ánh Sáng 3D',
-    subtitle: 'Hàng vạn hạt tinh vân tụ lại thành Trái Tim 3D khổng lồ đập nhịp nhàng giữa vũ trụ',
-    badge: '💖 Siêu Lãng Mạn',
-    price: 35000,
-    oldPrice: 59000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #4a0424 0%, #be185d 50%, #fb7185 100%)',
-    previewEmoji: '💖',
-    features: ['Trái tim hạt 3D', 'Tải 8 ảnh kỷ niệm', 'Bắn pháo hoa 3D'],
-    preset: {
-      occasion: 'Trái Tim Này Dành Trọn Cho Em',
-      defaultShape: 'heart',
-      theme: 'pink',
-      melody: 'canon'
-    }
   }
 ];
 
@@ -93,43 +51,43 @@ const CONFESS_TEMPLATES = [
 // ============================================================================
 const ANNIVERSARY_TEMPLATES = [
   {
-    id: 'ring_anniversary_3d',
+    id: 'anniversary_galaxy_flight',
     category: 'anniversary',
     isHot: true,
-    salesCount: '920+ đã tạo',
-    title: 'Vòng Nhẫn Tinh Vân Đôi & Đếm Ngày Yêu',
-    subtitle: 'Hai vòng nhẫn ánh sao đan vào nhau kèm bộ đếm số ngày bên nhau & album ảnh bay 3D',
-    badge: '💍 Kỷ Niệm Ngày Yêu',
+    salesCount: 'Mới ra mắt',
+    title: 'Chuyến Bay Ngân Hà',
+    subtitle: 'Dải Ngân Hà Kỷ Niệm • Khung ảnh Polaroid cặp đôi trôi lơ lửng, camera zoom chậm từng kỷ niệm & nhạc Lofi/Chillout',
+    badge: '💑 Hot Kỷ Niệm Yêu',
     price: 39000,
-    oldPrice: 65000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #1e1b4b 0%, #6d28d9 55%, #c084fc 100%)',
-    previewEmoji: '💍',
-    features: ['Đếm số ngày yêu', '8 ảnh Polaroid 3D', 'Thiệp QR lưu máy'],
+    oldPrice: 69000,
+    engineUrl: 'templates/anniversary/galaxy-flight-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #16082e 0%, #5b1462 50%, #f472b6 100%)',
+    previewEmoji: '🌌',
+    features: ['Khung ảnh Polaroid 3D zoom chậm', 'Nhạc Lofi / Chillout Web Audio', 'Bảng tên & Đếm ngày yêu 3D + QR'],
     preset: {
-      occasion: 'Kỷ Niệm Tình Yêu • Mãi Bên Nhau',
-      defaultShape: 'ring',
-      theme: 'purple',
-      melody: 'canon'
+      occasion: 'Kỷ Niệm Yêu • Chuyến Bay Ngân Hà',
+      theme: 'galaxy_rose',
+      melody: 'lofi_stars'
     }
   },
   {
-    id: 'crystal_memory_3d',
+    id: 'galaxy_love_3d',
     category: 'anniversary',
-    salesCount: '640+ đã tạo',
-    title: 'Quả Cầu Pha Lê Kỷ Niệm 3D',
-    subtitle: 'Quả cầu ánh sáng lấp lánh bao bọc những bức ảnh kỷ niệm đẹp nhất của hai đứa',
-    badge: '🔮 Độc Đáo',
-    price: 35000,
-    oldPrice: 55000,
+    isHot: true,
+    salesCount: '1.8k+ đã tạo',
+    title: 'Dải Ngân Hà Kỷ Niệm 3D',
+    subtitle: '16.000 vì sao xoắn ốc 3D bay quanh trái tim pha lê & khung ảnh Polaroid',
+    badge: '🔥 Best Seller TikTok',
+    price: 39000,
+    oldPrice: 69000,
     engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #082f49 0%, #0284c7 55%, #38bdf8 100%)',
-    previewEmoji: '🔮',
-    features: ['Quả cầu sao 3D', 'Bay điện ảnh tự động', 'Tâm thư bí mật'],
+    previewGradient: 'linear-gradient(135deg, #2e0854 0%, #9d174d 55%, #ff2a85 100%)',
+    previewEmoji: '🪐',
+    features: ['Ghép tới 8 ảnh 3D', 'Xoay 360° tương tác', 'Tâm thư + Nhạc nền'],
     preset: {
-      occasion: 'Hành Trình Hạnh Phúc Của Chúng Mình',
-      defaultShape: 'sphere',
-      theme: 'blue',
+      occasion: 'Kỷ Niệm Yêu • Dải Ngân Hà Kỷ Niệm',
+      defaultShape: 'galaxy',
+      theme: 'pink',
       melody: 'romance'
     }
   }
@@ -155,26 +113,6 @@ const BIRTHDAY_TEMPLATES = [
     features: ['Thổi nến qua Micro/Chạm', 'Nổ pháo hoa ghép tên', 'Nhạc Happy Birthday'],
     preset: {
       occasion: 'Happy Birthday • Chúc Mừng Sinh Nhật'
-    }
-  },
-  {
-    id: 'birthday_galaxy_3d',
-    category: 'birthday',
-    salesCount: '780+ đã tạo',
-    title: 'Vũ Trụ Tuổi Mới Hoàng Kim 3D',
-    subtitle: 'Dải ngân hà ánh vàng hoàng kim lưu giữ những bức ảnh rực rỡ nhất mừng tuổi mới',
-    badge: '✨ Sang Trọng',
-    price: 39000,
-    oldPrice: 65000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
-    previewGradient: 'linear-gradient(135deg, #422006 0%, #b45309 55%, #fde047 100%)',
-    previewEmoji: '👑',
-    features: ['Tinh vân Vàng Gold', 'Giai điệu Sinh Nhật', '8 khung ảnh 3D'],
-    preset: {
-      occasion: 'Happy Birthday • Tuổi Mới Rực Rỡ',
-      defaultShape: 'galaxy',
-      theme: 'gold',
-      melody: 'birthday'
     }
   }
 ];

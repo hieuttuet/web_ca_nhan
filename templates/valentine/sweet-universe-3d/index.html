@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vũ Trụ Valentine Ngọt Ngào 3D • Hành Tinh Tình Yêu 🌌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Tắt Tiếng</button>
+    </div>
+  </header>
+
+  <!-- 4 Valentine Presets -->
+  <section class="valentine-header" id="valentine-header">
+    <div class="quick-presets-bar creator-only" id="quick-presets-bar" aria-label="Chọn nhanh đối tượng Valentine">
+      <button type="button" class="recipient-preset-btn active" data-recipient="lover">💕 Người Yêu</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="wife">💍 Vợ Yêu</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="crush">💘 Crush</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="anniversary">🥂 Kỷ Niệm</button>
+    </div>
+  </section>
+
+  <!-- Story Caption Pill -->
+  <div class="story-caption-pill" id="story-caption-pill">
+    <span id="story-caption-text"></span>
+  </div>
+
+  <!-- Action Hint Pill -->
+  <button type="button" class="action-hint-pill" id="action-hint-pill">✨ Chạm Ngôi Sao Ký Ức hoặc Hành Tinh để Thắp Sáng (1/3)</button>
+
+  <!-- Bottom Dock (1 row, 3 buttons max) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-viewer-wish">💌 Tâm Thư</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">🎨 Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- 3D Photo Spotlight Overlay -->
+  <div class="photo-spotlight-overlay" id="photo-spotlight-overlay">
+    <div class="photo-spotlight-card">
+      <button type="button" class="modal-close" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="spotlight-badge" id="spotlight-badge">🌌 Kỷ Niệm Vũ Trụ #1</div>
+      <div class="spotlight-frame">
+        <img id="spotlight-img" src="" alt="Ảnh kỷ niệm 3D" />
+      </div>
+      <div class="spotlight-receiver" id="spotlight-receiver">💕 Người Yêu Dấu • Minh Anh</div>
+      <p class="spotlight-caption" id="spotlight-caption">Mỗi ngôi sao trong vũ trụ này đều lưu giữ một khoảnh khắc ngọt ngào của đôi ta.</p>
+      <div class="spotlight-actions">
+        <button type="button" class="spotlight-btn" id="btn-spotlight-prev">◀ Trước</button>
+        <button type="button" class="spotlight-btn gold" id="btn-spotlight-album">💌 Mở Thư & Album</button>
+        <button type="button" class="spotlight-btn" id="btn-spotlight-next">Tiếp ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tùy Chỉnh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">🌌 Cá Nhân Hóa Vũ Trụ Valentine 3D</h2>
+      <p class="modal-sub">Chọn đối tượng Valentine, khắc tên lên bảng 3D khi cặp nhẫn & trái tim kết sao hợp nhất, gắn tối đa 8 ảnh kỷ niệm.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Nhanh Đối Tượng Nhận (Đổi Danh Hiệu, Lời Yêu & Sắc Màu)</label>
+        <div class="chip-grid-2" id="modal-presets-bar">
+          <button type="button" class="option-chip recipient-preset-btn active" data-recipient="lover">💕 Người Yêu</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="wife">💍 Vợ Yêu</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="crush">💘 Crush</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="anniversary">🥂 Kỷ Niệm</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bảng Màu Vũ Trụ Valentine 3D</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="cosmic_rose">🌌 Hồng Tím Vũ Trụ</button>
+          <button type="button" class="option-chip theme-chip" data-theme="champagne_galaxy">🥂 Dải Ngân Hà Vàng</button>
+          <button type="button" class="option-chip theme-chip" data-theme="violet_nebula">💜 Tinh Vân Tím Biếc</button>
+          <button type="button" class="option-chip theme-chip" data-theme="ruby_eclipse">❤️ Nguyệt Thực Ruby</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-honorific">Danh Hiệu Khắc Nổi 3D</label>
+        <input id="input-honorific" type="text" class="form-input" maxlength="36" placeholder="VD: Người Yêu Dấu, Vợ Yêu Tuyệt Vời..." value="Người Yêu Dấu" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Thảo Vy..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Quốc Bảo..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Yêu Thương 14/2</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời yêu thương gửi đến người ấy..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ảnh Kỷ Niệm 3D (Tối đa 8 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị (Tối đa 8 ảnh)</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">✨ Áp Dụng & Xem Thử Cao Trào 3D</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Tâm Thư & Album -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Anh Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Happy Valentine's Day 14/2</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. THEMES, VALENTINE PRESETS & STATE ====================
+      const THEMES = {
+        cosmic_rose: {
+          name: 'Hồng Tím Vũ Trụ',
+          bgTop: '#2e0826',
+          bgMid: '#15041a',
+          bgDeep: '#05010a',
+          accentPrimary: '#ec4899',
+          accentSecondary: '#fde047',
+          planetA: '#db2777',
+          planetB: '#7e22ce',
+          planetC: '#fbcfe8',
+          auraColor: 0xf472b6,
+          ringColor: 0xfde047,
+          ringEmissive: 0x9d174d,
+          pointLight: 0xffb347,
+          rimLight: 0x93c5fd,
+          particleColors: [0xfde047, 0xf472b6, 0xe879f9, 0xffffff]
+        },
+        champagne_galaxy: {
+          name: 'Dải Ngân Hà Vàng',
+          bgTop: '#2a1808',
+          bgMid: '#140b03',
+          bgDeep: '#060301',
+          accentPrimary: '#d97706',
+          accentSecondary: '#fef08a',
+          planetA: '#f59e0b',
+          planetB: '#92400e',
+          planetC: '#fef3c7',
+          auraColor: 0xfbbf24,
+          ringColor: 0xfef08a,
+          ringEmissive: 0x78350f,
+          pointLight: 0xfde047,
+          rimLight: 0xbae6fd,
+          particleColors: [0xfef08a, 0xfbbf24, 0xfda4af, 0xffffff]
+        },
+        violet_nebula: {
+          name: 'Tinh Vân Tím Biếc',
+          bgTop: '#230b36',
+          bgMid: '#11041c',
+          bgDeep: '#040108',
+          accentPrimary: '#a855f7',
+          accentSecondary: '#f9a8d4',
+          planetA: '#9333ea',
+          planetB: '#4c1d95',
+          planetC: '#f5d0fe',
+          auraColor: 0xc084fc,
+          ringColor: 0xf9a8d4,
+          ringEmissive: 0x581c87,
+          pointLight: 0xf9a8d4,
+          rimLight: 0x38bdf8,
+          particleColors: [0xc084fc, 0xf472b6, 0xfde047, 0xffffff]
+        },
+        ruby_eclipse: {
+          name: 'Nguyệt Thực Ruby',
+          bgTop: '#330612',
+          bgMid: '#160208',
+          bgDeep: '#060103',
+          accentPrimary: '#f43f5e',
+          accentSecondary: '#fde047',
+          planetA: '#e11d48',
+          planetB: '#881337',
+          planetC: '#fecdd3',
+          auraColor: 0xfb7185,
+          ringColor: 0xfde047,
+          ringEmissive: 0x881337,
+          pointLight: 0xffaa44,
+          rimLight: 0x93c5fd,
+          particleColors: [0xf43f5e, 0xfde047, 0xfecdd3, 0xffffff]
+        }
+      };
+
+      const RECIPIENT_PRESETS = {
+        lover: {
+          honorific: 'Người Yêu Dấu',
+          defaultReceiver: 'Minh Anh',
+          theme: 'cosmic_rose',
+          melodyMood: 'romantic',
+          wish: 'Giữa hàng tỷ vì sao ngoài kia, gặp được em là phép màu ngọt ngào nhất của anh. Chúc em Valentine 14/2 thật rạng rỡ và luôn hạnh phúc bên anh!'
+        },
+        wife: {
+          honorific: 'Vợ Yêu Tuyệt Vời',
+          defaultReceiver: 'Ngọc Hân',
+          theme: 'champagne_galaxy',
+          melodyMood: 'warm',
+          wish: 'Cảm ơn em đã biến mái ấm nhỏ của chúng mình thành vũ trụ bình yên nhất. Yêu em hôm nay, ngày mai và mãi mãi về sau!'
+        },
+        crush: {
+          honorific: 'Nàng Thơ Của Anh',
+          defaultReceiver: 'Thảo Vy',
+          theme: 'violet_nebula',
+          melodyMood: 'dreamy',
+          wish: 'Mỗi lần nhìn thấy nụ cười của cậu, cả bầu trời đêm trong tớ như bừng sáng. Valentine này, cho phép tớ bước vào thế giới của cậu nhé?'
+        },
+        anniversary: {
+          honorific: 'Hành Trình Đôi Ta',
+          defaultReceiver: 'Khánh Linh',
+          theme: 'ruby_eclipse',
+          melodyMood: 'festive',
+          wish: 'Thêm một mùa Valentine ta cùng nhau thắp sáng những vì sao ký ức. Chúc tình yêu của chúng mình luôn bền chặt và ngập tràn tiếng cười!'
+        }
+      };
+
+      const DEFAULT_RECEIVER_SET = new Set(Object.values(RECIPIENT_PRESETS).map((p) => p.defaultReceiver));
+
+      const DEFAULT_CAPTIONS = [
+        'Khoảnh khắc hai ánh mắt chạm nhau giữa vũ trụ bao la.',
+        'Chòm sao ký ức lưu giữ nụ cười rạng rỡ nhất của em.',
+        'Những buổi tối bình yên cùng ngắm sao và sẻ chia ước mơ.',
+        'Từng bước chân đi qua đều hóa thành ánh sáng lấp lánh.',
+        'Cặp nhẫn ánh sáng đan vào nhau — lời hẹn ước bền lâu.',
+        'Happy Valentine’s Day 14/2 — Mãi thuộc về nhau!'
+      ];
+
+      const appState = {
+        recipientPreset: 'lover',
+        theme: 'cosmic_rose',
+        honorific: RECIPIENT_PRESETS.lover.honorific,
+        receiver: RECIPIENT_PRESETS.lover.defaultReceiver,
+        sender: 'Bảo Nam',
+        wish: RECIPIENT_PRESETS.lover.wish,
+        photos: [],
+        storyStep: 0, // 0: Planet & Unlit Stars, 1: Constellation I (3 stars + first photos), 2: Constellation II (6 stars + all photos), 3: Climax (Heart + Interlocking Rings + Nameplate)
+        climaxFactor: 0,
+        activeSpotlightIdx: 0,
+        isViewerMode: false,
+        hasCustomReceiver: false,
+        melodyMood: 'romantic'
+      };
+
+      // ==================== 2. WEB AUDIO API (SYNTHESIZED VALENTINE SOUND) ====================
+      const AudioEngine = {
+        ctx: null,
+        enabled: false,
+        melodyTimer: null,
+        noteIdx: 0,
+
+        ensureCtx() {
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            this.ctx = new AC();
+          }
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          return this.ctx;
+        },
+
+        updateButton() {
+          const btn = document.getElementById('btn-sound');
+          if (btn) btn.textContent = this.enabled ? '🔊 Âm Thanh' : '🔇 Tắt Tiếng';
+        },
+
+        toggle() {
+          if (this.enabled) {
+            this.enabled = false;
+            this.stopMelody();
+          } else {
+            this.ensureCtx();
+            this.enabled = true;
+            if (appState.storyStep === 3) {
+              this.startMelody();
+            } else {
+              this.playStarChime(appState.storyStep + 1);
+            }
+          }
+          this.updateButton();
+        },
+
+        autoUnlock() {
+          if (!this.enabled) {
+            this.ensureCtx();
+            this.enabled = true;
+            this.updateButton();
+          }
+        },
+
+        playStarChime(stepNum) {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const scales = {
+            1: [523.25, 659.25, 783.99],
+            2: [587.33, 739.99, 880.0, 1046.5],
+            3: [523.25, 659.25, 783.99, 1046.5, 1318.51]
+          };
+          const notes = scales[stepNum] || scales[1];
+          notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.001, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.11, now + i * 0.08 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + i * 0.08 + 0.75);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.8);
+          });
+        },
+
+        playClimaxChord() {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          [261.63, 329.63, 392.0, 523.25, 659.25].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = idx < 2 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.exponentialRampToValueAtTime(0.075, now + 0.25);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + 2.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 2.5);
+          });
+        },
+
+        startMelody() {
+          this.stopMelody();
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+
+          const moodPatterns = {
+            romantic: [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.0, 783.99],
+            warm: [392.0, 493.88, 587.33, 783.99, 659.25, 587.33, 493.88, 587.33],
+            dreamy: [523.25, 587.33, 783.99, 987.77, 880.0, 783.99, 659.25, 587.33],
+            festive: [523.25, 659.25, 783.99, 1046.5, 880.0, 783.99, 659.25, 783.99]
+          };
+          const seq = moodPatterns[appState.melodyMood] || moodPatterns.romantic;
+
+          this.melodyTimer = setInterval(() => {
+            if (!this.enabled) {
+              this.stopMelody();
+              return;
+            }
+            const c = this.ensureCtx();
+            if (!c) return;
+            const now = c.currentTime;
+            const freq = seq[this.noteIdx % seq.length];
+            this.noteIdx++;
+
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.exponentialRampToValueAtTime(0.05, now + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + 0.95);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(now);
+            osc.stop(now + 1.0);
+          }, 560);
+        },
+
+        stopMelody() {
+          if (this.melodyTimer) {
+            clearInterval(this.melodyTimer);
+            this.melodyTimer = null;
+          }
+        }
+      };
+
+      // ==================== 3. THREE.JS SCENE & RESPONSIVE CAMERA ====================
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 140);
+
+      const universeRoot = new THREE.Group();
+      scene.add(universeRoot);
+
+      function updateCameraResponsive() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const aspect = w / Math.max(h, 1);
+        const isMobile = w < 768 || aspect < 0.8;
+
+        camera.aspect = aspect;
+        camera.fov = isMobile ? 54 : 46;
+        camera.position.set(0, isMobile ? 0.55 : 0.35, isMobile ? 11.4 : 8.8);
+        camera.lookAt(0, 0.1, 0);
+        camera.updateProjectionMatrix();
+
+        universeRoot.scale.setScalar(isMobile ? 0.82 : 1.0);
+        renderer.setSize(w, h);
+      }
+
+      // ==================== 4. 3-POINT LIGHTING ====================
+      const ambientLight = new THREE.AmbientLight(0xffd6e7, 0.65);
+      scene.add(ambientLight);
+
+      const warmLight = new THREE.PointLight(0xffb347, 2.2, 36);
+      warmLight.position.set(2.5, 2.8, 5.2);
+      scene.add(warmLight);
+
+      const coolLight = new THREE.DirectionalLight(0x93c5fd, 1.05);
+      coolLight.position.set(-4.5, -2.0, -3.5);
+      scene.add(coolLight);
+
+      // ==================== 5. PROCEDURAL TEXTURES ====================
+      function createStarSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 128;
+        c.height = 128;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(64, 64, 2, 64, 64, 64);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.28, 'rgba(255,240,248,0.88)');
+        grad.addColorStop(0.65, 'rgba(244,114,182,0.28)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 128, 128);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      const starSpriteTex = createStarSpriteTexture();
+
+      function createPlanetTexture(themeObj) {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 512;
+        const g = c.getContext('2d');
+
+        const bg = g.createLinearGradient(0, 0, 1024, 512);
+        bg.addColorStop(0, themeObj.planetB);
+        bg.addColorStop(0.45, themeObj.planetA);
+        bg.addColorStop(1, themeObj.planetB);
+        g.fillStyle = bg;
+        g.fillRect(0, 0, 1024, 512);
+
+        // Swirling cosmic bands
+        for (let i = 0; i < 18; i++) {
+          const y = 30 + i * 26;
+          g.beginPath();
+          g.moveTo(0, y);
+          for (let x = 0; x <= 1024; x += 64) {
+            g.lineTo(x, y + Math.sin(x * 0.012 + i) * 16);
+          }
+          g.strokeStyle = i % 2 === 0 ? 'rgba(255, 255, 255, 0.14)' : 'rgba(253, 224, 71, 0.12)';
+          g.lineWidth = 4 + (i % 4) * 2;
+          g.stroke();
+        }
+
+        // Soft glowing nebula spots
+        for (let i = 0; i < 24; i++) {
+          const cx = (i * 137) % 1024;
+          const cy = 60 + ((i * 89) % 390);
+          const r = 36 + (i % 5) * 18;
+          const rg = g.createRadialGradient(cx, cy, 4, cx, cy, r);
+          rg.addColorStop(0, themeObj.planetC);
+          rg.addColorStop(1, 'rgba(255,255,255,0)');
+          g.globalAlpha = 0.24;
+          g.fillStyle = rg;
+          g.beginPath();
+          g.arc(cx, cy, r, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.globalAlpha = 1;
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // ==================== 6. BACKGROUND COSMIC STARS ====================
+      const BG_STAR_COUNT = 850;
+      const bgGeo = new THREE.BufferGeometry();
+      const bgPos = new Float32Array(BG_STAR_COUNT * 3);
+      const bgCol = new Float32Array(BG_STAR_COUNT * 3);
+      for (let i = 0; i < BG_STAR_COUNT; i++) {
+        const r = 14 + Math.random() * 26;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        bgPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        bgPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        bgPos[i * 3 + 2] = r * Math.cos(phi);
+        const c = new THREE.Color().setHSL(0.85 + Math.random() * 0.16, 0.65, 0.72 + Math.random() * 0.28);
+        bgCol[i * 3] = c.r;
+        bgCol[i * 3 + 1] = c.g;
+        bgCol[i * 3 + 2] = c.b;
+      }
+      bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
+      bgGeo.setAttribute('color', new THREE.BufferAttribute(bgCol, 3));
+      const bgPoints = new THREE.Points(
+        bgGeo,
+        new THREE.PointsMaterial({
+          size: 0.18,
+          map: starSpriteTex,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        })
+      );
+      scene.add(bgPoints);
+
+      // ==================== 7. LOVE PLANET, METEOR RING & MEMORY STARS (STEPS 0-2) ====================
+      const planetGroup = new THREE.Group();
+      universeRoot.add(planetGroup);
+
+      const planetMat = new THREE.MeshStandardMaterial({
+        map: createPlanetTexture(THEMES[appState.theme]),
+        roughness: 0.42,
+        metalness: 0.18,
+        emissive: 0x3b0724,
+        emissiveIntensity: 0.45
+      });
+      const planetMesh = new THREE.Mesh(new THREE.SphereGeometry(1.48, 48, 48), planetMat);
+      planetMesh.userData = { isInteractivePlanet: true };
+      planetGroup.add(planetMesh);
+
+      const auraMat = new THREE.MeshBasicMaterial({
+        color: THEMES[appState.theme].auraColor,
+        transparent: true,
+        opacity: 0.22,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        depthWrite: false
+      });
+      const planetAura = new THREE.Mesh(new THREE.SphereGeometry(1.76, 36, 36), auraMat);
+      planetGroup.add(planetAura);
+
+      // Sparkling Meteor Ring around Planet
+      const METEOR_COUNT = 1100;
+      const meteorGeo = new THREE.BufferGeometry();
+      const meteorPos = new Float32Array(METEOR_COUNT * 3);
+      const meteorCol = new Float32Array(METEOR_COUNT * 3);
+      for (let i = 0; i < METEOR_COUNT; i++) {
+        const ang = (i / METEOR_COUNT) * Math.PI * 2 + Math.random() * 0.2;
+        const rad = 2.05 + Math.random() * 1.15;
+        const tiltY = (Math.random() - 0.5) * 0.14;
+        meteorPos[i * 3] = Math.cos(ang) * rad;
+        meteorPos[i * 3 + 1] = tiltY + Math.sin(ang) * 0.18;
+        meteorPos[i * 3 + 2] = Math.sin(ang) * rad;
+        const c = new THREE.Color(i % 3 === 0 ? 0xfde047 : 0xf472b6);
+        meteorCol[i * 3] = c.r;
+        meteorCol[i * 3 + 1] = c.g;
+        meteorCol[i * 3 + 2] = c.b;
+      }
+      meteorGeo.setAttribute('position', new THREE.BufferAttribute(meteorPos, 3));
+      meteorGeo.setAttribute('color', new THREE.BufferAttribute(meteorCol, 3));
+      const meteorRing = new THREE.Points(
+        meteorGeo,
+        new THREE.PointsMaterial({
+          size: 0.14,
+          map: starSpriteTex,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.92,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        })
+      );
+      meteorRing.rotation.x = 0.34;
+      meteorRing.rotation.z = -0.18;
+      planetGroup.add(meteorRing);
+
+      // 6 Memory Stars & Constellation Lines
+      const memoryStarsGroup = new THREE.Group();
+      planetGroup.add(memoryStarsGroup);
+      const memoryStars = [];
+      const STAR_COUNT = 6;
+      const starPositions = [];
+
+      for (let i = 0; i < STAR_COUNT; i++) {
+        const angle = (i / STAR_COUNT) * Math.PI * 2 - Math.PI / 2;
+        const radius = 2.65;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle * 2) * 0.48 + (i % 2 === 0 ? 0.35 : -0.35);
+        const z = Math.sin(angle) * radius;
+        starPositions.push(new THREE.Vector3(x, y, z));
+
+        const starMat = new THREE.MeshStandardMaterial({
+          color: 0xfef08a,
+          emissive: 0xf59e0b,
+          emissiveIntensity: 0.65,
+          roughness: 0.15,
+          metalness: 0.85
+        });
+        const starMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), starMat);
+        starMesh.position.set(x, y, z);
+        starMesh.userData = { isMemoryStar: true, index: i, lit: false };
+
+        const haloMat = new THREE.SpriteMaterial({
+          map: starSpriteTex,
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.72,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const halo = new THREE.Sprite(haloMat);
+        halo.scale.set(1.15, 1.15, 1);
+        starMesh.add(halo);
+        starMesh.userData.halo = halo;
+
+        memoryStarsGroup.add(starMesh);
+        memoryStars.push(starMesh);
+      }
+
+      // Constellation Lines connecting the 6 Memory Stars
+      const constellationPts = [...starPositions, starPositions[0]];
+      const constellationGeo = new THREE.BufferGeometry().setFromPoints(constellationPts);
+      const constellationMat = new THREE.LineBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending
+      });
+      const constellationLine = new THREE.Line(constellationGeo, constellationMat);
+      memoryStarsGroup.add(constellationLine);
+
+      // ==================== 8. MORPHING STAR HEART + INTERLOCKING RINGS (STEP 3) ====================
+      const MORPH_COUNT = 2400;
+      const morphGeo = new THREE.BufferGeometry();
+      const morphCurrent = new Float32Array(MORPH_COUNT * 3);
+      const morphPlanet = new Float32Array(MORPH_COUNT * 3);
+      const morphHeart = new Float32Array(MORPH_COUNT * 3);
+      const morphColors = new Float32Array(MORPH_COUNT * 3);
+
+      for (let i = 0; i < MORPH_COUNT; i++) {
+        // Source: Planet halo sphere
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * Math.PI * 2;
+        const phi = Math.acos(2 * v - 1);
+        const rP = 1.55 + Math.random() * 0.45;
+        morphPlanet[i * 3] = rP * Math.sin(phi) * Math.cos(theta);
+        morphPlanet[i * 3 + 1] = rP * Math.sin(phi) * Math.sin(theta);
+        morphPlanet[i * 3 + 2] = rP * Math.cos(phi);
+
+        morphCurrent[i * 3] = morphPlanet[i * 3];
+        morphCurrent[i * 3 + 1] = morphPlanet[i * 3 + 1];
+        morphCurrent[i * 3 + 2] = morphPlanet[i * 3 + 2];
+
+        // Target: 3D Parametric Heart
+        const t = Math.random() * Math.PI * 2;
+        const hx = 16 * Math.pow(Math.sin(t), 3);
+        const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        const depth = (Math.random() - 0.5) * 2.4 * (1 - Math.abs(Math.cos(t)) * 0.35);
+        const spread = 0.82 + Math.random() * 0.24;
+        morphHeart[i * 3] = hx * 0.115 * spread;
+        morphHeart[i * 3 + 1] = hy * 0.115 * spread + 0.55;
+        morphHeart[i * 3 + 2] = depth * 0.42;
+
+        const c = new THREE.Color(i % 4 === 0 ? 0xfde047 : i % 2 === 0 ? 0xf472b6 : 0xffffff);
+        morphColors[i * 3] = c.r;
+        morphColors[i * 3 + 1] = c.g;
+        morphColors[i * 3 + 2] = c.b;
+      }
+
+      morphGeo.setAttribute('position', new THREE.BufferAttribute(morphCurrent, 3));
+      morphGeo.setAttribute('color', new THREE.BufferAttribute(morphColors, 3));
+      morphGeo.userData = { planet: morphPlanet, heart: morphHeart };
+
+      const morphPointsMat = new THREE.PointsMaterial({
+        size: 0.15,
+        map: starSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const morphPoints = new THREE.Points(morphGeo, morphPointsMat);
+      universeRoot.add(morphPoints);
+
+      // Interlocking Light Rings (Cặp Nhẫn Ánh Sáng Đan Vào Nhau 3D)
+      const ringsGroup = new THREE.Group();
+      ringsGroup.position.set(0, -0.45, 0.35);
+      ringsGroup.scale.setScalar(0.001);
+      ringsGroup.visible = false;
+      universeRoot.add(ringsGroup);
+
+      const ringMatA = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.72,
+        metalness: 0.9,
+        roughness: 0.16
+      });
+      const ringMatB = new THREE.MeshStandardMaterial({
+        color: 0xf9a8d4,
+        emissive: 0xdb2777,
+        emissiveIntensity: 0.72,
+        metalness: 0.9,
+        roughness: 0.16
+      });
+
+      const ringMeshA = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.08, 24, 96), ringMatA);
+      ringMeshA.position.set(-0.46, 0, 0);
+      ringMeshA.rotation.set(0.45, 0.38, 0.25);
+
+      const ringMeshB = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.08, 24, 96), ringMatB);
+      ringMeshB.position.set(0.46, 0, 0);
+      ringMeshB.rotation.set(-0.45, -0.38, -0.25);
+
+      const diamondMatA = new THREE.MeshStandardMaterial({
+        color: 0xfef9c3,
+        emissive: 0xfde047,
+        emissiveIntensity: 0.55,
+        roughness: 0.08,
+        metalness: 0.92
+      });
+      const diamondA = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 0), diamondMatA);
+      diamondA.position.set(0, 0.92, 0);
+      const gemGlowA = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starSpriteTex,
+        color: 0xfef08a,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      }));
+      gemGlowA.scale.set(0.55, 0.55, 1);
+      diamondA.add(gemGlowA);
+      ringMeshA.add(diamondA);
+
+      const diamondMatB = new THREE.MeshStandardMaterial({
+        color: 0xfce7f3,
+        emissive: 0xf472b6,
+        emissiveIntensity: 0.55,
+        roughness: 0.08,
+        metalness: 0.92
+      });
+      const diamondB = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 0), diamondMatB);
+      diamondB.position.set(0, 0.92, 0);
+      const gemGlowB = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starSpriteTex,
+        color: 0xf9a8d4,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      }));
+      gemGlowB.scale.set(0.55, 0.55, 1);
+      diamondB.add(gemGlowB);
+      ringMeshB.add(diamondB);
+
+      ringsGroup.add(ringMeshA, ringMeshB);
+
+      // ==================== 9. 3D ENGRAVED NAMEPLATE (CLEAN ABOVE HEART, VIETNAMESE SAFE) ====================
+      const nameplateCanvas = document.createElement('canvas');
+      nameplateCanvas.width = 1280;
+      nameplateCanvas.height = 380;
+      const nameplateTex = new THREE.CanvasTexture(nameplateCanvas);
+      nameplateTex.encoding = THREE.sRGBEncoding;
+
+      const nameplateMat = new THREE.MeshBasicMaterial({
+        map: nameplateTex,
+        transparent: true,
+        depthWrite: false,
+        toneMapped: false
+      });
+      const nameplateMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.36), nameplateMat);
+      nameplateMesh.position.set(0, 2.28, 0.2);
+      nameplateMesh.scale.setScalar(0.001);
+      nameplateMesh.visible = false;
+      universeRoot.add(nameplateMesh);
+
+      function wrapCanvasLines(ctx, text, maxWidth, maxLines) {
+        const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+        const lines = [];
+        let cur = '';
+        for (const w of words) {
+          const test = cur ? cur + ' ' + w : w;
+          if (ctx.measureText(test).width > maxWidth && cur) {
+            lines.push(cur);
+            cur = w;
+            if (lines.length >= maxLines) break;
+          } else {
+            cur = test;
+          }
+        }
+        if (cur && lines.length < maxLines) lines.push(cur);
+        return lines;
+      }
+
+      function rebuildNameplateTexture() {
+        const ctx = nameplateCanvas.getContext('2d');
+        const W = nameplateCanvas.width;
+        const H = nameplateCanvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+
+        ctx.shadowColor = 'rgba(253, 224, 71, 0.55)';
+        ctx.shadowBlur = 18;
+        ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fde047';
+        ctx.fillText(`✨ ${(appState.honorific || 'Người Yêu Dấu').toUpperCase()} ✨`, W / 2, 78);
+
+        // Receiver Name (generous vertical padding so Vietnamese diacritics & g, y, p, q never clip)
+        const recText = appState.receiver || 'Minh Anh';
+        const fontSize = recText.length > 14 ? 82 : 104;
+        ctx.shadowColor = 'rgba(244, 114, 182, 0.85)';
+        ctx.shadowBlur = 28;
+        ctx.font = `700 ${fontSize}px "Dancing Script", "Plus Jakarta Sans", cursive, sans-serif`;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(recText, W / 2, 212);
+
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+        ctx.font = '700 26px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fbcfe8';
+        ctx.fillText(`— Từ ${appState.sender || 'Bảo Nam'} • Valentine 14/2 —`, W / 2, 310);
+
+        nameplateTex.needsUpdate = true;
+      }
+
+      // ==================== 10. 3D PHOTO FRAMES (UP TO 8 PHOTOS) ====================
+      const photoFramesGroup = new THREE.Group();
+      universeRoot.add(photoFramesGroup);
+      let photoFrames = [];
+
+      function createFallbackPhotoTexture(idx) {
+        const c = document.createElement('canvas');
+        c.width = 512;
+        c.height = 384;
+        const g = c.getContext('2d');
+        const grad = g.createLinearGradient(0, 0, 512, 384);
+        grad.addColorStop(0, '#500724');
+        grad.addColorStop(0.5, '#9d174d');
+        grad.addColorStop(1, '#4c1d95');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 512, 384);
+
+        g.fillStyle = 'rgba(255,255,255,0.12)';
+        g.beginPath();
+        g.arc(256, 192, 92, 0, Math.PI * 2);
+        g.fill();
+
+        const icons = ['💘', '🌹', '💍', '✨', '🥂', '💖', '🌙', '💫'];
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.font = '104px "Segoe UI Emoji", sans-serif';
+        g.fillText(icons[idx % icons.length], 256, 196);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      function createCoverPhotoTexture(url, onReady) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 512;
+          c.height = 384;
+          const g = c.getContext('2d');
+          const targetAspect = 512 / 384;
+          const imgAspect = img.naturalWidth / Math.max(img.naturalHeight, 1);
+          let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+          if (imgAspect > targetAspect) {
+            sw = img.naturalHeight * targetAspect;
+            sx = (img.naturalWidth - sw) / 2;
+          } else {
+            sh = img.naturalWidth / targetAspect;
+            sy = (img.naturalHeight - sh) / 2;
+          }
+          g.drawImage(img, sx, sy, sw, sh, 0, 0, 512, 384);
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          onReady(tex);
+        };
+        img.onerror = () => {};
+        img.src = url;
+      }
+
+      function rebuild3DPhotoFrames() {
+        while (photoFramesGroup.children.length > 0) {
+          photoFramesGroup.remove(photoFramesGroup.children[0]);
+        }
+        photoFrames = [];
+
+        const count = Math.max(appState.photos.length, 4);
+        const total = Math.min(count, 8);
+
+        for (let i = 0; i < total; i++) {
+          const holder = new THREE.Group();
+
+          const borderMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047,
+            transparent: true,
+            opacity: 0.0
+          });
+          const borderMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 1.04), borderMat);
+          borderMesh.position.z = -0.01;
+          holder.add(borderMesh);
+
+          const photoMat = new THREE.MeshBasicMaterial({
+            map: createFallbackPhotoTexture(i),
+            transparent: true,
+            opacity: 0.0,
+            toneMapped: false
+          });
+          const photoMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.26, 0.94), photoMat);
+          photoMesh.userData = { isPhotoFrame: true, photoIndex: i };
+          holder.add(photoMesh);
+
+          if (appState.photos[i] && appState.photos[i].url) {
+            createCoverPhotoTexture(appState.photos[i].url, (tex) => {
+              photoMat.map = tex;
+              photoMat.needsUpdate = true;
+            });
+          }
+
+          const angle = (i / total) * Math.PI * 2;
+          const orbitRad = 3.25;
+          const arcSpan = Math.PI * 1.15;
+          const arcAngle = -arcSpan / 2 + (total > 1 ? (i / (total - 1)) * arcSpan : 0);
+          const arcRadius = 3.55;
+
+          holder.userData = {
+            index: i,
+            phase: i * 0.85,
+            orbitAngle: angle,
+            orbitRad,
+            arcX: Math.sin(arcAngle) * arcRadius,
+            arcY: -0.95 + Math.cos(arcAngle) * 0.45,
+            arcZ: Math.cos(arcAngle) * 1.4 - 1.2,
+            arcRy: -arcAngle * 0.55,
+            photoMat,
+            borderMat
+          };
+
+          holder.scale.setScalar(0.001);
+          holder.visible = false;
+          photoFramesGroup.add(holder);
+          photoFrames.push(holder);
+        }
+      }
+
+      // ==================== 11. STORY STEPS, PRESETS & UI SYNC ====================
+      function syncStoryHUD() {
+        const hintEl = document.getElementById('action-hint-pill');
+        const capWrap = document.getElementById('story-caption-pill');
+        const capText = document.getElementById('story-caption-text');
+        const payBtn = document.getElementById('btn-pay');
+
+        if (appState.storyStep === 0) {
+          hintEl.textContent = '✨ Chạm Ngôi Sao hoặc Hành Tinh để Thắp Sáng (1/3)';
+          hintEl.classList.remove('hidden-hint');
+          capText.textContent = '';
+          capWrap.classList.add('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (appState.storyStep === 1) {
+          hintEl.textContent = '🌟 Chạm tiếp để Thắp Sáng Trọn Chòm Sao (2/3)';
+          hintEl.classList.remove('hidden-hint');
+          capText.textContent = 'Những ngôi sao đầu tiên đã kết nối thành dải ánh sáng!';
+          capWrap.classList.remove('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (appState.storyStep === 2) {
+          hintEl.textContent = '💍 Chạm để Hợp Nhất Cặp Nhẫn & Trái Tim Kết Sao (3/3)';
+          hintEl.classList.remove('hidden-hint');
+          capText.textContent = 'Chạm vào khung ảnh 3D để ngắm cận cảnh.';
+          capWrap.classList.remove('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else {
+          hintEl.classList.add('hidden-hint');
+          capText.textContent = '';
+          capWrap.classList.add('hidden-caption');
+          if (!appState.isViewerMode) {
+            payBtn.classList.add('climax-glow');
+          }
+        }
+      }
+
+      function advanceStoryStep(targetStep) {
+        AudioEngine.autoUnlock();
+        const nextStep = typeof targetStep === 'number' ? targetStep : Math.min(3, appState.storyStep + 1);
+        if (nextStep === appState.storyStep && nextStep !== 3) return;
+        appState.storyStep = nextStep;
+
+        if (nextStep === 1) {
+          AudioEngine.playStarChime(1);
+        } else if (nextStep === 2) {
+          AudioEngine.playStarChime(2);
+        } else if (nextStep === 3) {
+          AudioEngine.playClimaxChord();
+          AudioEngine.startMelody();
+        }
+        syncStoryHUD();
+      }
+
+      function replayStory(jumpToClimax) {
+        AudioEngine.stopMelody();
+        appState.storyStep = jumpToClimax ? 3 : 0;
+        appState.climaxFactor = jumpToClimax ? 1 : 0;
+        if (jumpToClimax) {
+          AudioEngine.playClimaxChord();
+          AudioEngine.startMelody();
+        }
+        syncStoryHUD();
+      }
+
+      function applyThemePalette(themeKey) {
+        const t = THEMES[themeKey] || THEMES.cosmic_rose;
+        appState.theme = themeKey in THEMES ? themeKey : 'cosmic_rose';
+
+        document.documentElement.style.setProperty('--bg-top', t.bgTop);
+        document.documentElement.style.setProperty('--bg-mid', t.bgMid);
+        document.documentElement.style.setProperty('--bg-deep', t.bgDeep);
+        document.documentElement.style.setProperty('--accent-primary', t.accentPrimary);
+        document.documentElement.style.setProperty('--accent-secondary', t.accentSecondary);
+
+        planetMat.map = createPlanetTexture(t);
+        planetMat.needsUpdate = true;
+        auraMat.color.setHex(t.auraColor);
+        ringMatA.color.setHex(t.ringColor);
+        ringMatA.emissive.setHex(t.ringEmissive);
+        warmLight.color.setHex(t.pointLight);
+        coolLight.color.setHex(t.rimLight);
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === appState.theme);
+        });
+      }
+
+      function applyRecipientPreset(presetKey, shouldPlaySound) {
+        const p = RECIPIENT_PRESETS[presetKey] || RECIPIENT_PRESETS.lover;
+        appState.recipientPreset = presetKey in RECIPIENT_PRESETS ? presetKey : 'lover';
+        appState.honorific = p.honorific;
+        if (!appState.hasCustomReceiver) {
+          appState.receiver = p.defaultReceiver;
+        }
+        appState.wish = p.wish;
+        appState.melodyMood = p.melodyMood;
+        applyThemePalette(p.theme);
+        syncUIAndBanners();
+
+        document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.recipient === appState.recipientPreset);
+        });
+
+        if (shouldPlaySound) {
+          AudioEngine.autoUnlock();
+          if (appState.storyStep === 3) AudioEngine.startMelody();
+          else AudioEngine.playStarChime(1);
+        }
+      }
+
+      function syncUIAndBanners() {
+        rebuildNameplateTexture();
+        const titleEl = document.getElementById('viewer-title');
+        const metaEl = document.getElementById('viewer-meta');
+        const wishEl = document.getElementById('viewer-wish-text');
+        if (titleEl) titleEl.textContent = `💌 Gửi ${appState.receiver} Yêu Thương`;
+        if (metaEl) metaEl.textContent = `Từ ${appState.sender} • ${appState.honorific} • Valentine 14/2`;
+        if (wishEl) wishEl.textContent = appState.wish;
+      }
+
+      // ==================== 12. MODALS, SPOTLIGHT & RAYCASTER ====================
+      function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('open');
+      }
+
+      function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      }
+
+      function openPhotoSpotlight(idx) {
+        const total = Math.max(appState.photos.length, photoFrames.length);
+        if (total <= 0) return;
+        const safeIdx = ((idx % total) + total) % total;
+        appState.activeSpotlightIdx = safeIdx;
+
+        const badge = document.getElementById('spotlight-badge');
+        const img = document.getElementById('spotlight-img');
+        const rec = document.getElementById('spotlight-receiver');
+        const cap = document.getElementById('spotlight-caption');
+
+        badge.textContent = `🌌 Kỷ Niệm Vũ Trụ #${safeIdx + 1}`;
+        rec.textContent = `✨ ${appState.honorific} • ${appState.receiver}`;
+        cap.textContent = DEFAULT_CAPTIONS[safeIdx % DEFAULT_CAPTIONS.length];
+
+        if (appState.photos[safeIdx] && appState.photos[safeIdx].url) {
+          img.src = appState.photos[safeIdx].url;
+        } else {
+          const fallbackCanvas = document.createElement('canvas');
+          fallbackCanvas.width = 512;
+          fallbackCanvas.height = 384;
+          const fg = fallbackCanvas.getContext('2d');
+          const grad = fg.createLinearGradient(0, 0, 512, 384);
+          grad.addColorStop(0, '#500724');
+          grad.addColorStop(1, '#4c1d95');
+          fg.fillStyle = grad;
+          fg.fillRect(0, 0, 512, 384);
+          fg.textAlign = 'center';
+          fg.fillStyle = '#fde047';
+          fg.font = '700 40px "Plus Jakarta Sans", sans-serif';
+          fg.fillText(`🌌 Kỷ Niệm #${safeIdx + 1}`, 256, 196);
+          img.src = fallbackCanvas.toDataURL('image/png');
+        }
+
+        document.getElementById('photo-spotlight-overlay').classList.add('open');
+      }
+
+      function closePhotoSpotlight() {
+        document.getElementById('photo-spotlight-overlay').classList.remove('open');
+      }
+
+      function openWishViewerModal() {
+        syncUIAndBanners();
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p) => {
+          const img = document.createElement('img');
+          img.src = p.url;
+          img.alt = 'Ảnh kỷ niệm';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'photo-thumb-wrap';
+          const img = document.createElement('img');
+          img.src = p.url;
+          img.alt = 'Ảnh ' + (idx + 1);
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'photo-thumb-del';
+          del.textContent = '✕';
+          del.addEventListener('click', () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          });
+          wrap.appendChild(img);
+          wrap.appendChild(del);
+          grid.appendChild(wrap);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        return {
+          templateId: 'valentine_heart_3d',
+          templateTitle: 'Vũ Trụ Valentine Ngọt Ngào 3D',
+          amount: 39000,
+          sender: appState.sender,
+          receiver: appState.receiver,
+          message: appState.wish,
+          customData: {
+            recipientPreset: appState.recipientPreset,
+            honorific: appState.honorific,
+            theme: appState.theme,
+            photos: appState.photos.slice(0, 8)
+          }
+        };
+      }
+
+      // Orbit Drag + Raycaster Click
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let isDragging = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+      let targetRotY = 0;
+      let targetRotX = 0.08;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        if (Math.hypot(dx, dy) > 6) {
+          targetRotY += dx * 0.0065;
+          targetRotX = Math.max(-0.55, Math.min(0.55, targetRotX + dy * 0.0045));
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+        }
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const dragDist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+        if (dragDist > 6) return;
+
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+
+        // Check photo frames first
+        const visiblePhotoMeshes = [];
+        photoFrames.forEach((holder) => {
+          if (holder.visible) {
+            holder.children.forEach((ch) => {
+              if (ch.userData && ch.userData.isPhotoFrame) visiblePhotoMeshes.push(ch);
+            });
+          }
+        });
+        const photoHits = raycaster.intersectObjects(visiblePhotoMeshes, false);
+        if (photoHits.length > 0) {
+          openPhotoSpotlight(photoHits[0].object.userData.photoIndex);
+          return;
+        }
+
+        // Check Memory Stars or Planet
+        if (appState.storyStep < 3) {
+          const starHits = raycaster.intersectObjects([...memoryStars, planetMesh], false);
+          if (starHits.length > 0 || appState.storyStep < 3) {
+            advanceStoryStep();
+          }
+        }
+      });
+
+      // DOM Event Listeners
+      document.getElementById('action-hint-pill').addEventListener('click', () => advanceStoryStep());
+      document.getElementById('btn-replay').addEventListener('click', () => replayStory(false));
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+
+      document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyRecipientPreset(btn.dataset.recipient, true);
+        });
+      });
+
+      document.getElementById('btn-close-spotlight').addEventListener('click', closePhotoSpotlight);
+      document.getElementById('photo-spotlight-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'photo-spotlight-overlay') closePhotoSpotlight();
+      });
+      document.getElementById('btn-spotlight-prev').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx - 1);
+      });
+      document.getElementById('btn-spotlight-next').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx + 1);
+      });
+      document.getElementById('btn-spotlight-album').addEventListener('click', () => {
+        closePhotoSpotlight();
+        openWishViewerModal();
+      });
+
+      document.getElementById('btn-viewer-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-honorific').value = appState.honorific;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-wish').value = appState.wish;
+        renderCreatorPhotoThumbs();
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.getElementById('input-receiver').addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val && !DEFAULT_RECEIVER_SET.has(val)) {
+          appState.hasCustomReceiver = true;
+        }
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => applyThemePalette(chip.dataset.theme));
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 8,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        const customHonorific = document.getElementById('input-honorific').value.trim();
+        const customReceiver = document.getElementById('input-receiver').value.trim();
+        appState.honorific = customHonorific || appState.honorific || 'Người Yêu Dấu';
+        if (customReceiver) {
+          appState.receiver = customReceiver;
+          if (!DEFAULT_RECEIVER_SET.has(customReceiver)) {
+            appState.hasCustomReceiver = true;
+          }
+        }
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        replayStory(true);
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', updateCameraResponsive);
+
+      // ==================== 13. ANIMATION LOOP ====================
+      const clock = new THREE.Clock();
+      let elapsedTotal = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        elapsedTotal += dt;
+
+        // Smooth camera/scene orbit
+        if (!isDragging) {
+          targetRotY += dt * 0.14;
+        }
+        universeRoot.rotation.y += (targetRotY - universeRoot.rotation.y) * Math.min(1, dt * 6);
+        universeRoot.rotation.x += (targetRotX - universeRoot.rotation.x) * Math.min(1, dt * 6);
+        bgPoints.rotation.y += dt * 0.02;
+
+        // Climax morph factor (0 in Steps 0-2, -> 1 in Step 3)
+        const targetClimax = appState.storyStep === 3 ? 1.0 : 0.0;
+        appState.climaxFactor += (targetClimax - appState.climaxFactor) * Math.min(1, dt * 2.4);
+        const cf = appState.climaxFactor;
+
+        // Planet fades & shrinks cleanly into morphing stars at Step 3
+        const planetScale = Math.max(0.001, 1.0 - cf * 0.98);
+        planetGroup.scale.setScalar(planetScale);
+        planetGroup.visible = planetScale > 0.03;
+        planetMesh.rotation.y += dt * 0.28;
+        meteorRing.rotation.y -= dt * 0.35;
+
+        // Memory Stars lighting state (Step 1: 3 stars lit, Step 2+: all 6 lit)
+        const litCount = appState.storyStep >= 2 ? 6 : appState.storyStep === 1 ? 3 : 0;
+        memoryStars.forEach((star, idx) => {
+          const isLit = idx < litCount;
+          star.rotation.y += dt * (isLit ? 1.8 : 0.6);
+          star.rotation.x += dt * 0.5;
+          const targetS = isLit ? 1.35 + Math.sin(elapsedTotal * 3 + idx) * 0.12 : 0.85;
+          const s = star.scale.x + (targetS - star.scale.x) * Math.min(1, dt * 6);
+          star.scale.setScalar(s);
+          star.material.color.setHex(isLit ? 0xfde047 : 0x94a3b8);
+          star.material.emissive.setHex(isLit ? 0xf59e0b : 0x334155);
+          star.material.emissiveIntensity = isLit ? 1.4 : 0.35;
+          if (star.userData.halo) {
+            star.userData.halo.material.opacity = isLit ? 0.92 : 0.18;
+          }
+        });
+        constellationMat.opacity += ((appState.storyStep === 1 ? 0.45 : appState.storyStep >= 2 ? 0.9 : 0.0) - constellationMat.opacity) * Math.min(1, dt * 4);
+
+        // Morphing Star Heart Points
+        morphPoints.visible = cf > 0.02;
+        morphPointsMat.opacity = Math.min(0.95, cf * 1.15);
+        if (morphPoints.visible) {
+          const posAttr = morphGeo.attributes.position;
+          const arr = posAttr.array;
+          const pArr = morphGeo.userData.planet;
+          const hArr = morphGeo.userData.heart;
+          const pulse = 1 + Math.sin(elapsedTotal * 2.6) * 0.028 * cf;
+          for (let i = 0; i < MORPH_COUNT; i++) {
+            const ix = i * 3;
+            arr[ix] = (pArr[ix] + (hArr[ix] - pArr[ix]) * cf) * pulse;
+            arr[ix + 1] = (pArr[ix + 1] + (hArr[ix + 1] - pArr[ix + 1]) * cf) * pulse;
+            arr[ix + 2] = pArr[ix + 2] + (hArr[ix + 2] - pArr[ix + 2]) * cf;
+          }
+          posAttr.needsUpdate = true;
+        }
+
+        // Interlocking Rings & 3D Nameplate in Step 3
+        const ringTargetScale = cf > 0.25 ? Math.min(1, (cf - 0.25) / 0.75) : 0.001;
+        ringsGroup.scale.setScalar(ringTargetScale);
+        ringsGroup.visible = ringTargetScale > 0.02;
+        if (ringsGroup.visible) {
+          ringsGroup.rotation.y = Math.sin(elapsedTotal * 0.9) * 0.28;
+          ringMeshA.rotation.z += dt * 0.45;
+          ringMeshB.rotation.z -= dt * 0.45;
+        }
+
+        const plateTargetScale = cf > 0.35 ? Math.min(1, (cf - 0.35) / 0.65) : 0.001;
+        nameplateMesh.scale.setScalar(plateTargetScale);
+        nameplateMesh.visible = plateTargetScale > 0.02;
+        nameplateMesh.lookAt(camera.position);
+
+        // 3D Photo Frames (Step 1: first half, Step 2: all orbit, Step 3: grand arc)
+        const totalPhotos = photoFrames.length;
+        const halfPhotos = Math.ceil(totalPhotos / 2);
+
+        photoFrames.forEach((frame, idx) => {
+          const ud = frame.userData;
+          let tOpacity = 0.0;
+          let tScale = 0.001;
+          let tx = 0;
+          let ty = 0;
+          let tz = 0;
+
+          if (appState.storyStep === 1 && idx < halfPhotos) {
+            const ang = ud.orbitAngle + elapsedTotal * 0.22;
+            tx = Math.cos(ang) * ud.orbitRad;
+            ty = Math.sin(elapsedTotal * 1.4 + ud.phase) * 0.25;
+            tz = Math.sin(ang) * ud.orbitRad;
+            tScale = 0.85;
+            tOpacity = 1.0;
+          } else if (appState.storyStep === 2) {
+            const ang = ud.orbitAngle + elapsedTotal * 0.25;
+            tx = Math.cos(ang) * ud.orbitRad;
+            ty = Math.sin(elapsedTotal * 1.4 + ud.phase) * 0.32;
+            tz = Math.sin(ang) * ud.orbitRad;
+            tScale = 0.92;
+            tOpacity = 1.0;
+          } else if (appState.storyStep === 3) {
+            tx = ud.arcX;
+            ty = ud.arcY + Math.sin(elapsedTotal * 1.2 + ud.phase) * 0.06;
+            tz = ud.arcZ;
+            tScale = 0.95;
+            tOpacity = 1.0;
+          }
+
+          const lerpK = Math.min(1, dt * 4.5);
+          frame.position.x += (tx - frame.position.x) * lerpK;
+          frame.position.y += (ty - frame.position.y) * lerpK;
+          frame.position.z += (tz - frame.position.z) * lerpK;
+          frame.lookAt(camera.position);
+
+          const s = frame.scale.x + (tScale - frame.scale.x) * lerpK;
+          frame.scale.setScalar(s);
+
+          ud.photoMat.opacity += (tOpacity - ud.photoMat.opacity) * lerpK;
+          ud.borderMat.opacity += (tOpacity * 0.92 - ud.borderMat.opacity) * lerpK;
+          frame.visible = s > 0.02 && ud.photoMat.opacity > 0.02;
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 14. INIT & VIEWER HYDRATION (?id=) ====================
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const urlPreset = params.get('preset');
+        if (urlPreset && RECIPIENT_PRESETS[urlPreset]) {
+          applyRecipientPreset(urlPreset, false);
+        }
+
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        syncUIAndBanners();
+        syncStoryHUD();
+        rebuild3DPhotoFrames();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => rebuildNameplateTexture());
+        }
+        animate();
+
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.recipientPreset && RECIPIENT_PRESETS[p.recipientPreset]) {
+                appState.recipientPreset = p.recipientPreset;
+              }
+              if (p.honorific) appState.honorific = p.honorific;
+              if (p.theme && THEMES[p.theme]) applyThemePalette(p.theme);
+              if (Array.isArray(p.photos)) appState.photos = p.photos;
+              syncUIAndBanners();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

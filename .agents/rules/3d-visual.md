@@ -91,7 +91,7 @@ Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng,
 
 ## 7. Chuẩn Giao Diện HUD & Thanh Toán / QR
 - **HUD Tối Giản & Chống Trùng Lặp (Glassmorphism)**:
-  - Trên cùng: `← Trang chủ` (trái — **bắt buộc gắn class `creator-only`** để tự ẩn khi người nhận mở link quà `?id=`), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh` (phải). **Không** thêm pill/banner lặp lại `"Dành tặng [Tên]"` ở phía trên nếu Tên người nhận & Danh hiệu đã khắc nổi trong không gian 3D.
+  - Trên cùng: `← Trang chủ` (trái — **bắt buộc gắn class `creator-only`** để tự ẩn khi người nhận mở link quà `?id=`), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh`, và **nút `📹` Chế độ Quay TikTok (`#btn-tiktok-mode` qua `<script src="../../../shared/tiktok-mode.js"></script>`)** (phải) để ẩn toàn bộ HUD khi quay video TikTok. **Không** thêm pill/banner lặp lại `"Dành tặng [Tên]"` ở phía trên nếu Tên người nhận & Danh hiệu đã khắc nổi trong không gian 3D.
   - Dưới cùng: `.bottom-dock` giữ các nút chính trên **1 hàng ngang** (`flex-wrap: nowrap`) ngay cả trên điện thoại nhỏ (`<= 520px`), gồm: `💌 Tâm Thư` (mở modal đọc trọn vẹn lời chúc), `🎨 Tùy Chỉnh` và **duy nhất 1 nút `✨ Tạo Link & QR`** (không đặt thêm thanh `#cro-hook-bar` hay nút `Tạo Link & QR` thứ hai).
   - **Không** đặt hộp văn bản Tâm thư (`#wish-banner`) dài nhiều dòng đè lên vật thể/bảng tên 3D; toàn bộ nội dung tâm thư hiển thị sạch sẽ trong Modal khi bấm nút `💌 Tâm Thư`.
   - Khi mở kết quả 3D (ví dụ: thẻ quẻ, vật phẩm quay), không dùng nền tối che mất 3D; tách 2 bên trên desktop (3D trái – thẻ thông tin phải) hoặc trên/dưới trên mobile.

@@ -212,7 +212,7 @@ const VALENTINE_TEMPLATES = [
     badge: '🌹 14/2 Đặc Biệt',
     price: 39000,
     oldPrice: 69000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
+    engineUrl: 'templates/valentine/sweet-universe-3d/index.html',
     previewGradient: 'linear-gradient(135deg, #500724 0%, #be123c 55%, #fb7185 100%)',
     previewEmoji: '🌹',
     features: ['Trái tim 3D phát sáng', 'Tải 8 ảnh cặp đôi', 'AI gợi ý thư tình'],

@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mũi Tên Cupid 3D • Nhịp Đập Trái Tim 14/2 💘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../shared/payment-qr-kit.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound">🔇 Tắt Tiếng</button>
+    </div>
+  </header>
+
+  <!-- 4 Valentine Presets -->
+  <section class="valentine-header" id="valentine-header">
+    <div class="quick-presets-bar creator-only" id="quick-presets-bar" aria-label="Chọn nhanh đối tượng Valentine">
+      <button type="button" class="recipient-preset-btn active" data-recipient="lover">💕 Người Yêu</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="wife">💍 Vợ Yêu</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="crush">💘 Crush</button>
+      <button type="button" class="recipient-preset-btn" data-recipient="anniversary">🥂 Kỷ Niệm</button>
+    </div>
+  </section>
+
+  <!-- Bow Draw Charge Bar -->
+  <div class="bow-charge-wrap" id="bow-charge-wrap">
+    <div class="bow-charge-fill" id="bow-charge-fill"></div>
+  </div>
+
+  <!-- Story Caption Pill -->
+  <div class="story-caption-pill" id="story-caption-pill">
+    <span id="story-caption-text"></span>
+    <div class="photo-timer-bar" id="photo-timer-bar">
+      <div class="photo-timer-fill" id="photo-timer-fill"></div>
+    </div>
+  </div>
+
+  <!-- Action Hint Pill -->
+  <button type="button" class="action-hint-pill" id="action-hint-pill">🏹 Giữ & Kéo cung (hoặc Chạm) để Bắn Mũi Tên</button>
+
+  <!-- Bottom Dock (1 row, 3 buttons max) -->
+  <nav class="bottom-dock">
+    <button type="button" class="dock-btn" id="btn-viewer-wish">💌 Tâm Thư</button>
+    <button type="button" class="dock-btn creator-only" id="btn-customize">🎨 Tùy Chỉnh</button>
+    <button type="button" class="dock-btn primary creator-only" id="btn-pay">✨ Tạo Link & QR</button>
+  </nav>
+
+  <!-- 3D Photo Spotlight Overlay -->
+  <div class="photo-spotlight-overlay" id="photo-spotlight-overlay">
+    <div class="photo-spotlight-card">
+      <button type="button" class="modal-close" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="spotlight-badge" id="spotlight-badge">💘 Kỷ Niệm Tình Yêu #1</div>
+      <div class="spotlight-frame">
+        <img id="spotlight-img" src="" alt="Ảnh kỷ niệm 3D" />
+      </div>
+      <div class="spotlight-receiver" id="spotlight-receiver">💕 Người Yêu Dấu • Minh Anh</div>
+      <p class="spotlight-caption" id="spotlight-caption">Khoảnh khắc trái tim rung động ngay từ ánh nhìn đầu tiên.</p>
+      <div class="spotlight-actions">
+        <button type="button" class="spotlight-btn" id="btn-spotlight-prev">◀ Trước</button>
+        <button type="button" class="spotlight-btn gold" id="btn-spotlight-album">💌 Mở Thư & Album</button>
+        <button type="button" class="spotlight-btn" id="btn-spotlight-next">Tiếp ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tùy Chỉnh -->
+  <div class="modal-backdrop" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <h2 class="modal-title">💘 Cá Nhân Hóa Mũi Tên Cupid 3D</h2>
+      <p class="modal-sub">Chọn đối tượng Valentine, khắc tên lên bảng 3D khi trái tim nở rộ và gắn tới 6 ảnh kỷ niệm.</p>
+
+      <div class="form-group">
+        <label class="form-label">Chọn Nhanh Đối Tượng Nhận (Đổi Danh Hiệu, Lời Yêu & Sắc Màu)</label>
+        <div class="chip-grid-2" id="modal-presets-bar">
+          <button type="button" class="option-chip recipient-preset-btn active" data-recipient="lover">💕 Người Yêu</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="wife">💍 Vợ Yêu</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="crush">💘 Crush</button>
+          <button type="button" class="option-chip recipient-preset-btn" data-recipient="anniversary">🥂 Kỷ Niệm</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bảng Màu Ánh Sáng Valentine 3D</label>
+        <div class="chip-grid-2">
+          <button type="button" class="option-chip theme-chip active" data-theme="ruby_valentine">🌹 Hồng Ruby 14/2</button>
+          <button type="button" class="option-chip theme-chip" data-theme="champagne_love">🥂 Vàng Champagne</button>
+          <button type="button" class="option-chip theme-chip" data-theme="midnight_violet">💜 Tím Midnight</button>
+          <button type="button" class="option-chip theme-chip" data-theme="crimson_velvet">❤️ Đỏ Nhung Đam Mê</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-honorific">Danh Hiệu Khắc Nổi 3D</label>
+        <input id="input-honorific" type="text" class="form-input" maxlength="36" placeholder="VD: Người Yêu Dấu, Nữ Hoàng Trái Tim..." value="Người Yêu Dấu" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-receiver">Tên Người Nhận</label>
+        <input id="input-receiver" type="text" class="form-input" maxlength="32" placeholder="VD: Minh Anh, Thảo Vy..." value="Minh Anh" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-sender">Tên Người Gửi</label>
+        <input id="input-sender" type="text" class="form-input" maxlength="32" placeholder="VD: Bảo Nam, Quốc Bảo..." value="Bảo Nam" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-wish">Lời Yêu Thương 14/2</label>
+        <textarea id="input-wish" class="form-textarea" maxlength="380" placeholder="Nhập lời yêu thương gửi đến người ấy..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ảnh Kỷ Niệm 3D (Tối đa 6 ảnh)</label>
+        <label class="upload-label" for="input-photos">📸 Chọn Ảnh Từ Thiết Bị</label>
+        <input id="input-photos" type="file" accept="image/*" multiple style="display:none;" />
+        <div class="photo-grid" id="photo-preview-grid"></div>
+      </div>
+
+      <button type="button" class="btn-submit-modal" id="btn-apply-custom">💘 Áp Dụng & Xem Thử Cao Trào 3D</button>
+    </div>
+  </div>
+
+  <!-- Modal Đọc Tâm Thư & Album -->
+  <div class="modal-backdrop" id="modal-wish-viewer">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <h2 class="modal-title" id="viewer-title">💌 Gửi Minh Anh Yêu Thương</h2>
+      <p class="modal-sub" id="viewer-meta">Từ Bảo Nam • Happy Valentine's Day 14/2</p>
+      <div class="viewer-wish-box" id="viewer-wish-text"></div>
+      <div class="viewer-photos-grid" id="viewer-photos-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ==================== 1. VALENTINE THEMES, PRESETS & STATE ====================
+      const THEMES = {
+        ruby_valentine: {
+          name: 'Hồng Ruby 14/2',
+          bgTop: '#2b0614',
+          bgMid: '#13030a',
+          bgDeep: '#060104',
+          accentPrimary: '#f43f5e',
+          accentSecondary: '#fde047',
+          heartColor: 0xe11d48,
+          heartEmissive: 0x7f1d1d,
+          coreGlow: 0xfde047,
+          crackColor: 0xfde047,
+          bowColor: 0xfbbf24,
+          arrowGlow: 0xfef08a,
+          pointLight: 0xffb347,
+          rimLight: 0x93c5fd,
+          particleColors: [0xfde047, 0xfb7185, 0xffffff]
+        },
+        champagne_love: {
+          name: 'Vàng Champagne',
+          bgTop: '#261808',
+          bgMid: '#140b03',
+          bgDeep: '#070401',
+          accentPrimary: '#d97706',
+          accentSecondary: '#fef08a',
+          heartColor: 0xf59e0b,
+          heartEmissive: 0x78350f,
+          coreGlow: 0xffffff,
+          crackColor: 0xfef08a,
+          bowColor: 0xfde047,
+          arrowGlow: 0xffffff,
+          pointLight: 0xffe4a0,
+          rimLight: 0xfbbf24,
+          particleColors: [0xfef08a, 0xfbbf24, 0xffffff]
+        },
+        midnight_violet: {
+          name: 'Tím Midnight',
+          bgTop: '#1b092e',
+          bgMid: '#0d0418',
+          bgDeep: '#040108',
+          accentPrimary: '#a855f7',
+          accentSecondary: '#f5d0fe',
+          heartColor: 0x9333ea,
+          heartEmissive: 0x4c1d95,
+          coreGlow: 0xfde047,
+          crackColor: 0xfde047,
+          bowColor: 0xfbbf24,
+          arrowGlow: 0xf5d0fe,
+          pointLight: 0xf5d0fe,
+          rimLight: 0x60a5fa,
+          particleColors: [0xe9d5ff, 0xfde047, 0xffffff]
+        },
+        crimson_velvet: {
+          name: 'Đỏ Nhung Đam Mê',
+          bgTop: '#2c050a',
+          bgMid: '#160205',
+          bgDeep: '#070102',
+          accentPrimary: '#dc2626',
+          accentSecondary: '#fde047',
+          heartColor: 0xb91c1c,
+          heartEmissive: 0x6b0f1a,
+          coreGlow: 0xfef08a,
+          crackColor: 0xfde047,
+          bowColor: 0xfde047,
+          arrowGlow: 0xfef08a,
+          pointLight: 0xffc978,
+          rimLight: 0xfda4af,
+          particleColors: [0xfde047, 0xf87171, 0xfff1f2]
+        }
+      };
+
+      const RECIPIENT_PRESETS = {
+        lover: {
+          honorific: 'Người Yêu Dấu',
+          defaultReceiver: 'Minh Anh',
+          defaultSender: 'Bảo Nam',
+          theme: 'ruby_valentine',
+          wish: 'Mũi tên Cupid đã chọn đúng nhịp đập trái tim anh. Chúc em một mùa Valentine 14/2 thật ngọt ngào, bình yên và mãi rạng rỡ trong vòng tay anh!',
+          captions: [
+            'Khoảnh khắc trái tim rung động ngay từ ánh nhìn đầu tiên.',
+            'Nụ cười của em là điều ngọt ngào nhất trong mỗi ngày của anh.',
+            'Cảm ơn em đã bước đến và làm thế giới của anh rực rỡ sắc hồng.',
+            'Dù mai sau có thế nào, nhịp tim anh vẫn luôn hướng về phía em.',
+            'Mỗi kỷ niệm bên em đều là một viên pha lê lấp lánh.',
+            'Happy Valentine’s Day 14/2 — Yêu em nhiều hơn hôm qua!'
+          ]
+        },
+        wife: {
+          honorific: 'Nữ Hoàng Trái Tim',
+          defaultReceiver: 'Vợ Yêu',
+          defaultSender: 'Ông Xã Của Em',
+          theme: 'crimson_velvet',
+          wish: 'Cảm ơn Vợ đã luôn là bến đỗ bình yên và là điều kỳ diệu nhất trong cuộc đời anh. Yêu em hơn cả ngày đầu tiên!',
+          captions: [
+            'Từ người yêu thành bạn đời — hành trình hạnh phúc nhất của anh.',
+            'Cảm ơn em đã luôn vun vén tổ ấm ngập tràn tiếng cười.',
+            'Chúc Vợ yêu mãi trẻ trung, dịu dàng và được cưng chiều mỗi ngày.',
+            'Tay nắm tay đi qua năm tháng, tình yêu anh dành cho em vẫn vẹn nguyên.',
+            'Mọi vất vả của em đều xứng đáng được nâng niu và trân trọng.',
+            'Hạnh phúc nhất của anh là mỗi sáng thức dậy được thấy em cười.'
+          ]
+        },
+        crush: {
+          honorific: 'Ánh Nắng Của Anh',
+          defaultReceiver: 'Thảo Vy',
+          defaultSender: 'Người Thầm Thương',
+          theme: 'midnight_violet',
+          wish: 'Có những rung động chẳng cần nói thành lời, chỉ mong mũi tên nhỏ này mang theo cả bầu trời chân thành gửi đến cậu nhân ngày 14/2!',
+          captions: [
+            'Lần đầu bắt gặp ánh mắt ấy, tim bỗng lỡ mất một nhịp.',
+            'Những lần vô tình chạm mặt lại khiến cả ngày dài trở nên rực rỡ.',
+            'Chỉ mong có cơ hội được đi bên cạnh cậu lâu thật lâu.',
+            'Cậu giống như vì sao sáng nhất trên bầu trời đêm Valentine này.',
+            'Nếu mũi tên Cupid bắn trúng, cho tớ xin một cơ hội nhé!',
+            'Chúc cậu một ngày 14/2 thật nhiều niềm vui và bất ngờ ngọt ngào.'
+          ]
+        },
+        anniversary: {
+          honorific: 'Mảnh Ghép Hoàn Hảo',
+          defaultReceiver: 'Hải Yến',
+          defaultSender: 'Quốc Bảo',
+          theme: 'champagne_love',
+          wish: 'Thêm một mùa Valentine nữa chúng ta cùng viết tiếp câu chuyện của riêng mình. Cảm ơn vì đã nắm tay anh đi qua mọi khoảnh khắc!',
+          captions: [
+            'Ngày đầu tiên nắm tay vẫn còn nguyên vẹn cảm xúc như mới hôm qua.',
+            'Cùng nhau đi qua nắng mưa, chúng ta càng hiểu và thương nhau hơn.',
+            'Mỗi bức ảnh là một dấu mốc đẹp trong cuốn nhật ký tình yêu.',
+            'Cảm ơn vì đã luôn kiên nhẫn, lắng nghe và đồng hành cùng anh.',
+            'Chặng đường phía trước còn dài, mình cứ nắm tay nhau thật chặt nhé.',
+            'Kỷ niệm 14/2 rực rỡ — Mãi là mảnh ghép hoàn hảo của nhau!'
+          ]
+        }
+      };
+
+      const DEFAULT_RECEIVER_SET = new Set(
+        Object.values(RECIPIENT_PRESETS).map((p) => p.defaultReceiver)
+      );
+
+      const appState = {
+        templateId: 'valentine_cupid_arrow_3d',
+        recipientPreset: 'lover',
+        theme: 'ruby_valentine',
+        honorific: RECIPIENT_PRESETS.lover.honorific,
+        receiver: RECIPIENT_PRESETS.lover.defaultReceiver,
+        sender: RECIPIENT_PRESETS.lover.defaultSender,
+        wish: RECIPIENT_PRESETS.lover.wish,
+        hasCustomReceiver: false,
+        photos: [],
+        phase: 'aim', // 'aim' | 'fly_photo' | 'hold_photo' | 'fly_heart' | 'heart_shatter' | 'finale'
+        activePhotoIdx: 0,
+        holdPhotoElapsed: 0,
+        storyStep: 0, // 0: aim, 1: flying/photos, 2: fly_heart, 3: finale
+        isViewerMode: false,
+        activeSpotlightIdx: 0
+      };
+
+      // ==================== 2. WEB AUDIO API (WHOOSH 'VÚT', HEARTBEAT LUB-DUB, SHATTER & FINALE CLIMAX) ====================
+      const AudioEngine = {
+        ctx: null,
+        enabled: false,
+        musicTimer: null,
+        heartbeatTimer: null,
+        noteIdx: 0,
+
+        ensureCtx() {
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            this.ctx = new AC();
+          }
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          return this.ctx;
+        },
+
+        toggle() {
+          if (this.enabled) {
+            this.enabled = false;
+            this.stopAllLoops();
+          } else {
+            this.ensureCtx();
+            this.enabled = true;
+            this.startHeartbeatLoop();
+            if (appState.phase === 'finale') this.startMusicLoop();
+          }
+          this.updateButton();
+        },
+
+        autoUnlock() {
+          if (!this.enabled) {
+            this.ensureCtx();
+            this.enabled = true;
+            this.startHeartbeatLoop();
+            if (appState.phase === 'finale') this.startMusicLoop();
+            this.updateButton();
+          }
+        },
+
+        updateButton() {
+          const btn = document.getElementById('btn-sound');
+          if (btn) btn.textContent = this.enabled ? '🔊 Âm Thanh' : '🔇 Tắt Tiếng';
+        },
+
+        stopAllLoops() {
+          if (this.musicTimer) {
+            clearInterval(this.musicTimer);
+            this.musicTimer = null;
+          }
+          if (this.heartbeatTimer) {
+            clearTimeout(this.heartbeatTimer);
+            this.heartbeatTimer = null;
+          }
+        },
+
+        // Tiếng xé gió 'Vút' khi mũi tên Cupid lao đi
+        playWhoosh() {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+
+          const duration = 0.58;
+          const bufferSize = Math.floor(ctx.sampleRate * duration);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.Q.setValueAtTime(2.6, now);
+          filter.frequency.setValueAtTime(340, now);
+          filter.frequency.exponentialRampToValueAtTime(2600, now + 0.16);
+          filter.frequency.exponentialRampToValueAtTime(420, now + duration);
+
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.34, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          noise.start(now);
+          noise.stop(now + duration);
+
+          const osc = ctx.createOscillator();
+          const oscGain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(920, now);
+          osc.frequency.exponentialRampToValueAtTime(260, now + 0.44);
+          oscGain.gain.setValueAtTime(0.001, now);
+          oscGain.gain.linearRampToValueAtTime(0.09, now + 0.06);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.44);
+          osc.connect(oscGain);
+          oscGain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.46);
+        },
+
+        // Tiếng tim đập 'Lub-Dub' trầm ấm
+        playHeartbeatOnce(intensity = 1) {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+
+          const triggerThump = (offset, freqStart, amp) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freqStart, now + offset);
+            osc.frequency.exponentialRampToValueAtTime(28, now + offset + 0.14);
+            gain.gain.setValueAtTime(0.001, now + offset);
+            gain.gain.linearRampToValueAtTime(amp * intensity, now + offset + 0.018);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.16);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.18);
+          };
+
+          triggerThump(0, 64, 0.24);
+          triggerThump(0.15, 52, 0.16);
+        },
+
+        startHeartbeatLoop() {
+          if (this.heartbeatTimer) clearTimeout(this.heartbeatTimer);
+          const tick = () => {
+            if (!this.enabled) return;
+            const bpm = getTargetHeartbeatBpm();
+            const intervalMs = Math.max(380, Math.round(60000 / bpm));
+            const intensity = (appState.phase === 'fly_heart' || appState.phase === 'fly_finale') ? 1.3 : 0.85;
+            this.playHeartbeatOnce(intensity);
+            this.heartbeatTimer = setTimeout(tick, intervalMs);
+          };
+          tick();
+        },
+
+        // Tiếng vỡ tung đốm sao khi mũi tên xuyên trúng trái tim
+        playHeartShatter() {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+
+          const sub = ctx.createOscillator();
+          const subGain = ctx.createGain();
+          sub.type = 'sine';
+          sub.frequency.setValueAtTime(110, now);
+          sub.frequency.exponentialRampToValueAtTime(32, now + 0.45);
+          subGain.gain.setValueAtTime(0.001, now);
+          subGain.gain.linearRampToValueAtTime(0.32, now + 0.02);
+          subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+          sub.connect(subGain);
+          subGain.connect(ctx.destination);
+          sub.start(now);
+          sub.stop(now + 0.5);
+
+          const chimes = [659.25, 880, 1046.5, 1318.51, 1567.98];
+          chimes.forEach((f, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now + idx * 0.04);
+            gain.gain.setValueAtTime(0.001, now + idx * 0.04);
+            gain.gain.linearRampToValueAtTime(0.085, now + idx * 0.04 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.9);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.04);
+            osc.stop(now + idx * 0.04 + 0.95);
+          });
+        },
+
+        // Âm thanh cao trào khi về đích nổ ra lời chúc & tên người nhận 3D
+        playFinaleClimax() {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+
+          const dur = 0.65;
+          const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+          const ch = buf.getChannelData(0);
+          for (let i = 0; i < ch.length; i++) {
+            ch[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.16));
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          const hp = ctx.createBiquadFilter();
+          hp.type = 'highpass';
+          hp.frequency.setValueAtTime(1400, now);
+          const nGain = ctx.createGain();
+          nGain.gain.setValueAtTime(0.22, now);
+          nGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+          src.connect(hp);
+          hp.connect(nGain);
+          nGain.connect(ctx.destination);
+          src.start(now);
+
+          const freqs = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+          freqs.forEach((f, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = idx % 2 === 0 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(f, now + idx * 0.06);
+            gain.gain.setValueAtTime(0.001, now + idx * 0.06);
+            gain.gain.linearRampToValueAtTime(0.11, now + idx * 0.06 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 1.65);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.06);
+            osc.stop(now + idx * 0.06 + 1.7);
+          });
+        },
+
+        // Tiếng chuông nhẹ khi chuyển ảnh
+        playPhotoChime() {
+          if (!this.enabled) return;
+          const ctx = this.ensureCtx();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(783.99, now);
+          osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.18);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.06, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.7);
+        },
+
+        // Nhạc Valentine lãng mạn nhẹ nhàng
+        startMusicLoop() {
+          if (this.musicTimer) return;
+          const melody = [
+            349.23, 440.0, 523.25, 659.25,
+            329.63, 392.0, 493.88, 587.33,
+            293.66, 349.23, 440.0, 523.25,
+            261.63, 329.63, 392.0, 523.25
+          ];
+          this.musicTimer = setInterval(() => {
+            if (!this.enabled || !this.ctx) return;
+            const now = this.ctx.currentTime;
+            const freq = melody[this.noteIdx % melody.length];
+            this.noteIdx++;
+
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            const vol = appState.phase === 'finale' ? 0.055 : 0.032;
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(vol, now + 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 1.0);
+          }, 540);
+        }
+      };
+
+      // ==================== 3. THREE.JS SCENE, CAMERA & LIGHTING ====================
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 80);
+
+      let isMobileLayout = window.innerWidth < 768;
+      const cameraBase = { x: 0, y: 0.25, z: 7.4 };
+      const cameraTarget = { rotX: 0.04, rotY: 0 };
+
+      function updateCameraResponsive() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const aspect = w / Math.max(1, h);
+        isMobileLayout = w < 768 || aspect < 0.85;
+
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+
+        cameraBase.z = isMobileLayout ? 9.4 : 7.4;
+        cameraBase.y = isMobileLayout ? 0.35 : 0.22;
+      }
+
+      // 3-Point Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      const heartPointLight = new THREE.PointLight(THEMES.ruby_valentine.pointLight, 2.2, 32);
+      heartPointLight.position.set(0, 0.45, -14.5);
+      scene.add(heartPointLight);
+
+      const rimLight = new THREE.DirectionalLight(THEMES.ruby_valentine.rimLight, 1.15);
+      rimLight.position.set(-4.5, 5.2, -3.5);
+      scene.add(rimLight);
+
+      const keySpotLight = new THREE.SpotLight(0xfde047, 1.25, 24, Math.PI / 4, 0.5);
+      keySpotLight.position.set(3.2, 4.5, 4.5);
+      scene.add(keySpotLight);
+
+      // ==================== 4. HELPER TEXTURES (SPRITE + NAMEPLATE + PHOTOS) ====================
+      function createGlowSpriteTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        g.addColorStop(0, 'rgba(255,255,255,1)');
+        g.addColorStop(0.32, 'rgba(255,232,190,0.85)');
+        g.addColorStop(0.7, 'rgba(244,63,94,0.28)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+      const glowSpriteTex = createGlowSpriteTexture();
+
+      function createDefaultValentineCardTexture(index) {
+        const c = document.createElement('canvas');
+        c.width = 640;
+        c.height = 480;
+        const ctx = c.getContext('2d');
+        const palettes = [
+          ['#4c0519', '#be123c', '#fda4af'],
+          ['#3b0764', '#9333ea', '#f5d0fe'],
+          ['#451a03', '#d97706', '#fde68a'],
+          ['#500724', '#db2777', '#fbcfe8'],
+          ['#4c0519', '#e11d48', '#fef08a'],
+          ['#1e1b4b', '#7c3aed', '#f9a8d4']
+        ];
+        const pal = palettes[index % palettes.length];
+        const grad = ctx.createLinearGradient(0, 0, 640, 480);
+        grad.addColorStop(0, pal[0]);
+        grad.addColorStop(0.6, pal[1]);
+        grad.addColorStop(1, pal[2]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 640, 480);
+
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.72)';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(20, 20, 600, 440);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+        ctx.beginPath();
+        ctx.arc(320, 200, 92, 0, Math.PI * 2);
+        ctx.fill();
+
+        const icons = ['💘', '🌹', '💍', '✨', '🥂', '💖'];
+        ctx.font = '112px "Segoe UI Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icons[index % icons.length], 320, 240);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // ==================== 5. LUMINOUS-DOT 3D HEART (THREE.Points + AdditiveBlending) ====================
+      const HEART_CENTER = new THREE.Vector3(0, 0.45, -16.8);
+      const FINALE_POS = HEART_CENTER.clone();
+
+      const heartGroup = new THREE.Group();
+      heartGroup.position.copy(HEART_CENTER);
+      scene.add(heartGroup);
+
+      const HEART_COUNT = 2600;
+      const heartGeo = new THREE.BufferGeometry();
+      const heartPos = new Float32Array(HEART_COUNT * 3);
+      const heartOrigins = new Float32Array(HEART_COUNT * 3);
+      const heartBurstDirs = new Float32Array(HEART_COUNT * 3);
+      const heartCol = new Float32Array(HEART_COUNT * 3);
+      const heartPhases = new Float32Array(HEART_COUNT);
+
+      for (let i = 0; i < HEART_COUNT; i++) {
+        const t = Math.random() * Math.PI * 2;
+        const isOutline = i < HEART_COUNT * 0.44;
+        const radial = isOutline ? (0.94 + Math.random() * 0.09) : Math.pow(Math.random(), 0.42);
+        const hx = 1.38 * radial * Math.pow(Math.sin(t), 3);
+        const hy = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.098 * radial + 0.12;
+        const maxZ = isOutline ? 0.16 : 0.48 * (1 - radial * 0.45);
+        const hz = (Math.random() - 0.5) * 2 * maxZ;
+
+        heartOrigins[i * 3] = hx;
+        heartOrigins[i * 3 + 1] = hy;
+        heartOrigins[i * 3 + 2] = hz;
+
+        heartPos[i * 3] = hx;
+        heartPos[i * 3 + 1] = hy;
+        heartPos[i * 3 + 2] = hz;
+
+        // Burst outward 360 deg + along the flight corridor so the camera flies through shattered stars
+        const outDir = new THREE.Vector3(hx + (Math.random() - 0.5) * 0.8, hy + (Math.random() - 0.5) * 0.8, hz + (Math.random() - 0.5) * 1.2);
+        if (outDir.lengthSq() < 0.01) outDir.set(Math.random() - 0.5, Math.random() - 0.5, -1);
+        outDir.normalize();
+        const speed = 1.45 + Math.random() * 2.65;
+        heartBurstDirs[i * 3] = outDir.x * speed;
+        heartBurstDirs[i * 3 + 1] = outDir.y * speed;
+        heartBurstDirs[i * 3 + 2] = outDir.z * speed;
+
+        heartPhases[i] = Math.random() * Math.PI * 2;
+      }
+      heartGeo.setAttribute('position', new THREE.BufferAttribute(heartPos, 3));
+      heartGeo.setAttribute('color', new THREE.BufferAttribute(heartCol, 3));
+
+      const heartPointsMat = new THREE.PointsMaterial({
+        size: 0.16,
+        map: glowSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.96,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const heartPoints = new THREE.Points(heartGeo, heartPointsMat);
+      heartGroup.add(heartPoints);
+
+      // ==================== 6. RED CURVED CUPID BOW (DIAGONAL CORNER) & LIGHT ARROW 3D ====================
+      function getBowBasePos() {
+        return isMobileLayout
+          ? new THREE.Vector3(-0.95, -1.45, 4.35)
+          : new THREE.Vector3(-1.55, -1.25, 3.35);
+      }
+
+      const bowGroup = new THREE.Group();
+      scene.add(bowGroup);
+
+      // Recurve bow arc in local XY/Z plane
+      const bowCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-1.28, -0.14, 0.34),
+        new THREE.Vector3(-0.74, 0.16, -0.08),
+        new THREE.Vector3(0, 0.28, -0.26),
+        new THREE.Vector3(0.74, 0.16, -0.08),
+        new THREE.Vector3(1.28, -0.14, 0.34)
+      ]);
+      const bowMat = new THREE.MeshPhongMaterial({
+        color: 0xff1e42,
+        emissive: 0x991b1b,
+        emissiveIntensity: 0.78,
+        specular: 0xffcbd5,
+        shininess: 120
+      });
+      const bowMesh = new THREE.Mesh(new THREE.TubeGeometry(bowCurve, 48, 0.048, 12, false), bowMat);
+      bowGroup.add(bowMesh);
+
+      // Golden handle grip & recurve tip accents
+      const bowAccentMat = new THREE.MeshPhongMaterial({
+        color: 0xfde047,
+        emissive: 0x92400e,
+        emissiveIntensity: 0.5,
+        shininess: 110
+      });
+      const bowGripMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.34, 12), bowAccentMat);
+      bowGripMesh.rotation.z = Math.PI / 2;
+      bowGripMesh.position.set(0, 0.28, -0.26);
+      bowGroup.add(bowGripMesh);
+
+      [-1, 1].forEach((side) => {
+        const tip = new THREE.Mesh(new THREE.SphereGeometry(0.062, 12, 12), bowAccentMat);
+        tip.position.set(side * 1.28, -0.14, 0.34);
+        bowGroup.add(tip);
+      });
+
+      // Dynamic Bowstring (3 vertices: left tip -> nock point -> right tip)
+      const bowstringGeo = new THREE.BufferGeometry();
+      const bowstringPositions = new Float32Array([
+        -1.28, -0.14, 0.34,
+        0, 0.02, 0.34,
+        1.28, -0.14, 0.34
+      ]);
+      bowstringGeo.setAttribute('position', new THREE.BufferAttribute(bowstringPositions, 3));
+      const bowstringMat = new THREE.LineBasicMaterial({
+        color: 0xfef08a,
+        transparent: true,
+        opacity: 0.94
+      });
+      const bowstringLine = new THREE.Line(bowstringGeo, bowstringMat);
+      bowGroup.add(bowstringLine);
+
+      function orientBowToHeart() {
+        bowGroup.position.copy(getBowBasePos());
+        bowGroup.lookAt(HEART_CENTER);
+        // Flip local -Z forward & tilt diagonally across bottom-left corner
+        bowGroup.rotateY(Math.PI);
+        bowGroup.rotateZ(0.58);
+      }
+
+      // Cupid Light Arrow (tip points along +Z or -Z? Let's point tip along +Z in local space so lookAt aligns +Z!)
+      const arrowGroup = new THREE.Group();
+      scene.add(arrowGroup);
+
+      const arrowShaftMat = new THREE.MeshBasicMaterial({
+        color: THEMES.ruby_valentine.arrowGlow,
+        transparent: true,
+        opacity: 0.96
+      });
+      const shaftMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.022, 0.022, 1.55, 10),
+        arrowShaftMat
+      );
+      shaftMesh.rotation.x = Math.PI / 2;
+      arrowGroup.add(shaftMesh);
+
+      // Glowing Arrowhead pointing along +Z (so arrowGroup.lookAt(target) aims tip at target)
+      const headGeo = new THREE.ConeGeometry(0.095, 0.28, 6);
+      headGeo.rotateX(Math.PI / 2);
+      const headMat = new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.98
+      });
+      const arrowHeadMesh = new THREE.Mesh(headGeo, headMat);
+      arrowHeadMesh.position.z = 0.86;
+      arrowGroup.add(arrowHeadMesh);
+
+      // Arrow Glow Halo
+      const arrowHalo = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: glowSpriteTex,
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.8,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      arrowHalo.scale.set(0.68, 0.68, 1);
+      arrowHalo.position.z = 0.78;
+      arrowGroup.add(arrowHalo);
+
+      // Arrow Trail Particles (for 'Vút' flight)
+      const TRAIL_COUNT = 130;
+      const trailGeo = new THREE.BufferGeometry();
+      const trailPos = new Float32Array(TRAIL_COUNT * 3);
+      for (let i = 0; i < TRAIL_COUNT; i++) {
+        trailPos[i * 3] = 0;
+        trailPos[i * 3 + 1] = -80;
+        trailPos[i * 3 + 2] = 0;
+      }
+      trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+      const trailMat = new THREE.PointsMaterial({
+        size: 0.16,
+        map: glowSpriteTex,
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const trailPoints = new THREE.Points(trailGeo, trailMat);
+      scene.add(trailPoints);
+
+      // ==================== 7. AMBIENT & FINALE EXPLOSION PARTICLES ====================
+      const BG_PARTICLE_COUNT = 380;
+      const bgParticleGeo = new THREE.BufferGeometry();
+      const bgPos = new Float32Array(BG_PARTICLE_COUNT * 3);
+      const bgCol = new Float32Array(BG_PARTICLE_COUNT * 3);
+      const bgSpeeds = new Float32Array(BG_PARTICLE_COUNT);
+      for (let i = 0; i < BG_PARTICLE_COUNT; i++) {
+        bgPos[i * 3] = (Math.random() - 0.5) * 16;
+        bgPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+        bgPos[i * 3 + 2] = 4 - Math.random() * 24;
+        bgSpeeds[i] = 0.2 + Math.random() * 0.5;
+      }
+      bgParticleGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
+      bgParticleGeo.setAttribute('color', new THREE.BufferAttribute(bgCol, 3));
+      const bgParticleMat = new THREE.PointsMaterial({
+        size: 0.14,
+        map: glowSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.82,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      scene.add(new THREE.Points(bgParticleGeo, bgParticleMat));
+
+      // Finale Explosion Star Halo Particles (1,500 particles around FINALE_POS)
+      const FINALE_COUNT = 1500;
+      const finaleGeo = new THREE.BufferGeometry();
+      const finalePos = new Float32Array(FINALE_COUNT * 3);
+      const finaleOrigins = new Float32Array(FINALE_COUNT * 3);
+      const finaleTargets = new Float32Array(FINALE_COUNT * 3);
+      const finaleCol = new Float32Array(FINALE_COUNT * 3);
+      const finalePhases = new Float32Array(FINALE_COUNT);
+
+      for (let i = 0; i < FINALE_COUNT; i++) {
+        const isHeartRing = i < FINALE_COUNT * 0.65;
+        let tx, ty, tz;
+        if (isHeartRing) {
+          const t = (i / (FINALE_COUNT * 0.65)) * Math.PI * 2;
+          const spread = 0.92 + Math.random() * 0.48;
+          tx = FINALE_POS.x + 2.35 * spread * Math.pow(Math.sin(t), 3);
+          ty = FINALE_POS.y + (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.16 * spread;
+          tz = FINALE_POS.z + (Math.random() - 0.5) * 0.9;
+        } else {
+          const r = 2.6 + Math.random() * 3.8;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          tx = FINALE_POS.x + r * Math.sin(phi) * Math.cos(theta);
+          ty = FINALE_POS.y + r * Math.sin(phi) * Math.sin(theta) * 0.72;
+          tz = FINALE_POS.z + r * Math.cos(phi) * 0.45;
+        }
+
+        finaleOrigins[i * 3] = FINALE_POS.x + (Math.random() - 0.5) * 0.25;
+        finaleOrigins[i * 3 + 1] = FINALE_POS.y + (Math.random() - 0.5) * 0.25;
+        finaleOrigins[i * 3 + 2] = FINALE_POS.z;
+
+        finaleTargets[i * 3] = tx;
+        finaleTargets[i * 3 + 1] = ty;
+        finaleTargets[i * 3 + 2] = tz;
+
+        finalePos[i * 3] = finaleOrigins[i * 3];
+        finalePos[i * 3 + 1] = finaleOrigins[i * 3 + 1];
+        finalePos[i * 3 + 2] = finaleOrigins[i * 3 + 2];
+
+        finalePhases[i] = Math.random() * Math.PI * 2;
+      }
+      finaleGeo.setAttribute('position', new THREE.BufferAttribute(finalePos, 3));
+      finaleGeo.setAttribute('color', new THREE.BufferAttribute(finaleCol, 3));
+      const finaleMat = new THREE.PointsMaterial({
+        size: 0.13,
+        map: glowSpriteTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const finalePoints = new THREE.Points(finaleGeo, finaleMat);
+      finalePoints.visible = false;
+      scene.add(finalePoints);
+
+      // ==================== 8. 3D ENGRAVED NAMEPLATE & WISH (VIETNAMESE SAFE PADDING) ====================
+      const nameplateCanvas = document.createElement('canvas');
+      nameplateCanvas.width = 1280;
+      nameplateCanvas.height = 640;
+      const nameplateTex = new THREE.CanvasTexture(nameplateCanvas);
+      nameplateTex.encoding = THREE.sRGBEncoding;
+
+      const nameplateMat = new THREE.MeshBasicMaterial({
+        map: nameplateTex,
+        transparent: true,
+        toneMapped: false
+      });
+      const nameplateMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.2), nameplateMat);
+      nameplateMesh.position.copy(FINALE_POS);
+      nameplateMesh.scale.setScalar(0.001);
+      nameplateMesh.visible = false;
+      scene.add(nameplateMesh);
+
+      function wrapCanvasLines(ctx, text, maxWidth, maxLines) {
+        const words = (text || '').trim().split(/\s+/);
+        const lines = [];
+        let current = '';
+        for (let i = 0; i < words.length; i++) {
+          const test = current ? current + ' ' + words[i] : words[i];
+          if (ctx.measureText(test).width > maxWidth && current) {
+            lines.push(current);
+            current = words[i];
+            if (lines.length >= maxLines) break;
+          } else {
+            current = test;
+          }
+        }
+        if (current && lines.length < maxLines) lines.push(current);
+        if (lines.length === maxLines && words.join(' ').length > lines.join(' ').length) {
+          lines[maxLines - 1] = lines[maxLines - 1].replace(/[.,;!?]*$/, '') + '...';
+        }
+        return lines;
+      }
+
+      function rebuildNameplateTexture() {
+        const ctx = nameplateCanvas.getContext('2d');
+        const W = nameplateCanvas.width;
+        const H = nameplateCanvas.height;
+        const theme = THEMES[appState.theme] || THEMES.ruby_valentine;
+        ctx.clearRect(0, 0, W, H);
+
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, 'rgba(36, 6, 20, 0.94)');
+        bgGrad.addColorStop(0.5, 'rgba(66, 10, 34, 0.94)');
+        bgGrad.addColorStop(1, 'rgba(24, 4, 14, 0.94)');
+
+        ctx.fillStyle = bgGrad;
+        ctx.beginPath();
+        ctx.roundRect(28, 28, W - 56, H - 56, 36);
+        ctx.fill();
+
+        ctx.strokeStyle = theme.accentSecondary;
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(44, 44, W - 88, H - 88, 26);
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Honorific (>= 30% vertical margin preserved)
+        ctx.font = '700 34px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fef08a';
+        ctx.fillText(`💘 ${(appState.honorific || 'Người Yêu Dấu').toUpperCase()} 💘`, W / 2, 118);
+
+        // Receiver Name (large, full Vietnamese diacritics & descenders g, y, p, q protected)
+        const recText = appState.receiver || 'Minh Anh';
+        const fontSize = recText.length > 14 ? 78 : 98;
+        ctx.font = `700 ${fontSize}px "Dancing Script", "Plus Jakarta Sans", cursive, sans-serif`;
+        ctx.shadowColor = 'rgba(244, 63, 94, 0.88)';
+        ctx.shadowBlur = 24;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(recText, W / 2, 245);
+        ctx.shadowBlur = 0;
+
+        // Short Wish Excerpt (2 lines max)
+        ctx.font = '500 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fff1f2';
+        const wishLines = wrapCanvasLines(ctx, appState.wish, W - 180, 2);
+        wishLines.forEach((line, idx) => {
+          ctx.fillText(line, W / 2, 365 + idx * 44);
+        });
+
+        // Sender & Occasion Footer
+        ctx.font = '700 30px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#fecdd3';
+        ctx.fillText(`Từ ${appState.sender} • Happy Valentine's Day 14/2`, W / 2, 520);
+
+        nameplateTex.needsUpdate = true;
+      }
+
+      // ==================== 9. 3D PHOTO WAYPOINTS (CORRIDOR + FINALE ARC) ====================
+      const photoGroup = new THREE.Group();
+      scene.add(photoGroup);
+      const clickableMeshes = [];
+
+      function getCaptionsList() {
+        const preset = RECIPIENT_PRESETS[appState.recipientPreset] || RECIPIENT_PRESETS.lover;
+        return preset.captions;
+      }
+
+      function createCroppedPhotoTexture(url, fallbackIdx, onReady) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = 640;
+          c.height = 480;
+          const ctx = c.getContext('2d');
+          const targetRatio = 640 / 480;
+          const imgRatio = img.width / img.height;
+          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+          if (imgRatio > targetRatio) {
+            sw = img.height * targetRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / targetRatio;
+            sy = (img.height - sh) / 2;
+          }
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 640, 480);
+          const tex = new THREE.CanvasTexture(c);
+          tex.encoding = THREE.sRGBEncoding;
+          onReady(tex);
+        };
+        img.onerror = () => {
+          onReady(createDefaultValentineCardTexture(fallbackIdx));
+        };
+        img.src = url;
+      }
+
+      function getPhotoCount() {
+        return Math.max(4, Math.min(6, appState.photos.length || 4));
+      }
+
+      function rebuild3DPhotoFrames() {
+        while (photoGroup.children.length > 0) {
+          photoGroup.remove(photoGroup.children[0]);
+        }
+        clickableMeshes.length = 0;
+
+        const count = getPhotoCount();
+        const captions = getCaptionsList();
+
+        for (let i = 0; i < count; i++) {
+          const frame = new THREE.Group();
+
+          // Corridor waypoint along the path from bow toward the distant heart (-1.2 to -11.2)
+          const stepZ = count > 1 ? 10.0 / (count - 1) : 2.2;
+          const corrX = Math.sin(i * 1.45 + 0.6) * (isMobileLayout ? 0.95 : 1.55);
+          const corrY = 0.45 + Math.cos(i * 1.15) * 0.45;
+          const corrZ = -1.2 - i * stepZ;
+
+          // Finale arc position around FINALE_POS
+          const angle = ((i / Math.max(1, count - 1)) - 0.5) * Math.PI * 0.8;
+          const radius = isMobileLayout ? 2.65 : 3.5;
+          const arcX = FINALE_POS.x + Math.sin(angle) * radius;
+          const arcZ = FINALE_POS.z + 0.55 - Math.cos(angle) * 1.05;
+          const arcY = FINALE_POS.y + (i % 2 === 0 ? 1.58 : -1.32) + Math.cos(angle) * 0.14;
+          const arcRy = -angle * 0.52;
+
+          const borderMat = new THREE.MeshBasicMaterial({
+            color: 0xfde047,
+            transparent: true,
+            opacity: 0
+          });
+          const borderMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.52, 1.16), borderMat);
+          borderMesh.position.z = -0.01;
+          frame.add(borderMesh);
+
+          const initTex = createDefaultValentineCardTexture(i);
+          const photoMat = new THREE.MeshBasicMaterial({
+            map: initTex,
+            transparent: true,
+            opacity: 0,
+            toneMapped: false
+          });
+          const photoMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.42, 1.06), photoMat);
+          photoMesh.userData = {
+            photoIndex: i,
+            photoUrl: appState.photos[i] ? appState.photos[i].url : '',
+            caption: captions[i % captions.length]
+          };
+          frame.add(photoMesh);
+          clickableMeshes.push(photoMesh);
+
+          if (appState.photos[i] && appState.photos[i].url) {
+            createCroppedPhotoTexture(appState.photos[i].url, i, (tex) => {
+              photoMat.map = tex;
+              photoMat.needsUpdate = true;
+            });
+          }
+
+          frame.position.set(corrX, corrY, corrZ);
+          frame.scale.setScalar(0.001);
+          frame.userData = {
+            corrX, corrY, corrZ,
+            arcX, arcY, arcZ, arcRy,
+            phase: i * 1.1,
+            photoMat,
+            borderMat
+          };
+          photoGroup.add(frame);
+        }
+      }
+
+      // ==================== 10. STORY CHOREOGRAPHY & INTERACTION ====================
+      const HOLD_PHOTO_DURATION = 5.0;
+      const SHATTER_HOLD_DURATION = 2.05;
+      let shatterHoldElapsed = 0;
+      let bowDrawAmount = 0;
+      let isDrawingBow = false;
+      let flightProgress = 0;
+      let activeFlightCurve = null;
+      let heartShatterProgress = 0;
+      let finaleParticleProgress = 0;
+      let cameraShake = 0;
+      let impactFlash = 0;
+
+      const camLookCurrent = new THREE.Vector3(0, 0.35, -0.6);
+
+      function getTargetHeartbeatBpm() {
+        if (appState.phase === 'aim') return isDrawingBow ? 112 : 70;
+        if (appState.phase === 'fly_heart' || appState.phase === 'heart_shatter') return 156;
+        if (appState.phase === 'fly_photo' || appState.phase === 'hold_photo') return 96;
+        return 78;
+      }
+
+      function getPhotoWaypoint(idx) {
+        const frame = photoGroup.children[idx];
+        if (!frame) return new THREE.Vector3(0, 0.45, -6);
+        return new THREE.Vector3(frame.userData.corrX, frame.userData.corrY, frame.userData.corrZ);
+      }
+
+      function getPhotoStopPos(idx) {
+        const wp = getPhotoWaypoint(idx);
+        const dist = isMobileLayout ? 2.55 : 2.05;
+        return new THREE.Vector3(wp.x, wp.y - 0.12, wp.z + dist);
+      }
+
+      function buildFlightCurve(startVec, endVec, arcLift = 0.35) {
+        const mid = startVec.clone().lerp(endVec, 0.5);
+        mid.y += arcLift;
+        mid.x += (endVec.x - startVec.x) * 0.12;
+        return new THREE.CatmullRomCurve3([startVec.clone(), mid, endVec.clone()]);
+      }
+
+      function fireCupidArrow() {
+        if (appState.phase !== 'aim') return;
+        isDrawingBow = false;
+        bowDrawAmount = 0;
+        document.getElementById('bow-charge-wrap').classList.remove('active');
+
+        AudioEngine.autoUnlock();
+        AudioEngine.playWhoosh();
+        AudioEngine.startHeartbeatLoop();
+        startFlyToPhoto(0);
+      }
+
+      function startFlyToPhoto(idx) {
+        const count = getPhotoCount();
+        if (idx >= count) {
+          startFlyToHeart();
+          return;
+        }
+        const fromPos = idx === 0 ? getBowBasePos() : getPhotoStopPos(idx - 1);
+        const toPos = getPhotoStopPos(idx);
+        appState.phase = 'fly_photo';
+        appState.storyStep = 1;
+        appState.activePhotoIdx = idx;
+        flightProgress = 0;
+        activeFlightCurve = buildFlightCurve(fromPos, toPos, idx === 0 ? 0.42 : 0.32);
+        trailMat.opacity = 0.88;
+        if (idx > 0) AudioEngine.playWhoosh();
+        syncStoryHUD();
+      }
+
+      function startFlyToHeart() {
+        const lastIdx = Math.max(0, getPhotoCount() - 1);
+        const fromPos = getPhotoStopPos(lastIdx);
+        const pierceEnd = HEART_CENTER.clone().add(new THREE.Vector3(0, 0, -0.8));
+        const mid = fromPos.clone().lerp(HEART_CENTER, 0.5);
+        mid.y += 0.28;
+
+        appState.phase = 'fly_heart';
+        appState.storyStep = 2;
+        flightProgress = 0;
+        activeFlightCurve = new THREE.CatmullRomCurve3([
+          fromPos.clone(),
+          mid,
+          HEART_CENTER.clone(),
+          pierceEnd
+        ]);
+        trailMat.opacity = 0.94;
+        AudioEngine.playWhoosh();
+        syncStoryHUD();
+      }
+
+      function advanceStoryStep() {
+        AudioEngine.autoUnlock();
+        if (appState.phase === 'aim') {
+          fireCupidArrow();
+        } else if (appState.phase === 'hold_photo') {
+          const nextIdx = appState.activePhotoIdx + 1;
+          if (nextIdx < getPhotoCount()) {
+            startFlyToPhoto(nextIdx);
+          } else {
+            startFlyToHeart();
+          }
+        }
+      }
+
+      function replayCupidStory(jumpToClimax = false) {
+        isDrawingBow = false;
+        bowDrawAmount = 0;
+        flightProgress = 0;
+        activeFlightCurve = null;
+        cameraShake = 0;
+        impactFlash = 0;
+        appState.activePhotoIdx = 0;
+        appState.holdPhotoElapsed = 0;
+        document.getElementById('bow-charge-wrap').classList.remove('active');
+        heartGroup.position.copy(HEART_CENTER);
+
+        if (jumpToClimax) {
+          appState.phase = 'finale';
+          appState.storyStep = 3;
+          heartShatterProgress = 1;
+          finaleParticleProgress = 0;
+          impactFlash = 1.0;
+          cameraShake = 0.2;
+          camera.position.set(0, 0.55, FINALE_POS.z + (isMobileLayout ? 6.8 : 5.1));
+          camLookCurrent.copy(FINALE_POS);
+          AudioEngine.playFinaleClimax();
+          AudioEngine.startMusicLoop();
+        } else {
+          appState.phase = 'aim';
+          appState.storyStep = 0;
+          heartShatterProgress = 0;
+          finaleParticleProgress = 0;
+          cameraTarget.rotX = 0.04;
+          cameraTarget.rotY = 0;
+          camera.fov = 46;
+          camera.updateProjectionMatrix();
+          camera.position.set(cameraBase.x, cameraBase.y, cameraBase.z);
+          camLookCurrent.set(0, 0.35, -0.6);
+          orientBowToHeart();
+
+          // Reset heart points back to original heart formation
+          const hAttr = heartGeo.getAttribute('position');
+          for (let i = 0; i < HEART_COUNT; i++) {
+            hAttr.setXYZ(i, heartOrigins[i * 3], heartOrigins[i * 3 + 1], heartOrigins[i * 3 + 2]);
+          }
+          hAttr.needsUpdate = true;
+
+          // Reset photo frames to corridor positions
+          photoGroup.children.forEach((frame) => {
+            frame.position.set(frame.userData.corrX, frame.userData.corrY, frame.userData.corrZ);
+            frame.rotation.set(0, 0, 0);
+            frame.scale.setScalar(0.001);
+          });
+        }
+        syncStoryHUD();
+      }
+
+      function syncStoryHUD() {
+        const hintBtn = document.getElementById('action-hint-pill');
+        const capPill = document.getElementById('story-caption-pill');
+        const capText = document.getElementById('story-caption-text');
+        const timerBar = document.getElementById('photo-timer-bar');
+        const timerFill = document.getElementById('photo-timer-fill');
+        const payBtn = document.getElementById('btn-pay');
+
+        const p = appState.phase;
+        if (p === 'aim') {
+          hintBtn.textContent = '🏹 Giữ & Kéo cung (hoặc Chạm) để Bắn Mũi Tên';
+          hintBtn.classList.remove('hidden-hint');
+          capText.textContent = '';
+          timerBar.classList.remove('active');
+          timerFill.style.width = '0%';
+          capPill.classList.add('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (p === 'fly_photo') {
+          hintBtn.classList.add('hidden-hint');
+          capText.textContent = '';
+          timerBar.classList.remove('active');
+          capPill.classList.add('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (p === 'hold_photo') {
+          const captions = getCaptionsList();
+          const remainSec = Math.max(1, Math.ceil(HOLD_PHOTO_DURATION - appState.holdPhotoElapsed));
+          hintBtn.textContent = `⏭️ Chạm để qua ảnh tiếp theo (${remainSec}s)`;
+          hintBtn.classList.remove('hidden-hint');
+          capText.textContent = captions[appState.activePhotoIdx % captions.length];
+          timerBar.classList.add('active');
+          capPill.classList.remove('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (p === 'fly_heart') {
+          hintBtn.classList.add('hidden-hint');
+          capText.textContent = '';
+          timerBar.classList.remove('active');
+          capPill.classList.add('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else if (p === 'heart_shatter') {
+          hintBtn.classList.add('hidden-hint');
+          capText.textContent = '';
+          timerBar.classList.remove('active');
+          capPill.classList.add('hidden-caption');
+          payBtn.classList.remove('climax-glow');
+        } else {
+          hintBtn.classList.add('hidden-hint');
+          timerBar.classList.remove('active');
+          capPill.classList.add('hidden-caption');
+          payBtn.classList.add('climax-glow');
+        }
+      }
+
+      // Pointer & Raycaster Handling (Drag vs Tap)
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let isPointerDown = false;
+      let downX = 0;
+      let downY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let dragDist = 0;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        downX = e.clientX;
+        downY = e.clientY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        dragDist = 0;
+
+        if (appState.phase === 'aim') {
+          isDrawingBow = true;
+          document.getElementById('bow-charge-wrap').classList.add('active');
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        dragDist += Math.hypot(dx, dy);
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        if (appState.phase === 'aim' && isDrawingBow) {
+          const pullY = Math.max(0, e.clientY - downY);
+          const pullX = Math.max(0, downX - e.clientX);
+          bowDrawAmount = Math.min(1, Math.max(bowDrawAmount, Math.hypot(pullX, pullY) / 110));
+          document.getElementById('bow-charge-fill').style.width = `${Math.round(bowDrawAmount * 100)}%`;
+        } else if (appState.phase === 'finale') {
+          cameraTarget.rotY = Math.max(-0.55, Math.min(0.55, cameraTarget.rotY + dx * 0.0045));
+          cameraTarget.rotX = Math.max(-0.28, Math.min(0.32, cameraTarget.rotX + dy * 0.0035));
+        }
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+
+        if (appState.phase === 'aim' && isDrawingBow) {
+          fireCupidArrow();
+          return;
+        }
+
+        if (dragDist <= 8) {
+          if (appState.phase === 'finale') {
+            const rect = canvas.getBoundingClientRect();
+            pointerNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointerNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointerNDC, camera);
+            const hits = raycaster.intersectObjects(clickableMeshes, false);
+            if (hits.length > 0) {
+              const hitData = hits[0].object.userData;
+              openPhotoSpotlight(hitData.photoIndex);
+              return;
+            }
+          }
+          advanceStoryStep();
+        }
+      });
+
+      document.getElementById('action-hint-pill').addEventListener('click', (e) => {
+        e.stopPropagation();
+        advanceStoryStep();
+      });
+
+      // ==================== 11. UI SYNC, PRESETS, THEMES & MODALS ====================
+      function applyThemePalette(themeKey) {
+        const t = THEMES[themeKey] || THEMES.ruby_valentine;
+        appState.theme = themeKey;
+
+        const root = document.documentElement.style;
+        root.setProperty('--bg-top', t.bgTop);
+        root.setProperty('--bg-mid', t.bgMid);
+        root.setProperty('--bg-deep', t.bgDeep);
+        root.setProperty('--accent-primary', t.accentPrimary);
+        root.setProperty('--accent-secondary', t.accentSecondary);
+
+        const cArr = t.particleColors.map((hex) => new THREE.Color(hex));
+        const heartBaseColor = new THREE.Color(t.heartColor);
+        const hColAttr = heartGeo.getAttribute('color');
+        for (let i = 0; i < HEART_COUNT; i++) {
+          const c = i % 3 === 0 ? cArr[i % cArr.length] : heartBaseColor.clone().lerp(cArr[0], (i % 5) * 0.12);
+          hColAttr.setXYZ(i, c.r, c.g, c.b);
+        }
+        hColAttr.needsUpdate = true;
+
+        arrowShaftMat.color.setHex(t.arrowGlow);
+        heartPointLight.color.setHex(t.pointLight);
+        rimLight.color.setHex(t.rimLight);
+
+        const bgColAttr = bgParticleGeo.getAttribute('color');
+        for (let i = 0; i < BG_PARTICLE_COUNT; i++) {
+          const c = cArr[i % cArr.length];
+          bgColAttr.setXYZ(i, c.r, c.g, c.b);
+        }
+        bgColAttr.needsUpdate = true;
+
+        const finColAttr = finaleGeo.getAttribute('color');
+        for (let i = 0; i < FINALE_COUNT; i++) {
+          const c = cArr[i % cArr.length];
+          finColAttr.setXYZ(i, c.r, c.g, c.b);
+        }
+        finColAttr.needsUpdate = true;
+
+        document.querySelectorAll('.theme-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.theme === themeKey);
+        });
+        rebuildNameplateTexture();
+      }
+
+      function applyRecipientPreset(presetKey, autoReplay = false) {
+        const p = RECIPIENT_PRESETS[presetKey] || RECIPIENT_PRESETS.lover;
+        appState.recipientPreset = presetKey;
+        appState.honorific = p.honorific;
+        if (!appState.hasCustomReceiver) {
+          appState.receiver = p.defaultReceiver;
+          appState.sender = p.defaultSender;
+        }
+        appState.wish = p.wish;
+        applyThemePalette(p.theme);
+
+        document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.recipient === presetKey);
+        });
+
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        if (autoReplay) {
+          AudioEngine.autoUnlock();
+        }
+      }
+
+      function syncUIAndBanners() {
+        rebuildNameplateTexture();
+        const viewerTitle = document.getElementById('viewer-title');
+        const viewerMeta = document.getElementById('viewer-meta');
+        const viewerWish = document.getElementById('viewer-wish-text');
+        if (viewerTitle) viewerTitle.textContent = `💌 Gửi ${appState.receiver} Yêu Thương`;
+        if (viewerMeta) viewerMeta.textContent = `Từ ${appState.sender} • ${appState.honorific} • Valentine 14/2`;
+        if (viewerWish) viewerWish.textContent = appState.wish;
+      }
+
+      function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('open');
+      }
+
+      function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      }
+
+      function openPhotoSpotlight(idx) {
+        const count = clickableMeshes.length || 4;
+        const safeIdx = ((idx % count) + count) % count;
+        appState.activeSpotlightIdx = safeIdx;
+
+        const targetMesh = clickableMeshes[safeIdx];
+        const captions = getCaptionsList();
+        const photoUrl = appState.photos[safeIdx] ? appState.photos[safeIdx].url : '';
+        const imgEl = document.getElementById('spotlight-img');
+        if (photoUrl) {
+          imgEl.src = photoUrl;
+        } else if (targetMesh && targetMesh.material && targetMesh.material.map && targetMesh.material.map.image) {
+          imgEl.src = targetMesh.material.map.image.toDataURL('image/png');
+        }
+
+        document.getElementById('spotlight-badge').textContent = `💘 Kỷ Niệm Tình Yêu #${safeIdx + 1}`;
+        document.getElementById('spotlight-receiver').textContent = `💕 ${appState.honorific} • ${appState.receiver}`;
+        document.getElementById('spotlight-caption').textContent = captions[safeIdx % captions.length];
+        openModal('photo-spotlight-overlay');
+      }
+
+      function closePhotoSpotlight() {
+        closeModal('photo-spotlight-overlay');
+      }
+
+      function openWishViewerModal() {
+        syncUIAndBanners();
+        const grid = document.getElementById('viewer-photos-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p) => {
+          const img = document.createElement('img');
+          img.src = p.url;
+          img.alt = 'Ảnh kỷ niệm Valentine';
+          grid.appendChild(img);
+        });
+        openModal('modal-wish-viewer');
+      }
+
+      function renderCreatorPhotoThumbs() {
+        const grid = document.getElementById('photo-preview-grid');
+        grid.innerHTML = '';
+        appState.photos.forEach((p, idx) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'photo-thumb-wrap';
+          const img = document.createElement('img');
+          img.src = p.url;
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'photo-thumb-del';
+          del.textContent = '✕';
+          del.addEventListener('click', () => {
+            appState.photos.splice(idx, 1);
+            renderCreatorPhotoThumbs();
+          });
+          wrap.appendChild(img);
+          wrap.appendChild(del);
+          grid.appendChild(wrap);
+        });
+      }
+
+      function getPaymentKitConfig() {
+        return {
+          templateId: appState.templateId,
+          templateType: 'valentine_cupid_arrow_3d',
+          emoji: '💘',
+          defaultAmount: 39000,
+          waitTitle: 'Quét Mã Mở Khóa Mũi Tên Cupid 3D',
+          successTitle: 'Thiệp Mũi Tên Cupid 3D Đã Sẵn Sàng!',
+          cardTitle: '💘 MŨI TÊN CUPID 3D • NHỊP ĐẬP TRÁI TIM 14/2 ✨',
+          scanLabel: 'Quét QR để Kéo Cung Bắn Mũi Tên & Mở Trái Tim 3D',
+          footerHint: 'Kéo cung ánh sáng bắn vào trái tim 3D để khám phá lời yêu thương',
+          gradientStops: ['#2b0614', '#be123c', '#f43f5e'],
+          senderName: appState.sender,
+          receiverName: appState.receiver,
+          occasion: 'Happy Valentine’s Day 14/2',
+          message: appState.wish,
+          payload: {
+            recipientPreset: appState.recipientPreset,
+            honorific: appState.honorific,
+            theme: appState.theme,
+            photos: appState.photos
+          }
+        };
+      }
+
+      // ==================== 12. EVENT BINDINGS ====================
+      document.getElementById('btn-sound').addEventListener('click', () => AudioEngine.toggle());
+      document.getElementById('btn-replay').addEventListener('click', () => {
+        AudioEngine.autoUnlock();
+        replayCupidStory(false);
+      });
+
+      document.querySelectorAll('.recipient-preset-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyRecipientPreset(btn.dataset.recipient, true);
+        });
+      });
+
+      document.getElementById('btn-close-spotlight').addEventListener('click', closePhotoSpotlight);
+      document.getElementById('photo-spotlight-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'photo-spotlight-overlay') closePhotoSpotlight();
+      });
+      document.getElementById('btn-spotlight-prev').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx - 1);
+      });
+      document.getElementById('btn-spotlight-next').addEventListener('click', () => {
+        openPhotoSpotlight(appState.activeSpotlightIdx + 1);
+      });
+      document.getElementById('btn-spotlight-album').addEventListener('click', () => {
+        closePhotoSpotlight();
+        openWishViewerModal();
+      });
+
+      document.getElementById('btn-viewer-wish').addEventListener('click', openWishViewerModal);
+      document.getElementById('btn-close-wish').addEventListener('click', () => closeModal('modal-wish-viewer'));
+
+      document.getElementById('btn-customize').addEventListener('click', () => {
+        document.getElementById('input-honorific').value = appState.honorific;
+        document.getElementById('input-receiver').value = appState.receiver;
+        document.getElementById('input-sender').value = appState.sender;
+        document.getElementById('input-wish').value = appState.wish;
+        renderCreatorPhotoThumbs();
+        openModal('modal-customize');
+      });
+      document.getElementById('btn-close-customize').addEventListener('click', () => closeModal('modal-customize'));
+
+      document.getElementById('input-receiver').addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val && !DEFAULT_RECEIVER_SET.has(val)) {
+          appState.hasCustomReceiver = true;
+        }
+      });
+
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.addEventListener('click', () => applyThemePalette(chip.dataset.theme));
+      });
+
+      PaymentQrKit.bindPhotoUploader(document.getElementById('input-photos'), {
+        maxCount: 6,
+        maxSide: 900,
+        quality: 0.8,
+        getList: () => appState.photos,
+        onPhotoReady: (dataUrl) => {
+          appState.photos.push({ url: dataUrl });
+          renderCreatorPhotoThumbs();
+        }
+      });
+
+      document.getElementById('btn-apply-custom').addEventListener('click', () => {
+        const customHonorific = document.getElementById('input-honorific').value.trim();
+        const customReceiver = document.getElementById('input-receiver').value.trim();
+        appState.honorific = customHonorific || appState.honorific || 'Người Yêu Dấu';
+        if (customReceiver) {
+          appState.receiver = customReceiver;
+          if (!DEFAULT_RECEIVER_SET.has(customReceiver)) {
+            appState.hasCustomReceiver = true;
+          }
+        }
+        appState.sender = document.getElementById('input-sender').value.trim() || 'Bảo Nam';
+        appState.wish = document.getElementById('input-wish').value.trim() || appState.wish;
+        syncUIAndBanners();
+        rebuild3DPhotoFrames();
+        closeModal('modal-customize');
+        AudioEngine.autoUnlock();
+        replayCupidStory(true);
+      });
+
+      document.getElementById('btn-pay').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-pay');
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '⏳ Đang tạo...';
+        try {
+          await PaymentQrKit.createOrderAndPay(getPaymentKitConfig());
+        } catch (err) {
+          alert('Có lỗi khi tạo đơn: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+
+      window.addEventListener('resize', updateCameraResponsive);
+
+      // ==================== 13. ANIMATION LOOP (ARROW-CHASE POV & MULTI-STAGE) ====================
+      const clock = new THREE.Clock();
+      let elapsedTotal = 0;
+      let lastHoldSecond = -1;
+
+      function updateArrowTrail(arrowPos) {
+        trailPoints.visible = true;
+        const trAttr = trailGeo.getAttribute('position');
+        for (let i = TRAIL_COUNT - 1; i > 0; i--) {
+          trAttr.setXYZ(i, trAttr.getX(i - 1), trAttr.getY(i - 1), trAttr.getZ(i - 1));
+        }
+        trAttr.setXYZ(
+          0,
+          arrowPos.x + (Math.random() - 0.5) * 0.09,
+          arrowPos.y + (Math.random() - 0.5) * 0.09,
+          arrowPos.z + (Math.random() - 0.5) * 0.09
+        );
+        trAttr.needsUpdate = true;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        elapsedTotal += dt;
+
+        const phase = appState.phase;
+
+        // Ambient floating sparks (slow-motion during hold_photo)
+        const bgTimeScale = phase === 'hold_photo' ? 0.18 : 1.0;
+        const bgAttr = bgParticleGeo.getAttribute('position');
+        for (let i = 0; i < BG_PARTICLE_COUNT; i++) {
+          let x = bgAttr.getX(i) + Math.sin(elapsedTotal * 0.6 + i) * dt * 0.18 * bgTimeScale;
+          let y = bgAttr.getY(i) + bgSpeeds[i] * dt * 0.35 * bgTimeScale;
+          if (y > 5.0) y = -5.0;
+          if (x > 8.0) x = -8.0;
+          if (x < -8.0) x = 8.0;
+          bgAttr.setXY(i, x, y);
+        }
+        bgAttr.needsUpdate = true;
+
+        // Heartbeat lub-dub pulse curve
+        const bpm = getTargetHeartbeatBpm();
+        const beatPhase = ((elapsedTotal * bpm) / 60) % 1;
+        let pulse = 0;
+        if (beatPhase < 0.14) pulse = Math.sin((beatPhase / 0.14) * Math.PI) * 0.09;
+        else if (beatPhase > 0.22 && beatPhase < 0.36) pulse = Math.sin(((beatPhase - 0.22) / 0.14) * Math.PI) * 0.055;
+
+        // 1. Bow & String in 'aim'
+        if (phase === 'aim' && isDrawingBow && bowDrawAmount < 0.98) {
+          bowDrawAmount = Math.min(1, bowDrawAmount + dt * 0.65);
+          document.getElementById('bow-charge-fill').style.width = `${Math.round(bowDrawAmount * 100)}%`;
+        }
+        bowGroup.visible = phase === 'aim';
+        if (bowGroup.visible) {
+          orientBowToHeart();
+          const stringPullZ = 0.34 + bowDrawAmount * 0.68;
+          const bsAttr = bowstringGeo.getAttribute('position');
+          bsAttr.setXYZ(1, 0, 0.02 - bowDrawAmount * 0.06, stringPullZ);
+          bsAttr.needsUpdate = true;
+
+          // Arrow nocked on the diagonal red bow pointing straight at HEART_CENTER
+          arrowGroup.visible = true;
+          const dirToHeart = HEART_CENTER.clone().sub(bowGroup.position).normalize();
+          const nockOffset = dirToHeart.clone().multiplyScalar(-bowDrawAmount * 0.55);
+          arrowGroup.position.copy(bowGroup.position).add(nockOffset);
+          arrowGroup.lookAt(HEART_CENTER);
+          trailPoints.visible = false;
+        }
+
+        // 2. Heart Points (Lub-Dub Beat & Tremble -> Slow-Motion Starburst Shatter)
+        const targetShatter = (phase === 'aim' || phase === 'fly_photo' || phase === 'hold_photo' || phase === 'fly_heart') ? 0 : 1;
+        const shatterSpeed = phase === 'heart_shatter' ? 1.55 : 2.2;
+        heartShatterProgress += (targetShatter - heartShatterProgress) * Math.min(1, dt * shatterSpeed);
+
+        const hAttr = heartGeo.getAttribute('position');
+        const heartPulseAmp = phase === 'fly_heart' ? 1.75 : 1.0;
+        const hScale = (isMobileLayout ? 1.85 : 2.1) * (1 + pulse * heartPulseAmp * (1 - heartShatterProgress));
+        heartGroup.scale.setScalar(hScale);
+        heartGroup.rotation.y = Math.sin(elapsedTotal * 0.55) * 0.14 * (1 - heartShatterProgress);
+        if (phase === 'fly_heart') {
+          heartGroup.position.set(
+            HEART_CENTER.x + Math.sin(elapsedTotal * 28) * 0.045,
+            HEART_CENTER.y + Math.cos(elapsedTotal * 23) * 0.035,
+            HEART_CENTER.z
+          );
+        } else {
+          heartGroup.position.copy(HEART_CENTER);
+        }
+
+        const shatterEase = 1 - Math.pow(1 - heartShatterProgress, 3);
+        for (let i = 0; i < HEART_COUNT; i++) {
+          const ox = heartOrigins[i * 3];
+          const oy = heartOrigins[i * 3 + 1];
+          const oz = heartOrigins[i * 3 + 2];
+          const twinkle = Math.sin(elapsedTotal * 2.6 + heartPhases[i]) * 0.024;
+          if (shatterEase > 0.002) {
+            const bx = heartBurstDirs[i * 3];
+            const by = heartBurstDirs[i * 3 + 1];
+            const bz = heartBurstDirs[i * 3 + 2];
+            hAttr.setXYZ(
+              i,
+              ox + bx * shatterEase + twinkle,
+              oy + by * shatterEase + twinkle,
+              oz + bz * shatterEase
+            );
+          } else {
+            hAttr.setXYZ(i, ox + twinkle, oy + twinkle, oz);
+          }
+        }
+        hAttr.needsUpdate = true;
+        heartPointsMat.size = phase === 'heart_shatter' ? 0.22 : 0.16;
+        heartPointsMat.opacity = phase === 'finale' ? Math.max(0.22, 0.96 - finaleParticleProgress * 0.72) : 0.96;
+
+        heartPointLight.intensity = 2.0 + pulse * 8.0 + impactFlash * 2.8;
+        if (cameraShake > 0) cameraShake = Math.max(0, cameraShake - dt * 0.9);
+        if (impactFlash > 0) impactFlash = Math.max(0, impactFlash - dt * 2.2);
+
+        // 3. Arrow Flight & Camera POV Chase
+        let desiredCamPos = new THREE.Vector3(
+          cameraBase.x + Math.sin(cameraTarget.rotY) * cameraBase.z * 0.45,
+          cameraBase.y + cameraTarget.rotX * 1.8,
+          cameraBase.z
+        );
+        let desiredLookAt = new THREE.Vector3(0, 0.35, -0.6);
+        let desiredFov = 46;
+
+        if (phase === 'fly_photo' && activeFlightCurve) {
+          flightProgress = Math.min(1, flightProgress + dt * 0.85);
+          const t = flightProgress;
+          const pos = activeFlightCurve.getPointAt(t);
+          const tan = activeFlightCurve.getTangentAt(t).normalize();
+
+          arrowGroup.visible = true;
+          arrowGroup.position.copy(pos);
+          arrowGroup.lookAt(pos.clone().add(tan));
+          updateArrowTrail(pos);
+
+          desiredCamPos = pos.clone().sub(tan.clone().multiplyScalar(1.55)).add(new THREE.Vector3(0, 0.22, 0));
+          desiredLookAt = pos.clone().add(tan.clone().multiplyScalar(2.5));
+          desiredFov = 54;
+
+          if (flightProgress >= 1) {
+            appState.phase = 'hold_photo';
+            appState.holdPhotoElapsed = 0;
+            lastHoldSecond = -1;
+            AudioEngine.playPhotoChime();
+            syncStoryHUD();
+          }
+        } else if (phase === 'hold_photo') {
+          appState.holdPhotoElapsed += dt;
+          const progressPct = Math.min(100, (appState.holdPhotoElapsed / HOLD_PHOTO_DURATION) * 100);
+          document.getElementById('photo-timer-fill').style.width = `${progressPct.toFixed(1)}%`;
+
+          const remainSec = Math.max(1, Math.ceil(HOLD_PHOTO_DURATION - appState.holdPhotoElapsed));
+          if (remainSec !== lastHoldSecond) {
+            lastHoldSecond = remainSec;
+            document.getElementById('action-hint-pill').textContent = `⏭️ Chạm để qua ảnh tiếp theo (${remainSec}s)`;
+          }
+
+          const wp = getPhotoWaypoint(appState.activePhotoIdx);
+          const stopPos = getPhotoStopPos(appState.activePhotoIdx);
+
+          // Park the glowing arrow diagonally at the bottom-left corner without overlapping the photo frame
+          arrowGroup.visible = true;
+          arrowGroup.position.set(
+            stopPos.x - (isMobileLayout ? 0.46 : 0.94),
+            stopPos.y - (isMobileLayout ? 0.58 : 0.46) + Math.sin(elapsedTotal * 1.4) * 0.02,
+            stopPos.z - 1.15
+          );
+          arrowGroup.lookAt(wp.x + 0.45, wp.y + 0.35, wp.z - 4.0);
+          trailMat.opacity = Math.max(0, trailMat.opacity - dt * 2.5);
+          if (trailMat.opacity <= 0.02) trailPoints.visible = false;
+
+          desiredCamPos = stopPos.clone();
+          desiredLookAt = wp.clone();
+          desiredFov = 46;
+
+          if (appState.holdPhotoElapsed >= HOLD_PHOTO_DURATION) {
+            const nextIdx = appState.activePhotoIdx + 1;
+            if (nextIdx < getPhotoCount()) {
+              startFlyToPhoto(nextIdx);
+            } else {
+              startFlyToHeart();
+            }
+          }
+        } else if (phase === 'fly_heart' && activeFlightCurve) {
+          flightProgress = Math.min(1, flightProgress + dt * 0.92);
+          const t = flightProgress;
+          const pos = activeFlightCurve.getPointAt(t);
+          const tan = activeFlightCurve.getTangentAt(t).normalize();
+
+          arrowGroup.visible = true;
+          arrowGroup.position.copy(pos);
+          arrowGroup.lookAt(pos.clone().add(tan));
+          updateArrowTrail(pos);
+
+          // Frame camera at ideal distance before impact so the arrow visibly pierces the heart
+          const maxCamZ = HEART_CENTER.z + (isMobileLayout ? 6.4 : 4.8);
+          const chaseCamPos = pos.clone().sub(tan.clone().multiplyScalar(1.85)).add(new THREE.Vector3(0, 0.24, 0));
+          chaseCamPos.z = Math.max(chaseCamPos.z, maxCamZ);
+          desiredCamPos = chaseCamPos;
+          desiredLookAt = HEART_CENTER.clone().lerp(pos.clone().add(tan.clone().multiplyScalar(2.0)), 0.35);
+          desiredFov = 46 + 10 * Math.sin(t * Math.PI * 0.85);
+
+          if (flightProgress >= 1) {
+            appState.phase = 'heart_shatter';
+            shatterHoldElapsed = 0;
+            cameraShake = 0.32;
+            impactFlash = 1.0;
+            AudioEngine.playHeartShatter();
+            syncStoryHUD();
+          }
+        } else if (phase === 'heart_shatter') {
+          shatterHoldElapsed += dt;
+          if (shatterHoldElapsed < 0.55) {
+            arrowGroup.visible = true;
+            arrowGroup.position.z -= dt * 1.8;
+          } else {
+            arrowGroup.visible = false;
+          }
+          trailMat.opacity = Math.max(0, trailMat.opacity - dt * 2.2);
+          if (trailMat.opacity <= 0.02) trailPoints.visible = false;
+
+          desiredCamPos = new THREE.Vector3(0, 0.55, FINALE_POS.z + (isMobileLayout ? 6.8 : 5.2));
+          desiredLookAt = HEART_CENTER.clone();
+          desiredFov = 52;
+
+          if (shatterHoldElapsed >= SHATTER_HOLD_DURATION) {
+            appState.phase = 'finale';
+            appState.storyStep = 3;
+            finaleParticleProgress = 0;
+            cameraShake = 0.24;
+            impactFlash = 1.0;
+            AudioEngine.playFinaleClimax();
+            AudioEngine.startMusicLoop();
+            syncStoryHUD();
+          }
+        } else if (phase === 'finale') {
+          arrowGroup.visible = false;
+          trailPoints.visible = false;
+          const camZOffset = isMobileLayout ? 6.8 : 5.1;
+          desiredCamPos = new THREE.Vector3(
+            FINALE_POS.x + Math.sin(cameraTarget.rotY) * camZOffset * 0.55,
+            FINALE_POS.y + 0.05 + cameraTarget.rotX * 1.8,
+            FINALE_POS.z + camZOffset
+          );
+          desiredLookAt = FINALE_POS.clone();
+          desiredFov = 46;
+        }
+
+        // Smooth FOV & Camera Tracking
+        if (Math.abs(camera.fov - desiredFov) > 0.05) {
+          camera.fov += (desiredFov - camera.fov) * Math.min(1, dt * 4.5);
+          camera.updateProjectionMatrix();
+        }
+        const shakeX = cameraShake > 0 ? (Math.random() - 0.5) * cameraShake * 0.45 : 0;
+        const shakeY = cameraShake > 0 ? (Math.random() - 0.5) * cameraShake * 0.45 : 0;
+        const camLerp = Math.min(1, dt * (phase === 'fly_heart' || phase === 'fly_photo' ? 8.5 : 4.5));
+
+        camera.position.x += (desiredCamPos.x + shakeX - camera.position.x) * camLerp;
+        camera.position.y += (desiredCamPos.y + shakeY - camera.position.y) * camLerp;
+        camera.position.z += (desiredCamPos.z - camera.position.z) * camLerp;
+        camLookCurrent.lerp(desiredLookAt, camLerp);
+        camera.lookAt(camLookCurrent);
+
+        // 4. Finale Explosion Star Halo
+        const targetFinale = phase === 'finale' ? 1 : 0;
+        finaleParticleProgress += (targetFinale - finaleParticleProgress) * Math.min(1, dt * 1.9);
+        finalePoints.visible = finaleParticleProgress > 0.01;
+        if (finalePoints.visible) {
+          finaleMat.opacity = Math.min(0.96, finaleParticleProgress * 1.25);
+          const easeF = 1 - Math.pow(1 - finaleParticleProgress, 3);
+          const fAttr = finaleGeo.getAttribute('position');
+          for (let i = 0; i < FINALE_COUNT; i++) {
+            const ox = finaleOrigins[i * 3];
+            const oy = finaleOrigins[i * 3 + 1];
+            const oz = finaleOrigins[i * 3 + 2];
+            const tx = finaleTargets[i * 3];
+            const ty = finaleTargets[i * 3 + 1];
+            const tz = finaleTargets[i * 3 + 2];
+            const shimmer = Math.sin(elapsedTotal * 2.3 + finalePhases[i]) * 0.03;
+            fAttr.setXYZ(
+              i,
+              ox + (tx - ox) * easeF + shimmer,
+              oy + (ty - oy) * easeF + shimmer,
+              oz + (tz - oz) * easeF
+            );
+          }
+          fAttr.needsUpdate = true;
+        }
+
+        // 5. 3D Engraved Nameplate & Wish in Finale
+        const targetNPScale = phase === 'finale' ? (isMobileLayout ? 0.72 : 0.94) : 0.001;
+        const nextNP = nameplateMesh.scale.x + (targetNPScale - nameplateMesh.scale.x) * Math.min(1, dt * 5.0);
+        nameplateMesh.scale.setScalar(nextNP);
+        nameplateMesh.visible = nextNP > 0.02;
+
+        // 6. 3D Photo Frames Choreography (Corridor -> Finale Arc)
+        const showCorridor = phase === 'fly_photo' || phase === 'hold_photo';
+        const showFinaleArc = phase === 'finale';
+        photoGroup.children.forEach((frame, idx) => {
+          const ud = frame.userData;
+          const lerpK = Math.min(1, dt * 4.8);
+          let tx = ud.corrX;
+          let ty = ud.corrY + Math.sin(elapsedTotal * 1.2 + ud.phase) * 0.04;
+          let tz = ud.corrZ;
+          let tryRot = 0;
+          let tScale = 0.001;
+          let tOpacity = 0.0;
+
+          if (showFinaleArc) {
+            tx = ud.arcX;
+            ty = ud.arcY + Math.sin(elapsedTotal * 1.2 + ud.phase) * 0.05;
+            tz = ud.arcZ;
+            tryRot = ud.arcRy;
+            tScale = 0.95;
+            tOpacity = 1.0;
+          } else if (showCorridor && idx === appState.activePhotoIdx) {
+            tScale = 1.08;
+            tOpacity = 1.0;
+          }
+
+          const fadeLerp = tOpacity === 0 ? Math.min(1, dt * 12.0) : lerpK;
+          frame.position.x += (tx - frame.position.x) * lerpK;
+          frame.position.y += (ty - frame.position.y) * lerpK;
+          frame.position.z += (tz - frame.position.z) * lerpK;
+          frame.rotation.y += (tryRot - frame.rotation.y) * lerpK;
+
+          const s = frame.scale.x + (tScale - frame.scale.x) * fadeLerp;
+          frame.scale.setScalar(s);
+
+          if (ud.photoMat) ud.photoMat.opacity += (tOpacity - ud.photoMat.opacity) * fadeLerp;
+          if (ud.borderMat) ud.borderMat.opacity += (tOpacity * 0.92 - ud.borderMat.opacity) * fadeLerp;
+
+          frame.visible = s > 0.02 && (!ud.photoMat || ud.photoMat.opacity > 0.02);
+        });
+
+        renderer.render(scene, camera);
+      }
+
+      // ==================== 14. INIT & VIEWER HYDRATION (?id=) ====================
+      async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const urlPreset = params.get('preset');
+        if (urlPreset && RECIPIENT_PRESETS[urlPreset]) {
+          applyRecipientPreset(urlPreset, false);
+        }
+
+        updateCameraResponsive();
+        applyThemePalette(appState.theme);
+        syncUIAndBanners();
+        syncStoryHUD();
+        rebuild3DPhotoFrames();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => rebuildNameplateTexture());
+        }
+        animate();
+
+        const orderId = params.get('id');
+        if (orderId) {
+          appState.isViewerMode = true;
+          document.querySelectorAll('.creator-only').forEach((el) => el.classList.add('hidden'));
+          try {
+            const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
+            const data = await res.json();
+            if (data && data.order) {
+              const o = data.order;
+              appState.sender = o.sender_name || o.sender || appState.sender;
+              appState.receiver = o.receiver_name || o.receiver || appState.receiver;
+              appState.wish = o.message || appState.wish;
+              const p = o.payload || o.customData || {};
+              if (p.recipientPreset && RECIPIENT_PRESETS[p.recipientPreset]) {
+                appState.recipientPreset = p.recipientPreset;
+              }
+              if (p.honorific) appState.honorific = p.honorific;
+              if (p.theme && THEMES[p.theme]) applyThemePalette(p.theme);
+              if (Array.isArray(p.photos)) appState.photos = p.photos;
+              syncUIAndBanners();
+              rebuild3DPhotoFrames();
+            }
+          } catch (_) {}
+        } else {
+          PaymentQrKit.restorePendingIfAny(getPaymentKitConfig());
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

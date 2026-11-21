@@ -184,6 +184,26 @@ const BIRTHDAY_TEMPLATES = [
 // ============================================================================
 const VALENTINE_TEMPLATES = [
   {
+    id: 'valentine_cupid_arrow_3d',
+    category: 'valentine',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Mũi Tên Cupid 3D • Nhịp Đập Trái Tim',
+    subtitle: 'Kéo cung ánh sáng bắn mũi tên xé gió "Vút" ghim vào trái tim pha lê đập dồn dập, nứt ánh sáng vàng kim nở rộ tên đôi lứa & vòng cung ảnh 3D',
+    badge: '💘 Hot Valentine 14/2',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/valentine/cupid-arrow-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #2b0614 0%, #be123c 52%, #f43f5e 100%)',
+    previewEmoji: '💘',
+    features: ['Kéo cung & Bắn mũi tên 3D', 'Trái tim đập & nứt ánh sáng', 'Âm thanh Vút + Nhạc 14/2 + QR'],
+    preset: {
+      occasion: 'Happy Valentine’s Day 14/2',
+      theme: 'ruby_valentine',
+      melody: 'romance'
+    }
+  },
+  {
     id: 'valentine_heart_3d',
     category: 'valentine',
     salesCount: '1.1k+ đã tạo',

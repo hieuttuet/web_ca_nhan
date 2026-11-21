@@ -12,7 +12,7 @@ Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng,
 ---
 
 ## 1. Kiến Trúc & Ngăn Xếp Công Nghệ
-- **100% Vanilla HTML/CSS/JS**: Không sử dụng bundler (Vite/Webpack) hay framework SPA. Mỗi template là một file `index.html` độc lập, chạy trực tiếp trên trình duyệt.
+- **100% Vanilla HTML/CSS/JS**: Không sử dụng bundler (Vite/Webpack) hay framework SPA. Mỗi template nằm trong thư mục riêng, **tách CSS ra file `./style.css`** (`<link rel="stylesheet" href="./style.css" />`) để `index.html` gọn nhẹ, dễ bảo trì và chạy trực tiếp được cả trên `file://` lẫn Next.js server (qua `scripts/sync-public.js`).
 - **3D Engine**: Sử dụng **Three.js (`r128`)** qua CDN (`https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js`).
 - **2D / Hiệu ứng ánh sáng cao tốc**: Sử dụng **Dual-Canvas Stage** (`trails-canvas` + `main-canvas`) cho các hiệu ứng hạt/tia sáng có đuôi chuyển động mượt.
 - **AI / Cảm biến (tùy chọn)**: `@mediapipe/hands` cho điều khiển cử chỉ tay hoặc `DeviceMotionEvent` / `DeviceOrientationEvent` cho lắc và nghiêng điện thoại.
@@ -91,7 +91,7 @@ Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng,
 
 ## 7. Chuẩn Giao Diện HUD & Thanh Toán / QR
 - **HUD Tối Giản & Chống Trùng Lặp (Glassmorphism)**:
-  - Trên cùng: `← Trang chủ` (trái), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh` (phải). **Không** thêm pill/banner lặp lại `"Dành tặng [Tên]"` ở phía trên nếu Tên người nhận & Danh hiệu đã khắc nổi trong không gian 3D.
+  - Trên cùng: `← Trang chủ` (trái — **bắt buộc gắn class `creator-only`** để tự ẩn khi người nhận mở link quà `?id=`), các nút phụ như `🔄 Xem Lại`, `🔊 Âm Thanh` (phải). **Không** thêm pill/banner lặp lại `"Dành tặng [Tên]"` ở phía trên nếu Tên người nhận & Danh hiệu đã khắc nổi trong không gian 3D.
   - Dưới cùng: `.bottom-dock` giữ các nút chính trên **1 hàng ngang** (`flex-wrap: nowrap`) ngay cả trên điện thoại nhỏ (`<= 520px`), gồm: `💌 Tâm Thư` (mở modal đọc trọn vẹn lời chúc), `🎨 Tùy Chỉnh` và **duy nhất 1 nút `✨ Tạo Link & QR`** (không đặt thêm thanh `#cro-hook-bar` hay nút `Tạo Link & QR` thứ hai).
   - **Không** đặt hộp văn bản Tâm thư (`#wish-banner`) dài nhiều dòng đè lên vật thể/bảng tên 3D; toàn bộ nội dung tâm thư hiển thị sạch sẽ trong Modal khi bấm nút `💌 Tâm Thư`.
   - Khi mở kết quả 3D (ví dụ: thẻ quẻ, vật phẩm quay), không dùng nền tối che mất 3D; tách 2 bên trên desktop (3D trái – thẻ thông tin phải) hoặc trên/dưới trên mobile.

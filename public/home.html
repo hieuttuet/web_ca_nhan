@@ -1479,7 +1479,53 @@
   </div>
 
   <script>
-    let selectedCategory = 'hot';
+    const CATEGORY_STORAGE_KEY = 'web_ca_nhan_hoa_selected_cat';
+
+    function isValidCategory(catId) {
+      if (!catId) return false;
+      const cats = window.EVENT_CATEGORIES || [];
+      return cats.some((c) => c.id === catId);
+    }
+
+    function getInitialCategory() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const urlCat = params.get('cat');
+        if (isValidCategory(urlCat)) return urlCat;
+        const savedCat = sessionStorage.getItem(CATEGORY_STORAGE_KEY);
+        if (isValidCategory(savedCat)) return savedCat;
+      } catch (e) {}
+      return 'hot';
+    }
+
+    function persistSelectedCategory(catId) {
+      try {
+        sessionStorage.setItem(CATEGORY_STORAGE_KEY, catId);
+      } catch (e) {}
+      try {
+        const url = new URL(window.location.href);
+        if (catId && catId !== 'hot') {
+          url.searchParams.set('cat', catId);
+        } else {
+          url.searchParams.delete('cat');
+        }
+        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+      } catch (e) {}
+    }
+
+    function scrollToActiveCategoryTab(smooth = true) {
+      const wrap = document.getElementById('category-tabs');
+      if (!wrap) return;
+      const activeBtn = wrap.querySelector('.cat-tab.active');
+      if (!activeBtn) return;
+      const targetLeft = activeBtn.offsetLeft - (wrap.clientWidth - activeBtn.offsetWidth) / 2;
+      wrap.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+
+    let selectedCategory = getInitialCategory();
 
     // Tự động chuyển hướng nếu người nhận mở link quà tặng cũ ở trang chủ
     async function checkAndRedirectGiftOrder() {
@@ -1513,11 +1559,14 @@
       (window.EVENT_CATEGORIES || []).forEach((cat) => {
         const btn = document.createElement('button');
         btn.className = `cat-tab ${cat.id === selectedCategory ? 'active' : ''}`.trim();
+        btn.dataset.catId = cat.id;
         btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
         btn.addEventListener('click', () => {
           selectedCategory = cat.id;
+          persistSelectedCategory(cat.id);
           renderCategoryTabs();
           renderTemplateCards();
+          requestAnimationFrame(() => scrollToActiveCategoryTab(true));
         });
         wrap.appendChild(btn);
       });
@@ -2080,11 +2129,24 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      selectedCategory = getInitialCategory();
+      if (selectedCategory !== 'hot') {
+        persistSelectedCategory(selectedCategory);
+      }
       checkAndRedirectGiftOrder();
       renderCategoryTabs();
       renderTemplateCards();
       startLiveBuyerTicker();
       initCategoryTabsScroll();
+      requestAnimationFrame(() => scrollToActiveCategoryTab(false));
+    });
+
+    window.addEventListener('pageshow', (event) => {
+      if (!event.persisted) return;
+      selectedCategory = getInitialCategory();
+      renderCategoryTabs();
+      renderTemplateCards();
+      requestAnimationFrame(() => scrollToActiveCategoryTab(false));
     });
   </script>
 </body>

@@ -1,0 +1,323 @@
+:root {
+  --neon-pink: #ff2a85;
+  --neon-gold: #fde047;
+  --neon-red: #ff1e56;
+  --glass-bg: rgba(16, 8, 32, 0.72);
+  --glass-border: rgba(255, 110, 180, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 100%, #1c0836 0%, #090316 60%, #020108 100%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==================== 1. BẦU TRỜI SAO LẤP LÁNH (CSS ANIMATION) ==================== */
+.night-sky-stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #ffffff, transparent),
+    radial-gradient(1.2px 1.2px at 28% 62%, #ffd1e8, transparent),
+    radial-gradient(2px 2px at 46% 24%, #ffffff, transparent),
+    radial-gradient(1.5px 1.5px at 68% 48%, #fde047, transparent),
+    radial-gradient(1.2px 1.2px at 84% 16%, #ffffff, transparent),
+    radial-gradient(2px 2px at 91% 72%, #ffb3d9, transparent),
+    radial-gradient(1.5px 1.5px at 19% 84%, #ffffff, transparent),
+    radial-gradient(1.2px 1.2px at 58% 82%, #ffd1e8, transparent),
+    radial-gradient(1.8px 1.8px at 36% 38%, #ffffff, transparent),
+    radial-gradient(1.4px 1.4px at 76% 88%, #fde047, transparent);
+  background-size: 320px 320px;
+  animation: twinkleSky 4s ease-in-out infinite alternate;
+}
+
+.night-sky-stars.layer-2 {
+  background-size: 480px 480px;
+  background-position: 140px 90px;
+  animation-duration: 6.5s;
+  opacity: 0.65;
+}
+
+@keyframes twinkleSky {
+  0% { opacity: 0.35; transform: scale(0.99); }
+  50% { opacity: 0.95; }
+  100% { opacity: 0.45; transform: scale(1.01); }
+}
+
+/* ==================== 2. CANVAS HOẠT HỌA 2D ==================== */
+#firework-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: block;
+}
+
+/* ==================== 3. THANH CÔNG CỤ NHỎ TRÊN CÙNG ==================== */
+.top-bar {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.top-bar > * {
+  pointer-events: auto;
+}
+
+.top-pill-btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(16, 8, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.top-pill-btn:hover {
+  border-color: var(--neon-pink);
+  background: rgba(255, 42, 133, 0.22);
+}
+
+/* ==================== 4. MÀN HÌNH CHỜ GLASSMORPHISM FORM ==================== */
+.screen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+              visibility 0.85s;
+}
+
+.screen-overlay.fade-out {
+  opacity: 0;
+  transform: scale(0.9) translateY(24px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.glass-form-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 28px 32px;
+  border-radius: 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.8),
+    0 0 38px rgba(255, 42, 133, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  text-align: center;
+}
+
+.sparkle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255, 42, 133, 0.16);
+  border: 1px solid rgba(255, 110, 180, 0.45);
+  color: #ff9ec6;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 14px;
+}
+
+.form-heading {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2.25rem, 6.5vw, 2.85rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #fde047 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.form-subtext {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  margin-bottom: 22px;
+}
+
+.input-wrap {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fbcfe8;
+  margin-bottom: 7px;
+  padding-left: 4px;
+}
+
+.glass-input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: all 0.25s ease;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.glass-input:focus {
+  border-color: var(--neon-pink);
+  background: rgba(255, 42, 133, 0.1);
+  box-shadow: 0 0 22px rgba(255, 42, 133, 0.4);
+}
+
+.btn-firework-launch {
+  position: relative;
+  width: 100%;
+  padding: 16px 26px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
+  background-size: 200% 200%;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow:
+    0 10px 28px rgba(255, 42, 133, 0.55),
+    0 0 0 0 rgba(255, 42, 133, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.45);
+  animation: pulseFireworkBtn 2s infinite ease-in-out, shimmerBg 4s ease infinite;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.btn-firework-launch:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 14px 36px rgba(255, 42, 133, 0.8),
+    0 0 24px rgba(253, 224, 71, 0.55);
+}
+
+.btn-firework-launch:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@keyframes pulseFireworkBtn {
+  0%, 100% {
+    box-shadow: 0 10px 28px rgba(255, 42, 133, 0.55), 0 0 0 0 rgba(255, 42, 133, 0.55);
+  }
+  50% {
+    box-shadow: 0 12px 34px rgba(255, 42, 133, 0.8), 0 0 0 12px rgba(255, 42, 133, 0);
+  }
+}
+
+@keyframes shimmerBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==================== 5. THANH ĐIỀU KHIỂN NỔI SAU KHI TỤ CHỮ ==================== */
+.floating-action-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 92%;
+  max-width: 560px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.floating-action-dock.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.dock-btn {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(16, 8, 32, 0.8);
+  border: 1px solid rgba(255, 110, 180, 0.35);
+  color: #fce7f3;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dock-btn:hover {
+  background: rgba(255, 42, 133, 0.3);
+  border-color: var(--neon-pink);
+  transform: translateY(-2px);
+}
+
+.dock-btn.cta-pay {
+  background: linear-gradient(135deg, #ff2a85 0%, #9333ea 100%);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 42, 133, 0.45);
+}

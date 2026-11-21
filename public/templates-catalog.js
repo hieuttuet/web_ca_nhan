@@ -80,7 +80,7 @@ const ANNIVERSARY_TEMPLATES = [
     badge: '🔥 Best Seller TikTok',
     price: 39000,
     oldPrice: 69000,
-    engineUrl: 'templates/confess/galaxy-3d/index.html',
+    engineUrl: 'templates/anniversary/galaxy-3d/index.html',
     previewGradient: 'linear-gradient(135deg, #2e0854 0%, #9d174d 55%, #ff2a85 100%)',
     previewEmoji: '🪐',
     features: ['Ghép tới 8 ảnh 3D', 'Xoay 360° tương tác', 'Tâm thư + Nhạc nền'],

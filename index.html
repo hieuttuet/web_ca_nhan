@@ -1546,7 +1546,7 @@
           } else if (tplType === 'birthday') {
             window.location.replace(`templates/birthday/birthday-cake/index.html?id=${encodeURIComponent(orderId)}`);
           } else {
-            window.location.replace(`templates/confess/galaxy-3d/index.html?id=${encodeURIComponent(orderId)}`);
+            window.location.replace(`templates/anniversary/galaxy-3d/index.html?id=${encodeURIComponent(orderId)}`);
           }
         }
       } catch (e) {}
@@ -1963,7 +1963,7 @@
           if (data.status === 'PAID') {
             const tplType = ord.template_type || 'galaxy';
             const matched = (window.TEMPLATES_CATALOG || []).find((t) => t.id === tplType || t.engineUrl.includes(tplType));
-            const engineUrl = matched ? matched.engineUrl : 'templates/confess/galaxy-3d/index.html';
+            const engineUrl = matched ? matched.engineUrl : 'templates/anniversary/galaxy-3d/index.html';
             const giftUrl = `${window.location.origin}/${engineUrl}?id=${encodeURIComponent(code)}&tpl=${encodeURIComponent(tplType)}`;
 
             resultBox.className = 'lookup-result-card success';

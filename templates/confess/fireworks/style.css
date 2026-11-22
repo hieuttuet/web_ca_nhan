@@ -68,12 +68,12 @@ html, body {
   display: block;
 }
 
-/* ==================== 3. THANH CÔNG CỤ NHỎ TRÊN CÙNG ==================== */
-.top-bar {
+/* ==================== 3. THANH CÔNG CỤ TRÊN CÙNG (.top-hud) & TIẾN TRÌNH ==================== */
+.top-hud {
   position: fixed;
-  top: 16px;
-  left: 16px;
-  right: 16px;
+  top: max(14px, env(safe-area-inset-top));
+  left: 14px;
+  right: 14px;
   z-index: 20;
   display: flex;
   justify-content: space-between;
@@ -81,58 +81,59 @@ html, body {
   pointer-events: none;
 }
 
-.top-bar > * {
+.top-hud > * {
   pointer-events: auto;
 }
 
-.top-pill-btn {
-  height: 38px;
+.top-hud-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-btn {
+  height: 36px;
   padding: 0 14px;
   border-radius: 999px;
   background: rgba(16, 8, 32, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #f8fafc;
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   text-decoration: none;
   cursor: pointer;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
-.top-pill-btn:hover {
+.hud-btn:hover {
   border-color: var(--neon-pink);
   background: rgba(255, 42, 133, 0.22);
 }
 
-.top-pill-btn.cta-creator-top {
-  background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
-  border-color: rgba(255, 208, 67, 0.45);
-  color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4px 14px rgba(255, 42, 133, 0.4);
+.hud-btn.hidden {
+  display: none !important;
 }
 
-.top-pill-btn.cta-creator-top:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 42, 133, 0.6);
-}
-
-.top-right-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* Huy hiệu tiến trình 5 hồi: Thả nổi độc lập ở giữa, không chèn ép các nút trên cùng */
 .stage-badge {
-  height: 38px;
+  position: fixed;
+  top: max(56px, calc(env(safe-area-inset-top) + 48px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  height: 34px;
   padding: 0 16px;
   border-radius: 999px;
-  background: rgba(16, 8, 32, 0.78);
+  background: rgba(16, 8, 32, 0.82);
   border: 1px solid rgba(255, 208, 67, 0.45);
   color: #ffd043;
   font-family: inherit;
@@ -141,7 +142,10 @@ html, body {
   letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -149,7 +153,7 @@ html, body {
 
 .stage-badge.hidden {
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateX(-50%) translateY(-8px);
   visibility: hidden;
 }
 
@@ -185,15 +189,25 @@ html, body {
 }
 
 @media (max-width: 520px) {
-  .stage-badge {
-    height: 32px;
-    padding: 0 10px;
-    font-size: 0.72rem;
+  .top-hud {
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
   }
-  .top-pill-btn {
+  .top-hud-group {
+    gap: 6px;
+  }
+  .hud-btn {
     height: 32px;
-    padding: 0 10px;
-    font-size: 0.75rem;
+    padding: 0 9px;
+    font-size: 0.74rem;
+    gap: 4px;
+  }
+  .stage-badge {
+    top: max(46px, calc(env(safe-area-inset-top) + 40px));
+    height: 30px;
+    padding: 0 12px;
+    font-size: 0.72rem;
   }
 }
 
@@ -427,34 +441,38 @@ html, body {
   100% { background-position: 0% 50%; }
 }
 
-/* ==================== 5. THANH ĐIỀU KHIỂN NỔI SAU KHI TỤ CHỮ ==================== */
-.floating-action-dock {
+/* ==================== 5. THANH ĐIỀU KHIỂN DƯỚI CÙNG (.bottom-dock) ==================== */
+.bottom-dock {
   position: fixed;
-  bottom: 24px;
+  bottom: max(18px, env(safe-area-inset-bottom));
   left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  z-index: 20;
+  transform: translateX(-50%) translateY(24px);
+  z-index: 30;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 10px;
-  width: 92%;
-  max-width: 560px;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 20px);
+  padding: 0 4px;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.floating-action-dock.visible {
+.bottom-dock.visible {
   opacity: 1;
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
 .dock-btn {
-  padding: 10px 18px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 999px;
-  background: rgba(16, 8, 32, 0.8);
+  background: rgba(16, 8, 32, 0.82);
   border: 1px solid rgba(255, 110, 180, 0.35);
   color: #fce7f3;
   font-family: inherit;
@@ -462,21 +480,71 @@ html, body {
   font-weight: 700;
   cursor: pointer;
   backdrop-filter: blur(12px);
-  transition: all 0.2s ease;
+  -webkit-backdrop-filter: blur(12px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   white-space: nowrap;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dock-btn:hover {
-  background: rgba(255, 42, 133, 0.3);
+  background: rgba(255, 42, 133, 0.25);
   border-color: var(--neon-pink);
   transform: translateY(-2px);
 }
 
-.dock-btn.cta-pay {
+.dock-btn.primary-cta {
   background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
-  border-color: rgba(255, 208, 67, 0.45);
+  border: 1px solid rgba(255, 208, 67, 0.5);
   color: #ffffff;
-  box-shadow: 0 6px 22px rgba(255, 42, 133, 0.55);
+  box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5);
+}
+
+.dock-btn.primary-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 42, 133, 0.7);
+}
+
+.dock-price-badge {
+  background: rgba(0, 0, 0, 0.32);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #fef08a;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 520px) {
+  .bottom-dock {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+  .dock-btn {
+    height: 35px;
+    padding: 0 10px;
+    font-size: 0.74rem;
+    gap: 4px;
+  }
+  .dock-price-badge {
+    padding: 1px 5px;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 370px) {
+  .bottom-dock {
+    gap: 4px;
+  }
+  .dock-btn {
+    height: 33px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+    gap: 3px;
+  }
 }
 
 /* ==================== 6. THẺ NGƯỜI NHẬN & NÚT TRÊN CARD CHÀO ==================== */

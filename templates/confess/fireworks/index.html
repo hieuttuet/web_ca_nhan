@@ -23,16 +23,19 @@
     <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
   </audio>
 
-  <!-- 3. Thanh công cụ phía trên -->
-  <div class="top-bar">
-    <a href="../../../index.html" class="top-pill-btn creator-only">← Trang chủ</a>
-    <div id="stage-badge" class="stage-badge hidden">✨ Hồi 1/5: Bầu Trời Sao</div>
-    <div class="top-right-group">
-      <button type="button" id="btn-top-creator" class="top-pill-btn creator-only cta-creator-top" title="Cá nhân hóa và tạo mã QR">✨ Tạo Thiệp (19k)</button>
-      <button type="button" id="btn-skip-finale" class="top-pill-btn hidden" title="Xem ngay lời chốt hạ">⏭️ Câu Chốt</button>
-      <button type="button" id="btn-mute" class="top-pill-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
+  <!-- 3. Thanh công cụ phía trên chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Trang Chủ">← Trang chủ</a>
     </div>
-  </div>
+    <div class="top-hud-group">
+      <button type="button" id="btn-skip-finale" class="hud-btn hidden" title="Xem ngay lời chốt hạ">⏭️ Câu Chốt</button>
+      <button type="button" id="btn-mute" class="hud-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
+    </div>
+  </header>
+
+  <!-- Huy hiệu tiến trình 5 hồi pháo hoa (Thả nổi độc lập ở giữa) -->
+  <div id="stage-badge" class="stage-badge hidden">✨ Hồi 1/5: Bầu Trời Sao</div>
 
   <!-- 4. Canvas chính vẽ Pháo Hoa & Hạt Tụ Chữ -->
   <canvas id="firework-canvas"></canvas>
@@ -40,16 +43,17 @@
   <!-- 5. Gợi ý chạm màn hình ở các hồi 1 - 4 -->
   <div id="stage-hint" class="stage-hint hidden">Chạm màn hình để tiếp tục ⏩</div>
 
-  <!-- 6. Thanh nút nổi sau khi hoàn thành 5 hồi (Bố cục chuẩn hóa) -->
-  <nav id="floating-dock" class="floating-action-dock" aria-label="Thanh điều khiển pháo hoa">
+  <!-- 6. Thanh nút nổi sau khi hoàn thành 5 hồi (Bố cục chuẩn hóa 1 hàng ngang per 3d-visual.md) -->
+  <nav id="floating-dock" class="bottom-dock" aria-label="Thanh điều khiển pháo hoa">
     <button type="button" id="btn-replay-show" class="dock-btn" title="Bắn lại từ hồi đầu">
-      🔄 Bắn Lại 5 Hồi
+      <span>🔄</span><span>Bắn Lại</span>
     </button>
     <button type="button" id="btn-change-color" class="dock-btn" title="Đổi màu pháo hoa">
-      🎨 Đổi Màu
+      <span>🎨</span><span>Đổi Màu</span>
     </button>
-    <button type="button" id="btn-open-creator-modal" class="dock-btn cta-pay creator-only" title="Cá nhân hóa và tạo mã QR">
-      ✨ Tạo Thiệp Riêng (19k)
+    <button type="button" id="btn-open-creator-modal" class="dock-btn primary-cta creator-only" title="Cá nhân hóa và tạo mã QR">
+      <span>✨ Tạo Thiệp Riêng</span>
+      <span class="dock-price-badge">19k</span>
     </button>
   </nav>
 
@@ -1377,7 +1381,7 @@
     document.getElementById('btn-mute').addEventListener('click', (e) => {
       soundController.initContext();
       const isMuted = soundController.toggleMute();
-      e.currentTarget.textContent = isMuted ? '🔇 Đã tắt tiếng' : '🔊 Âm thanh';
+      e.currentTarget.textContent = isMuted ? '🔇 Tắt tiếng' : '🔊 Âm thanh';
     });
 
     // Modal Tạo Thiệp Riêng (Nhập Tên & 5 Câu)
@@ -1416,7 +1420,6 @@
       if (s5) STAGE_CONFIGS[4].customPrefix = s5;
     }
 
-    document.getElementById('btn-top-creator')?.addEventListener('click', openCreatorModal);
     document.getElementById('btn-open-creator-modal')?.addEventListener('click', openCreatorModal);
     document.getElementById('btn-close-modal-creator')?.addEventListener('click', closeCreatorModal);
 

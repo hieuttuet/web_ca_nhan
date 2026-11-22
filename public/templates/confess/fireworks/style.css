@@ -109,6 +109,19 @@ html, body {
   background: rgba(255, 42, 133, 0.22);
 }
 
+.top-pill-btn.cta-creator-top {
+  background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
+  border-color: rgba(255, 208, 67, 0.45);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(255, 42, 133, 0.4);
+}
+
+.top-pill-btn.cta-creator-top:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 42, 133, 0.6);
+}
+
 .top-right-group {
   display: flex;
   align-items: center;
@@ -460,8 +473,279 @@ html, body {
 }
 
 .dock-btn.cta-pay {
-  background: linear-gradient(135deg, #ff2a85 0%, #9333ea 100%);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
+  border-color: rgba(255, 208, 67, 0.45);
   color: #ffffff;
-  box-shadow: 0 6px 20px rgba(255, 42, 133, 0.45);
+  box-shadow: 0 6px 22px rgba(255, 42, 133, 0.55);
+}
+
+/* ==================== 6. THẺ NGƯỜI NHẬN & NÚT TRÊN CARD CHÀO ==================== */
+.recipient-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: rgba(255, 42, 133, 0.14);
+  border: 1px solid rgba(255, 110, 180, 0.4);
+  color: #fce7f3;
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.recipient-tag strong {
+  color: #ffd043;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.welcome-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.btn-welcome-secondary {
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 208, 67, 0.45);
+  background: rgba(255, 208, 67, 0.08);
+  color: #ffd043;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btn-welcome-secondary:hover {
+  background: rgba(255, 208, 67, 0.18);
+  border-color: #ffd043;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 208, 67, 0.3);
+}
+
+/* ==================== 7. MODAL TẠO MÃ QR THIỆP RIÊNG (5 HỒI CÁ NHÂN HÓA) ==================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(3, 1, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(16, 8, 32, 0.94);
+  border: 1px solid rgba(255, 110, 180, 0.35);
+  border-radius: 26px;
+  padding: 30px 24px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    0 0 38px rgba(255, 42, 133, 0.25);
+  color: #ffffff;
+  text-align: left;
+}
+
+.modal-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-card::-webkit-scrollbar-thumb {
+  background: rgba(255, 110, 180, 0.3);
+  border-radius: 999px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 42, 133, 0.3);
+  border-color: #ff2a85;
+}
+
+.modal-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #ff9ec6 50%, #fde047 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  margin: 6px 0 6px;
+}
+
+.modal-sub {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fbcfe8;
+  margin-bottom: 5px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s ease;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.modal-input:focus {
+  border-color: #ff2a85;
+  background: rgba(255, 42, 133, 0.1);
+  box-shadow: 0 0 14px rgba(255, 42, 133, 0.3);
+}
+
+.stages-config-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.stages-box-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #ffd043;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-helper {
+  display: block;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.modal-theme-select {
+  margin-bottom: 20px;
+}
+
+.modal-btn-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+  .modal-btn-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-btn-secondary {
+  padding: 13px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.modal-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-btn-primary {
+  padding: 13px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff1e56 0%, #ff2a85 50%, #f59e0b 100%);
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 42, 133, 0.5);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.modal-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(255, 42, 133, 0.7);
 }

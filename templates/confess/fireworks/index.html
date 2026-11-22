@@ -28,6 +28,7 @@
     <a href="../../../index.html" class="top-pill-btn creator-only">← Trang chủ</a>
     <div id="stage-badge" class="stage-badge hidden">✨ Hồi 1/5: Bầu Trời Sao</div>
     <div class="top-right-group">
+      <button type="button" id="btn-top-creator" class="top-pill-btn creator-only cta-creator-top" title="Cá nhân hóa và tạo mã QR">✨ Tạo Thiệp (19k)</button>
       <button type="button" id="btn-skip-finale" class="top-pill-btn hidden" title="Xem ngay lời chốt hạ">⏭️ Câu Chốt</button>
       <button type="button" id="btn-mute" class="top-pill-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
     </div>
@@ -39,51 +40,92 @@
   <!-- 5. Gợi ý chạm màn hình ở các hồi 1 - 4 -->
   <div id="stage-hint" class="stage-hint hidden">Chạm màn hình để tiếp tục ⏩</div>
 
-  <!-- 6. Màn hình chờ (Glassmorphism Form UI) -->
-  <div id="input-screen" class="screen-overlay">
-    <form id="love-form" class="glass-form-card" autocomplete="off">
-      <div class="sparkle-badge">✨ 5 Hồi Pháo Hoa Tỏ Tình ✨</div>
-      <h1 id="form-heading" class="form-heading">Gửi Lời Yêu Thương</h1>
-      <p id="form-subtext" class="form-subtext">
-        Bắn 5 lượt pháo hoa liên tiếp kể câu chuyện tình yêu lãng mạn, kết thúc bằng cú nổ đại bác rực rỡ và lời tỏ tình ngọt ngào nhất.
+  <!-- 6. Thanh nút nổi sau khi hoàn thành 5 hồi (Bố cục chuẩn hóa) -->
+  <nav id="floating-dock" class="floating-action-dock" aria-label="Thanh điều khiển pháo hoa">
+    <button type="button" id="btn-replay-show" class="dock-btn" title="Bắn lại từ hồi đầu">
+      🔄 Bắn Lại 5 Hồi
+    </button>
+    <button type="button" id="btn-change-color" class="dock-btn" title="Đổi màu pháo hoa">
+      🎨 Đổi Màu
+    </button>
+    <button type="button" id="btn-open-creator-modal" class="dock-btn cta-pay creator-only" title="Cá nhân hóa và tạo mã QR">
+      ✨ Tạo Thiệp Riêng (19k)
+    </button>
+  </nav>
+
+  <!-- 7. Modal Tạo Mã QR Thiệp Riêng (5 Hồi Pháo Hoa Cá Nhân Hóa) -->
+  <div id="modal-create-gift" class="modal-backdrop creator-only">
+    <div class="modal-card">
+      <button type="button" id="btn-close-modal-creator" class="modal-close" aria-label="Đóng">✕</button>
+
+      <div class="sparkle-badge">✨ Cá Nhân Hóa 5 Hồi Pháo Hoa ✨</div>
+      <h2 class="modal-title">Tạo Mã QR Thiệp Riêng</h2>
+      <p class="modal-sub">
+        Nhập tên người thương & 5 câu nói riêng cho 5 hồi pháo hoa. Sau khi quét mã QR thanh toán (19.000đ), bạn sẽ nhận ngay Link quà tặng & Mã QR độc quyền gửi người ấy!
       </p>
 
-      <div id="input-container" class="input-wrap">
-        <label class="input-label" for="target-name-input">Tên người được tỏ tình</label>
-        <input
-          id="target-name-input"
-          type="text"
-          class="glass-input"
-          placeholder="Ví dụ: Trang"
-          maxlength="20"
-          required
-        />
-      </div>
-
-      <div class="theme-selector-wrap">
-        <label class="input-label">Màu sắc pháo hoa</label>
-        <div class="theme-chips-row">
-          <button type="button" class="theme-chip active" data-theme="0">✨ Vàng Kim & Ruby</button>
-          <button type="button" class="theme-chip" data-theme="1">🌸 Hồng Rose & San Hô</button>
-          <button type="button" class="theme-chip" data-theme="2">🌅 Hoàng Hôn Ánh Dương</button>
-          <button type="button" class="theme-chip" data-theme="3">💜 Tím Mộng Mơ</button>
+      <form id="creator-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="input-creator-receiver">Tên người nhận (Người thương) *</label>
+            <input type="text" id="input-creator-receiver" class="modal-input" placeholder="VD: Thúy Quỳnh" value="Thúy Quỳnh" maxlength="24" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-creator-sender">Tên người gửi (Bạn)</label>
+            <input type="text" id="input-creator-sender" class="modal-input" placeholder="VD: Anh" value="Anh" maxlength="24" />
+          </div>
         </div>
-      </div>
 
-      <button type="submit" id="btn-trigger-firework" class="btn-firework-launch">
-        Bắn Pháo Hoa 5 Hồi 🚀
-      </button>
-    </form>
-  </div>
+        <div class="stages-config-box">
+          <div class="stages-box-title">💌 5 Câu Nói Cho 5 Hồi Pháo Hoa</div>
 
-  <!-- 7. Thanh nút nổi sau khi hoàn thành 5 hồi -->
-  <div id="floating-dock" class="floating-action-dock">
-    <button type="button" id="btn-replay-show" class="dock-btn">🎆 Bắn Lại 5 Hồi</button>
-    <button type="button" id="btn-change-color" class="dock-btn">🎨 Đổi Màu</button>
-    <button type="button" id="btn-change-name" class="dock-btn creator-only">✏️ Nhập Tên Khác</button>
-    <button type="button" id="btn-create-gift-qr" class="dock-btn cta-pay creator-only">
-      ✨ Tạo Link & QR Gửi Người Ấy
-    </button>
+          <div class="form-group">
+            <label class="form-label" for="input-stage-1">✨ Hồi 1 (Bầu Trời Sao):</label>
+            <input type="text" id="input-stage-1" class="modal-input" maxlength="45" value="Giữa hàng tỷ vì sao ngoài kia..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-stage-2">✨ Hồi 2 (Nhân Duyên):</label>
+            <input type="text" id="input-stage-2" class="modal-input" maxlength="45" value="Gặp được em là phép màu đẹp nhất..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-stage-3">✨ Hồi 3 (Chân Tình):</label>
+            <input type="text" id="input-stage-3" class="modal-input" maxlength="50" value="Nụ cười của em thắp sáng thế giới của anh..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-stage-4">✨ Hồi 4 (Tiền Cao Trào):</label>
+            <input type="text" id="input-stage-4" class="modal-input" maxlength="45" value="Và đêm nay, dưới bầu trời sao này..." required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="input-stage-5">💖 Hồi 5 (Lời Chốt Hạ):</label>
+            <input type="text" id="input-stage-5" class="modal-input" maxlength="35" value="Làm người yêu anh nhé" required />
+            <span class="input-helper">Pháo hoa Hồi 5 sẽ ghép thành: "<strong>[Lời chốt hạ] [Tên người thương]? ❤️</strong>"</span>
+          </div>
+        </div>
+
+        <div class="modal-theme-select">
+          <label class="form-label">Chọn Tone Màu Pháo Hoa</label>
+          <div class="theme-chips-row">
+            <button type="button" class="theme-chip modal-theme-chip active" data-theme="0">✨ Vàng Kim & Ruby</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="1">🌸 Hồng Rose & San Hô</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="2">🌅 Hoàng Hôn Ánh Dương</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="3">💜 Tím Mộng Mơ</button>
+          </div>
+        </div>
+
+        <div class="modal-btn-actions">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            👁️ Xem Thử 5 Hồi
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Mã QR & Link Thiệp (19.000đ)
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- 8. Toast thông báo đổi màu tức thì -->
@@ -216,6 +258,7 @@
         stage: 5,
         badge: '✨ Hồi 5/5: Lời Chốt Hạ ❤️',
         isFinale: true,
+        customPrefix: 'Làm người yêu anh nhé',
         duration: Infinity,
         rockets: (w, h) => [
           { startX: w * 0.18, startY: h + 15, targetX: w * 0.28, targetY: h * 0.42, isMain: false },
@@ -741,9 +784,9 @@
       }
 
       // Quét câu chốt hạ ở hồi 5 (Grand Finale)
-      static computeBalancedLines(receiverName, maxAllowedWidth, octx, targetFontSize) {
+      static computeBalancedLines(receiverName, maxAllowedWidth, octx, targetFontSize, customPrefix) {
         const formattedName = this.formatProperName(receiverName);
-        const linePrefix = 'Làm người yêu anh nhé';
+        const linePrefix = customPrefix || 'Làm người yêu anh nhé';
         const nameWords = formattedName.split(' ').filter(Boolean);
 
         const option2Lines = [linePrefix, `${formattedName}? ❤️`];
@@ -764,17 +807,13 @@
         }
 
         if (nameWords.length === 2 && w2 > maxAllowedWidth) {
-          return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
-        }
-
-        if (w1 > maxAllowedWidth) {
-          return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
+          return [linePrefix, formattedName, '❤️'];
         }
 
         return option2Lines;
       }
 
-      static sampleFinaleCoordinates(receiverName, viewportWidth, viewportHeight) {
+      static sampleFinaleCoordinates(receiverName, viewportWidth, viewportHeight, customPrefix) {
         const offCanvas = document.createElement('canvas');
         offCanvas.width = viewportWidth;
         offCanvas.height = viewportHeight;
@@ -796,7 +835,7 @@
           return w;
         };
 
-        let lines = this.computeBalancedLines(receiverName, maxAllowedWidth, octx, fontSize);
+        let lines = this.computeBalancedLines(receiverName, maxAllowedWidth, octx, fontSize, customPrefix);
 
         while (fontSize > 22) {
           octx.font = `600 ${fontSize}px "Dancing Script", cursive, sans-serif`;
@@ -892,7 +931,7 @@
     let burstSparks = [];
     let ambientSparks = [];
     let explosionTimestamp = 0;
-    let currentReceiverName = 'Trang';
+    let currentReceiverName = 'Thúy Quỳnh';
     let dockShown = false;
     let toastTimer = null;
 
@@ -970,7 +1009,7 @@
       if (currentPhase === 'MORPHING' && particles.length > 0) {
         const cfg = STAGE_CONFIGS[currentStage - 1];
         const newTargets = cfg.isFinale
-          ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height)
+          ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height, cfg.customPrefix)
           : TextPixelScanner.sampleStageCoordinates(cfg.text, width, height, currentStage);
 
         if (newTargets.length > 0) {
@@ -1035,7 +1074,7 @@
       }
 
       const targetPoints = cfg.isFinale
-        ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height)
+        ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height, cfg.customPrefix)
         : TextPixelScanner.sampleStageCoordinates(cfg.text, width, height, currentStage);
 
       const numExplosions = currentExplosionPoints.length || 1;
@@ -1102,10 +1141,9 @@
 
     // Kích hoạt chuỗi 5 Hồi Pháo Hoa Tỏ Tình
     async function triggerConfessionFirework(receiverName) {
-      currentReceiverName = TextPixelScanner.formatProperName(receiverName || 'Trang');
-      nameInput.value = currentReceiverName;
+      currentReceiverName = TextPixelScanner.formatProperName(receiverName || 'Thúy Quỳnh');
       dockShown = false;
-      document.getElementById('floating-dock').classList.remove('visible');
+      document.getElementById('floating-dock')?.classList.remove('visible');
 
       if (document.fonts) {
         try {
@@ -1118,8 +1156,6 @@
           console.warn('Font load error:', e);
         }
       }
-
-      document.getElementById('input-screen').classList.add('fade-out');
 
       // Khởi động từ Hồi 1
       startStage(1);
@@ -1289,25 +1325,32 @@
      * 9. SỰ KIỆN GIAO DIỆN & TÍCH HỢP VIETQR / CHẾ ĐỘ NGƯỜI NHẬN QUÀ
      * ============================================================================
      */
-    const loveForm = document.getElementById('love-form');
-    const nameInput = document.getElementById('target-name-input');
-
-    // Chạm màn hình để chuyển nhanh hồi
+    // Chạm màn hình để khởi động âm thanh (nếu bị trình duyệt chặn) và chuyển nhanh hồi
     canvas.addEventListener('click', () => {
+      soundController.initContext();
       advanceStageEarly();
     });
+    canvas.addEventListener('touchstart', () => {
+      soundController.initContext();
+    }, { passive: true });
 
     // Bấm xem ngay câu chốt hạ
     document.getElementById('btn-skip-finale').addEventListener('click', () => {
+      soundController.initContext();
       startStage(5);
     });
 
-    // Chọn chủ đề màu từ Form ban đầu
+    function syncThemeChips(themeIdx) {
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.classList.toggle('active', parseInt(chip.dataset.theme, 10) === themeIdx);
+      });
+    }
+
+    // Chọn chủ đề màu trong modal
     document.querySelectorAll('.theme-chip').forEach((chip) => {
       chip.addEventListener('click', (e) => {
-        document.querySelectorAll('.theme-chip').forEach((c) => c.classList.remove('active'));
-        e.currentTarget.classList.add('active');
         currentThemeIndex = parseInt(e.currentTarget.dataset.theme, 10) || 0;
+        syncThemeChips(currentThemeIndex);
       });
     });
 
@@ -1319,85 +1362,146 @@
         particles[i].updateColorFromTheme();
       }
       showThemeToast(theme.name);
-      document.querySelectorAll('.theme-chip').forEach((chip) => {
-        chip.classList.toggle('active', parseInt(chip.dataset.theme, 10) === currentThemeIndex);
-      });
-    });
-
-    loveForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const enteredName = nameInput.value.trim() || 'Trang';
-      triggerConfessionFirework(enteredName);
+      syncThemeChips(currentThemeIndex);
     });
 
     // Bắn lại cả 5 hồi
     document.getElementById('btn-replay-show').addEventListener('click', () => {
+      soundController.initContext();
       dockShown = false;
       document.getElementById('floating-dock').classList.remove('visible');
       startStage(1);
     });
 
-    document.getElementById('btn-change-name').addEventListener('click', () => {
-      currentPhase = 'IDLE';
-      particles = [];
-      ambientSparks = [];
-      activeRockets = [];
-      ctx.clearRect(0, 0, width, height);
-      document.getElementById('stage-badge').classList.add('hidden');
-      document.getElementById('btn-skip-finale').classList.add('hidden');
-      document.getElementById('stage-hint').classList.add('hidden');
-      document.getElementById('floating-dock').classList.remove('visible');
-      document.getElementById('input-container').style.display = 'block';
-      document.getElementById('input-screen').classList.remove('fade-out');
-      nameInput.value = currentReceiverName;
-      nameInput.focus();
-    });
-
+    // Bật/tắt âm thanh
     document.getElementById('btn-mute').addEventListener('click', (e) => {
+      soundController.initContext();
       const isMuted = soundController.toggleMute();
       e.currentTarget.textContent = isMuted ? '🔇 Đã tắt tiếng' : '🔊 Âm thanh';
     });
 
-    // Tích hợp GiftSDK để người dùng tạo Link & Mã QR gửi tặng người thương
+    // Modal Tạo Thiệp Riêng (Nhập Tên & 5 Câu)
+    function openCreatorModal() {
+      const modal = document.getElementById('modal-create-gift');
+      if (!modal) return;
+      document.getElementById('input-creator-receiver').value = currentReceiverName;
+      document.getElementById('input-stage-1').value = STAGE_CONFIGS[0].text;
+      document.getElementById('input-stage-2').value = STAGE_CONFIGS[1].text;
+      document.getElementById('input-stage-3').value = STAGE_CONFIGS[2].text;
+      document.getElementById('input-stage-4').value = STAGE_CONFIGS[3].text;
+      document.getElementById('input-stage-5').value = STAGE_CONFIGS[4].customPrefix || 'Làm người yêu anh nhé';
+      syncThemeChips(currentThemeIndex);
+      modal.classList.add('active');
+    }
+
+    function closeCreatorModal() {
+      const modal = document.getElementById('modal-create-gift');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function applyCustomStagesFromModal() {
+      const receiver = document.getElementById('input-creator-receiver').value.trim() || 'Thúy Quỳnh';
+      currentReceiverName = TextPixelScanner.formatProperName(receiver);
+
+      const s1 = document.getElementById('input-stage-1').value.trim();
+      const s2 = document.getElementById('input-stage-2').value.trim();
+      const s3 = document.getElementById('input-stage-3').value.trim();
+      const s4 = document.getElementById('input-stage-4').value.trim();
+      const s5 = document.getElementById('input-stage-5').value.trim();
+
+      if (s1) STAGE_CONFIGS[0].text = s1;
+      if (s2) STAGE_CONFIGS[1].text = s2;
+      if (s3) STAGE_CONFIGS[2].text = s3;
+      if (s4) STAGE_CONFIGS[3].text = s4;
+      if (s5) STAGE_CONFIGS[4].customPrefix = s5;
+    }
+
+    document.getElementById('btn-top-creator')?.addEventListener('click', openCreatorModal);
+    document.getElementById('btn-open-creator-modal')?.addEventListener('click', openCreatorModal);
+    document.getElementById('btn-close-modal-creator')?.addEventListener('click', closeCreatorModal);
+
+    // Xem thử ngay trên màn pháo hoa
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      soundController.initContext();
+      applyCustomStagesFromModal();
+      closeCreatorModal();
+      triggerConfessionFirework(currentReceiverName);
+    });
+
+    // Gửi tạo mã QR VietQR qua GiftSDK
+    document.getElementById('creator-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      applyCustomStagesFromModal();
+      closeCreatorModal();
+
+      const sender = document.getElementById('input-creator-sender').value.trim() || 'Anh';
+      const receiver = currentReceiverName;
+      const stage5 = STAGE_CONFIGS[4].customPrefix || 'Làm người yêu anh nhé';
+
+      if (window.GiftSDK) {
+        window.GiftSDK.openPayment({
+          templateId: 'fireworks_confess',
+          templateType: 'fireworks_confess',
+          senderName: sender,
+          receiverName: receiver,
+          occasion: 'Lời Tỏ Tình Dưới Pháo Hoa',
+          message: `${stage5} ${receiver}? ❤️`,
+          payload: {
+            customStages: [
+              STAGE_CONFIGS[0].text,
+              STAGE_CONFIGS[1].text,
+              STAGE_CONFIGS[2].text,
+              STAGE_CONFIGS[3].text,
+              stage5
+            ],
+            themeIndex: currentThemeIndex
+          }
+        });
+      }
+    });
+
+    // Tự động khởi chạy pháo hoa ngay khi mở trang với màu Vàng Kim & Ruby và người nhận Thúy Quỳnh
     window.addEventListener('DOMContentLoaded', async () => {
+      currentThemeIndex = 0; // Mặc định Vàng Kim & Ruby
+      currentReceiverName = 'Thúy Quỳnh';
+
       const params = new URLSearchParams(window.location.search);
       const prefilledName = params.get('name');
       if (prefilledName) {
-        nameInput.value = TextPixelScanner.formatProperName(prefilledName);
+        currentReceiverName = TextPixelScanner.formatProperName(prefilledName);
       }
 
       if (window.GiftSDK) {
         await window.GiftSDK.init({
           templateId: 'fireworks_confess',
           onGiftLoaded(order) {
-            const receiver = TextPixelScanner.formatProperName(order.receiver_name || 'Em');
+            const receiver = TextPixelScanner.formatProperName(order.receiver_name || 'Thúy Quỳnh');
             currentReceiverName = receiver;
-            nameInput.value = receiver;
 
-            // Ẩn ô nhập tên khi Người Nhận mở link quà tặng
-            document.getElementById('input-container').style.display = 'none';
-            const themeWrap = document.querySelector('.theme-selector-wrap');
-            if (themeWrap) themeWrap.style.display = 'none';
+            if (order.payload && Array.isArray(order.payload.customStages)) {
+              const cs = order.payload.customStages;
+              if (cs[0]) STAGE_CONFIGS[0].text = cs[0];
+              if (cs[1]) STAGE_CONFIGS[1].text = cs[1];
+              if (cs[2]) STAGE_CONFIGS[2].text = cs[2];
+              if (cs[3]) STAGE_CONFIGS[3].text = cs[3];
+              if (cs[4]) STAGE_CONFIGS[4].customPrefix = cs[4];
+            }
 
-            document.getElementById('form-heading').textContent = `Món Quà Dành Tặng ${receiver}`;
-            document.getElementById('form-subtext').textContent =
-              'Ai đó đã gửi cho bạn một màn pháo hoa 5 hồi đặc biệt. Hãy chạm nút bên dưới để thắp sáng bầu trời đêm nhé!';
-            document.getElementById('btn-trigger-firework').textContent = 'Chạm Để Ngắm 5 Hồi Pháo Hoa 🚀';
+            if (order.payload && typeof order.payload.themeIndex === 'number') {
+              currentThemeIndex = order.payload.themeIndex % COLOR_THEMES.length;
+              syncThemeChips(currentThemeIndex);
+            }
+
+            // Ẩn tất cả phần tử chỉ dành cho người tạo
+            document.querySelectorAll('.creator-only, [data-creator-only]').forEach((el) => {
+              el.style.display = 'none';
+            });
           }
         });
-
-        const payBtn = document.getElementById('btn-create-gift-qr');
-        if (payBtn) {
-          payBtn.addEventListener('click', () => {
-            window.GiftSDK.openPayment({
-              templateId: 'fireworks_confess',
-              senderName: 'Anh',
-              receiverName: currentReceiverName,
-              message: `Làm người yêu anh nhé ${currentReceiverName}?`
-            });
-          });
-        }
       }
+
+      // Tự động chạy pháo hoa ngay khi mở trang!
+      triggerConfessionFirework(currentReceiverName);
     });
   </script>
   <script src="../../../shared/tiktok-mode.js"></script>

@@ -860,6 +860,58 @@
     let dockShown = false;
     let toastTimer = null;
 
+    // Bộ sưu tập các chấm sao điểm xuyết lấp lánh trên nền trời đêm
+    const backgroundStars = [];
+    function initBackgroundStars() {
+      backgroundStars.length = 0;
+      const numStars = Math.floor(Math.max(55, Math.min(width, height) * 0.08));
+      const starColors = ['#ffffff', '#fff9e6', '#e0f2fe', '#fce7f3', '#fef08a'];
+
+      for (let i = 0; i < numStars; i++) {
+        backgroundStars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          baseRadius: Math.random() * 0.75 + 0.65, // 0.65px - 1.4px
+          baseAlpha: Math.random() * 0.45 + 0.35,  // 0.35 - 0.80
+          twinkleSpeed: Math.random() * 2.4 + 1.2,
+          phase: Math.random() * Math.PI * 2,
+          color: starColors[Math.floor(Math.random() * starColors.length)],
+          hasGlint: Math.random() < 0.25 // 25% số sao có tia lấp lánh 4 cánh vi mô
+        });
+      }
+    }
+
+    function drawBackgroundStars(timeSec) {
+      ctx.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < backgroundStars.length; i++) {
+        const s = backgroundStars[i];
+        // Nhịp nhấp nháy êm ái
+        const twinkle = (Math.sin(timeSec * s.twinkleSpeed + s.phase) + 1) * 0.5;
+        const alpha = s.baseAlpha * (0.35 + 0.65 * twinkle);
+        if (alpha <= 0.06) continue;
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.baseRadius * (0.8 + 0.3 * twinkle), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tia lấp lánh 4 cánh vi mô siêu nhỏ điểm xuyết
+        if (s.hasGlint && twinkle > 0.62) {
+          const glintLen = s.baseRadius * 2.8 * (twinkle - 0.4);
+          ctx.strokeStyle = s.color;
+          ctx.lineWidth = 0.75;
+          ctx.beginPath();
+          ctx.moveTo(s.x - glintLen, s.y);
+          ctx.lineTo(s.x + glintLen, s.y);
+          ctx.moveTo(s.x, s.y - glintLen);
+          ctx.lineTo(s.x, s.y + glintLen);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
     function handleResize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = window.innerWidth;
@@ -869,6 +921,15 @@
       canvas.height = Math.round(height * dpr);
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
+
+      if (backgroundStars.length === 0) {
+        initBackgroundStars();
+      } else {
+        backgroundStars.forEach((star) => {
+          if (star.x > width) star.x = Math.random() * width;
+          if (star.y > height) star.y = Math.random() * height;
+        });
+      }
 
       if (currentPhase === 'MORPHING' && particles.length > 0) {
         const cfg = STAGE_CONFIGS[currentStage - 1];
@@ -1037,6 +1098,9 @@
       const clearOpacity = currentPhase === 'MORPHING' ? 0.48 : (currentPhase === 'LAUNCHING' ? 0.38 : 0.44);
       ctx.fillStyle = `rgba(5, 2, 14, ${clearOpacity})`;
       ctx.fillRect(0, 0, width, height);
+
+      // Điểm xuyết các chấm sao lấp lánh nhẹ nhàng trên nền trời đêm
+      drawBackgroundStars(timeSec);
 
       // 1. Giai đoạn BẮN TÊN LỬA (LAUNCHING)
       if (currentPhase === 'LAUNCHING' && activeRockets.length > 0) {

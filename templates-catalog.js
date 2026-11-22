@@ -31,14 +31,14 @@ const CONFESS_TEMPLATES = [
     isHot: true,
     salesCount: '3.4k+ đã tạo',
     title: 'Pháo Hoa Chốt Hạ: Làm Người Yêu Anh Nhé?',
-    subtitle: 'Tên lửa bắn lên trời đêm nổ tung hàng ngàn hạt sáng và hội tụ thành câu tỏ tình "Làm người yêu anh nhé [Tên]?"',
-    badge: '⚡ Pháo Hoa Chốt Hạ',
+    subtitle: 'Bắn 5 lượt pháo hoa liên tiếp kể câu chuyện tình yêu, kết thúc bằng cú nổ chốt hạ siêu đại bác "Làm người yêu anh nhé [Tên]?"',
+    badge: '⚡ 5 Hồi Pháo Hoa',
     price: 19000,
     oldPrice: 39000,
     engineUrl: 'templates/confess/fireworks/index.html',
     previewGradient: 'linear-gradient(135deg, #090418 0%, #4c1d95 55%, #ec4899 100%)',
     previewEmoji: '🎆',
-    features: ['Tụ hạt "Làm người yêu anh nhé"', 'Âm thanh nổ + Nhạc nền Fade-in', 'Hiệu ứng lấp lánh 60fps'],
+    features: ['5 hồi pháo hoa liên tiếp', 'Cú nổ chốt hạ siêu đại bác', 'Chống lóa & 60fps mượt mà'],
     preset: {
       occasion: 'Lời Tỏ Tình Dưới Pháo Hoa',
       theme: 'pink'

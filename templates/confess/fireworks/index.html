@@ -25,20 +25,27 @@
 
   <!-- 3. Thanh công cụ phía trên -->
   <div class="top-bar">
-    <a href="../../../index.html" class="top-pill-btn creator-only">⬅️ Kho Mẫu</a>
-    <button type="button" id="btn-mute" class="top-pill-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
+    <a href="../../../index.html" class="top-pill-btn creator-only">← Trang chủ</a>
+    <div id="stage-badge" class="stage-badge hidden">✨ Hồi 1/5: Bầu Trời Sao</div>
+    <div class="top-right-group">
+      <button type="button" id="btn-skip-finale" class="top-pill-btn hidden" title="Xem ngay lời chốt hạ">⏭️ Câu Chốt</button>
+      <button type="button" id="btn-mute" class="top-pill-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
+    </div>
   </div>
 
   <!-- 4. Canvas chính vẽ Pháo Hoa & Hạt Tụ Chữ -->
   <canvas id="firework-canvas"></canvas>
 
-  <!-- 5. Màn hình chờ (Glassmorphism Form UI) -->
+  <!-- 5. Gợi ý chạm màn hình ở các hồi 1 - 4 -->
+  <div id="stage-hint" class="stage-hint hidden">Chạm màn hình để tiếp tục ⏩</div>
+
+  <!-- 6. Màn hình chờ (Glassmorphism Form UI) -->
   <div id="input-screen" class="screen-overlay">
     <form id="love-form" class="glass-form-card" autocomplete="off">
-      <div class="sparkle-badge">✨ Pháo Hoa Chốt Hạ 3D ✨</div>
-      <h1 id="form-heading" class="form-heading">Gửi lời yêu thương</h1>
+      <div class="sparkle-badge">✨ 5 Hồi Pháo Hoa Tỏ Tình ✨</div>
+      <h1 id="form-heading" class="form-heading">Gửi Lời Yêu Thương</h1>
       <p id="form-subtext" class="form-subtext">
-        Nhập tên người thương để bắn viên pháo hoa rực rỡ và thắp sáng lời tỏ tình giữa bầu trời đêm.
+        Bắn 5 lượt pháo hoa liên tiếp kể câu chuyện tình yêu lãng mạn, kết thúc bằng cú nổ đại bác rực rỡ và lời tỏ tình ngọt ngào nhất.
       </p>
 
       <div id="input-container" class="input-wrap">
@@ -53,25 +60,179 @@
         />
       </div>
 
+      <div class="theme-selector-wrap">
+        <label class="input-label">Màu sắc pháo hoa</label>
+        <div class="theme-chips-row">
+          <button type="button" class="theme-chip active" data-theme="0">✨ Vàng Kim & Ruby</button>
+          <button type="button" class="theme-chip" data-theme="1">🌸 Hồng Rose & San Hô</button>
+          <button type="button" class="theme-chip" data-theme="2">🌅 Hoàng Hôn Ánh Dương</button>
+          <button type="button" class="theme-chip" data-theme="3">💜 Tím Mộng Mơ</button>
+        </div>
+      </div>
+
       <button type="submit" id="btn-trigger-firework" class="btn-firework-launch">
-        Bắn Pháo Hoa 🚀
+        Bắn Pháo Hoa 5 Hồi 🚀
       </button>
     </form>
   </div>
 
-  <!-- 6. Thanh nút nổi sau khi pháo hoa tụ chữ hoàn tất -->
+  <!-- 7. Thanh nút nổi sau khi hoàn thành 5 hồi -->
   <div id="floating-dock" class="floating-action-dock">
-    <button type="button" id="btn-replay-show" class="dock-btn">🎆 Bắn Lại</button>
+    <button type="button" id="btn-replay-show" class="dock-btn">🎆 Bắn Lại 5 Hồi</button>
+    <button type="button" id="btn-change-color" class="dock-btn">🎨 Đổi Màu</button>
     <button type="button" id="btn-change-name" class="dock-btn creator-only">✏️ Nhập Tên Khác</button>
     <button type="button" id="btn-create-gift-qr" class="dock-btn cta-pay creator-only">
       ✨ Tạo Link & QR Gửi Người Ấy
     </button>
   </div>
 
+  <!-- 8. Toast thông báo đổi màu tức thì -->
+  <div id="theme-toast" class="theme-toast-pill"></div>
+
   <script>
     /**
      * ============================================================================
-     * 1. SOUND SYNTHESIZER & AUDIO CONTROLLER (Web Audio API + Background MP3)
+     * 1. BỘ CHỦ ĐỀ MÀU PHÁO HOA CHỐNG LÓA (ANTI-GLARE VIBRANT PALETTES)
+     * ============================================================================
+     */
+    const COLOR_THEMES = [
+      {
+        id: 'gold_ruby',
+        name: 'Vàng Kim & Ruby',
+        line1: ['#ffd043', '#ffc107', '#ffb300', '#ffe082'], // Vàng Kim Sa ấm áp sang trọng
+        line2: ['#ff2a6d', '#ff1744', '#f50057', '#ff5252'], // Hồng Ruby & Trái Tim Đỏ Rực
+        sparks: ['#ffd043', '#ff9100', '#ff2a6d', '#ff1744', '#ffe082']
+      },
+      {
+        id: 'rose_gold',
+        name: 'Hồng Rose & San Hô',
+        line1: ['#ff6584', '#f43f5e', '#fb7185', '#fda4af'], // Hồng Rose dịu ngọt
+        line2: ['#ff2a85', '#e11d48', '#be123c', '#ff4d6d'], // Đỏ San Hô quyến rũ
+        sparks: ['#ff6584', '#fb7185', '#ff2a85', '#fde047', '#ffedd5']
+      },
+      {
+        id: 'sunset_glow',
+        name: 'Hoàng Hôn Ánh Dương',
+        line1: ['#ff9f43', '#f39c12', '#e67e22', '#f1c40f'], // Cam hoàng hôn ấm áp
+        line2: ['#ee5253', '#ff6b6b', '#ff4757', '#ff3838'], // Đỏ cam rực rỡ
+        sparks: ['#ff9f43', '#f39c12', '#ff6b6b', '#ff4757', '#ffd32a']
+      },
+      {
+        id: 'twilight_neon',
+        name: 'Tím Mộng Mơ & Lam Ngọc',
+        line1: ['#38bdf8', '#0ea5e9', '#67e8f9', '#a5f3fc'], // Lam ngọc trong trẻo
+        line2: ['#c084fc', '#a855f7', '#9333ea', '#e879f9'], // Tím thạch anh lãng mạn
+        sparks: ['#38bdf8', '#c084fc', '#a855f7', '#67e8f9', '#ffffff']
+      }
+    ];
+
+    let currentThemeIndex = 0;
+
+    // Helper hòa trộn màu với màu trắng để tạo tâm phát sáng (Luminous Highlight Core)
+    function blendWithWhite(hex, ratio) {
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      const nr = Math.min(255, Math.round(r + (255 - r) * ratio));
+      const ng = Math.min(255, Math.round(g + (255 - g) * ratio));
+      const nb = Math.min(255, Math.round(b + (255 - b) * ratio));
+      return `rgb(${nr}, ${ng}, ${nb})`;
+    }
+
+    // Bộ nhớ cache Sprite lõi chữ sắc nét
+    const coreSpriteCache = {};
+
+    function getCoreSprite(color) {
+      if (coreSpriteCache[color]) return coreSpriteCache[color];
+      const size = 8;
+      const c = document.createElement('canvas');
+      c.width = size;
+      c.height = size;
+      const sctx = c.getContext('2d');
+      const center = size / 2;
+      const radius = 1.6;
+
+      // Hạt tròn sắc sảo: tâm sáng dịu vừa phải (52% pastel tint), viền giữ màu bão hòa chuẩn, KHÔNG lóa trắng
+      const grad = sctx.createRadialGradient(center, center, 0, center, center, radius);
+      grad.addColorStop(0, blendWithWhite(color, 0.52));
+      grad.addColorStop(0.65, color);
+      grad.addColorStop(0.95, color);
+      grad.addColorStop(1.0, 'rgba(0,0,0,0)');
+
+      sctx.fillStyle = grad;
+      sctx.fillRect(0, 0, size, size);
+
+      coreSpriteCache[color] = c;
+      return c;
+    }
+
+    /**
+     * ============================================================================
+     * 2. KỊCH BẢN 5 HỒI PHÁO HOA TỎ TÌNH LÃNG MẠN (MULTI-ROCKET SALVOS)
+     * ============================================================================
+     */
+    const STAGE_CONFIGS = [
+      {
+        stage: 1,
+        badge: '✨ Hồi 1/5: Bầu Trời Sao',
+        text: 'Giữa hàng tỷ vì sao ngoài kia...',
+        duration: 5.6,
+        rockets: (w, h) => [
+          { startX: w * 0.5, startY: h + 15, targetX: w * 0.5, targetY: h * 0.42, isMain: true }
+        ]
+      },
+      {
+        stage: 2,
+        badge: '✨ Hồi 2/5: Nhân Duyên',
+        text: 'Gặp được em là phép màu đẹp nhất...',
+        duration: 5.8,
+        rockets: (w, h) => [
+          { startX: w * 0.32, startY: h + 15, targetX: w * 0.5, targetY: h * 0.42, isMain: true }
+        ]
+      },
+      {
+        stage: 3,
+        badge: '✨ Hồi 3/5: Chân Tình',
+        text: 'Nụ cười của em thắp sáng thế giới của anh...',
+        duration: 6.2,
+        rockets: (w, h) => [
+          { startX: w * 0.26, startY: h + 15, targetX: w * 0.36, targetY: h * 0.40, isMain: true },
+          { startX: w * 0.74, startY: h + 15, targetX: w * 0.64, targetY: h * 0.40, isMain: true }
+        ]
+      },
+      {
+        stage: 4,
+        badge: '✨ Hồi 4/5: Tiền Cao Trào',
+        text: 'Và đêm nay, dưới bầu trời sao này...',
+        duration: 6.0,
+        rockets: (w, h) => [
+          { startX: w * 0.22, startY: h + 15, targetX: w * 0.38, targetY: h * 0.41, isMain: true },
+          { startX: w * 0.78, startY: h + 15, targetX: w * 0.62, targetY: h * 0.41, isMain: true }
+        ]
+      },
+      {
+        stage: 5,
+        badge: '✨ Hồi 5/5: Lời Chốt Hạ ❤️',
+        isFinale: true,
+        duration: Infinity,
+        rockets: (w, h) => [
+          { startX: w * 0.18, startY: h + 15, targetX: w * 0.28, targetY: h * 0.42, isMain: false },
+          { startX: w * 0.50, startY: h + 15, targetX: w * 0.50, targetY: h * 0.35, isMain: true },
+          { startX: w * 0.82, startY: h + 15, targetX: w * 0.72, targetY: h * 0.42, isMain: false }
+        ]
+      }
+    ];
+
+    let currentStage = 1;
+    let activeRockets = [];
+    let currentExplosionPoints = [];
+    let disperseTimestamp = 0;
+
+    /**
+     * ============================================================================
+     * 3. SOUND SYNTHESIZER & AUDIO CONTROLLER (Web Audio API + Background MP3)
      * ============================================================================
      */
     class SoundController {
@@ -80,20 +241,28 @@
         this.bgAudio = audioElement;
         this.muted = false;
         this.fadeInterval = null;
+        this.noiseBuffer = null;
       }
 
       initContext() {
         if (!this.ctx) {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) this.ctx = new AudioCtx();
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            const bufferSize = Math.floor(this.ctx.sampleRate * 1.5);
+            this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const output = this.noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              output[i] = Math.random() * 2 - 1;
+            }
+          }
         }
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
         }
       }
 
-      // Tiếng rít khi tên lửa bắn từ đáy màn hình lên trung tâm
-      playLaunchWhistle(duration = 1.05) {
+      playLaunchWhistle(duration = 0.95) {
         if (this.muted) return;
         this.initContext();
         if (!this.ctx) return;
@@ -116,16 +285,14 @@
         osc.stop(now + duration);
       }
 
-      // Tiếng nổ pháo hoa lớn bằng White Noise + Lowpass Filter + Sub Bass
       playExplosionBoom(isMain = true) {
         if (this.muted) return;
         this.initContext();
-        if (!this.ctx) return;
+        if (!this.ctx || !this.noiseBuffer) return;
 
         const now = this.ctx.currentTime;
-        const duration = isMain ? 1.65 : 0.75;
+        const duration = isMain ? 1.5 : 0.75;
 
-        // 1. Sub-bass punch cho cú nổ uy lực
         if (isMain) {
           const subOsc = this.ctx.createOscillator();
           const subGain = this.ctx.createGain();
@@ -142,17 +309,8 @@
           subOsc.stop(now + 0.62);
         }
 
-        // 2. White noise burst cho tiếng pháo nổ vang
-        const bufferSize = Math.floor(this.ctx.sampleRate * duration);
-        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          const decay = Math.exp(-i / (this.ctx.sampleRate * (isMain ? 0.36 : 0.16)));
-          output[i] = (Math.random() * 2 - 1) * decay;
-        }
-
         const whiteNoise = this.ctx.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.buffer = this.noiseBuffer;
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
@@ -160,16 +318,16 @@
         filter.frequency.exponentialRampToValueAtTime(95, now + duration);
 
         const noiseGain = this.ctx.createGain();
-        noiseGain.gain.setValueAtTime(isMain ? 0.48 : 0.12, now);
+        noiseGain.gain.setValueAtTime(isMain ? 0.48 : 0.28, now);
         noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
         whiteNoise.connect(filter);
         filter.connect(noiseGain);
         noiseGain.connect(this.ctx.destination);
         whiteNoise.start(now);
+        whiteNoise.stop(now + duration);
       }
 
-      // Kích hoạt nhạc nền và tăng dần âm lượng (Fade-in) sau tiếng nổ
       startBackgroundMusicWithFadeIn() {
         if (!this.bgAudio || this.muted) return;
         if (this.fadeInterval) clearInterval(this.fadeInterval);
@@ -207,95 +365,134 @@
 
     /**
      * ============================================================================
-     * 2. CLASS FIREWORK (Giai đoạn 1: Tên lửa lao vút lên với tốc độ cực nhanh)
+     * 4. CLASS FIREWORK (Tên lửa vút lên)
      * ============================================================================
      */
     class Firework {
-      constructor(startX, startY, targetX, targetY) {
+      constructor(startX, startY, targetX, targetY, isMain = true) {
         this.x = startX;
         this.y = startY;
         this.targetX = targetX;
         this.targetY = targetY;
+        this.isMain = isMain;
 
-        // Vận tốc bắn lên cực nhanh (tăng gấp 3 lần: vy từ -12.5 lên -32)
-        this.vx = (targetX - startX) * 0.05;
-        this.vy = -32;
+        const distY = startY - targetY;
+        this.vy = -Math.sqrt(2 * 0.78 * distY) - 1.2;
+        this.gravity = 0.78;
         this.trail = [];
         this.exploded = false;
+        this.burstCreated = false;
       }
 
       update() {
-        this.trail.push({ x: this.x, y: this.y, alpha: 1 });
-        if (this.trail.length > 25) {
+        this.trail.push({ x: this.x, y: this.y, alpha: 1.0 });
+        if (this.trail.length > 22) {
           this.trail.shift();
         }
-        this.trail.forEach((pt) => {
-          pt.alpha *= 0.85;
-        });
+        for (let i = 0; i < this.trail.length; i++) {
+          this.trail[i].alpha *= 0.88;
+        }
 
-        // Lao vút lên mạnh mẽ và chỉ giảm tốc nhẹ khi rất sát điểm nổ
-        const dy = this.targetY - this.y;
-        this.vy += 0.85; // gia tốc hãm tự nhiên
-        if (this.vy > -8) this.vy = -8; // đảm bảo vẫn lao nhanh vút lên
+        this.vy += this.gravity;
+        if (this.vy > -4) this.vy = -4;
 
-        this.x += (this.targetX - this.x) * 0.12;
+        this.x += (this.targetX - this.x) * 0.088;
         this.y += this.vy;
 
-        if (this.y <= this.targetY || Math.abs(dy) <= 16) {
+        const dy = this.targetY - this.y;
+        if (this.y <= this.targetY || Math.abs(dy) <= 12) {
           this.y = this.targetY;
           this.exploded = true;
         }
       }
 
       draw(ctx) {
-        ctx.save();
-        // Vệt sáng tên lửa lao rực rỡ
+        ctx.fillStyle = 'rgba(253, 224, 71, 0.85)';
         for (let i = 0; i < this.trail.length; i++) {
           const pt = this.trail[i];
           const ratio = (i + 1) / this.trail.length;
+          ctx.globalAlpha = pt.alpha * ratio * 0.85;
           ctx.beginPath();
-          ctx.arc(pt.x + (Math.random() - 0.5) * 1.5, pt.y, ratio * 4.2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(253, 224, 71, ${pt.alpha * ratio * 0.9})`;
+          ctx.arc(pt.x + (Math.random() - 0.5) * 1.5, pt.y, ratio * 3.8, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Đầu tên lửa sáng chói
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#fde047';
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = '#fde047';
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        ctx.arc(this.x, this.y, 9, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
+
+        ctx.globalAlpha = 0.75;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3.2, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
     /**
      * ============================================================================
-     * 3. CLASS BURST SPARK (Hạt pháo nổ bung xòe to hết cỡ 350+ hạt)
+     * 5. CLASS BURST SPARK (Cấu trúc 5 tầng hoa 3D, độ rơi liễu rủ kiêu sa)
      * ============================================================================
      */
     class BurstSpark {
-      constructor(originX, originY, color) {
+      constructor(originX, originY, color, isBig = false) {
         this.x = originX;
         this.y = originY;
+        this.prevX = originX;
+        this.prevY = originY;
+
         const angle = Math.random() * Math.PI * 2;
-        // Lực nổ cực mạnh bung xòe rộng khắp màn hình
-        const speed = Math.random() * 26 + 6;
+        // Chuẩn hóa tỷ lệ theo khung hình, không để vươn tràn mép màn hình
+        const baseScale = Math.max(0.82, Math.min(width, height) / 660);
+
+        // CẤU TRÚC PHÁO HOA 5 TẦNG RÕ NÉT:
+        // Tầng 1 (15%): Tâm nhụy kim sa - sáng tụ ở lõi
+        // Tầng 2 (20%): Vòng nhụy ngọc - đệm trung tâm
+        // Tầng 3 (35%): Thân hoa chính - quả cầu pháo hoa rực rỡ
+        // Tầng 4 (20%): Vành hoa bung xòe - định hình cánh hoa
+        // Tầng 5 (10%): Tia sao chổi vươn xa - điểm nhấn kiêu sa (đã giảm nhẹ tầm cực đại)
+        const tier = Math.random();
+        let speedMult;
+        if (tier < 0.15) {
+          speedMult = Math.random() * 3.5 + 4.5;  // Tầng 1: 4.5 - 8.0
+        } else if (tier < 0.35) {
+          speedMult = Math.random() * 4.0 + 8.5;  // Tầng 2: 8.5 - 12.5
+        } else if (tier < 0.70) {
+          speedMult = Math.random() * 4.5 + 13.0; // Tầng 3: 13.0 - 17.5
+        } else if (tier < 0.90) {
+          speedMult = Math.random() * 4.5 + 18.0; // Tầng 4: 18.0 - 22.5
+        } else {
+          speedMult = Math.random() * 3.5 + 23.0; // Tầng 5: 23.0 - 26.5 (giảm nhẹ vừa vặn)
+        }
+        if (isBig) speedMult *= 1.18;
+
+        const speed = speedMult * baseScale;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
 
-        this.friction = 0.94; // ma sát tự nhiên
-        this.gravity = 0.16;  // trọng lực tự nhiên rơi rụng sống động
-        this.alpha = 1;
-        this.decay = Math.random() * 0.018 + 0.012;
+        this.friction = 0.958;
+        // Độ rơi trọng lực liễu rủ tự nhiên sau khi bung nở
+        this.gravity = 0.15;
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.009 + 0.008;
         this.color = color;
-        this.radius = Math.random() * 1.6 + 1.0;
+        this.radius = Math.random() * 0.6 + 1.4; // Hạt tròn 1.4 - 2.0px
       }
 
       update() {
+        this.prevX = this.x;
+        this.prevY = this.y;
+
         this.vx *= this.friction;
         this.vy *= this.friction;
+        // Khi tia pháo giảm tốc ngang, gia tốc rơi tạo đường cong liễu rủ tuyệt đẹp
         this.vy += this.gravity;
         this.x += this.vx;
         this.y += this.vy;
@@ -304,106 +501,102 @@
 
       draw(ctx) {
         if (this.alpha <= 0) return;
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = this.color;
+        const a = Math.max(0, this.alpha);
+
+        // 1. Tia đuôi lửa thanh mảnh uốn lượn theo đường cong rơi
+        ctx.globalAlpha = a * 0.78;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+
+        // 2. Viền hạt pháo hoa bão hòa sắc nét
+        ctx.globalAlpha = a;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius + 0.6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
+
+        // 3. Tâm nhụy hạt phát sáng trắng tinh khôi
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.55, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
     /**
      * ============================================================================
-     * 4. CLASS PARTICLE (Hạt morphing tạo chữ sắc sảo, thanh mảnh 1px, không cháy sáng)
+     * 6. CLASS PARTICLE (Bụi sao bung xòe, uốn rơi theo trọng lực rồi tụ thành chữ)
      * ============================================================================
      */
-    const ROMANTIC_PALETTE = [
-      '#ff85b3', // Hồng phấn
-      '#ff2a85', // Hồng Neon
-      '#f472b6', // Hồng Pastel
-      '#fde047', // Vàng Gold
-      '#f59e0b', // Vàng Hổ Phách
-      '#fb7185', // Đỏ Rose
-      '#ff3b69'  // Đỏ San Hô
-    ];
-
     class Particle {
       constructor(originX, originY, targetPoint, index) {
         this.x = originX;
         this.y = originY;
-
-        // Tọa độ đích chữ
         this.tx = targetPoint.x;
         this.ty = targetPoint.y;
+        this.lineType = targetPoint.lineType || 1;
+        this.colorSeed = index;
 
-        // Vận tốc nổ ban đầu cực mạnh tỏa ra không gian rộng
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 24 + 5;
+        const baseScale = Math.max(0.82, Math.min(width, height) / 660);
+        // Tốc độ bung xòe stardust hài hòa, vừa vặn theo 5 tầng pháo
+        const speed = (Math.random() * 10 + 5.5) * baseScale;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
 
-        // Vật lý nổ sống động
-        this.friction = 0.942;
+        this.friction = 0.952;
+        // Trọng lực tạo độ rơi trĩu nhẹ cho bụi sao sau khi bung nở
         this.gravity = 0.14;
 
-        // Độ dày của hạt đúng 1px sắc nét thanh mảnh
-        this.baseRadius = 1.0;
-        this.radius = 1.0;
-        this.color = ROMANTIC_PALETTE[index % ROMANTIC_PALETTE.length];
         this.phaseOffset = Math.random() * Math.PI * 2;
-        this.springFactor = 0.058 + Math.random() * 0.032;
+        this.springFactor = 0.065 + Math.random() * 0.022;
+        this.alpha = 0.95;
 
-        // Alpha vừa phải (0.65 - 0.85) để không bị cộng hưởng cháy trắng khi đứng cạnh nhau
-        this.alpha = 0.72 + (index % 5) * 0.03;
+        this.updateColorFromTheme();
+      }
+
+      updateColorFromTheme() {
+        const theme = COLOR_THEMES[currentThemeIndex];
+        const palette = this.lineType === 1 ? theme.line1 : theme.line2;
+        this.color = palette[this.colorSeed % palette.length];
+        this.coreSprite = getCoreSprite(this.color);
       }
 
       update(phase, elapsedSinceExplosion, timeSec) {
         if (phase === 'EXPLODING') {
-          // Bung xòe to khắp màn hình với ma sát và trọng lực rơi tự nhiên
           this.vx *= this.friction;
           this.vy *= this.friction;
+          // Bụi sao bung xòe rồi cong trĩu rơi xuống một đoạn trước khi tụ lại
           this.vy += this.gravity;
           this.x += this.vx;
           this.y += this.vy;
         } else if (phase === 'MORPHING') {
-          // Bay về tạo nét chữ
           const dx = this.tx - this.x;
           const dy = this.ty - this.y;
-          const dist = Math.hypot(dx, dy);
 
           this.x += dx * this.springFactor;
           this.y += dy * this.springFactor;
 
-          // Khi đã về vị trí: chỉ dao động vi mô cực nhẹ (0.2px) để giữ nguyên phom chữ thanh mảnh
-          if (dist < 2.5) {
-            const jitterX = Math.sin(timeSec * 3.8 + this.phaseOffset) * 0.2;
-            const jitterY = Math.cos(timeSec * 3.4 + this.phaseOffset) * 0.2;
-            this.x = this.tx + jitterX;
-            this.y = this.ty + jitterY;
+          if (Math.abs(dx) < 1.5 && Math.abs(dy) < 1.5) {
+            // Khi đã vào vị trí chữ: giữ nguyên tọa độ nét chữ sắc nét tuyệt đối, không rung nhòe
+            this.x = this.tx;
+            this.y = this.ty;
           }
         }
-      }
-
-      draw(ctx) {
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 1.0, 0, Math.PI * 2);
-        ctx.fill();
       }
     }
 
     /**
      * ============================================================================
-     * 4. OFFSCREEN CANVAS TEXT SCANNER (Quét tọa độ pixel & Layout chữ Neon chống rớt chữ)
+     * 7. OFFSCREEN CANVAS TEXT SCANNER (Nét thư pháp thanh thoát, rõ ràng, chống nhòe)
      * ============================================================================
      */
     class TextPixelScanner {
-      // 1. Tự động viết hoa chữ cái đầu cho tên người nhận (Title Case chuẩn tiếng Việt)
       static formatProperName(rawName) {
         if (!rawName) return 'Em';
         const clean = rawName.trim().replace(/\s+/g, ' ');
@@ -414,26 +607,114 @@
           .join(' ');
       }
 
-      // 2. Thuật toán tính toán ngắt dòng (Line Breaking) thông minh:
-      // Tuyệt đối không để rớt chữ hay rớt dấu hỏi "?", giữ câu từ cân đối, đẹp mắt
+      // Quét câu nói ở các hồi 1 - 4
+      static sampleStageCoordinates(text, viewportWidth, viewportHeight, stageIndex) {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = viewportWidth;
+        offCanvas.height = viewportHeight;
+        const octx = offCanvas.getContext('2d');
+
+        const maxAllowedWidth = viewportWidth * 0.88;
+
+        let fontSize = viewportWidth < 600
+          ? Math.max(30, Math.min(Math.floor(viewportWidth * 0.092), 42))
+          : Math.max(46, Math.min(Math.floor(viewportWidth * 0.065), 62));
+
+        octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
+
+        let lines = [text];
+        if (octx.measureText(text).width > maxAllowedWidth) {
+          const words = text.split(' ');
+          const mid = Math.ceil(words.length / 2);
+          lines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+        }
+
+        while (fontSize > 20) {
+          octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
+          const allFit = lines.every((line) => octx.measureText(line).width <= maxAllowedWidth);
+          if (allFit) break;
+          fontSize -= 1;
+        }
+
+        octx.textAlign = 'center';
+        octx.textBaseline = 'middle';
+        octx.fillStyle = '#ffffff';
+        octx.strokeStyle = '#ffffff';
+        // Viền thanh mảnh vừa đủ (không làm bít các khe chữ như e, a, o)
+        const strokeWidth = Math.max(1.2, fontSize * 0.024);
+        octx.lineWidth = strokeWidth;
+        octx.lineJoin = 'round';
+        octx.lineCap = 'round';
+
+        const centerX = viewportWidth / 2;
+        const centerY = viewportHeight * 0.43;
+        const lineHeight = fontSize * 1.36;
+        const totalBlockHeight = (lines.length - 1) * lineHeight;
+        const startY = centerY - totalBlockHeight / 2;
+
+        lines.forEach((line, idx) => {
+          const y = startY + idx * lineHeight;
+          octx.strokeText(line, centerX, y);
+          octx.fillText(line, centerX, y);
+        });
+
+        const minY = Math.max(0, Math.floor(startY - fontSize * 1.2));
+        const maxY = Math.min(viewportHeight, Math.ceil(startY + lines.length * lineHeight + fontSize * 0.6));
+        const minX = Math.max(0, Math.floor(centerX - maxAllowedWidth * 0.56));
+        const maxX = Math.min(viewportWidth, Math.ceil(centerX + maxAllowedWidth * 0.56));
+
+        const cropW = maxX - minX;
+        const cropH = maxY - minY;
+        if (cropW <= 0 || cropH <= 0) return [];
+
+        const imgData = octx.getImageData(minX, minY, cropW, cropH).data;
+        const step = 1.9; // Bước lấy mẫu chuẩn xác, hạt gối nhẹ nhàng, không bị dính cục
+        const coords = [];
+
+        for (let cy = 0; cy < cropH; cy += step) {
+          const iy = Math.floor(cy);
+          for (let cx = 0; cx < cropW; cx += step) {
+            const ix = Math.floor(cx);
+            const alphaIndex = (iy * cropW + ix) * 4 + 3;
+            if (imgData[alphaIndex] > 70) {
+              coords.push({
+                x: minX + ix,
+                y: minY + iy,
+                lineType: stageIndex % 2 === 1 ? 1 : 2
+              });
+            }
+          }
+        }
+
+        const maxParticles = viewportWidth < 600 ? 2200 : 3000;
+        if (coords.length > maxParticles) {
+          const ratio = coords.length / maxParticles;
+          const sampled = [];
+          for (let i = 0; i < maxParticles; i++) {
+            sampled.push(coords[Math.floor(i * ratio)]);
+          }
+          return sampled;
+        }
+
+        return coords;
+      }
+
+      // Quét câu chốt hạ ở hồi 5 (Grand Finale)
       static computeBalancedLines(receiverName, maxAllowedWidth, octx, targetFontSize) {
         const formattedName = this.formatProperName(receiverName);
         const linePrefix = 'Làm người yêu anh nhé';
         const nameWords = formattedName.split(' ').filter(Boolean);
 
-        // Kịch bản A: 2 dòng chuẩn lãng mạn
         const option2Lines = [linePrefix, `${formattedName}? ❤️`];
 
         octx.font = `700 ${targetFontSize}px "Dancing Script", cursive, sans-serif`;
         const w1 = octx.measureText(option2Lines[0]).width;
         const w2 = octx.measureText(option2Lines[1]).width;
 
-        // Nếu cả 2 dòng vừa vặn trong màn hình
         if (w1 <= maxAllowedWidth && w2 <= maxAllowedWidth) {
           return option2Lines;
         }
 
-        // Nếu tên dài (>= 3 từ) khiến dòng 2 bị tràn -> Chia thành 3 dòng cân đối
         if (nameWords.length >= 3) {
           const splitIdx = Math.ceil(nameWords.length / 2);
           const part1 = nameWords.slice(0, splitIdx).join(' ');
@@ -441,12 +722,10 @@
           return [linePrefix, part1, `${part2}? ❤️`];
         }
 
-        // Nếu tên 2 từ nhưng màn hình hẹp khiến dòng 2 bị tràn
         if (nameWords.length === 2 && w2 > maxAllowedWidth) {
           return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
         }
 
-        // Nếu dòng 1 bị tràn trên màn hình siêu nhỏ
         if (w1 > maxAllowedWidth) {
           return ['Làm người yêu anh', `nhé ${formattedName}? ❤️`];
         }
@@ -454,27 +733,21 @@
         return option2Lines;
       }
 
-      // 3. Quét tọa độ pixel từ Offscreen Canvas: giãn cách chữ, nét sắc mảnh thanh tao
-      static sampleTextCoordinates(receiverName, viewportWidth, viewportHeight) {
+      static sampleFinaleCoordinates(receiverName, viewportWidth, viewportHeight) {
         const offCanvas = document.createElement('canvas');
         offCanvas.width = viewportWidth;
         offCanvas.height = viewportHeight;
         const octx = offCanvas.getContext('2d');
 
-        const maxAllowedWidth = viewportWidth * 0.86;
+        const maxAllowedWidth = viewportWidth * 0.88;
 
-        // Tính toán kích thước chữ tối ưu theo thiết bị
         let fontSize = viewportWidth < 600
-          ? Math.max(32, Math.min(Math.floor(viewportWidth * 0.102), 46))
-          : Math.min(Math.floor(viewportWidth * 0.08), 74);
+          ? Math.max(34, Math.min(Math.floor(viewportWidth * 0.105), 48))
+          : Math.max(50, Math.min(Math.floor(viewportWidth * 0.078), 72));
 
-        // Tính toán ngắt dòng hợp lý
         let lines = this.computeBalancedLines(receiverName, maxAllowedWidth, octx, fontSize);
+        const letterSpacing = Math.max(2.2, fontSize * 0.055);
 
-        // Tăng khoảng cách giữa các chữ cái (letter-spacing) để các chữ không bị dính nét vào nhau
-        const letterSpacing = Math.max(2.5, fontSize * 0.065);
-
-        // Helper đo độ dài chuỗi có tính letterSpacing
         const measureWithSpacing = (str) => {
           let w = 0;
           for (let i = 0; i < str.length; i++) {
@@ -483,9 +756,8 @@
           return w;
         };
 
-        // Thu nhỏ nhẹ fontSize nếu dòng vẫn dài hơn màn hình điện thoại khi có letterSpacing
-        while (fontSize > 20) {
-          octx.font = `600 ${fontSize}px "Dancing Script", cursive, sans-serif`;
+        while (fontSize > 22) {
+          octx.font = `700 ${fontSize}px "Dancing Script", cursive, sans-serif`;
           const allFit = lines.every((line) => measureWithSpacing(line) <= maxAllowedWidth);
           if (allFit) break;
           fontSize -= 1;
@@ -494,15 +766,20 @@
         octx.textAlign = 'center';
         octx.textBaseline = 'middle';
         octx.fillStyle = '#ffffff';
+        octx.strokeStyle = '#ffffff';
+        // Nét viền thanh tú, giữ khoảng mở rõ ràng cho từng nét uốn
+        const strokeWidth = Math.max(1.2, fontSize * 0.024);
+        octx.lineWidth = strokeWidth;
+        octx.lineJoin = 'round';
+        octx.lineCap = 'round';
 
-        // Căn giữa hoàn hảo cả trục X và trục Y
         const centerX = viewportWidth / 2;
         const centerY = viewportHeight * 0.43;
         const lineHeight = fontSize * 1.34;
         const totalBlockHeight = (lines.length - 1) * lineHeight;
         const startY = centerY - totalBlockHeight / 2;
+        const lineSplitY = startY + lineHeight * 0.55;
 
-        // Vẽ từng dòng chữ có giãn cách ký tự (letter-spacing)
         lines.forEach((line, idx) => {
           const y = startY + idx * lineHeight;
           const totalLineWidth = measureWithSpacing(line);
@@ -511,34 +788,43 @@
           for (let c = 0; c < line.length; c++) {
             const char = line[c];
             const charWidth = octx.measureText(char).width;
-            octx.fillText(char, currentX + charWidth / 2, y);
+            const charCenterX = currentX + charWidth / 2;
+            octx.strokeText(char, charCenterX, y);
+            octx.fillText(char, charCenterX, y);
             currentX += charWidth + letterSpacing;
           }
         });
 
-        // Giới hạn vùng quét quanh khối chữ để tối ưu tốc độ xử lý tuyệt đối
-        const minY = Math.max(0, Math.floor(startY - fontSize * 1.1));
-        const maxY = Math.min(viewportHeight, Math.ceil(startY + lines.length * lineHeight + fontSize * 0.5));
+        const minY = Math.max(0, Math.floor(startY - fontSize * 1.2));
+        const maxY = Math.min(viewportHeight, Math.ceil(startY + lines.length * lineHeight + fontSize * 0.6));
         const minX = Math.max(0, Math.floor(centerX - maxAllowedWidth * 0.56));
         const maxX = Math.min(viewportWidth, Math.ceil(centerX + maxAllowedWidth * 0.56));
 
-        const imageData = octx.getImageData(0, 0, viewportWidth, viewportHeight).data;
-        // Bước nhảy 2px: Giữ mật độ vừa vặn, không bị đè hạt quá dày gây lóa
-        const step = 2;
+        const cropW = maxX - minX;
+        const cropH = maxY - minY;
+        if (cropW <= 0 || cropH <= 0) return [];
+
+        const imgData = octx.getImageData(minX, minY, cropW, cropH).data;
+        const step = 1.9;
         const coords = [];
 
-        for (let y = minY; y < maxY; y += step) {
-          for (let x = minX; x < maxX; x += step) {
-            const alphaIndex = (y * viewportWidth + x) * 4 + 3;
-            // Ngưỡng alpha chuẩn để nét chữ thanh mảnh, rõ từng con chữ
-            if (imageData[alphaIndex] > 95) {
-              coords.push({ x, y });
+        for (let cy = 0; cy < cropH; cy += step) {
+          const iy = Math.floor(cy);
+          for (let cx = 0; cx < cropW; cx += step) {
+            const ix = Math.floor(cx);
+            const alphaIndex = (iy * cropW + ix) * 4 + 3;
+            if (imgData[alphaIndex] > 70) {
+              const realY = minY + iy;
+              coords.push({
+                x: minX + ix,
+                y: realY,
+                lineType: realY < lineSplitY ? 1 : 2
+              });
             }
           }
         }
 
-        // Tối ưu số lượng hạt khoảng 2.200 - 3.200 hạt: chữ sắc sảo, không bị chói lóa hay dính khối
-        const maxParticles = viewportWidth < 600 ? 2500 : 3400;
+        const maxParticles = viewportWidth < 600 ? 2400 : 3400;
         if (coords.length > maxParticles) {
           const ratio = coords.length / maxParticles;
           const sampled = [];
@@ -554,155 +840,225 @@
 
     /**
      * ============================================================================
-     * 5. ENGINE CHÍNH ĐIỀU PHỐI 3 GIAI ĐOẠN PHÁO HOA TỎ TÌNH
+     * 8. ENGINE ĐIỀU PHỐI 5 HỒI PHÁO HOA TỎ TÌNH
      * ============================================================================
      */
     const canvas = document.getElementById('firework-canvas');
     const ctx = canvas.getContext('2d');
     const soundController = new SoundController(document.getElementById('bg-music'));
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
 
-    let currentPhase = 'IDLE'; // 'IDLE' | 'LAUNCHING' | 'EXPLODING' | 'MORPHING'
-    let mainFirework = null;
+    let currentPhase = 'IDLE'; // 'IDLE' | 'LAUNCHING' | 'EXPLODING' | 'MORPHING' | 'DISPERSING'
     let particles = [];
-    let burstSparks = []; // Hạt pháo hoa bung xòe to khi nổ
+    let burstSparks = [];
     let ambientSparks = [];
     let explosionTimestamp = 0;
     let currentReceiverName = 'Trang';
     let dockShown = false;
+    let toastTimer = null;
 
     function handleResize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
 
-      // Nếu đang ở trạng thái tụ chữ mà xoay màn hình thì tính lại tọa độ đích
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
       if (currentPhase === 'MORPHING' && particles.length > 0) {
-        const newTargets = TextPixelScanner.sampleTextCoordinates(currentReceiverName, width, height);
+        const cfg = STAGE_CONFIGS[currentStage - 1];
+        const newTargets = cfg.isFinale
+          ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height)
+          : TextPixelScanner.sampleStageCoordinates(cfg.text, width, height, currentStage);
+
         if (newTargets.length > 0) {
           particles.forEach((p, idx) => {
             const target = newTargets[idx % newTargets.length];
             p.tx = target.x;
             p.ty = target.y;
+            p.lineType = target.lineType || 1;
+            p.updateColorFromTheme();
           });
         }
       }
     }
+    handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Tạo pháo hoa phụ trang trí nền sau khi chữ đã hiện lên
+    function showThemeToast(themeName) {
+      const toast = document.getElementById('theme-toast');
+      if (!toast) return;
+      toast.textContent = `✨ Màu chữ: ${themeName}`;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
     function spawnAmbientFirework() {
-      const cx = width * (0.12 + Math.random() * 0.76);
-      const cy = height * (0.12 + Math.random() * 0.72);
-      const color = ROMANTIC_PALETTE[Math.floor(Math.random() * ROMANTIC_PALETTE.length)];
-      for (let i = 0; i < 36; i++) {
-        const angle = (Math.PI * 2 * i) / 36 + (Math.random() - 0.5) * 0.15;
-        const speed = Math.random() * 3.2 + 0.8;
-        ambientSparks.push({
-          x: cx,
-          y: cy,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          alpha: 0.9,
-          color
-        });
+      const cx = width * (0.15 + Math.random() * 0.70);
+      const cy = height * (0.15 + Math.random() * 0.65);
+      const theme = COLOR_THEMES[currentThemeIndex];
+      const color = theme.sparks[Math.floor(Math.random() * theme.sparks.length)];
+      for (let i = 0; i < 24; i++) {
+        burstSparks.push(new BurstSpark(cx, cy, color));
       }
       soundController.playExplosionBoom(false);
     }
 
-    // Kích hoạt chuỗi 3 giai đoạn Pháo Hoa Chốt Hạ
+    // Nổ riêng từng tên lửa khi bay tới đích (Đảm bảo 2 tên lửa nổ cả 2, 3 tên lửa nổ cả 3 - tầm nở cực đại)
+    function triggerIndividualRocketBurst(originX, originY, isMain = true) {
+      currentExplosionPoints.push({ x: originX, y: originY });
+      soundController.playExplosionBoom(isMain);
+
+      const theme = COLOR_THEMES[currentThemeIndex];
+      const cfg = STAGE_CONFIGS[currentStage - 1];
+      // Số lượng hạt dồi dào lấp đầy tầm nở to lớn
+      const count = cfg.isFinale
+        ? (isMain ? (width < 600 ? 150 : 210) : (width < 600 ? 100 : 140))
+        : (width < 600 ? 110 : 160);
+
+      for (let i = 0; i < count; i++) {
+        const color = theme.sparks[i % theme.sparks.length];
+        burstSparks.push(new BurstSpark(originX, originY, color, isMain));
+      }
+    }
+
+    // Tạo các hạt chữ phân bổ từ tất cả các tâm nổ của loạt tên lửa
+    function spawnStageTextParticles() {
+      const cfg = STAGE_CONFIGS[currentStage - 1];
+      if (cfg.isFinale) {
+        soundController.startBackgroundMusicWithFadeIn();
+      }
+
+      const targetPoints = cfg.isFinale
+        ? TextPixelScanner.sampleFinaleCoordinates(currentReceiverName, width, height)
+        : TextPixelScanner.sampleStageCoordinates(cfg.text, width, height, currentStage);
+
+      const numExplosions = currentExplosionPoints.length || 1;
+      particles = targetPoints.map((pt, index) => {
+        const origin = currentExplosionPoints.length > 0
+          ? currentExplosionPoints[index % numExplosions]
+          : { x: width / 2, y: height * 0.42 };
+        return new Particle(origin.x, origin.y, pt, index);
+      });
+    }
+
+    // Khởi tạo một Hồi trong chuỗi 5 Hồi
+    function startStage(stageNumber) {
+      if (stageNumber > 5) return;
+      currentStage = stageNumber;
+      currentExplosionPoints = [];
+      const cfg = STAGE_CONFIGS[stageNumber - 1];
+
+      // Cập nhật Badge hồi ở góc trên
+      const badge = document.getElementById('stage-badge');
+      if (badge) {
+        badge.textContent = cfg.badge;
+        badge.classList.remove('hidden');
+      }
+
+      // Nút bỏ qua đến câu chốt
+      const skipBtn = document.getElementById('btn-skip-finale');
+      if (skipBtn) {
+        if (!cfg.isFinale) {
+          skipBtn.classList.remove('hidden');
+        } else {
+          skipBtn.classList.add('hidden');
+        }
+      }
+
+      const hint = document.getElementById('stage-hint');
+      if (hint) {
+        hint.classList.add('hidden');
+      }
+
+      // Khởi tạo tên lửa cho hồi này
+      const rocketDefs = cfg.rockets(width, height);
+      activeRockets = rocketDefs.map(
+        (r) => new Firework(r.startX, r.startY, r.targetX, r.targetY, r.isMain)
+      );
+
+      currentPhase = 'LAUNCHING';
+      particles = [];
+      burstSparks = [];
+
+      // Âm thanh rít pháo hoa
+      soundController.playLaunchWhistle(cfg.isFinale ? 1.05 : 0.7);
+    }
+
+    // Chuyển nhanh sang hồi kế tiếp khi người dùng chạm màn hình
+    function advanceStageEarly() {
+      if (currentPhase !== 'MORPHING') return;
+      if (currentStage >= 5) return;
+      currentPhase = 'DISPERSING';
+      disperseTimestamp = performance.now();
+      const hint = document.getElementById('stage-hint');
+      if (hint) hint.classList.add('hidden');
+    }
+
+    // Kích hoạt chuỗi 5 Hồi Pháo Hoa Tỏ Tình
     async function triggerConfessionFirework(receiverName) {
       currentReceiverName = TextPixelScanner.formatProperName(receiverName || 'Trang');
       nameInput.value = currentReceiverName;
       dockShown = false;
       document.getElementById('floating-dock').classList.remove('visible');
 
-      // Đảm bảo Google Font 'Dancing Script' đã tải xong trước khi quét pixel
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
+      if (document.fonts) {
+        try {
+          await document.fonts.load('700 48px "Dancing Script"');
+          await document.fonts.ready;
+        } catch (e) {
+          console.warn('Font load error:', e);
+        }
       }
 
-      // Ẩn màn hình Form với hiệu ứng Fade-out
       document.getElementById('input-screen').classList.add('fade-out');
 
-      // Khởi tạo Giai đoạn 1: Bắn tên lửa từ đáy màn hình lên tâm
-      const startX = width / 2;
-      const startY = height + 10;
-      const targetX = width / 2;
-      const targetY = height * 0.44;
-
-      particles = [];
-      burstSparks = [];
-      ambientSparks = [];
-      mainFirework = new Firework(startX, startY, targetX, targetY);
-      currentPhase = 'LAUNCHING';
-      soundController.playLaunchWhistle(0.55);
+      // Khởi động từ Hồi 1
+      startStage(1);
     }
 
-    // Chuyển từ Giai đoạn 1 (Bắn lên) sang Giai đoạn 2 (Phát nổ cực đại bung xòe to + morphing)
-    function explodeIntoParticles(originX, originY) {
-      currentPhase = 'EXPLODING';
-      explosionTimestamp = performance.now();
-
-      // Phát tiếng nổ Synthesizer cực uy lực & bắt đầu Fade-in nhạc nền
-      soundController.playExplosionBoom(true);
-      soundController.startBackgroundMusicWithFadeIn();
-
-      // 1. Tạo 350 - 400 hạt pháo hoa nổ bung xòe to hết cỡ màn hình
-      burstSparks = [];
-      const burstCount = width < 600 ? 320 : 420;
-      for (let i = 0; i < burstCount; i++) {
-        const color = ROMANTIC_PALETTE[i % ROMANTIC_PALETTE.length];
-        burstSparks.push(new BurstSpark(originX, originY, color));
-      }
-
-      // 2. Quét tọa độ chữ "Làm người yêu anh nhé [Tên]?" trên Offscreen Canvas
-      const targetPoints = TextPixelScanner.sampleTextCoordinates(currentReceiverName, width, height);
-
-      particles = targetPoints.map((pt, index) => new Particle(originX, originY, pt, index));
-    }
-
-    // Vòng lặp 60fps bằng requestAnimationFrame
+    // Vòng lặp Render 60fps
     function animate(now) {
       const timeSec = now * 0.001;
 
-      // Vẽ lớp phủ mờ để tạo vệt sáng chuyển động (Motion Trail)
-      ctx.fillStyle = currentPhase === 'MORPHING'
-        ? 'rgba(5, 2, 14, 0.34)'
-        : 'rgba(5, 2, 14, 0.22)';
+      // Scale context theo DPR
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Lớp phủ mờ chuyển động: Giữ độ trong suốt cao để không để lại bóng ma nhòe nhoẹt
+      ctx.globalCompositeOperation = 'source-over';
+      const clearOpacity = currentPhase === 'MORPHING' ? 0.48 : (currentPhase === 'LAUNCHING' ? 0.38 : 0.44);
+      ctx.fillStyle = `rgba(5, 2, 14, ${clearOpacity})`;
       ctx.fillRect(0, 0, width, height);
 
-      if (currentPhase === 'LAUNCHING' && mainFirework) {
-        mainFirework.update();
-        mainFirework.draw(ctx);
+      // 1. Giai đoạn BẮN TÊN LỬA (LAUNCHING)
+      if (currentPhase === 'LAUNCHING' && activeRockets.length > 0) {
+        ctx.globalCompositeOperation = 'lighter';
+        let allExploded = true;
 
-        if (mainFirework.exploded) {
-          explodeIntoParticles(mainFirework.x, mainFirework.y);
-          mainFirework = null;
-        }
-      } else if (currentPhase === 'EXPLODING' || currentPhase === 'MORPHING') {
-        const elapsed = (now - explosionTimestamp) / 1000;
-
-        // Sau đúng 1.5 giây kể từ khi nổ -> Chuyển sang Giai đoạn 3 (Tụ chữ)
-        if (currentPhase === 'EXPLODING' && elapsed >= 1.5) {
-          currentPhase = 'MORPHING';
-        }
-
-        // Hiển thị thanh công cụ sau khi chữ đã tụ rõ ràng
-        if (currentPhase === 'MORPHING' && elapsed >= 3.2 && !dockShown) {
-          dockShown = true;
-          document.getElementById('floating-dock').classList.add('visible');
+        for (let i = 0; i < activeRockets.length; i++) {
+          const r = activeRockets[i];
+          if (!r.exploded) {
+            r.update();
+            r.draw(ctx);
+            allExploded = false;
+          } else {
+            if (!r.burstCreated) {
+              r.burstCreated = true;
+              triggerIndividualRocketBurst(r.x, r.y, r.isMain);
+            }
+          }
         }
 
-        // Bắn pháo hoa phụ nhẹ nhàng làm nền sau khi chữ đã hình thành
-        if (currentPhase === 'MORPHING' && elapsed > 3.0 && Math.random() < 0.018) {
-          spawnAmbientFirework();
-        }
-
-        // Vẽ các hạt pháo hoa nổ bung xòe cực đại
+        // Vẽ các tia nổ của từng tên lửa đã phát nổ trong khi các tên lửa khác đang bay
         if (burstSparks.length > 0) {
-          ctx.save();
           ctx.globalCompositeOperation = 'lighter';
           for (let i = burstSparks.length - 1; i >= 0; i--) {
             const b = burstSparks[i];
@@ -712,40 +1068,102 @@
               burstSparks.splice(i, 1);
             }
           }
-          ctx.restore();
         }
 
-        // Vẽ các hạt pháo hoa phụ làm nền
-        for (let i = ambientSparks.length - 1; i >= 0; i--) {
-          const sp = ambientSparks[i];
-          sp.x += sp.vx;
-          sp.y += sp.vy;
-          sp.vy += 0.03;
-          sp.alpha -= 0.016;
-          if (sp.alpha <= 0) {
-            ambientSparks.splice(i, 1);
-            continue;
+        if (allExploded) {
+          activeRockets = [];
+          currentPhase = 'EXPLODING';
+          explosionTimestamp = performance.now();
+          spawnStageTextParticles();
+        }
+      }
+      // 2. Giai đoạn PHÁT NỔ & TỤ CHỮ (EXPLODING | MORPHING)
+      else if (currentPhase === 'EXPLODING' || currentPhase === 'MORPHING') {
+        const elapsed = (now - explosionTimestamp) / 1000;
+        const cfg = STAGE_CONFIGS[currentStage - 1];
+
+        // Thời gian nổ bung và uốn rơi theo trọng lực trước khi chuyển sang tụ chữ
+        if (currentPhase === 'EXPLODING' && elapsed >= 1.0) {
+          currentPhase = 'MORPHING';
+        }
+
+        if (currentPhase === 'MORPHING') {
+          if (cfg.isFinale) {
+            // Hồi 5: Lời chốt hạ lưu vĩnh viễn trên màn hình
+            if (elapsed >= 3.2 && !dockShown) {
+              dockShown = true;
+              document.getElementById('floating-dock').classList.add('visible');
+            }
+            if (elapsed > 2.8 && Math.random() < 0.016) {
+              spawnAmbientFirework();
+            }
+          } else {
+            // Hồi 1 - 4: Tăng thời gian chờ đọc chữ xong (hiện gợi ý chạm sau 3.2s)
+            if (elapsed >= 3.2 && elapsed < cfg.duration) {
+              const hint = document.getElementById('stage-hint');
+              if (hint) hint.classList.remove('hidden');
+            }
+            if (elapsed >= cfg.duration) {
+              advanceStageEarly();
+            }
           }
-          ctx.globalAlpha = sp.alpha;
-          ctx.fillStyle = sp.color;
-          ctx.beginPath();
-          ctx.arc(sp.x, sp.y, 1.8, 0, Math.PI * 2);
-          ctx.fill();
         }
-        ctx.globalAlpha = 1;
 
-        // Cập nhật & vẽ các hạt morphing chữ (ShadowBlur nhỏ 3.5, hạt 1px, nét thanh mảnh sắc sảo)
-        ctx.save();
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.shadowBlur = currentPhase === 'MORPHING' ? 3.5 : 2;
-        ctx.shadowColor = '#ff2a85';
+        // Vẽ các tia pháo hoa nổ bung xòe (Chế độ lighter với hạt sắc nét, thấy rõ từng tia)
+        if (burstSparks.length > 0) {
+          ctx.globalCompositeOperation = 'lighter';
+          for (let i = burstSparks.length - 1; i >= 0; i--) {
+            const b = burstSparks[i];
+            b.update();
+            b.draw(ctx);
+            if (b.alpha <= 0) {
+              burstSparks.splice(i, 1);
+            }
+          }
+        }
+
+        // Cập nhật tọa độ hạt morphing
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update(currentPhase, elapsed, timeSec);
+        }
+
+        // VẼ HẠT CHỮ: Sử dụng 'source-over' đơn tầng sắc nét, KHÔNG dùng lighter chồng lớp gây lóa nhòe
+        ctx.globalCompositeOperation = 'source-over';
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
-          p.update(currentPhase, elapsed, timeSec);
-          p.draw(ctx);
+          ctx.globalAlpha = p.alpha;
+          ctx.drawImage(p.coreSprite, p.x - 4, p.y - 4);
         }
-        ctx.restore();
       }
+      // 3. Giai đoạn TAN BIẾN CHUYỂN HỒI (DISPERSING)
+      else if (currentPhase === 'DISPERSING') {
+        let allFaded = true;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.vx += (Math.random() - 0.5) * 0.4;
+          p.vy -= 0.15 + Math.random() * 0.2; // bay bồng bềnh lên cao như tàn sao
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.042;
+          if (p.alpha > 0) allFaded = false;
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          if (p.alpha > 0) {
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.drawImage(p.coreSprite, p.x - 4, p.y - 4);
+          }
+        }
+
+        if (allFaded || (now - disperseTimestamp) > 750) {
+          startStage(currentStage + 1);
+        }
+      }
+
+      ctx.globalAlpha = 1.0;
+      ctx.globalCompositeOperation = 'source-over';
 
       requestAnimationFrame(animate);
     }
@@ -753,11 +1171,43 @@
 
     /**
      * ============================================================================
-     * 6. SỰ KIỆN GIAO DIỆN & TÍCH HỢP VIETQR / CHẾ ĐỘ NGƯỜI NHẬN QUÀ
+     * 9. SỰ KIỆN GIAO DIỆN & TÍCH HỢP VIETQR / CHẾ ĐỘ NGƯỜI NHẬN QUÀ
      * ============================================================================
      */
     const loveForm = document.getElementById('love-form');
     const nameInput = document.getElementById('target-name-input');
+
+    // Chạm màn hình để chuyển nhanh hồi
+    canvas.addEventListener('click', () => {
+      advanceStageEarly();
+    });
+
+    // Bấm xem ngay câu chốt hạ
+    document.getElementById('btn-skip-finale').addEventListener('click', () => {
+      startStage(5);
+    });
+
+    // Chọn chủ đề màu từ Form ban đầu
+    document.querySelectorAll('.theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentThemeIndex = parseInt(e.currentTarget.dataset.theme, 10) || 0;
+      });
+    });
+
+    // Đổi màu trực tiếp ngay trên màn pháo hoa
+    document.getElementById('btn-change-color').addEventListener('click', () => {
+      currentThemeIndex = (currentThemeIndex + 1) % COLOR_THEMES.length;
+      const theme = COLOR_THEMES[currentThemeIndex];
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].updateColorFromTheme();
+      }
+      showThemeToast(theme.name);
+      document.querySelectorAll('.theme-chip').forEach((chip) => {
+        chip.classList.toggle('active', parseInt(chip.dataset.theme, 10) === currentThemeIndex);
+      });
+    });
 
     loveForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -765,15 +1215,22 @@
       triggerConfessionFirework(enteredName);
     });
 
+    // Bắn lại cả 5 hồi
     document.getElementById('btn-replay-show').addEventListener('click', () => {
-      triggerConfessionFirework(currentReceiverName);
+      dockShown = false;
+      document.getElementById('floating-dock').classList.remove('visible');
+      startStage(1);
     });
 
     document.getElementById('btn-change-name').addEventListener('click', () => {
       currentPhase = 'IDLE';
       particles = [];
       ambientSparks = [];
+      activeRockets = [];
       ctx.clearRect(0, 0, width, height);
+      document.getElementById('stage-badge').classList.add('hidden');
+      document.getElementById('btn-skip-finale').classList.add('hidden');
+      document.getElementById('stage-hint').classList.add('hidden');
       document.getElementById('floating-dock').classList.remove('visible');
       document.getElementById('input-container').style.display = 'block';
       document.getElementById('input-screen').classList.remove('fade-out');
@@ -802,12 +1259,15 @@
             currentReceiverName = receiver;
             nameInput.value = receiver;
 
-            // Ẩn ô nhập tên khi Người Nhận mở link quà tặng, chỉ hiện nút Bắn Pháo Hoa mở quà
+            // Ẩn ô nhập tên khi Người Nhận mở link quà tặng
             document.getElementById('input-container').style.display = 'none';
+            const themeWrap = document.querySelector('.theme-selector-wrap');
+            if (themeWrap) themeWrap.style.display = 'none';
+
             document.getElementById('form-heading').textContent = `Món Quà Dành Tặng ${receiver}`;
             document.getElementById('form-subtext').textContent =
-              'Ai đó đã gửi cho bạn một bầu trời pháo hoa đặc biệt. Hãy chạm nút bên dưới để thắp sáng bầu trời đêm nhé!';
-            document.getElementById('btn-trigger-firework').textContent = 'Chạm Để Ngắm Pháo Hoa 🚀';
+              'Ai đó đã gửi cho bạn một màn pháo hoa 5 hồi đặc biệt. Hãy chạm nút bên dưới để thắp sáng bầu trời đêm nhé!';
+            document.getElementById('btn-trigger-firework').textContent = 'Chạm Để Ngắm 5 Hồi Pháo Hoa 🚀';
           }
         });
 

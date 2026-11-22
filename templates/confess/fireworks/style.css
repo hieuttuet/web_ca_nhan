@@ -53,9 +53,9 @@ html, body {
 }
 
 @keyframes twinkleSky {
-  0% { opacity: 0.35; transform: scale(0.99); }
-  50% { opacity: 0.95; }
-  100% { opacity: 0.45; transform: scale(1.01); }
+  0% { opacity: 0.35; }
+  50% { opacity: 0.92; }
+  100% { opacity: 0.45; }
 }
 
 /* ==================== 2. CANVAS HOẠT HỌA 2D ==================== */
@@ -107,6 +107,81 @@ html, body {
 .top-pill-btn:hover {
   border-color: var(--neon-pink);
   background: rgba(255, 42, 133, 0.22);
+}
+
+.top-right-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-badge {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(16, 8, 32, 0.78);
+  border: 1px solid rgba(255, 208, 67, 0.45);
+  color: #ffd043;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.stage-badge.hidden {
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+}
+
+.stage-hint {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(16, 8, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  animation: hintPulse 2s infinite ease-in-out;
+}
+
+.stage-hint.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  visibility: hidden;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.95; }
+}
+
+@media (max-width: 520px) {
+  .stage-badge {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 0.72rem;
+  }
+  .top-pill-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 0.75rem;
+  }
 }
 
 /* ==================== 4. MÀN HÌNH CHỜ GLASSMORPHISM FORM ==================== */
@@ -220,6 +295,75 @@ html, body {
   border-color: var(--neon-pink);
   background: rgba(255, 42, 133, 0.1);
   box-shadow: 0 0 22px rgba(255, 42, 133, 0.4);
+}
+
+/* ==================== 4.1 BỘ CHỌN MÀU PHÁO HOA CHỐNG LÓA ==================== */
+.theme-selector-wrap {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.theme-chips-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.theme-chip {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.theme-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.theme-chip.active {
+  background: linear-gradient(135deg, rgba(255, 208, 67, 0.28) 0%, rgba(255, 42, 109, 0.28) 100%);
+  border-color: #ffd043;
+  color: #ffd043;
+  box-shadow: 0 0 12px rgba(255, 208, 67, 0.35);
+}
+
+/* Toast Badge khi đổi màu trong show */
+.theme-toast-pill {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(16, 8, 32, 0.88);
+  border: 1px solid rgba(255, 208, 67, 0.45);
+  color: #ffd043;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.theme-toast-pill.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .btn-firework-launch {

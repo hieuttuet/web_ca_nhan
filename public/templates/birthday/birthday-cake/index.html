@@ -6,99 +6,869 @@
   <title>Bánh Sinh Nhật Thổi Nến & Pháo Hoa 3D 🎂</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
   <script src="../../../templates-catalog.js"></script>
-  <script src="../../../shared/payment-qr-kit.js"></script>
+  <script src="/shared/gift-sdk.js"></script>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
+  <!-- 1. Bầu trời sao lấp lánh (CSS Animation 60fps) -->
+  <div class="night-sky-stars"></div>
+  <div class="night-sky-stars layer-2"></div>
+
+  <!-- 2. Màn chớp sáng bừng tỉnh khi bật đèn phòng -->
+  <div id="screen-flash" class="screen-flash"></div>
+
+  <!-- 3. Hồi 1: Đếm ngược 3, 2, 1 -> Căn phòng đen tối -> Bật công tắc bừng sáng -->
+  <div id="intro-story-overlay" class="intro-story-overlay">
+    <!-- Bước 1: Màn đếm ngược 3, 2, 1 -->
+    <div id="countdown-step" class="countdown-step">
+      <div class="countdown-tag">✨ SẴN SÀNG ĐÓN ĐIỀU BẤT NGỜ ✨</div>
+      <div id="countdown-big-num" class="countdown-big-num">3</div>
+      <div id="countdown-person" class="countdown-person">Dành riêng cho Minh Anh ❤️</div>
+      <div class="countdown-sub">Khoảnh khắc bước sang tuổi mới bắt đầu sau...</div>
+      <button type="button" id="btn-skip-countdown" class="btn-skip-countdown">⏩ Bỏ qua đếm ngược</button>
+    </div>
+
+    <!-- Bước 2: Căn phòng đen tối thui & Công tắc đèn -->
+    <div id="dark-room-step" class="dark-room-step">
+      <div class="dark-room-title">Ủa sao phòng tối thui vậy ta? 🤫</div>
+      <button type="button" id="btn-switch-light" class="btn-switch-light">
+        <span>💡</span><span id="txt-switch-btn">BẬT ĐÈN XEM NÀO!</span>
+      </button>
+      <div class="dark-room-sub">👉 Chạm vào công tắc để bật đèn đón sinh nhật nào!</div>
+    </div>
+  </div>
+
+  <!-- 4. Thanh công cụ phía trên chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Kho Mẫu Quà Tặng">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-toggle-mic" title="Bật Micro để thổi nến chân thực">🎤 Thổi Mic</button>
+      <button type="button" id="btn-toggle-sound" class="hud-btn" title="Bật/Tắt Âm Thanh">🔊 Âm thanh</button>
+      <!-- #btn-tiktok-mode 📹 được tự động gắn vào đây bởi tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 5. Huy hiệu dịp sinh nhật nổi độc lập chính giữa -->
+  <div id="bday-stage-pill" class="bday-stage-pill">🎂 Chúc Mừng Sinh Nhật • Mừng Tuổi Mới 🎂</div>
+
+  <!-- 6. Canvas chính vẽ Dây đèn, Bánh 2.5D, Khói nến, Bóng bay, Pháo hoa & Pháo giấy -->
   <canvas id="bday-canvas"></canvas>
 
-  <div class="top-nav">
-    <a id="btn-top-back" href="../../../index.html" class="pill-link">⬅️ Kho Mẫu Quà Tặng</a>
-    <button id="btn-mic-blow" class="pill-link">🎤 Bật Micro Thổi Nến</button>
-  </div>
+  <!-- 7. Gợi ý hành động thổi nến -->
+  <div id="bday-action-hint" class="bday-action-hint">✨ Nhắm mắt ước một điều rồi <b>Thổi vào Mic</b> hoặc <b>Chạm vào nến</b> nhé! 🕯️</div>
 
-  <div class="center-hud">
-    <div class="bday-badge">🎂 HAPPY BIRTHDAY • MỪNG TUỔI MỚI 🎂</div>
-    <h1 id="hud-bday-name" class="bday-title">Chúc Mừng Sinh Nhật Minh Anh ✨</h1>
-    <p id="hud-bday-wish" class="bday-wish">
-      Hãy nhắm mắt ước một điều thật đẹp rồi <b>Thổi vào Micro</b> hoặc <b>Chạm vào ngọn nến</b> để thổi nến nhé! 🕯️
-    </p>
-  </div>
+  <!-- 8. Thanh nút điều khiển dưới cùng (Chuẩn 1 hàng ngang per 3d-visual.md) -->
+  <nav id="floating-dock" class="bottom-dock" aria-label="Thanh điều khiển sinh nhật">
+    <button type="button" id="btn-blow-action" class="dock-btn" title="Thổi nến hoặc thắp lại nến">
+      <span id="ico-blow-action">💨</span><span id="txt-blow-action">Thổi Nến</span>
+    </button>
+    <button type="button" id="btn-open-wish" class="dock-btn" title="Đọc trọn vẹn lời chúc tâm thư">
+      <span>💌</span><span>Lời Chúc</span>
+    </button>
+    <button type="button" id="btn-open-creator-modal" class="dock-btn primary-cta creator-only" title="Cá nhân hóa bánh sinh nhật và tạo mã QR">
+      <span>✨ Tạo Bánh Riêng</span>
+      <span class="dock-price-badge">29k</span>
+    </button>
+  </nav>
 
-  <div class="bottom-dock">
-    <button id="btn-blow-now" class="action-btn">💨 Chạm Thổi Nến</button>
-    <button id="btn-relight" class="action-btn" style="display:none;">🕯️ Thắp Lại Nến</button>
-    <button id="btn-open-customize" class="action-btn primary">✨ Tạo Bánh Sinh Nhật Riêng (29.000đ)</button>
-  </div>
+  <!-- 9. Modal Cá Nhân Hóa & Tạo Mã QR (Dành cho người tặng) -->
+  <div id="modal-creator" class="modal-backdrop creator-only">
+    <div class="modal-card">
+      <button type="button" id="btn-close-modal-creator" class="modal-close" aria-label="Đóng">✕</button>
 
-  <!-- Modal Tùy Chỉnh Tên & Lời Chúc Sinh Nhật -->
-  <div id="modal-custom" class="modal-wrap">
-    <div class="modal-box">
-      <h3 style="font-size: 1.4rem; margin-bottom: 6px;">🎂 Tạo Bánh Sinh Nhật 3D</h3>
-      <p style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 16px;">
-        Nhập tên người nhận, số tuổi và lời chúc sinh nhật ngọt ngào nhất:
+      <div class="sparkle-badge">🎂 Cá Nhân Hóa Bánh Sinh Nhật 3D ✨</div>
+      <h2 class="modal-title">Tạo Bánh Sinh Nhật & Pháo Hoa</h2>
+      <p class="modal-sub">
+        Nhập tên chủ nhân sinh nhật, số tuổi và lời chúc yêu thương. Trải nghiệm kịch bản đếm ngược 3, 2, 1 bất ngờ, căn phòng tối và đại tiệc pháo hoa kết tên!
       </p>
-      <input id="in-sender" class="input-field" placeholder="Tên người gửi (VD: Bảo Nam)" value="Bảo Nam" />
-      <input id="in-receiver" class="input-field" placeholder="Tên chủ nhân sinh nhật (VD: Minh Anh)" value="Minh Anh" />
-      <input id="in-wish" class="input-field" placeholder="Lời chúc sinh nhật..." value="Chúc em tuổi mới luôn rạng rỡ, hạnh phúc và mọi điều ước đều thành sự thật! ❤️" />
 
-      <div style="display:flex; gap:8px; margin-top: 6px;">
-        <button id="btn-preview-bday" class="action-btn" style="flex:1;">👁️ Xem Thử</button>
-        <button id="btn-pay-bday" class="action-btn primary" style="flex:1;">💳 Lấy Link & QR (29k)</button>
-      </div>
-      <button id="btn-close-custom" class="action-btn" style="width:100%; margin-top:8px;">Đóng</button>
+      <form id="creator-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên chủ nhân sinh nhật *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Minh Anh" value="Minh Anh" maxlength="24" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên người gửi (Bạn) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Bảo Nam" value="Bảo Nam" maxlength="24" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-age">Số tuổi mới (VD: 20):</label>
+          <input type="number" id="in-age" class="modal-input" placeholder="VD: 20" value="20" min="1" max="100" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Lời chúc tâm thư sinh nhật:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập lời chúc sinh nhật ngọt ngào..." required>Chúc em tuổi mới luôn rạng rỡ, xinh đẹp, hạnh phúc và mọi ước mơ đều trở thành sự thật! ❤️</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Chọn Tone Màu Pháo Hoa Ghép Tên:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="theme-chip modal-theme-chip active" data-theme="0">✨ Vàng Kim & Ruby</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="1">🌸 Hồng Rose & San Hô</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="2">🌅 Hoàng Hôn Ánh Dương</button>
+            <button type="button" class="theme-chip modal-theme-chip" data-theme="3">💜 Tím Mộng Mơ</button>
+          </div>
+        </div>
+
+        <div class="modal-btn-actions">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            👁️ Xem Thử Kịch Bản
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Mã QR & Link Thiệp (29.000đ)
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Modal Thanh Toán VietQR -->
-  <div id="modal-pay" class="modal-wrap">
-    <div class="modal-box">
-      <button class="modal-close-corner" onclick="closePayModal()" title="Đóng">✕</button>
+  <!-- 10. Modal Đọc Tâm Thư Sinh Nhật (Dành cho Người nhận & Người xem) -->
+  <div id="modal-wish-card" class="modal-backdrop">
+    <div class="modal-card">
+      <button type="button" id="btn-close-modal-wish" class="modal-close" aria-label="Đóng">✕</button>
 
-      <div id="bday-pay-waiting">
-        <h3 style="font-size: 1.35rem; margin-bottom: 6px;">📲 Quét VietQR Mở Khóa Link</h3>
-        <p style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 12px;">
-          Hệ thống tự động mở khóa Link ngay sau 3 giây khi nhận chuyển khoản!
-        </p>
-        <div class="qr-card"><img id="bday-vietqr" src="" alt="VietQR" /></div>
-        <button type="button" id="btn-bday-download-vietqr" class="action-btn" style="width: 100%; margin-bottom: 12px; font-size: 0.86rem; padding: 11px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,158,198,0.45);">
-          📥 Tải Mã QR Chuyển Tiền (Quét từ App Ngân Hàng)
+      <div class="sparkle-badge">💌 Lời Chúc Sinh Nhật Ngọt Ngào 🎂</div>
+      <h2 id="wish-card-title" class="modal-title">Gửi Tới Minh Anh</h2>
+      <div id="wish-card-content" class="letter-box">
+        Chúc em tuổi mới luôn rạng rỡ, xinh đẹp, hạnh phúc và mọi ước mơ đều trở thành sự thật! ❤️
+      </div>
+      <div id="wish-card-sender" class="letter-sign">Thân thương, Bảo Nam</div>
+
+      <div style="margin-top: 18px; text-align: center;">
+        <button type="button" id="btn-relight-from-wish" class="modal-btn-secondary" style="width: 100%;">
+          🕯️ Thắp Lại Nến Ước Nguyện
         </button>
-        <div style="font-size: 0.84rem; margin-bottom: 0; color: #fde047;">
-          Số tiền: <b id="bday-amount">29.000đ</b> • Nội dung: <b id="bday-code">LOVE...</b>
-        </div>
-      </div>
-
-      <div id="bday-pay-success" style="display:none;">
-        <h3 style="font-size: 1.4rem; color:#6ee7b7; margin-bottom: 8px;">🎉 Đã Tạo Link Quà Sinh Nhật!</h3>
-        <div class="qr-card"><img id="bday-gift-qr" src="" alt="Gift QR" /></div>
-        <input id="bday-share-url" class="input-field" readonly style="margin-bottom: 10px;" />
-        <div style="display: flex; gap: 8px;">
-          <button id="btn-bday-copy" class="action-btn primary" style="flex:1;">📋 Sao Chép Link</button>
-          <button id="btn-bday-download-qr" class="action-btn" style="flex:1; background: linear-gradient(135deg, #059669, #10b981);">📥 Lưu Mã QR</button>
-        </div>
       </div>
     </div>
   </div>
+
+  <!-- 11. Toast thông báo nhẹ -->
+  <div id="theme-toast" class="theme-toast-pill"></div>
 
   <script>
-    const canvas = document.getElementById('bday-canvas');
-    const ctx = canvas.getContext('2d');
-    let width = window.innerWidth, height = window.innerHeight;
+    /**
+     * ============================================================================
+     * 1. BẢNG MÀU PHÁO HOA CHỐNG LÓA
+     * ============================================================================
+     */
+    const COLOR_THEMES = [
+      {
+        id: 'gold_ruby',
+        name: 'Vàng Kim & Ruby',
+        line1: ['#ffd043', '#ffc107', '#ffb300', '#ffe082'],
+        line2: ['#ff2a6d', '#ff1744', '#f50057', '#ff5252'],
+        line3: ['#ffffff', '#fff7ed', '#fef08a'],
+        sparks: ['#ffd043', '#ff9100', '#ff2a6d', '#ff1744', '#ffe082']
+      },
+      {
+        id: 'rose_gold',
+        name: 'Hồng Rose & San Hô',
+        line1: ['#ff6584', '#f43f5e', '#fb7185', '#fda4af'],
+        line2: ['#ff2a85', '#e11d48', '#be123c', '#ff4d6d'],
+        line3: ['#ffffff', '#fce7f3', '#fbcfe8'],
+        sparks: ['#ff6584', '#fb7185', '#ff2a85', '#fde047', '#ffedd5']
+      },
+      {
+        id: 'sunset_glow',
+        name: 'Hoàng Hôn Ánh Dương',
+        line1: ['#ff9f43', '#f39c12', '#e67e22', '#f1c40f'],
+        line2: ['#ee5253', '#ff6b6b', '#ff4757', '#ff3838'],
+        line3: ['#ffffff', '#fef3c7', '#fed7aa'],
+        sparks: ['#ff9f43', '#f39c12', '#ff6b6b', '#ff4757', '#ffd32a']
+      },
+      {
+        id: 'purple_dream',
+        name: 'Tím Mộng Mơ',
+        line1: ['#a855f7', '#c084fc', '#d8b4fe', '#e9d5ff'],
+        line2: ['#ec4899', '#f43f5e', '#f472b6', '#fb7185'],
+        line3: ['#ffffff', '#f3e8ff', '#f5d0fe'],
+        sparks: ['#a855f7', '#c084fc', '#ec4899', '#f43f5e', '#fbcfe8']
+      }
+    ];
 
-    let state = {
-      sender: 'Bảo Nam',
+    let currentThemeIndex = 0;
+
+    /**
+     * ============================================================================
+     * 2. STATE VÀ DỮ LIỆU CÁ NHÂN HÓA
+     * ============================================================================
+     */
+    const state = {
       receiver: 'Minh Anh',
-      wish: 'Chúc em tuổi mới luôn rạng rỡ, hạnh phúc và mọi điều ước đều thành sự thật! ❤️',
-      candlesLit: true
+      sender: 'Bảo Nam',
+      age: 20,
+      wish: 'Chúc em tuổi mới luôn rạng rỡ, xinh đẹp, hạnh phúc và mọi ước mơ đều trở thành sự thật! ❤️',
+      stage: 'COUNTDOWN', // 'COUNTDOWN', 'PARTY_ROOM', 'EXTINGUISHED', 'ROCKETS', 'EXPLODING', 'MORPHING'
+      candlesLit: true,
+      lightsOn: false,
+      micListening: false,
+      micVolume: 0
     };
 
-    let fireworks = [];
-    let activeOrderCode = null;
-    let pollTimer = null;
+    /**
+     * ============================================================================
+     * 3. SOUND CONTROLLER (Web Audio API Thuần 100%)
+     * ============================================================================
+     */
+    class SoundController {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.noiseBuffer = null;
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            const bufferSize = Math.floor(this.ctx.sampleRate * 1.5);
+            this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const output = this.noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              output[i] = Math.random() * 2 - 1;
+            }
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTickSound(freq = 520) {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.08);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.085);
+      }
+
+      playSwitchSound() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        // Click tiếng công tắc
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.setValueAtTime(1400, now + 0.02);
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.09);
+
+        // Tiếng chuông ngân chào đón tuổi mới
+        setTimeout(() => {
+          if (this.muted || !this.ctx) return;
+          const t = this.ctx.currentTime;
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+            const bell = this.ctx.createOscillator();
+            const bGain = this.ctx.createGain();
+            bell.type = 'sine';
+            bell.frequency.setValueAtTime(freq, t + idx * 0.08);
+            bGain.gain.setValueAtTime(0.14, t + idx * 0.08);
+            bGain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.08 + 1.2);
+            bell.connect(bGain);
+            bGain.connect(this.ctx.destination);
+            bell.start(t + idx * 0.08);
+            bell.stop(t + idx * 0.08 + 1.25);
+          });
+        }, 100);
+      }
+
+      playExtinguishSound() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.noiseBuffer) return;
+
+        const now = this.ctx.currentTime;
+        const noiseSource = this.ctx.createBufferSource();
+        noiseSource.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2400, now);
+        filter.Q.setValueAtTime(3.5, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.24, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        noiseSource.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        noiseSource.start(now);
+        noiseSource.stop(now + 0.46);
+      }
+
+      playLaunchWhistle(duration = 0.95) {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(940, now + duration);
+
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.09, now + duration * 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      playExplosionBoom(isMain = true) {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.noiseBuffer) return;
+
+        const now = this.ctx.currentTime;
+        const noiseSource = this.ctx.createBufferSource();
+        noiseSource.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(isMain ? 480 : 360, now);
+        filter.frequency.exponentialRampToValueAtTime(50, now + (isMain ? 1.2 : 0.8));
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(isMain ? 0.55 : 0.28, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (isMain ? 1.25 : 0.85));
+
+        noiseSource.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        if (isMain) {
+          const subOsc = this.ctx.createOscillator();
+          const subGain = this.ctx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(115, now);
+          subOsc.frequency.exponentialRampToValueAtTime(32, now + 0.65);
+
+          subGain.gain.setValueAtTime(0.38, now);
+          subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+          subOsc.connect(subGain);
+          subGain.connect(this.ctx.destination);
+          subOsc.start(now);
+          subOsc.stop(now + 0.7);
+        }
+
+        noiseSource.start(now);
+        noiseSource.stop(now + 1.3);
+      }
+
+      playHappyBirthdayMelody() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+
+        const notes = [
+          { f: 261.63, d: 0.28 }, { f: 261.63, d: 0.16 }, { f: 293.66, d: 0.44 }, { f: 261.63, d: 0.44 }, { f: 349.23, d: 0.44 }, { f: 329.63, d: 0.82 },
+          { f: 261.63, d: 0.28 }, { f: 261.63, d: 0.16 }, { f: 293.66, d: 0.44 }, { f: 261.63, d: 0.44 }, { f: 392.00, d: 0.44 }, { f: 349.23, d: 0.82 },
+          { f: 261.63, d: 0.28 }, { f: 261.63, d: 0.16 }, { f: 523.25, d: 0.44 }, { f: 440.00, d: 0.44 }, { f: 349.23, d: 0.44 }, { f: 329.63, d: 0.44 }, { f: 293.66, d: 0.82 },
+          { f: 466.16, d: 0.28 }, { f: 466.16, d: 0.16 }, { f: 440.00, d: 0.44 }, { f: 349.23, d: 0.44 }, { f: 392.00, d: 0.44 }, { f: 349.23, d: 1.10 }
+        ];
+
+        let offset = 0;
+        notes.forEach((note) => {
+          const t = this.ctx.currentTime + offset;
+          const osc1 = this.ctx.createOscillator();
+          const gain1 = this.ctx.createGain();
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(note.f, t);
+
+          gain1.gain.setValueAtTime(0.001, t);
+          gain1.gain.linearRampToValueAtTime(0.14, t + 0.02);
+          gain1.gain.exponentialRampToValueAtTime(0.001, t + note.d * 1.5);
+
+          osc1.connect(gain1);
+          gain1.connect(this.ctx.destination);
+          osc1.start(t);
+          osc1.stop(t + note.d * 1.55);
+
+          const osc2 = this.ctx.createOscillator();
+          const gain2 = this.ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(note.f * 2, t);
+
+          gain2.gain.setValueAtTime(0.001, t);
+          gain2.gain.linearRampToValueAtTime(0.05, t + 0.02);
+          gain2.gain.exponentialRampToValueAtTime(0.001, t + note.d * 1.2);
+
+          osc2.connect(gain2);
+          gain2.connect(this.ctx.destination);
+          osc2.start(t);
+          osc2.stop(t + note.d * 1.25);
+
+          offset += note.d * 0.96;
+        });
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
+      }
+    }
+
+    const sound = new SoundController();
+
+    /**
+     * ============================================================================
+     * 4. DÀN ĐÈN DÂY FAIRYLIGHTS LUNG LINH KHI BẬT ĐÈN
+     * ============================================================================
+     */
+    class FairyLights {
+      draw(ctx, w, time) {
+        const lightCount = Math.floor(w / 45);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.lineWidth = 1.2;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 15);
+        for (let i = 0; i <= lightCount; i++) {
+          const x = (w / lightCount) * i;
+          const sag = Math.sin((i / lightCount) * Math.PI) * 18 + 15;
+          ctx.lineTo(x, sag);
+        }
+        ctx.stroke();
+
+        const bulbColors = ['#ffd043', '#ff2a85', '#38bdf8', '#4ade80', '#c084fc', '#f97316'];
+        for (let i = 0; i <= lightCount; i++) {
+          const x = (w / lightCount) * i;
+          const sag = Math.sin((i / lightCount) * Math.PI) * 18 + 15;
+          const color = bulbColors[i % bulbColors.length];
+          const blink = Math.sin(time * 3 + i * 1.3) * 0.35 + 0.65;
+
+          const grad = ctx.createRadialGradient(x, sag + 6, 1, x, sag + 6, 14);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.4, color);
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(x, sag + 6, 14 * blink, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x, sag + 6, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    const fairyLights = new FairyLights();
+
+    /**
+     * ============================================================================
+     * 5. SPRITES & TIỆN ÍCH HIỆU NĂNG
+     * ============================================================================
+     */
+    const coreSpriteCache = {};
+    function getCoreSprite(color) {
+      if (coreSpriteCache[color]) return coreSpriteCache[color];
+      const s = 14;
+      const c = document.createElement('canvas');
+      c.width = s;
+      c.height = s;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(s / 2, s / 2, 0.5, s / 2, s / 2, s / 2);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.4, color);
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, s, s);
+      coreSpriteCache[color] = c;
+      return c;
+    }
+
+    /**
+     * ============================================================================
+     * 6. LỚP BÓNG BAY VÀ PHÁO GIẤY
+     * ============================================================================
+     */
+    class BalloonCluster {
+      constructor(side) {
+        this.side = side;
+        const colors = side === 'left'
+          ? ['#f43f5e', '#ffd043', '#ec4899', '#c084fc']
+          : ['#38bdf8', '#fb7185', '#ffd043', '#a855f7'];
+        this.balloons = [
+          { ox: 0, oy: 0, r: 28, color: colors[0], seed: 0 },
+          { ox: -22, oy: 24, r: 24, color: colors[1], seed: 1.2 },
+          { ox: 24, oy: 28, r: 25, color: colors[2], seed: 2.5 },
+          { ox: 2, oy: 52, r: 22, color: colors[3], seed: 3.8 }
+        ];
+      }
+
+      draw(ctx, w, h, time) {
+        const isLeft = this.side === 'left';
+        const baseX = isLeft ? Math.max(50, w * 0.08) : Math.min(w - 50, w * 0.92);
+        const baseY = Math.max(140, h * 0.34);
+
+        this.balloons.forEach((b) => {
+          const floatY = Math.sin(time * 1.5 + b.seed) * 9;
+          const floatX = Math.cos(time * 1.2 + b.seed) * 5;
+          const bx = baseX + b.ox + floatX;
+          const by = baseY + b.oy + floatY;
+
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(bx, by + b.r);
+          ctx.quadraticCurveTo(bx + (isLeft ? 18 : -18), by + b.r + 55, baseX, h * 0.82);
+          ctx.stroke();
+
+          const bGrad = ctx.createRadialGradient(bx - b.r * 0.3, by - b.r * 0.3, b.r * 0.1, bx, by, b.r);
+          bGrad.addColorStop(0, '#ffffff');
+          bGrad.addColorStop(0.35, b.color);
+          bGrad.addColorStop(1, 'rgba(0, 0, 0, 0.65)');
+          ctx.fillStyle = bGrad;
+          ctx.beginPath();
+          ctx.ellipse(bx, by, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.beginPath();
+          ctx.ellipse(bx - b.r * 0.32, by - b.r * 0.35, b.r * 0.22, b.r * 0.14, -0.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+    }
+
+    class Confetti {
+      constructor(w, h, startFromTop = false) {
+        this.w = w;
+        this.h = h;
+        this.x = Math.random() * w;
+        this.y = startFromTop ? -Math.random() * h * 0.6 : Math.random() * h;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = Math.random() * 1.5 + 1.2;
+        this.width = Math.random() * 8 + 6;
+        this.height = Math.random() * 14 + 8;
+        this.rot = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.08;
+        this.flip = Math.random() * Math.PI * 2;
+        this.flipSpeed = Math.random() * 0.1 + 0.04;
+        const colors = ['#f43f5e', '#ec4899', '#ffd043', '#38bdf8', '#a855f7', '#ffffff', '#fb923c', '#4ade80'];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      update() {
+        this.y += this.vy;
+        this.x += this.vx + Math.sin(this.rot) * 0.6;
+        this.rot += this.rotSpeed;
+        this.flip += this.flipSpeed;
+        if (this.y > this.h + 20) {
+          this.y = -20;
+          this.x = Math.random() * this.w;
+        }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+        ctx.scale(Math.cos(this.flip), 1);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
+      }
+    }
+
+    class SmokeParticle {
+      constructor(x, y) {
+        this.x = x + (Math.random() - 0.5) * 6;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = -(Math.random() * 1.6 + 1.1);
+        this.radius = Math.random() * 4 + 3;
+        this.maxRadius = this.radius * (Math.random() * 2.5 + 2.2);
+        this.alpha = 0.65;
+        this.decay = Math.random() * 0.012 + 0.008;
+        this.curlSeed = Math.random() * Math.PI * 2;
+      }
+
+      update() {
+        this.x += this.vx + Math.sin(this.curlSeed) * 0.45;
+        this.y += this.vy;
+        this.curlSeed += 0.06;
+        this.radius += (this.maxRadius - this.radius) * 0.035;
+        this.alpha -= this.decay;
+      }
+
+      draw(ctx) {
+        if (this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        grad.addColorStop(0, 'rgba(235, 230, 245, 0.7)');
+        grad.addColorStop(0.5, 'rgba(200, 190, 220, 0.35)');
+        grad.addColorStop(1, 'rgba(160, 150, 185, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class BurstSpark {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6.5 + 2.2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.94;
+        this.gravity = 0.12;
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.018 + 0.015;
+      }
+
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+
+      draw(ctx) {
+        if (this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 7. HẠT PHÁO HOA TỤ CHỮ
+     * ============================================================================
+     */
+    class MorphParticle {
+      constructor(ox, oy, tx, ty, lineType, colorSeed) {
+        this.ox = ox;
+        this.oy = oy;
+        this.tx = tx;
+        this.ty = ty;
+        this.x = ox;
+        this.y = oy;
+        this.lineType = lineType;
+        this.colorSeed = colorSeed;
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8.5 + 3.0;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.935;
+        this.gravity = 0.12;
+
+        this.springFactor = 0.068 + Math.random() * 0.02;
+        this.updateColor();
+      }
+
+      updateColor() {
+        const theme = COLOR_THEMES[currentThemeIndex];
+        let palette = theme.line1;
+        if (this.lineType === 2) palette = theme.line2;
+        if (this.lineType === 3) palette = theme.line3;
+        this.color = palette[this.colorSeed % palette.length];
+        this.sprite = getCoreSprite(this.color);
+      }
+
+      update(stage) {
+        if (stage === 'EXPLODING') {
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+        } else if (stage === 'MORPHING') {
+          const dx = this.tx - this.x;
+          const dy = this.ty - this.y;
+          this.x += dx * this.springFactor;
+          this.y += dy * this.springFactor;
+
+          if (Math.abs(dx) < 1.2 && Math.abs(dy) < 1.2) {
+            this.x = this.tx;
+            this.y = this.ty;
+          }
+        }
+      }
+
+      draw(ctx) {
+        ctx.drawImage(this.sprite, this.x - 7, this.y - 7);
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 8. SCANNER TỤ CHỮ FONT BO TRÒN DỄ THƯƠNG (QUICKSAND 800 BOLD)
+     * ============================================================================
+     */
+    class TextPixelScanner {
+      static formatProperName(rawName) {
+        if (!rawName) return 'MINH ANH';
+        const clean = rawName.trim().replace(/\s+/g, ' ');
+        if (!clean) return 'MINH ANH';
+        return clean.toUpperCase();
+      }
+
+      static sampleCoordinates(receiverName, age, width, height) {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = width;
+        offCanvas.height = height;
+        const octx = offCanvas.getContext('2d');
+
+        const isMobile = width < 768;
+
+        // 3 dòng chữ rõ nét, in hoa bo tròn Quicksand:
+        const line1 = 'HAPPY BIRTHDAY';
+        const line2 = `${receiverName} ❤️`;
+        const line3 = age ? `TUỔI ${age} RỰC RỠ ✨` : 'TUỔI MỚI RỰC RỠ ✨';
+
+        // Cỡ chữ lớn, cân đối, thoáng đãng
+        let fontSize1 = isMobile
+          ? Math.max(30, Math.min(Math.floor(width * 0.082), 38))
+          : Math.max(48, Math.min(Math.floor(width * 0.046), 66));
+
+        let fontSize2 = isMobile
+          ? Math.max(38, Math.min(Math.floor(width * 0.105), 48))
+          : Math.max(62, Math.min(Math.floor(width * 0.060), 84));
+
+        let fontSize3 = isMobile
+          ? Math.max(24, Math.min(Math.floor(width * 0.064), 30))
+          : Math.max(34, Math.min(Math.floor(width * 0.034), 46));
+
+        const letterSpacing1 = Math.max(3.2, fontSize1 * 0.08);
+        const letterSpacing2 = Math.max(3.8, fontSize2 * 0.085);
+        const letterSpacing3 = Math.max(2.8, fontSize3 * 0.075);
+
+        const centerY = isMobile ? height * 0.28 : height * 0.29;
+        const y1 = centerY - fontSize1 * 1.25;
+        const y2 = centerY + 4;
+        const y3 = centerY + fontSize2 * 1.15 + 16;
+
+        // Vẽ từng chữ cái độc lập kèm khoảng cách giãn nét chuẩn
+        const renderTextWithSpacing = (str, fontSize, y, letterSpacing) => {
+          octx.font = `800 ${fontSize}px "Quicksand", sans-serif`;
+          let totalW = 0;
+          for (let i = 0; i < str.length; i++) {
+            totalW += octx.measureText(str[i]).width + (i < str.length - 1 ? letterSpacing : 0);
+          }
+          let startX = (width - totalW) / 2;
+          for (let i = 0; i < str.length; i++) {
+            const ch = str[i];
+            const chW = octx.measureText(ch).width;
+            octx.fillText(ch, startX + chW / 2, y);
+            startX += chW + letterSpacing;
+          }
+        };
+
+        octx.textAlign = 'center';
+        octx.textBaseline = 'middle';
+        octx.fillStyle = '#ffffff';
+
+        renderTextWithSpacing(line1, fontSize1, y1, letterSpacing1);
+        renderTextWithSpacing(line2, fontSize2, y2, letterSpacing2);
+        renderTextWithSpacing(line3, fontSize3, y3, letterSpacing3);
+
+        const imgData = octx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+        const points = [];
+
+        const step = isMobile ? 3 : 4;
+        const startScanY = Math.max(0, Math.floor(y1 - fontSize1));
+        const endScanY = Math.min(height, Math.ceil(y3 + fontSize3));
+
+        for (let y = startScanY; y < endScanY; y += step) {
+          for (let x = Math.floor(width * 0.04); x < Math.ceil(width * 0.96); x += step) {
+            const idx = (y * width + x) * 4;
+            const alpha = data[idx + 3];
+            if (alpha >= 115) {
+              let lineType = 1;
+              if (y > (y1 + y2) / 2 && y <= (y2 + y3) / 2) lineType = 2;
+              else if (y > (y2 + y3) / 2) lineType = 3;
+
+              points.push({
+                x, y,
+                lineType,
+                colorSeed: points.length
+              });
+            }
+          }
+        }
+        return points;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 9. HỆ THỐNG HIỂN THỊ CHÍNH (RENDER LOOP)
+     * ============================================================================
+     */
+    const canvas = document.getElementById('bday-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    let smokeParticles = [];
+    let morphParticles = [];
+    let sparkFountains = [];
+    let ambientStars = [];
+    let burstSparks = [];
+    let confettiList = [];
+
+    const leftBalloons = new BalloonCluster('left');
+    const rightBalloons = new BalloonCluster('right');
 
     function resize() {
       width = window.innerWidth;
@@ -109,338 +879,697 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Happy Birthday Music Box
-    function playBirthdayMelody() {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const actx = new AudioCtx();
-      const notes = [
-        392, 392, 440, 392, 523.25, 493.88,
-        392, 392, 440, 392, 587.33, 523.25,
-        392, 392, 783.99, 659.25, 523.25, 493.88, 440,
-        698.46, 698.46, 659.25, 523.25, 587.33, 523.25
-      ];
-      notes.forEach((freq, i) => {
-        const osc = actx.createOscillator();
-        const gain = actx.createGain();
-        const t = actx.currentTime + i * 0.34;
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, t);
-        gain.gain.setValueAtTime(0.001, t);
-        gain.gain.linearRampToValueAtTime(0.09, t + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0005, t + 0.32);
-        osc.connect(gain);
-        gain.connect(actx.destination);
-        osc.start(t);
-        osc.stop(t + 0.33);
+    for (let i = 0; i < 50; i++) {
+      ambientStars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vy: Math.random() * 0.25 + 0.1,
+        alpha: Math.random() * 0.6 + 0.2,
+        size: Math.random() * 1.5 + 0.8
       });
     }
 
-    function spawnBdayFirework() {
-      const cx = width * (0.2 + Math.random() * 0.6);
-      const cy = height * (0.18 + Math.random() * 0.35);
-      const colors = ['#ff2a85', '#fde047', '#38bdf8', '#c084fc', '#4ade80'];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      for (let i = 0; i < 65; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const s = Math.random() * 4.8 + 0.8;
-        fireworks.push({
-          x: cx, y: cy,
-          vx: Math.cos(a) * s, vy: Math.sin(a) * s,
-          alpha: 1, color
-        });
-      }
-    }
+    function spawnAmbientFirework() {
+      const cx = width * (Math.random() < 0.5 ? (0.12 + Math.random() * 0.22) : (0.66 + Math.random() * 0.22));
+      const cy = height * (0.12 + Math.random() * 0.45);
+      const theme = COLOR_THEMES[currentThemeIndex];
+      const color = theme.sparks[Math.floor(Math.random() * theme.sparks.length)];
 
-    function blowOutCandles() {
-      if (!state.candlesLit) return;
-      state.candlesLit = false;
-      document.getElementById('hud-bday-name').textContent = `Happy Birthday ${state.receiver}! 🎉`;
-      document.getElementById('hud-bday-wish').innerHTML = `💌 <b>${state.sender} nhắn gửi:</b> "${state.wish}"`;
-      document.getElementById('btn-blow-now').style.display = 'none';
-      document.getElementById('btn-relight').style.display = 'inline-block';
-      playBirthdayMelody();
-      for (let i = 0; i < 5; i++) {
-        setTimeout(spawnBdayFirework, i * 350);
+      for (let i = 0; i < 32; i++) {
+        burstSparks.push(new BurstSpark(cx, cy, color));
       }
+      sound.playExplosionBoom(false);
     }
 
     function drawCake(time) {
-      ctx.clearRect(0, 0, width, height);
-
       const cx = width / 2;
-      const baseY = Math.min(height * 0.78, height - 110);
+      const isMobile = width < 768;
+      const cakeScale = isMobile ? Math.min(1.05, width / 400) : Math.min(1.35, width / 950);
+      const baseY = Math.min(height * 0.86, height - (isMobile ? 80 : 100));
 
-      // Plate
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.beginPath();
-      ctx.ellipse(cx, baseY + 12, 155, 22, 0, 0, Math.PI * 2);
-      ctx.fill();
+      const tier1W = 260 * cakeScale;
+      const tier1H = 78 * cakeScale;
+      const tier2W = 200 * cakeScale;
+      const tier2H = 70 * cakeScale;
+      const tier3W = 145 * cakeScale;
+      const tier3H = 60 * cakeScale;
 
-      // Tier 1 (Bottom)
-      ctx.fillStyle = '#f472b6';
-      ctx.beginPath();
-      ctx.roundRect(cx - 125, baseY - 68, 250, 75, 16);
-      ctx.fill();
+      const candleY = baseY - (tier1H + tier2H + tier3H) + 10;
 
-      // Tier 2 (Middle)
-      ctx.fillStyle = '#fb7185';
-      ctx.beginPath();
-      ctx.roundRect(cx - 95, baseY - 135, 190, 70, 14);
-      ctx.fill();
-
-      // Tier 3 (Top)
-      ctx.fillStyle = '#fda4af';
-      ctx.beginPath();
-      ctx.roundRect(cx - 65, baseY - 190, 130, 58, 12);
-      ctx.fill();
-
-      // Cream drips
-      ctx.fillStyle = '#fff1f2';
-      for (let i = -3; i <= 3; i++) {
+      // 1. Quầng sáng ấm của nến
+      if (state.candlesLit && state.lightsOn) {
+        const glowRadius = (isMobile ? 180 : 280) + Math.sin(time * 6) * 14;
+        const glowGrad = ctx.createRadialGradient(cx, candleY, 10, cx, candleY, glowRadius);
+        glowGrad.addColorStop(0, 'rgba(253, 224, 71, 0.28)');
+        glowGrad.addColorStop(0.4, 'rgba(245, 158, 11, 0.12)');
+        glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glowGrad;
         ctx.beginPath();
-        ctx.arc(cx + i * 32, baseY - 66, 13, 0, Math.PI * 2);
+        ctx.arc(cx, candleY, glowRadius, 0, Math.PI * 2);
         ctx.fill();
-      }
-      for (let i = -2; i <= 2; i++) {
-        ctx.beginPath();
-        ctx.arc(cx + i * 32, baseY - 133, 11, 0, Math.PI * 2);
-        ctx.fill();
-      }
 
-      // 3 Candles on top
-      const candleOffsets = [-32, 0, 32];
-      candleOffsets.forEach((ox, idx) => {
-        const x = cx + ox;
-        const y = baseY - 235;
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(x - 5, y, 10, 45);
-        ctx.fillStyle = '#ec4899';
-        ctx.fillRect(x - 5, y + 10, 10, 6);
-        ctx.fillRect(x - 5, y + 26, 10, 6);
-
-        if (state.candlesLit) {
-          const sway = Math.sin(time * 8 + idx) * 2.5;
-          const grad = ctx.createRadialGradient(x + sway, y - 12, 2, x + sway, y - 12, 22);
-          grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.4, '#fde047');
-          grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
-          ctx.fillStyle = grad;
+        if (state.micListening) {
+          const micRadius = 38 * cakeScale + state.micVolume * 35;
+          ctx.strokeStyle = `rgba(255, 42, 133, ${0.4 + state.micVolume * 0.6})`;
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.arc(x + sway, y - 12, 22, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.arc(cx, candleY, micRadius, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.strokeStyle = `rgba(253, 224, 71, ${0.3 + state.micVolume * 0.5})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(cx, candleY, micRadius * 1.35, 0, Math.PI * 2);
+          ctx.stroke();
         }
+      }
+
+      // 2. Đế đĩa gốm trắng viền vàng kim
+      ctx.save();
+      const plateW = tier1W * 0.68;
+      ctx.fillStyle = 'rgba(5, 2, 14, 0.75)';
+      ctx.beginPath();
+      ctx.ellipse(cx, baseY + 18, plateW + 14, 26 * cakeScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const plateGrad = ctx.createLinearGradient(cx - plateW, baseY, cx + plateW, baseY + 15);
+      plateGrad.addColorStop(0, '#f1f5f9');
+      plateGrad.addColorStop(0.5, '#ffffff');
+      plateGrad.addColorStop(1, '#cbd5e1');
+      ctx.fillStyle = plateGrad;
+      ctx.beginPath();
+      ctx.ellipse(cx, baseY + 8, plateW, 22 * cakeScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Tầng 1, 2, 3
+      drawCakeTier(cx, baseY - tier1H + 12, tier1W, tier1H, '#be185d', '#831843', '#f43f5e', cakeScale);
+      drawCakeTier(cx, baseY - tier1H - tier2H + 20, tier2W, tier2H, '#db2777', '#9d174d', '#fb7185', cakeScale);
+      drawCakeTier(cx, baseY - tier1H - tier2H - tier3H + 28, tier3W, tier3H, '#f472b6', '#be185d', '#fda4af', cakeScale);
+
+      // 4. Topping Dâu Tây / Cherry mọng nước
+      const berries = [-38 * cakeScale, 0, 38 * cakeScale];
+      berries.forEach((bx, i) => {
+        const by = candleY + 18 + (i === 1 ? -4 : 2);
+        const bRad = 9 * cakeScale;
+        const berryGrad = ctx.createRadialGradient(cx + bx - 2, by - 2, 1, cx + bx, by, bRad);
+        berryGrad.addColorStop(0, '#ff6b81');
+        berryGrad.addColorStop(0.5, '#ee5253');
+        berryGrad.addColorStop(1, '#b33939');
+        ctx.fillStyle = berryGrad;
+        ctx.beginPath();
+        ctx.arc(cx + bx, by, bRad, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.arc(cx + bx - 2.5, by - 2.5, 2 * cakeScale, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#2ed573';
+        ctx.beginPath();
+        ctx.ellipse(cx + bx, by - 8 * cakeScale, 4.5 * cakeScale, 2.5 * cakeScale, 0.4, 0, Math.PI * 2);
+        ctx.fill();
       });
 
-      // Fireworks
-      for (let i = fireworks.length - 1; i >= 0; i--) {
-        const f = fireworks[i];
-        f.x += f.vx;
-        f.y += f.vy;
-        f.vy += 0.06;
-        f.alpha -= 0.015;
-        if (f.alpha <= 0) {
-          fireworks.splice(i, 1);
-          continue;
-        }
-        ctx.globalAlpha = f.alpha;
-        ctx.fillStyle = f.color;
+      // 5. Cây Nến Sinh Nhật & Ngọn Lửa
+      const candleW = 12 * cakeScale;
+      const candleH = 46 * cakeScale;
+      const topCandleY = candleY - candleH;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(cx - candleW / 2, topCandleY, candleW, candleH);
+
+      ctx.fillStyle = '#ff2a85';
+      ctx.fillRect(cx - candleW / 2, topCandleY + 8 * cakeScale, candleW, 6 * cakeScale);
+      ctx.fillRect(cx - candleW / 2, topCandleY + 24 * cakeScale, candleW, 6 * cakeScale);
+
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(cx - 1.5, topCandleY - 6 * cakeScale, 3, 6 * cakeScale);
+
+      if (state.candlesLit && state.lightsOn) {
+        const sway = Math.sin(time * 9) * 2.5;
+        const flameY = topCandleY - 16 * cakeScale;
+
+        ctx.save();
+        const flameGrad = ctx.createRadialGradient(cx + sway, flameY, 1, cx + sway, flameY, 20 * cakeScale);
+        flameGrad.addColorStop(0, '#ffffff');
+        flameGrad.addColorStop(0.3, '#fde047');
+        flameGrad.addColorStop(0.7, '#f97316');
+        flameGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+        ctx.fillStyle = flameGrad;
         ctx.beginPath();
-        ctx.arc(f.x, f.y, 2.5, 0, Math.PI * 2);
+        ctx.ellipse(cx + sway, flameY, 9 * cakeScale, 18 * cakeScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(cx + sway * 0.5, flameY + 3, 3.5 * cakeScale, 8 * cakeScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawCakeTier(cx, y, w, h, col1, col2, creamCol, scale) {
+      const halfW = w / 2;
+      ctx.save();
+      const bodyGrad = ctx.createLinearGradient(cx - halfW, y, cx + halfW, y);
+      bodyGrad.addColorStop(0, col1);
+      bodyGrad.addColorStop(0.5, col2);
+      bodyGrad.addColorStop(1, col1);
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.roundRect(cx - halfW, y, w, h, 14 * scale);
+      ctx.fill();
+
+      ctx.fillStyle = creamCol;
+      ctx.beginPath();
+      ctx.ellipse(cx, y + 2, halfW, 14 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff1f2';
+      const dripCount = Math.floor(w / (28 * scale));
+      for (let i = -Math.floor(dripCount / 2); i <= Math.floor(dripCount / 2); i++) {
+        const dx = cx + i * (28 * scale);
+        const dy = y + 4;
+        ctx.beginPath();
+        ctx.arc(dx, dy + 6 * scale, 8 * scale, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
 
-      if (!state.candlesLit && Math.random() < 0.04) {
-        spawnBdayFirework();
+    /**
+     * ============================================================================
+     * 10. KỊCH BẢN ĐẾM NGƯỢC 3, 2, 1 -> PHÒNG TỐI ĐEN -> BẬT ĐÈN BỪNG SÁNG
+     * ============================================================================
+     */
+    let countdownCount = 3;
+    let countdownTimer = null;
+    let darkRoomAutoTimer = null;
+
+    function initCountdownStory() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      if (darkRoomAutoTimer) {
+        clearTimeout(darkRoomAutoTimer);
+        darkRoomAutoTimer = null;
       }
 
-      requestAnimationFrame((now) => drawCake(now * 0.001));
-    }
-    requestAnimationFrame((now) => drawCake(now * 0.001));
+      state.lightsOn = false;
+      state.stage = 'COUNTDOWN';
 
-    canvas.addEventListener('pointerdown', blowOutCandles);
-    document.getElementById('btn-blow-now').addEventListener('click', blowOutCandles);
-    document.getElementById('btn-relight').addEventListener('click', () => {
-      state.candlesLit = true;
-      document.getElementById('btn-blow-now').style.display = 'inline-block';
-      document.getElementById('btn-relight').style.display = 'none';
-      document.getElementById('hud-bday-name').textContent = `Chúc Mừng Sinh Nhật ${state.receiver} ✨`;
+      const overlay = document.getElementById('intro-story-overlay');
+      const countStep = document.getElementById('countdown-step');
+      const darkStep = document.getElementById('dark-room-step');
+      const numEl = document.getElementById('countdown-big-num');
+      const personEl = document.getElementById('countdown-person');
+
+      if (personEl) {
+        personEl.textContent = `Dành riêng cho ${state.receiver} ❤️`;
+      }
+
+      if (overlay) overlay.classList.remove('fade-out');
+      if (countStep) countStep.classList.remove('hidden');
+      if (darkStep) darkStep.classList.remove('active');
+
+      countdownCount = 3;
+      if (numEl) {
+        numEl.textContent = '3';
+        numEl.style.animation = 'none';
+        void numEl.offsetWidth; // trigger reflow
+        numEl.style.animation = 'numPop 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+      }
+      sound.playTickSound(440);
+
+      countdownTimer = setInterval(() => {
+        countdownCount--;
+
+        if (countdownCount === 2) {
+          if (numEl) {
+            numEl.textContent = '2';
+            numEl.style.animation = 'none';
+            void numEl.offsetWidth;
+            numEl.style.animation = 'numPop 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+          }
+          sound.playTickSound(554.37);
+        } else if (countdownCount === 1) {
+          if (numEl) {
+            numEl.textContent = '1';
+            numEl.style.animation = 'none';
+            void numEl.offsetWidth;
+            numEl.style.animation = 'numPop 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+          }
+          sound.playTickSound(659.25);
+        } else if (countdownCount <= 0) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+
+          // Sau số 1 -> Chuyển sang Căn phòng đen tối màn hình
+          if (countStep) countStep.classList.add('hidden');
+          if (darkStep) darkStep.classList.add('active');
+
+          // Tự động bật đèn sau 4.5s phòng hờ người xem không bấm
+          darkRoomAutoTimer = setTimeout(() => {
+            if (!state.lightsOn) {
+              triggerSwitchLights();
+            }
+          }, 4500);
+        }
+      }, 1000);
+    }
+
+    function triggerSwitchLights() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      if (darkRoomAutoTimer) {
+        clearTimeout(darkRoomAutoTimer);
+        darkRoomAutoTimer = null;
+      }
+
+      sound.initContext();
+      sound.playSwitchSound();
+
+      // Hiệu ứng chớp sáng bừng tỉnh phòng
+      const flash = document.getElementById('screen-flash');
+      if (flash) {
+        flash.classList.add('flash');
+        setTimeout(() => {
+          flash.classList.remove('flash');
+        }, 400);
+      }
+
+      state.lightsOn = true;
+      state.stage = 'PARTY_ROOM';
+
+      const overlay = document.getElementById('intro-story-overlay');
+      if (overlay) overlay.classList.add('fade-out');
+
+      const actionHint = document.getElementById('bday-action-hint');
+      if (actionHint) {
+        actionHint.innerHTML =
+          `🎉 Chào đón tuổi <b>${state.age}</b> rực rỡ! Nhắm mắt ước một điều rồi <b>Thổi Nến</b> nhé! 🕯️`;
+      }
+    }
+
+    document.getElementById('btn-switch-light')?.addEventListener('click', triggerSwitchLights);
+    document.getElementById('dark-room-step')?.addEventListener('click', (e) => {
+      // Cho phép chạm bất kỳ đâu trong phòng tối để bật đèn
+      triggerSwitchLights();
+    });
+    document.getElementById('btn-skip-countdown')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerSwitchLights();
     });
 
-    // Microphone Blow Detection
-    document.getElementById('btn-mic-blow').addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        const actx = new AudioCtx();
-        const source = actx.createMediaStreamSource(stream);
-        const analyser = actx.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-        const data = new Uint8Array(analyser.frequencyBinCount);
+    /**
+     * ============================================================================
+     * 11. THỔI NẾN VÀ ĐẠI TIỆC PHÁO HOA GIAO THỪA SINH NHẬT
+     * ============================================================================
+     */
+    function blowOutCandles() {
+      if (!state.candlesLit || !state.lightsOn || state.stage !== 'PARTY_ROOM') return;
 
-        document.getElementById('btn-mic-blow').textContent = '🎤 Đang nghe... Hãy thổi mạnh!';
-        const checkBlow = () => {
-          if (!state.candlesLit) return;
-          analyser.getByteFrequencyData(data);
-          let sum = 0;
-          for (let i = 0; i < 30; i++) sum += data[i];
-          if (sum / 30 > 95) {
+      sound.initContext();
+      sound.playExtinguishSound();
+
+      state.candlesLit = false;
+      state.stage = 'EXTINGUISHED';
+
+      const cx = width / 2;
+      const isMobile = width < 768;
+      const cakeScale = isMobile ? Math.min(1.05, width / 400) : Math.min(1.35, width / 950);
+      const baseY = Math.min(height * 0.86, height - (isMobile ? 80 : 100));
+      const candleY = baseY - (208 * cakeScale);
+
+      for (let i = 0; i < 40; i++) {
+        smokeParticles.push(new SmokeParticle(cx, candleY));
+      }
+
+      document.getElementById('bday-action-hint').textContent = '✨ Ước nguyện tuổi mới đã được gửi gắm tới các vì sao... ✨';
+      document.getElementById('txt-blow-action').textContent = 'Thắp Lại';
+      document.getElementById('ico-blow-action').textContent = '🕯️';
+
+      if (confettiList.length === 0) {
+        for (let i = 0; i < 75; i++) {
+          confettiList.push(new Confetti(width, height, true));
+        }
+      }
+
+      setTimeout(() => {
+        state.stage = 'ROCKETS';
+        launchFireworksFinale();
+      }, 750);
+    }
+
+    function relightCandles() {
+      state.candlesLit = true;
+      state.stage = 'PARTY_ROOM';
+      morphParticles = [];
+      sparkFountains = [];
+      burstSparks = [];
+      confettiList = [];
+      document.getElementById('bday-action-hint').innerHTML =
+        `✨ Nhắm mắt ước một điều cho tuổi ${state.age} rồi <b>Thổi vào Mic</b> hoặc <b>Chạm vào nến</b> nhé! 🕯️`;
+      document.getElementById('txt-blow-action').textContent = 'Thổi Nến';
+      document.getElementById('ico-blow-action').textContent = '💨';
+    }
+
+    function launchFireworksFinale() {
+      sound.playLaunchWhistle(0.9);
+
+      const cx = width / 2;
+      const baseY = Math.min(height * 0.86, height - 90);
+      for (let i = 0; i < 75; i++) {
+        sparkFountains.push({
+          x: cx + (Math.random() - 0.5) * 90,
+          y: baseY - 160,
+          vx: (Math.random() - 0.5) * 5.0,
+          vy: -(Math.random() * 6.0 + 3.0),
+          alpha: 1,
+          color: ['#ffd043', '#ff2a6d', '#ffffff', '#38bdf8'][Math.floor(Math.random() * 4)]
+        });
+      }
+
+      setTimeout(() => {
+        state.stage = 'EXPLODING';
+        sound.playExplosionBoom(true);
+
+        const targets = TextPixelScanner.sampleCoordinates(
+          TextPixelScanner.formatProperName(state.receiver),
+          state.age,
+          width,
+          height
+        );
+
+        const explodeX = width / 2;
+        const explodeY = height * 0.28;
+
+        morphParticles = targets.map((t) => {
+          return new MorphParticle(explodeX, explodeY, t.x, t.y, t.lineType, t.colorSeed);
+        });
+
+        setTimeout(spawnAmbientFirework, 200);
+        setTimeout(spawnAmbientFirework, 500);
+
+        setTimeout(() => {
+          state.stage = 'MORPHING';
+          sound.playHappyBirthdayMelody();
+        }, 340);
+
+      }, 920);
+    }
+
+    /**
+     * ============================================================================
+     * 12. ANIMATION LOOP CHÍNH
+     * ============================================================================
+     */
+    function animate(timeMs) {
+      const timeSec = timeMs * 0.001;
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Sao nền rơi nhẹ
+      ctx.save();
+      ambientStars.forEach((star) => {
+        star.y += star.vy;
+        if (star.y > height) star.y = 0;
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+
+      // 2. Khi bật đèn: hiện dàn đèn fairylights, bóng bay và bánh kem
+      if (state.lightsOn) {
+        fairyLights.draw(ctx, width, timeSec);
+        leftBalloons.draw(ctx, width, height, timeSec);
+        rightBalloons.draw(ctx, width, height, timeSec);
+        drawCake(timeSec);
+      }
+
+      // 3. Khói tắt nến
+      for (let i = smokeParticles.length - 1; i >= 0; i--) {
+        const s = smokeParticles[i];
+        s.update();
+        s.draw(ctx);
+        if (s.alpha <= 0) smokeParticles.splice(i, 1);
+      }
+
+      // 4. Tia pháo sáng từ bánh
+      for (let i = sparkFountains.length - 1; i >= 0; i--) {
+        const sf = sparkFountains[i];
+        sf.x += sf.vx;
+        sf.y += sf.vy;
+        sf.vy += 0.16;
+        sf.alpha -= 0.024;
+        if (sf.alpha <= 0) {
+          sparkFountains.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = sf.alpha;
+        ctx.fillStyle = sf.color;
+        ctx.beginPath();
+        ctx.arc(sf.x, sf.y, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 5. Pháo hoa phụ nổ liên hoàn
+      if (burstSparks.length > 0) {
+        for (let i = burstSparks.length - 1; i >= 0; i--) {
+          const b = burstSparks[i];
+          b.update();
+          b.draw(ctx);
+          if (b.alpha <= 0) burstSparks.splice(i, 1);
+        }
+      }
+
+      if (state.stage === 'MORPHING' && Math.random() < 0.018) {
+        spawnAmbientFirework();
+      }
+
+      // 6. Hạt pháo hoa tụ chữ (Morphing Particles)
+      if (morphParticles.length > 0) {
+        morphParticles.forEach((p) => {
+          p.update(state.stage);
+          p.draw(ctx);
+        });
+      }
+
+      // 7. Cơn mưa pháo giấy kim tuyến ngũ sắc (Confetti)
+      if (confettiList.length > 0) {
+        confettiList.forEach((c) => {
+          c.update();
+          c.draw(ctx);
+        });
+      }
+
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    /**
+     * ============================================================================
+     * 13. SỰ KIỆN TƯƠNG TÁC (CHẠM & MICROPHONE)
+     * ============================================================================
+     */
+    canvas.addEventListener('pointerdown', () => {
+      sound.initContext();
+      if (state.candlesLit && state.lightsOn) {
+        blowOutCandles();
+      }
+    });
+
+    document.getElementById('btn-blow-action').addEventListener('click', () => {
+      sound.initContext();
+      if (!state.lightsOn) {
+        triggerSwitchLights();
+      } else if (state.candlesLit) {
+        blowOutCandles();
+      } else {
+        relightCandles();
+      }
+    });
+
+    document.getElementById('btn-toggle-sound').addEventListener('click', (e) => {
+      sound.initContext();
+      const isMuted = sound.toggleMute();
+      e.currentTarget.textContent = isMuted ? '🔇 Tắt tiếng' : '🔊 Âm thanh';
+    });
+
+    let micStream = null;
+    let micAnalyser = null;
+    let micDataArray = null;
+
+    document.getElementById('btn-toggle-mic').addEventListener('click', async () => {
+      sound.initContext();
+      if (state.micListening) {
+        if (micStream) micStream.getTracks().forEach((t) => t.stop());
+        state.micListening = false;
+        state.micVolume = 0;
+        document.getElementById('btn-toggle-mic').classList.remove('active');
+        document.getElementById('btn-toggle-mic').textContent = '🎤 Thổi Mic';
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const actx = sound.ctx;
+        const source = actx.createMediaStreamSource(micStream);
+        micAnalyser = actx.createAnalyser();
+        micAnalyser.fftSize = 256;
+        source.connect(micAnalyser);
+        micDataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+
+        state.micListening = true;
+        document.getElementById('btn-toggle-mic').classList.add('active');
+        document.getElementById('btn-toggle-mic').textContent = '🎤 Đang nghe gió...';
+
+        const checkMicLoop = () => {
+          if (!state.micListening) return;
+          micAnalyser.getByteFrequencyData(micDataArray);
+
+          let lowSum = 0;
+          for (let i = 0; i < 24; i++) lowSum += micDataArray[i];
+          const avg = lowSum / 24;
+          state.micVolume = Math.min(1, avg / 120);
+
+          if (avg > 78 && state.candlesLit && state.lightsOn) {
             blowOutCandles();
-            stream.getTracks().forEach((t) => t.stop());
-            document.getElementById('btn-mic-blow').textContent = '🎤 Đã Thổi Tắt Nến!';
+            state.micListening = false;
+            document.getElementById('btn-toggle-mic').classList.remove('active');
+            document.getElementById('btn-toggle-mic').textContent = '🎤 Đã Thổi Tắt Nến!';
+            if (micStream) micStream.getTracks().forEach((t) => t.stop());
             return;
           }
-          requestAnimationFrame(checkBlow);
+          requestAnimationFrame(checkMicLoop);
         };
-        checkBlow();
-      } catch (e) {
-        alert('Bạn có thể chạm trực tiếp vào ngọn nến trên màn hình để thổi tắt nến nhé!');
+        checkMicLoop();
+      } catch (err) {
+        alert('Trình duyệt chưa cấp quyền micro. Bạn chỉ cần chạm nhẹ vào nến trên màn hình là thổi được nhé!');
       }
     });
 
-    // Customization & Payment
-    document.getElementById('btn-open-customize').addEventListener('click', () => {
-      document.getElementById('modal-custom').classList.add('active');
+    /**
+     * ============================================================================
+     * 14. MODAL TÂM THƯ & TÙY CHỈNH (GIFTSDK INTEGRATION)
+     * ============================================================================
+     */
+    function openWishModal() {
+      document.getElementById('wish-card-title').textContent = `Gửi Tới ${state.receiver}`;
+      document.getElementById('wish-card-content').textContent = state.wish;
+      document.getElementById('wish-card-sender').textContent = `Thân thương, ${state.sender}`;
+      document.getElementById('modal-wish-card').classList.add('active');
+    }
+
+    document.getElementById('btn-open-wish').addEventListener('click', openWishModal);
+    document.getElementById('btn-close-modal-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
     });
-    document.getElementById('btn-close-custom').addEventListener('click', () => {
-      document.getElementById('modal-custom').classList.remove('active');
+    document.getElementById('btn-relight-from-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      relightCandles();
     });
 
-    document.getElementById('btn-preview-bday').addEventListener('click', () => {
-      state.sender = document.getElementById('in-sender').value.trim() || 'Anh';
-      state.receiver = document.getElementById('in-receiver').value.trim() || 'Em';
+    function openCreatorModal() {
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-age').value = state.age;
+      document.getElementById('in-wish').value = state.wish;
+      document.getElementById('modal-creator').classList.add('active');
+    }
+
+    document.getElementById('btn-open-creator-modal')?.addEventListener('click', openCreatorModal);
+    document.getElementById('btn-close-modal-creator')?.addEventListener('click', () => {
+      document.getElementById('modal-creator').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentThemeIndex = parseInt(e.currentTarget.dataset.theme, 10) || 0;
+      });
+    });
+
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      sound.initContext();
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      state.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      state.age = parseInt(document.getElementById('in-age').value, 10) || 20;
       state.wish = document.getElementById('in-wish').value.trim();
-      state.candlesLit = true;
-      document.getElementById('hud-bday-name').textContent = `Chúc Mừng Sinh Nhật ${state.receiver} ✨`;
-      document.getElementById('modal-custom').classList.remove('active');
+
+      document.getElementById('modal-creator').classList.remove('active');
+      initCountdownStory();
     });
 
-    document.getElementById('btn-pay-bday').addEventListener('click', async () => {
-      state.sender = document.getElementById('in-sender').value.trim() || 'Anh';
-      state.receiver = document.getElementById('in-receiver').value.trim() || 'Em';
+    document.getElementById('creator-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sound.initContext();
+
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      state.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      state.age = parseInt(document.getElementById('in-age').value, 10) || 20;
       state.wish = document.getElementById('in-wish').value.trim();
 
-      try {
-        const res = await fetch('/api/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            templateId: 'birthday_cake_interactive',
-            templateType: 'birthday',
-            senderName: state.sender,
-            receiverName: state.receiver,
-            message: state.wish
-          })
+      document.getElementById('modal-creator').classList.remove('active');
+
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+        GiftSDK.openPayment({
+          templateId: 'birthday_cake_interactive',
+          templateType: 'birthday',
+          senderName: state.sender,
+          receiverName: state.receiver,
+          occasion: 'Chúc Mừng Sinh Nhật • Happy Birthday',
+          message: state.wish,
+          payload: {
+            age: state.age,
+            themeIndex: currentThemeIndex
+          }
         });
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.error || 'Chưa cấu hình Biến môi trường trên Vercel.');
-          return;
-        }
-        activeOrderCode = data.orderCode;
-        document.getElementById('modal-custom').classList.remove('active');
-        document.getElementById('bday-vietqr').src = data.qrUrl;
-        document.getElementById('bday-amount').textContent = Number(data.amount).toLocaleString('vi-VN') + 'đ';
-        document.getElementById('bday-code').textContent = data.orderCode;
-        document.getElementById('bday-pay-waiting').style.display = 'block';
-        document.getElementById('bday-pay-success').style.display = 'none';
-        document.getElementById('modal-pay').classList.add('active');
-
-        if (pollTimer) clearInterval(pollTimer);
-        pollTimer = setInterval(async () => {
-          const r = await fetch(`/api/check-order?code=${encodeURIComponent(activeOrderCode)}`);
-          const d = await r.json();
-          if (r.ok && d.status === 'PAID') {
-            clearInterval(pollTimer);
-            unlockBdayOrder(activeOrderCode);
-          }
-        }, 2500);
-      } catch (e) {
-        alert('Hãy triển khai lên Vercel để tạo mã VietQR tự động.');
+      } else {
+        alert('Đang trong môi trường demo local.');
       }
     });
 
-    function unlockBdayOrder(code) {
-      const url = `${window.location.origin}/q/${encodeURIComponent(code)}`;
-      document.getElementById('bday-share-url').value = url;
-      document.getElementById('bday-gift-qr').src =
-        `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=be185d&data=${encodeURIComponent(url)}`;
-      document.getElementById('bday-pay-waiting').style.display = 'none';
-      document.getElementById('bday-pay-success').style.display = 'block';
-    }
-
-    document.getElementById('btn-bday-copy').addEventListener('click', () => {
-      const el = document.getElementById('bday-share-url');
-      el.select();
-      navigator.clipboard.writeText(el.value);
-      alert('Đã sao chép link quà sinh nhật!');
-    });
-
-    document.getElementById('btn-bday-download-vietqr').addEventListener('click', async () => {
-      const img = document.getElementById('bday-vietqr');
-      if (!img.src) return;
-      await downloadBlobImage(img.src, `VietQR-SinhNhat-${activeOrderCode || 'BIDV'}.png`);
-      alert('Đã lưu mã QR chuyển tiền! Hãy mở App Ngân hàng và chọn quét từ ảnh trong thư viện.');
-    });
-
-    document.getElementById('btn-bday-download-qr').addEventListener('click', async () => {
-      const img = document.getElementById('bday-gift-qr');
-      if (!img.src) return;
-      await downloadBlobImage(img.src, `Ma-QR-SinhNhat-${state.receiver}.png`);
-      alert('Đã lưu mã QR Quà Tặng vào máy!');
-    });
-
-    async function downloadBlobImage(url, filename) {
-      return PaymentQrKit.downloadBlobImage(url, filename);
-    }
-
-    function closePayModal() {
-      if (pollTimer) clearInterval(pollTimer);
-      document.getElementById('modal-pay').classList.remove('active');
-    }
-
+    /**
+     * ============================================================================
+     * 15. KHỞI TẠO TỰ ĐỘNG VỚI GIFTSDK
+     * ============================================================================
+     */
     window.addEventListener('DOMContentLoaded', async () => {
-      const params = new URLSearchParams(window.location.search);
-      const orderId = params.get('id');
-      if (orderId) {
-        try {
-          const res = await fetch(`/api/check-order?code=${encodeURIComponent(orderId)}`);
-          const data = await res.json();
-          if (res.ok && data.status === 'PAID' && data.order) {
-            state.sender = data.order.sender_name;
-            state.receiver = data.order.receiver_name;
-            state.wish = data.order.message || state.wish;
-            document.getElementById('hud-bday-name').textContent = `Chúc Mừng Sinh Nhật ${state.receiver} ✨`;
-            document.getElementById('hud-bday-wish').innerHTML =
-              `💌 <b>${state.sender}</b> đã chuẩn bị chiếc bánh sinh nhật đặc biệt này tặng bạn! Hãy ước một điều rồi <b>Thổi vào Micro</b> hoặc <b>Chạm vào nến</b> nhé 🕯️`;
+      initCountdownStory();
 
-            // Ẩn nút "Tạo Bánh Sinh Nhật Riêng (29.000đ)" và link Kho mẫu của người tạo
-            const btnCustom = document.getElementById('btn-open-customize');
-            if (btnCustom) btnCustom.style.display = 'none';
-
-            const topBack = document.getElementById('btn-top-back') || document.querySelector('.top-nav a');
-            if (topBack) topBack.style.display = 'none';
-
-            // Thêm nút phụ tinh tế nếu người nhận muốn tạo quà
-            if (!document.getElementById('btn-bday-viral')) {
-              const vA = document.createElement('a');
-              vA.id = 'btn-bday-viral';
-              vA.href = '../../../index.html';
-              vA.className = 'action-btn';
-              vA.style.textDecoration = 'none';
-              vA.style.opacity = '0.85';
-              vA.innerHTML = '🎁 Tạo Quà Tương Tự';
-              const dock = document.querySelector('.bottom-dock');
-              if (dock) dock.appendChild(vA);
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+        await GiftSDK.init({
+          templateId: 'birthday_cake_interactive',
+          onGiftLoaded: (order) => {
+            if (order.receiver_name) state.receiver = order.receiver_name;
+            if (order.sender_name) state.sender = order.sender_name;
+            if (order.message) state.wish = order.message;
+            if (order.payload && order.payload.age) state.age = order.payload.age;
+            if (order.payload && typeof order.payload.themeIndex === 'number') {
+              currentThemeIndex = order.payload.themeIndex;
             }
+
+            initCountdownStory();
           }
-        } catch (e) {}
+        });
       }
     });
   </script>
   <script src="../../../shared/tiktok-mode.js"></script>
 </body>
 </html>
-

@@ -1,0 +1,2930 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Đồng Hồ Cát Ánh Sáng 3D • Dòng Chảy Thời Gian ⏳✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <script src="/shared/gift-sdk.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- 1. Lớp hào quang bầu trời & Canvas 3D Three.js -->
+  <div class="sky-radiance-layer" id="sky-radiance-layer"></div>
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+  <div class="magic-vignette" id="magic-vignette"></div>
+  <div class="screen-flash" id="screen-flash"></div>
+
+  <!-- 2. Top HUD chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Kho Mẫu Quà Tặng">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay" title="Lật lại đồng hồ cát từ đầu">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật/Tắt Âm Thanh">🔊 Âm Thanh</button>
+      <!-- #btn-tiktok-mode 📹 được tự động gắn bởi shared/tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 3. Bộ 4 Presets Kỷ Niệm 1-Chạm Dành Cho Người Tạo -->
+  <section class="anniversary-presets-bar creator-only" id="anniversary-presets-bar" aria-label="Chọn nhanh chủ đề kỷ niệm">
+    <button type="button" class="preset-chip active" data-preset="dating">💕 Đang Yêu</button>
+    <button type="button" class="preset-chip" data-preset="married">💍 Vợ Chồng</button>
+    <button type="button" class="preset-chip" data-preset="long_distance">✈️ Yêu Xa</button>
+    <button type="button" class="preset-chip" data-preset="first_anniversary">✨ Kỷ Niệm Đầu</button>
+  </section>
+
+  <!-- 4. Gợi ý hành động đặt gọn phía trên Bottom Dock -->
+  <div class="stage-pills-wrap">
+    <div class="action-hint-pill" id="action-hint-pill">
+      ⏳ Chạm vào đồng hồ cát để khai mở dòng chảy thời gian...
+    </div>
+  </div>
+
+  <!-- 5. Bottom Dock 1 hàng ngang chuẩn 3d-visual.md -->
+  <nav class="bottom-dock" aria-label="Thanh điều khiển đồng hồ cát kỷ niệm">
+    <button type="button" class="dock-btn" id="btn-open-wish" title="Đọc trọn vẹn tâm thư">
+      <span>💌</span><span>Tâm Thư</span>
+    </button>
+    <button type="button" class="dock-btn creator-only" id="btn-open-customize" title="Tùy chỉnh tên, ngày bắt đầu, ảnh & lời chúc">
+      <span>🎨</span><span>Tùy Chỉnh</span>
+    </button>
+    <button type="button" class="dock-btn primary-cta creator-only" id="btn-open-payment" title="Tạo link và mã QR riêng gửi tặng">
+      <span>✨ Tạo Link &amp; QR</span>
+      <span class="dock-price-badge">39k</span>
+    </button>
+  </nav>
+
+  <!-- 6. Modal Spotlight (Quả Cầu Ký Ức & Cận Cảnh Khung Ảnh 3D) -->
+  <div class="spotlight-modal" id="spotlight-modal" role="dialog" aria-modal="true" aria-labelledby="spotlight-caption">
+    <div class="spotlight-card">
+      <button type="button" class="spotlight-close-btn" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="spotlight-badge" id="spotlight-badge">🔮 Quả Cầu Ký Niệm #1</div>
+      <div class="spotlight-photo-frame">
+        <canvas id="spotlight-canvas" width="512" height="512"></canvas>
+      </div>
+      <p class="spotlight-caption" id="spotlight-caption">"Khoảnh khắc dòng thời gian ngừng trôi chỉ để giữ lại ánh mắt ấy..."</p>
+      <div class="spotlight-sub" id="spotlight-sub">Bảo Nam ❤️ Minh Anh • 14/02/2024</div>
+      <div class="spotlight-progress-track" id="spotlight-progress-track" aria-hidden="true">
+        <div class="spotlight-progress-fill" id="spotlight-progress-fill"></div>
+      </div>
+      <div class="spotlight-actions">
+        <button type="button" class="orb-action-btn primary" id="btn-spotlight-continue">
+          ⏳ Tiếp Tục Dòng Chảy
+        </button>
+        <button type="button" class="orb-action-btn" id="btn-spotlight-letter">
+          💌 Mở Tâm Thư
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Modal Tâm Thư (Hiển thị trên nền mờ xuyên thấu cảnh 3D phía sau) -->
+  <div class="modal-backdrop" id="modal-wish-card" role="dialog" aria-modal="true" aria-labelledby="wish-card-title">
+    <div class="wish-card">
+      <button type="button" class="spotlight-close-btn" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="wish-card-badge">⏳ Dòng Chảy Thời Gian • Kỷ Niệm Yêu ✨</div>
+      <h2 class="wish-card-title" id="wish-card-title">Gửi Tới Minh Anh</h2>
+      <div class="wish-card-divider"></div>
+      <div class="wish-card-meta" id="wish-card-meta">14 • 02 • 2024 • Bên Nhau</div>
+      <p class="wish-card-content" id="wish-card-content">
+        Mỗi hạt cát ánh sao rơi xuống là một ngày anh thêm thương em nhiều hơn. Cảm ơn em đã cùng anh viết nên những tháng ngày rực rỡ nhất cuộc đời. Dù thời gian có trôi đi bao lâu, tình yêu của đôi mình vẫn sẽ sáng mãi như ánh sao đêm nay! ❤️
+      </p>
+      <div class="wish-card-sender" id="wish-card-sender">Mãi thương em, Bảo Nam</div>
+      <div class="modal-actions-row">
+        <button type="button" class="modal-btn-primary" id="btn-relight-from-wish">
+          ⏳ Ngắm Đồng Hồ Cát 3D
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal Tùy Chỉnh Dành Cho Người Tạo -->
+  <div class="modal-backdrop" id="modal-customize" role="dialog" aria-modal="true" aria-labelledby="modal-customize-title">
+    <div class="modal-box">
+      <button type="button" class="spotlight-close-btn" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">⏳ Cá Nhân Hóa Đồng Hồ Cát 3D ✨</div>
+      <h2 class="modal-title" id="modal-customize-title">Khắc Tên &amp; Ngày Yêu Thương</h2>
+      <p class="modal-sub">
+        Nhập tên hai bạn, ngày bắt đầu yêu, tâm thư và ảnh kỷ niệm. Hạt cát ánh sao sẽ xếp thành ngày tháng kỷ niệm của riêng hai bạn!
+      </p>
+
+      <form id="customize-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên bạn (Người gửi) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Bảo Nam" value="Bảo Nam" maxlength="20" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên người ấy (Người nhận) *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Minh Anh" value="Minh Anh" maxlength="20" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-start-date">📅 Ngày bắt đầu yêu nhau / Ngày cưới:</label>
+          <input type="date" id="in-start-date" class="modal-input" value="2024-02-14" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Lời tâm thư gửi người thương:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập tâm thư gửi người ấy..." required>Mỗi hạt cát ánh sao rơi xuống là một ngày anh thêm thương em nhiều hơn. Cảm ơn em đã cùng anh viết nên những tháng ngày rực rỡ nhất cuộc đời. Dù thời gian có trôi đi bao lâu, tình yêu của đôi mình vẫn sẽ sáng mãi như ánh sao đêm nay! ❤️</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🖼️ Ảnh Kỷ Niệm Hiện Trong Khung 3D (Cao Trào):</label>
+          <div class="photo-picker-box">
+            <img id="photo-thumb" class="photo-thumb" alt="Ảnh kỷ niệm" />
+            <div style="flex:1; text-align:left;">
+              <label class="photo-upload-btn" for="in-photo">📸 Chọn Ảnh Hai Bạn</label>
+              <input type="file" id="in-photo" accept="image/*" style="display:none;" />
+              <div style="font-size:0.72rem; color:#cbd5e1; margin-top:4px;">Hoặc chọn nhanh tranh nghệ thuật bên dưới:</div>
+            </div>
+          </div>
+          <div class="art-preset-row">
+            <button type="button" class="art-preset-chip active" data-art="couple_starlight">💑 Đôi Ta Dưới Sao</button>
+            <button type="button" class="art-preset-chip" data-art="promise_ring">💍 Nhẫn Đôi Vĩnh Cửu</button>
+            <button type="button" class="art-preset-chip" data-art="hourglass_rose">⏳ Hoa Hồng Thời Gian</button>
+            <button type="button" class="art-preset-chip" data-art="celestial_toast">🥂 Hẹn Ước Đêm Trăng</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">✨ Bảng Màu Cát Sao &amp; Ánh Sáng:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="modal-theme-chip active" data-theme="rose_gold">🌹 Vàng Hồng Lãng Mạn</button>
+            <button type="button" class="modal-theme-chip" data-theme="royal_amber">👑 Hổ Phách Hoàng Gia</button>
+            <button type="button" class="modal-theme-chip" data-theme="celestial_blue">🌌 Ngân Hà Lam Ngọc</button>
+            <button type="button" class="modal-theme-chip" data-theme="sakura_violet">🌸 Tím Anh Đào Huyền Ảo</button>
+          </div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            👁️ Áp Dụng &amp; Xem Thử
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Link &amp; QR (39k)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. BẢNG MÀU CHỦ ĐỀ & 4 PRESET 1-CHẠM
+     * ============================================================================
+     */
+    const THEMES = {
+      rose_gold: {
+        name: 'Vàng Hồng Lãng Mạn',
+        sandA: 0xfde047,
+        sandB: 0xf472b6,
+        sandHexA: '#fde047',
+        sandHexB: '#f472b6',
+        glassTint: 0xffd1dc,
+        frameColor: 0x5c2d1e,
+        brassColor: 0xf6c453,
+        warmLight: 0xff9e7d,
+        rimLight: 0x60a5fa,
+        firefly: 0xfde047,
+        orbColors: [0xf472b6, 0xfbbf24, 0xfb7185, 0xfef08a]
+      },
+      royal_amber: {
+        name: 'Hổ Phách Hoàng Gia',
+        sandA: 0xfef08a,
+        sandB: 0xf59e0b,
+        sandHexA: '#fef08a',
+        sandHexB: '#f59e0b',
+        glassTint: 0xffe4b5,
+        frameColor: 0x3b1f10,
+        brassColor: 0xfacc15,
+        warmLight: 0xffb347,
+        rimLight: 0x93c5fd,
+        firefly: 0xfde047,
+        orbColors: [0xfbbf24, 0xf97316, 0xfef08a, 0xfb7185]
+      },
+      celestial_blue: {
+        name: 'Ngân Hà Lam Ngọc',
+        sandA: 0xbae6fd,
+        sandB: 0x38bdf8,
+        sandHexA: '#bae6fd',
+        sandHexB: '#38bdf8',
+        glassTint: 0xcffafe,
+        frameColor: 0x162238,
+        brassColor: 0x93c5fd,
+        warmLight: 0x67e8f9,
+        rimLight: 0xa78bfa,
+        firefly: 0x67e8f9,
+        orbColors: [0x38bdf8, 0x818cf8, 0x67e8f9, 0xfde047]
+      },
+      sakura_violet: {
+        name: 'Tím Anh Đào Huyền Ảo',
+        sandA: 0xfbcfe8,
+        sandB: 0xc084fc,
+        sandHexA: '#fbcfe8',
+        sandHexB: '#c084fc',
+        glassTint: 0xf3e8ff,
+        frameColor: 0x2a1438,
+        brassColor: 0xf0abfc,
+        warmLight: 0xe879f9,
+        rimLight: 0x38bdf8,
+        firefly: 0xfbcfe8,
+        orbColors: [0xe879f9, 0xf472b6, 0xa78bfa, 0xfde047]
+      }
+    };
+
+    const PRESETS = {
+      dating: {
+        sender: 'Bảo Nam',
+        receiver: 'Minh Anh',
+        startDate: '2024-02-14',
+        theme: 'rose_gold',
+        title3D: 'ĐANG YÊU • TÌNH ĐẦU RỰC RỠ',
+        signOff: 'Mãi thương em',
+        musicMood: 'romantic',
+        wish: 'Mỗi hạt cát ánh sao rơi xuống là một ngày anh thêm thương em nhiều hơn. Cảm ơn em đã cùng anh viết nên những tháng ngày rực rỡ nhất cuộc đời. Dù thời gian có trôi đi bao lâu, tình yêu của đôi mình vẫn sẽ sáng mãi như ánh sao đêm nay! ❤️',
+        memories: [
+          { badge: '🔮 Quả Cầu Ký Ức #1', title: 'Ánh Mắt Đầu Tiên', emoji: '✨', text: 'Khoảnh khắc đồng hồ thời gian dừng lại khi ánh mắt đôi ta vô tình chạm nhau giữa phố đông.' },
+          { badge: '🔮 Quả Cầu Ký Ức #2', title: 'Cơn Mưa Chung Ô', emoji: '☔', text: 'Chiếc ô nhỏ nghiêng hết về phía em, đổi lấy nụ cười ấm áp xua tan cả chiều mưa lạnh.' },
+          { badge: '🔮 Quả Cầu Ký Ức #3', title: 'Những Đêm Tâm Sự', emoji: '🌙', text: 'Những cuộc gọi thâu đêm kể nhau nghe bao điều vụn vặt mà chẳng hề biết chán.' },
+          { badge: '🔮 Quả Cầu Ký Ức #4', title: 'Lời Hẹn Tương Lai', emoji: '💍', text: 'Nguyện cùng em đi qua muôn mùa trăng sao, để từng giây trôi qua đều hóa thành vĩnh cửu.' }
+        ]
+      },
+      married: {
+        sender: 'Chồng Yêu',
+        receiver: 'Vợ Yêu',
+        startDate: '2021-10-20',
+        theme: 'royal_amber',
+        title3D: 'VỢ CHỒNG • TRỌN KIẾP BÊN NHAU',
+        signOff: 'Yêu vợ suốt đời',
+        musicMood: 'warm',
+        wish: 'Từ ngày mình trao nhau chiếc nhẫn hẹn ước, từng hạt cát thời gian đều hóa thành mái ấm bình yên. Cảm ơn vợ vì đã luôn dịu dàng, bao dung và đồng hành cùng anh qua mọi nắng mưa cuộc đời! 💍🥂',
+        memories: [
+          { badge: '🔮 Quả Cầu Ký Ức #1', title: 'Ngày Chung Đôi', emoji: '👰', text: 'Giây phút em bước ra trong tà váy cưới tinh khôi, cả bầu trời như bừng sáng rạng ngời.' },
+          { badge: '🔮 Quả Cầu Ký Ức #2', title: 'Nhẫn Cưới Hẹn Thề', emoji: '💍', text: 'Chiếc nhẫn tròn trên tay là lời hứa trọn đời nắm chặt, không bao giờ buông rời.' },
+          { badge: '🔮 Quả Cầu Ký Ức #3', title: 'Mái Ấm Bình Yên', emoji: '🏡', text: 'Sau bao bộn bề ngoài kia, về nhà nghe tiếng em cười là mọi mệt mỏi đều tan biến.' },
+          { badge: '🔮 Quả Cầu Ký Ức #4', title: 'Bạc Đầu Giai Lão', emoji: '🥂', text: 'Mong cho đồng hồ cát của chúng mình chảy mãi qua năm tháng, bên nhau tới đầu bạc răng long.' }
+        ]
+      },
+      long_distance: {
+        sender: 'Anh Phương Xa',
+        receiver: 'Em Nơi Ấy',
+        startDate: '2023-08-08',
+        theme: 'celestial_blue',
+        title3D: 'YÊU XA • CHUNG MỘT BẦU TRỜI SAO',
+        signOff: 'Nhớ em thật nhiều',
+        musicMood: 'nostalgic',
+        wish: 'Dù khoảng cách địa lý có chia đôi hai múi giờ, mỗi hạt cát rơi trong đồng hồ ánh sáng đều đếm ngược từng ngày anh được trở về ôm em thật chặt. Cùng nhìn lên bầu trời sao đêm nay em nhé! ✈️🌌',
+        memories: [
+          { badge: '🔮 Quả Cầu Ký Ức #1', title: 'Hai Múi Giờ Thương Nhớ', emoji: '🕰️', text: 'Bên này trời vừa tắt nắng, bên ấy bình minh đã lên — nhưng nỗi nhớ em thì chưa từng ngơi nghỉ.' },
+          { badge: '🔮 Quả Cầu Ký Ức #2', title: 'Tấm Vé Hội Ngộ', emoji: '✈️', text: 'Mỗi tấm vé máy bay được giữ lại như báu vật của những ngày đếm ngược chờ gặp nhau.' },
+          { badge: '🔮 Quả Cầu Ký Ức #3', title: 'Ánh Sao Chung Đôi', emoji: '🌌', text: 'Dẫu cách vạn dặm xa xôi, hai trái tim vẫn đập chung một nhịp dưới cùng một dải ngân hà.' },
+          { badge: '🔮 Quả Cầu Ký Ức #4', title: 'Ngày Không Còn Cách Xa', emoji: '🤍', text: 'Khoảnh khắc cái ôm siết chặt ở sân bay sẽ xóa nhòa mọi tháng ngày chờ đợi.' }
+        ]
+      },
+      first_anniversary: {
+        sender: 'Chàng Trai',
+        receiver: 'Cô Gái',
+        startDate: '2025-11-11',
+        theme: 'sakura_violet',
+        title3D: 'KỶ NIỆM ĐẦU • MÙA YÊU TINH KHÔI',
+        signOff: 'Thương em mãi mãi',
+        musicMood: 'dreamy',
+        wish: 'Chúc mừng cột mốc kỷ niệm đầu tiên của đôi mình! Cảm ơn em đã đến như một phép màu dịu dàng, biến từng khoảnh khắc bình dị trở thành ký ức lấp lánh nhất. Hãy cùng nhau viết tiếp thật nhiều chương mới nhé! ✨🌸',
+        memories: [
+          { badge: '🔮 Quả Cầu Ký Ức #1', title: 'Ngày Bắt Đầu Phép Màu', emoji: '🌸', text: 'Ngày em gật đầu đồng ý, cả thế giới trong anh bỗng nở rộ như một vườn hoa ánh sáng.' },
+          { badge: '🔮 Quả Cầu Ký Ức #2', title: 'Cái Nắm Tay Ngượng Ngùng', emoji: '🤝', text: 'Lần đầu tiên tay chạm tay run nhẹ, mà trái tim thì ngập tràn niềm hạnh phúc khôn nguôi.' },
+          { badge: '🔮 Quả Cầu Ký Ức #3', title: 'Cuốn Sổ Kỷ Niệm', emoji: '📸', text: 'Từng tấm ảnh, từng buổi hẹn cà phê nhỏ xinh góp nhặt thành kho báu đầu đời.' },
+          { badge: '🔮 Quả Cầu Ký Ức #4', title: 'Khởi Đầu Vĩnh Cửu', emoji: '✨', text: 'Kỷ niệm đầu tiên thật trọn vẹn — mở ra vạn ngày thương yêu rực rỡ phía trước!' }
+        ]
+      }
+    };
+
+    /**
+     * ============================================================================
+     * 2. STATE & HELPERS NGÀY THÁNG
+     * ============================================================================
+     */
+    const MILESTONES = [0.15, 0.38, 0.62, 0.85];
+
+    const state = {
+      templateId: 'anniversary_star_hourglass_3d',
+      presetKey: 'dating',
+      sender: PRESETS.dating.sender,
+      receiver: PRESETS.dating.receiver,
+      startDate: PRESETS.dating.startDate,
+      theme: PRESETS.dating.theme,
+      title3D: PRESETS.dating.title3D,
+      signOff: PRESETS.dating.signOff,
+      musicMood: PRESETS.dating.musicMood,
+      wish: PRESETS.dating.wish,
+      memories: [...PRESETS.dating.memories],
+      artPreset: 'couple_starlight',
+      photoDataUrl: null,
+
+      phase: 'idle', // 'idle' | 'flowing' | 'climax'
+      flipProgress: 0,
+      isFlipping: false,
+      sandProgress: 0,
+      targetSandProgress: 0,
+      litOrbs: new Set(),
+      openedOrbs: new Set(),
+      climaxTriggered: false
+    };
+
+    function formatDisplayDate(isoStr) {
+      const parts = String(isoStr || '2024-02-14').split('-');
+      if (parts.length !== 3) return '14 • 02 • 2024';
+      return `${parts[2]} • ${parts[1]} • ${parts[0]}`;
+    }
+
+    function computeDaysTogether(isoStr) {
+      const parsed = new Date((isoStr || '2024-02-14') + 'T00:00:00');
+      if (Number.isNaN(parsed.getTime())) return 520;
+      const now = new Date();
+      const diffMs = now.getTime() - parsed.getTime();
+      const days = Math.floor(diffMs / 86400000) + 1;
+      return Math.max(1, days);
+    }
+
+    /**
+     * ============================================================================
+     * 3. BỘ TỔNG HỢP ÂM THANH WEB AUDIO API (SANDSTREAM + ROMANTIC BALLAD 68 BPM)
+     * ============================================================================
+     */
+    class SandStreamSynth {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.source = null;
+        this.lfo = null;
+        this.grainTimer = null;
+        this.active = false;
+        this.muted = false;
+      }
+
+      ensurePinkNoiseBuffer(ctx) {
+        if (this.pinkBuffer) return this.pinkBuffer;
+        const length = ctx.sampleRate * 3;
+        const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+        const output = buffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < length; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.045;
+          b6 = white * 0.115926;
+        }
+        this.pinkBuffer = buffer;
+        return buffer;
+      }
+
+      start(ctx) {
+        if (!ctx || this.active) return;
+        this.ctx = ctx;
+        this.active = true;
+
+        const buffer = this.ensurePinkNoiseBuffer(ctx);
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.loop = true;
+
+        const highpass = ctx.createBiquadFilter();
+        highpass.type = 'highpass';
+        highpass.frequency.setValueAtTime(1100, ctx.currentTime);
+
+        const bandpass = ctx.createBiquadFilter();
+        bandpass.type = 'bandpass';
+        bandpass.frequency.setValueAtTime(2900, ctx.currentTime);
+        bandpass.Q.setValueAtTime(2.0, ctx.currentTime);
+
+        const breathGain = ctx.createGain();
+        breathGain.gain.setValueAtTime(0.65, ctx.currentTime);
+
+        const lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(0.28, ctx.currentTime);
+        const lfoDepth = ctx.createGain();
+        lfoDepth.gain.setValueAtTime(0.22, ctx.currentTime);
+        lfo.connect(lfoDepth);
+        lfoDepth.connect(breathGain.gain);
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.0001, ctx.currentTime);
+        master.gain.exponentialRampToValueAtTime(this.muted ? 0.0001 : 0.14, ctx.currentTime + 0.85);
+
+        src.connect(highpass);
+        highpass.connect(bandpass);
+        bandpass.connect(breathGain);
+        breathGain.connect(master);
+        master.connect(ctx.destination);
+
+        src.start();
+        lfo.start();
+
+        this.source = src;
+        this.lfo = lfo;
+        this.masterGain = master;
+
+        this.scheduleMicroGrains();
+      }
+
+      scheduleMicroGrains() {
+        if (this.grainTimer) clearTimeout(this.grainTimer);
+        if (!this.active) return;
+
+        const spawnGrain = () => {
+          if (!this.active || !this.ctx) return;
+          if (!this.muted) {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const bp = this.ctx.createBiquadFilter();
+            const g = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(2600 + Math.random() * 2800, now);
+
+            bp.type = 'bandpass';
+            bp.frequency.setValueAtTime(3200 + Math.random() * 1400, now);
+            bp.Q.setValueAtTime(4.5, now);
+
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.012 + Math.random() * 0.014, now + 0.003);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+
+            osc.connect(bp);
+            bp.connect(g);
+            g.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.03);
+          }
+          this.grainTimer = setTimeout(spawnGrain, 55 + Math.random() * 115);
+        };
+        this.grainTimer = setTimeout(spawnGrain, 120);
+      }
+
+      setMuted(muted) {
+        this.muted = muted;
+        if (this.masterGain && this.ctx && this.active) {
+          this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+          this.masterGain.gain.setTargetAtTime(muted ? 0.0001 : 0.14, this.ctx.currentTime, 0.08);
+        }
+      }
+
+      fadeOutSand(duration = 1.4) {
+        if (!this.active || !this.ctx) return;
+        this.active = false;
+        if (this.grainTimer) {
+          clearTimeout(this.grainTimer);
+          this.grainTimer = null;
+        }
+        const now = this.ctx.currentTime;
+        if (this.masterGain) {
+          this.masterGain.gain.cancelScheduledValues(now);
+          this.masterGain.gain.setValueAtTime(Math.max(0.0001, this.masterGain.gain.value), now);
+          this.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        }
+        const srcRef = this.source;
+        const lfoRef = this.lfo;
+        this.source = null;
+        this.lfo = null;
+        setTimeout(() => {
+          try { if (srcRef) srcRef.stop(); } catch (e) {}
+          try { if (lfoRef) lfoRef.stop(); } catch (e) {}
+        }, duration * 1000 + 80);
+      }
+    }
+
+    class RomanticBalladSynth {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.playing = false;
+        this.stepTimer = null;
+        this.stepIndex = 0;
+        this.sandSynth = new SandStreamSynth();
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, delay = 0, duration = 2.0, velocity = 0.16, type = 'sine') {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime + delay;
+
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const lpf = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc1.type = type;
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+
+        const overtoneGain = this.ctx.createGain();
+        overtoneGain.gain.setValueAtTime(0.24, now);
+
+        lpf.type = 'lowpass';
+        lpf.frequency.setValueAtTime(2200, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(velocity, now + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc1.connect(lpf);
+        osc2.connect(overtoneGain);
+        overtoneGain.connect(lpf);
+        lpf.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration + 0.04);
+        osc2.stop(now + duration + 0.04);
+      }
+
+      playOpeningChime() {
+        this.initContext();
+        if (this.muted || !this.ctx) return;
+        const crystalNotes = [587.33, 739.99, 880.0, 1174.66, 1479.98];
+        crystalNotes.forEach((f, i) => {
+          this.playTone(f, i * 0.09, 2.3, 0.14, 'sine');
+        });
+      }
+
+      playOrbChime(idx) {
+        this.initContext();
+        if (this.muted || !this.ctx) return;
+        const chords = [
+          [523.25, 659.25, 783.99, 1046.5],
+          [440.0, 523.25, 659.25, 880.0],
+          [349.23, 440.0, 523.25, 698.46],
+          [392.0, 493.88, 587.33, 783.99]
+        ];
+        const chord = chords[idx % chords.length];
+        chord.forEach((f, i) => {
+          this.playTone(f, i * 0.06, 2.2, 0.15, 'sine');
+        });
+      }
+
+      playClimaxFanfare() {
+        this.initContext();
+        if (this.muted || !this.ctx) return;
+        const fanfare = [
+          { f: 392.0, t: 0.0, d: 1.4, v: 0.16 },
+          { f: 523.25, t: 0.12, d: 1.6, v: 0.18 },
+          { f: 659.25, t: 0.25, d: 1.8, v: 0.18 },
+          { f: 783.99, t: 0.40, d: 2.2, v: 0.20 },
+          { f: 1046.5, t: 0.60, d: 2.8, v: 0.22 },
+          { f: 987.77, t: 1.15, d: 1.5, v: 0.15 },
+          { f: 1046.5, t: 1.55, d: 3.0, v: 0.22 }
+        ];
+        fanfare.forEach((n) => this.playTone(n.f, n.t, n.d, n.v, 'sine'));
+      }
+
+      getProgressionByMood() {
+        const mood = state.musicMood || 'romantic';
+        if (mood === 'warm') {
+          // Fmaj7 -> G6 -> Em7 -> Am7
+          return [
+            [174.61, 261.63, 329.63, 440.0, 523.25],
+            [196.0, 293.66, 392.0, 493.88, 587.33],
+            [164.81, 246.94, 329.63, 392.0, 493.88],
+            [220.0, 261.63, 329.63, 392.0, 523.25]
+          ];
+        }
+        if (mood === 'nostalgic') {
+          // Am9 -> Fmaj7 -> Cmaj7 -> Gsus4
+          return [
+            [220.0, 329.63, 392.0, 493.88, 659.25],
+            [174.61, 261.63, 329.63, 440.0, 523.25],
+            [130.81, 261.63, 329.63, 493.88, 523.25],
+            [196.0, 293.66, 392.0, 523.25, 587.33]
+          ];
+        }
+        if (mood === 'dreamy') {
+          // Dmaj7 -> Bm7 -> Gmaj7 -> A6
+          return [
+            [146.83, 220.0, 277.18, 369.99, 587.33],
+            [123.47, 246.94, 293.66, 369.99, 493.88],
+            [196.0, 293.66, 369.99, 493.88, 587.33],
+            [220.0, 277.18, 329.63, 440.0, 554.37]
+          ];
+        }
+        // romantic: Cmaj7 -> Am7 -> Fmaj7 -> G6
+        return [
+          [130.81, 261.63, 329.63, 493.88, 659.25],
+          [220.0, 261.63, 329.63, 440.0, 523.25],
+          [174.61, 261.63, 329.63, 440.0, 698.46],
+          [196.0, 293.66, 392.0, 493.88, 659.25]
+        ];
+      }
+
+      startBallad() {
+        this.initContext();
+        if (this.playing) return;
+        this.playing = true;
+        this.stepIndex = 0;
+
+        // 68 BPM -> 1 nhịp phách = 882ms, arpeggio nửa phách = 441ms
+        const tickMs = Math.round((60 / 68 / 2) * 1000);
+        const tick = () => {
+          if (!this.playing) return;
+          const prog = this.getProgressionByMood();
+          const bar = Math.floor(this.stepIndex / 8) % prog.length;
+          const beatInBar = this.stepIndex % 8;
+          const chord = prog[bar];
+
+          if (!this.muted && this.ctx) {
+            if (beatInBar === 0) {
+              this.playTone(chord[0], 0, 3.2, 0.13, 'sine');
+              this.playTone(chord[1], 0.04, 2.8, 0.09, 'sine');
+            }
+            const noteFreq = chord[1 + (beatInBar % (chord.length - 1))];
+            this.playTone(noteFreq, 0, 1.8, 0.095, 'sine');
+            if (beatInBar === 4 || beatInBar === 6) {
+              this.playTone(chord[chord.length - 1], 0.02, 2.0, 0.08, 'triangle');
+            }
+          }
+
+          this.stepIndex++;
+          this.stepTimer = setTimeout(tick, tickMs);
+        };
+        tick();
+      }
+
+      startFlowAudio() {
+        this.initContext();
+        this.playOpeningChime();
+        if (this.ctx) {
+          this.sandSynth.start(this.ctx);
+        }
+        this.startBallad();
+      }
+
+      fadeOutSand() {
+        this.sandSynth.fadeOutSand(1.5);
+      }
+
+      stopAll() {
+        this.playing = false;
+        if (this.stepTimer) {
+          clearTimeout(this.stepTimer);
+          this.stepTimer = null;
+        }
+        this.sandSynth.fadeOutSand(0.35);
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        this.sandSynth.setMuted(this.muted);
+        return this.muted;
+      }
+    }
+
+    const sound = new RomanticBalladSynth();
+
+    /**
+     * ============================================================================
+     * 4. PROCEDURAL TEXTURES & TRANH NGHỆ THUẬT MẶC ĐỊNH
+     * ============================================================================
+     */
+    function createSoftGlowTexture() {
+      const s = 64;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.28, 'rgba(255, 245, 210, 0.92)');
+      g.addColorStop(0.65, 'rgba(255, 165, 120, 0.35)');
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      return new THREE.CanvasTexture(cvs);
+    }
+    const softGlowSpriteTex = createSoftGlowTexture();
+
+    function createPinpointStarSprite() {
+      const s = 64;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s * 0.32);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.22, 'rgba(255, 252, 235, 0.95)');
+      g.addColorStop(0.55, 'rgba(255, 215, 175, 0.32)');
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      return new THREE.CanvasTexture(cvs);
+    }
+    const pinpointStarTex = createPinpointStarSprite();
+
+    function createWoodMetalTexture(baseHex, brassHex) {
+      const s = 512;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+
+      const cBase = new THREE.Color(baseHex);
+      const grad = ctx.createLinearGradient(0, 0, s, 0);
+      grad.addColorStop(0, '#' + cBase.clone().multiplyScalar(0.75).getHexString());
+      grad.addColorStop(0.35, '#' + cBase.getHexString());
+      grad.addColorStop(0.7, '#' + cBase.clone().multiplyScalar(1.25).getHexString());
+      grad.addColorStop(1, '#' + cBase.clone().multiplyScalar(0.8).getHexString());
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, s, s);
+
+      for (let i = 0; i < 220; i++) {
+        const y = Math.random() * s;
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.16)' : 'rgba(255,215,150,0.08)';
+        ctx.fillRect(0, y, s, 1 + Math.random() * 2.5);
+      }
+
+      const cBrass = new THREE.Color(brassHex);
+      ctx.fillStyle = 'rgba(' + Math.round(cBrass.r * 255) + ',' + Math.round(cBrass.g * 255) + ',' + Math.round(cBrass.b * 255) + ',0.35)';
+      ctx.fillRect(0, 14, s, 12);
+      ctx.fillRect(0, s - 26, s, 12);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    function createMoonlitWaterTexture() {
+      const s = 512;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const cx = s / 2;
+      const cy = s / 2;
+
+      const grad = ctx.createRadialGradient(cx, cy, s * 0.14, cx, cy, s * 0.5);
+      grad.addColorStop(0, 'rgba(13, 30, 58, 0.96)');
+      grad.addColorStop(0.45, 'rgba(15, 36, 70, 0.88)');
+      grad.addColorStop(0.74, 'rgba(10, 22, 48, 0.42)');
+      grad.addColorStop(1, 'rgba(4, 7, 20, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, s, s);
+
+      for (let i = 0; i < 160; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const rad = s * (0.18 + Math.random() * 0.27);
+        const rx = cx + Math.cos(ang) * rad;
+        const ry = cy + Math.sin(ang) * rad;
+        const w = 10 + Math.random() * 24;
+        ctx.save();
+        ctx.translate(rx, ry);
+        ctx.rotate(ang + Math.PI / 2);
+        ctx.fillStyle = i % 3 === 0 ? 'rgba(186, 230, 253, 0.16)' : 'rgba(253, 224, 71, 0.10)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, w, 1.8 + Math.random() * 1.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    function createPedestalStoneTexture() {
+      const s = 512;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const grad = ctx.createRadialGradient(s / 2, s / 2, 16, s / 2, s / 2, s / 2);
+      grad.addColorStop(0, '#2a223a');
+      grad.addColorStop(0.55, '#19192b');
+      grad.addColorStop(1, '#0c1220');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, s, s);
+
+      for (let i = 0; i < 420; i++) {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)';
+        ctx.beginPath();
+        ctx.arc(Math.random() * s, Math.random() * s, 2 + Math.random() * 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Bảng tên đôi lứa 3D: khoảng thở trên >= 48px, khoảng thở dưới >= 64px cho dấu thanh & nét dưới g, y, p, q
+    function createCouplePlaqueTexture(sender, receiver, title3D, startDate) {
+      const w = 1024;
+      const h = 320;
+      const cvs = document.createElement('canvas');
+      cvs.width = w;
+      cvs.height = h;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.rose_gold;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Khung bảng ngọc-đồng bo góc sang trọng
+      ctx.fillStyle = 'rgba(14, 9, 28, 0.92)';
+      ctx.beginPath();
+      ctx.roundRect(14, 14, w - 28, h - 28, 42);
+      ctx.fill();
+
+      ctx.strokeStyle = t.sandHexA;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      ctx.strokeStyle = t.sandHexB;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(28, 28, w - 56, h - 56, 30);
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Dòng 1: Danh hiệu 3D (y = 76 -> khoảng thở trên >= 54px cho dấu thanh viết hoa)
+      ctx.fillStyle = t.sandHexA;
+      ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(`⏳  ${title3D}  ✨`, w / 2, 76);
+
+      // Dòng 2: Tên đôi lứa nổi bật (y = 154)
+      ctx.shadowColor = t.sandHexB;
+      ctx.shadowBlur = 16;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 54px "Cinzel", "Playfair Display", serif';
+      ctx.fillText(`${sender.toUpperCase()}  ❤️  ${receiver.toUpperCase()}`, w / 2, 154, w - 88);
+
+      // Dòng 3: Ngày & Số ngày bên nhau (y = 228 -> khoảng thở dưới 320 - 250 = 70px >= 64px cho nét dưới g, y, p, q)
+      const days = computeDaysTogether(startDate);
+      const formatted = formatDisplayDate(startDate);
+      ctx.shadowColor = 'rgba(253, 224, 71, 0.55)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#fde68a';
+      ctx.font = 'italic 700 32px "Playfair Display", serif';
+      ctx.fillText(`${formatted}  •  ${days} Ngày Bên Nhau`, w / 2, 228);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Tạo tranh nghệ thuật / ảnh upload crop cover cho Khung Ảnh 3D và Thumb preview
+    function buildHeroPhotoCanvas(photoImg) {
+      const s = 768;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.rose_gold;
+
+      if (photoImg) {
+        const ratio = photoImg.width / Math.max(1, photoImg.height);
+        let sw = photoImg.width, sh = photoImg.height, sx = 0, sy = 0;
+        if (ratio > 1) {
+          sw = photoImg.height;
+          sx = (photoImg.width - sw) / 2;
+        } else {
+          sh = photoImg.width;
+          sy = (photoImg.height - sh) / 2;
+        }
+        ctx.drawImage(photoImg, sx, sy, sw, sh, 0, 0, s, s);
+
+        const vig = ctx.createRadialGradient(s / 2, s / 2, s * 0.28, s / 2, s / 2, s * 0.54);
+        vig.addColorStop(0, 'rgba(0,0,0,0)');
+        vig.addColorStop(1, 'rgba(12, 6, 26, 0.36)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, s, s);
+      } else {
+        const bg = ctx.createRadialGradient(s / 2, s * 0.42, 30, s / 2, s / 2, s * 0.58);
+        bg.addColorStop(0, '#fff7e6');
+        bg.addColorStop(0.32, t.sandHexB);
+        bg.addColorStop(0.76, '#3b0764');
+        bg.addColorStop(1, '#0d061c');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, s, s);
+
+        // Quầng sáng trung tâm
+        const glow = ctx.createRadialGradient(s / 2, s * 0.42, 16, s / 2, s * 0.42, 220);
+        glow.addColorStop(0, 'rgba(255,255,255,0.75)');
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(s / 2, s * 0.42, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const art = state.artPreset || 'couple_starlight';
+        if (art === 'promise_ring') {
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 18;
+          ctx.beginPath();
+          ctx.arc(s / 2 - 54, s * 0.42, 84, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(s / 2 + 54, s * 0.42, 84, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.font = '88px sans-serif';
+          ctx.fillText('💎', s / 2, s * 0.28);
+        } else if (art === 'hourglass_rose') {
+          ctx.font = '184px sans-serif';
+          ctx.fillText('⏳', s / 2, s * 0.40);
+          ctx.font = '88px sans-serif';
+          ctx.fillText('🌹', s / 2 + 65, s * 0.48);
+        } else if (art === 'celestial_toast') {
+          ctx.font = '180px sans-serif';
+          ctx.fillText('🥂', s / 2, s * 0.41);
+          ctx.font = '80px sans-serif';
+          ctx.fillText('✨', s / 2, s * 0.25);
+        } else {
+          ctx.font = '178px sans-serif';
+          ctx.fillText('👩‍❤️‍👨', s / 2, s * 0.41);
+          ctx.font = '68px sans-serif';
+          ctx.fillText('✨', s / 2 - 140, s * 0.27);
+          ctx.fillText('✨', s / 2 + 140, s * 0.27);
+        }
+
+        // Chữ khắc trong tranh với lề dưới thoáng
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(15, 5, 35, 0.9)';
+        ctx.shadowBlur = 14;
+        ctx.font = '800 38px "Cinzel", "Playfair Display", serif';
+        ctx.fillText(`${state.sender.toUpperCase()} ❤️ ${state.receiver.toUpperCase()}`, s / 2, s * 0.72, s - 84);
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'italic 700 28px "Playfair Display", serif';
+        ctx.fillText(`${formatDisplayDate(state.startDate)} • ${computeDaysTogether(state.startDate)} Ngày`, s / 2, s * 0.82);
+        ctx.shadowBlur = 0;
+      }
+
+      // Viền sao vàng quanh khung
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.85)';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(14, 14, s - 28, s - 28);
+
+      return cvs;
+    }
+
+    function buildOrbSpotlightCanvas(idx, memory) {
+      const s = 512;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.rose_gold;
+      const orbHex = '#' + new THREE.Color(t.orbColors[idx % t.orbColors.length]).getHexString();
+
+      const bg = ctx.createRadialGradient(256, 220, 20, 256, 256, 300);
+      bg.addColorStop(0, orbHex);
+      bg.addColorStop(0.55, '#3b0764');
+      bg.addColorStop(1, '#0c061d');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, s, s);
+
+      // Vòng quỹ đạo quanh quả cầu pha lê
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.65)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(256, 256, 200, 74, -0.32, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Quả cầu pha lê trung tâm
+      const orbGrad = ctx.createRadialGradient(220, 210, 18, 256, 256, 152);
+      orbGrad.addColorStop(0, '#fffdf5');
+      orbGrad.addColorStop(0.38, orbHex);
+      orbGrad.addColorStop(0.85, 'rgba(30, 14, 62, 0.92)');
+      orbGrad.addColorStop(1, 'rgba(255, 255, 255, 0.65)');
+      ctx.fillStyle = orbGrad;
+      ctx.beginPath();
+      ctx.arc(256, 256, 148, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 5;
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '72px sans-serif';
+      ctx.fillText(memory.emoji || '✨', 256, 205);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0,0,0,0.75)';
+      ctx.shadowBlur = 10;
+      ctx.font = '800 26px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(memory.title, 256, 282);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = '700 18px "Quicksand", sans-serif';
+      ctx.fillText(`Mốc ${Math.round(MILESTONES[idx] * 100)}% Dòng Thời Gian`, 256, 326);
+
+      return cvs;
+    }
+
+    /**
+     * ============================================================================
+     * 5. KHỞI TẠO THREE.JS R128 & HỆ THỐNG ĐÈN 3-POINT LIGHTING
+     * ============================================================================
+     */
+    const canvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    const worldStageGroup = new THREE.Group();
+    scene.add(worldStageGroup);
+
+    const ambientLight = new THREE.AmbientLight(0xe9d5ff, 0.28);
+    scene.add(ambientLight);
+
+    const moonDirLight = new THREE.DirectionalLight(0xe0e7ff, 0.36);
+    moonDirLight.position.set(12, 18, 10);
+    scene.add(moonDirLight);
+
+    const warmCoreLight = new THREE.PointLight(0xff9e7d, 0.45, 36);
+    warmCoreLight.position.set(0, 4.8, 2.2);
+    worldStageGroup.add(warmCoreLight);
+
+    const rimLight = new THREE.DirectionalLight(0x60a5fa, 0.38);
+    rimLight.position.set(-14, 9, -12);
+    scene.add(rimLight);
+
+    let isMobile = window.innerWidth < 768;
+    const baseCamPos = new THREE.Vector3(0, 5.15, 20.6);
+    const baseLookAt = new THREE.Vector3(0, 4.35, 0);
+
+    function updateCameraAndLayout() {
+      const aspect = window.innerWidth / Math.max(1, window.innerHeight);
+      isMobile = window.innerWidth < 768 || aspect < 0.8;
+      camera.aspect = aspect;
+      camera.fov = isMobile ? 56 : 46;
+
+      if (isMobile) {
+        baseCamPos.set(0, 5.4, 24.8);
+        baseLookAt.set(0, 4.75, 0);
+        worldStageGroup.scale.set(0.84, 0.84, 0.84);
+        worldStageGroup.position.set(0, -0.1, 0);
+      } else {
+        baseCamPos.set(0, 5.15, 20.6);
+        baseLookAt.set(0, 4.35, 0);
+        worldStageGroup.scale.set(1.0, 1.0, 1.0);
+        worldStageGroup.position.set(0, -0.1, 0);
+      }
+
+      camera.position.copy(baseCamPos);
+      camera.lookAt(baseLookAt);
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      if (typeof heroPhotoGroup !== 'undefined') {
+        if (isMobile) {
+          heroPhotoGroup.userData.targetPos.set(0, 11.45, 0.65);
+          heroPhotoGroup.userData.targetScale = 0.76;
+        } else {
+          heroPhotoGroup.userData.targetPos.set(4.15, 4.65, 0.95);
+          heroPhotoGroup.userData.targetScale = 0.90;
+        }
+      }
+      if (typeof daysCaptionMesh !== 'undefined') {
+        daysCaptionMesh.position.y = isMobile ? 7.85 : 7.55;
+      }
+    }
+    window.addEventListener('resize', updateCameraAndLayout);
+
+    /**
+     * ============================================================================
+     * 6. BẦU TRỜI SAO, ĐOM ĐÓM, MẶT HỒ ÁNH TRĂNG & ĐẢO BỆ ĐỠ
+     * ============================================================================
+     */
+    const starCount = 720;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 90;
+      starPos[i * 3 + 1] = -4 + Math.random() * 52;
+      starPos[i * 3 + 2] = -44 + (Math.random() - 0.5) * 28;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+      map: softGlowSpriteTex,
+      color: 0xf8fafc,
+      size: 0.72,
+      transparent: true,
+      opacity: 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    scene.add(new THREE.Points(starGeo, starMat));
+
+    // Đom đóm
+    const fireflyCount = 65;
+    const fireflyGeo = new THREE.BufferGeometry();
+    const fireflyPos = new Float32Array(fireflyCount * 3);
+    const fireflySeeds = [];
+    for (let i = 0; i < fireflyCount; i++) {
+      const fx = (Math.random() - 0.5) * 16;
+      const fy = 0.6 + Math.random() * 9.5;
+      const fz = (Math.random() - 0.5) * 14;
+      fireflyPos[i * 3] = fx;
+      fireflyPos[i * 3 + 1] = fy;
+      fireflyPos[i * 3 + 2] = fz;
+      fireflySeeds.push({ baseX: fx, baseY: fy, baseZ: fz, speed: 0.55 + Math.random() * 0.7, phase: Math.random() * Math.PI * 2 });
+    }
+    fireflyGeo.setAttribute('position', new THREE.BufferAttribute(fireflyPos, 3));
+    const fireflyMat = new THREE.PointsMaterial({
+      map: softGlowSpriteTex,
+      color: THEMES.rose_gold.firefly,
+      size: 0.42,
+      transparent: true,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const fireflyPoints = new THREE.Points(fireflyGeo, fireflyMat);
+    worldStageGroup.add(fireflyPoints);
+
+    // Mặt hồ ánh trăng gợn sóng nhẹ
+    const WATER_Y = -0.86;
+    const WATER_RADIUS = 17.5;
+    function createRipplingWaterGeometry() {
+      const rings = 32;
+      const segs = 64;
+      const positions = [0, WATER_Y, 0];
+      const uvs = [0.5, 0.5];
+      const indices = [];
+
+      for (let r = 1; r <= rings; r++) {
+        const rad = (r / rings) * WATER_RADIUS;
+        for (let s = 0; s <= segs; s++) {
+          const ang = (s / segs) * Math.PI * 2;
+          const x = Math.cos(ang) * rad;
+          const z = Math.sin(ang) * rad;
+          positions.push(x, WATER_Y, z);
+          uvs.push(0.5 + x / (WATER_RADIUS * 2), 0.5 + z / (WATER_RADIUS * 2));
+        }
+      }
+      for (let s = 0; s < segs; s++) indices.push(0, 1 + s + 1, 1 + s);
+      for (let r = 1; r < rings; r++) {
+        const rowStart = 1 + (r - 1) * (segs + 1);
+        const nextRowStart = 1 + r * (segs + 1);
+        for (let s = 0; s < segs; s++) {
+          const a = rowStart + s;
+          const b = nextRowStart + s;
+          const c = nextRowStart + s + 1;
+          const d = rowStart + s + 1;
+          indices.push(a, d, b);
+          indices.push(b, d, c);
+        }
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    const waterGeo = createRipplingWaterGeometry();
+    const waterBasePos = new Float32Array(waterGeo.attributes.position.array);
+    const waterMat = new THREE.MeshStandardMaterial({
+      map: createMoonlitWaterTexture(),
+      transparent: true,
+      opacity: 0.94,
+      roughness: 0.22,
+      metalness: 0.35,
+      emissive: 0x0c2142,
+      emissiveIntensity: 0.35
+    });
+    const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+    worldStageGroup.add(waterMesh);
+
+    const waterRippleRings = [];
+    for (let i = 0; i < 3; i++) {
+      const rMat = new THREE.MeshBasicMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.14,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const rMesh = new THREE.Mesh(new THREE.RingGeometry(0.96, 1.0, 64), rMat);
+      rMesh.rotation.x = -Math.PI / 2;
+      rMesh.position.y = WATER_Y + 0.025;
+      worldStageGroup.add(rMesh);
+      waterRippleRings.push({ mesh: rMesh, mat: rMat, phase: i / 3 });
+    }
+
+    // Đảo đá & bệ đỡ trung tâm
+    const pedestalGroup = new THREE.Group();
+    worldStageGroup.add(pedestalGroup);
+
+    const stoneMat = new THREE.MeshStandardMaterial({
+      map: createPedestalStoneTexture(),
+      roughness: 0.82,
+      metalness: 0.12
+    });
+
+    const islandBaseMesh = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 5.2, 1.1, 48), stoneMat);
+    islandBaseMesh.position.y = -0.58;
+    pedestalGroup.add(islandBaseMesh);
+
+    const plinthTier1 = new THREE.Mesh(new THREE.CylinderGeometry(2.7, 3.3, 0.65, 48), stoneMat);
+    plinthTier1.position.y = 0.28;
+    pedestalGroup.add(plinthTier1);
+
+    const plinthTier2 = new THREE.Mesh(new THREE.CylinderGeometry(2.15, 2.45, 0.72, 48), stoneMat);
+    plinthTier2.position.y = 0.95;
+    pedestalGroup.add(plinthTier2);
+
+    const brassTrimMat = new THREE.MeshStandardMaterial({
+      color: THEMES.rose_gold.brassColor,
+      metalness: 0.72,
+      roughness: 0.24,
+      emissive: THEMES.rose_gold.brassColor,
+      emissiveIntensity: 0.16
+    });
+    const plinthRing = new THREE.Mesh(new THREE.TorusGeometry(2.22, 0.07, 16, 64), brassTrimMat);
+    plinthRing.rotation.x = Math.PI / 2;
+    plinthRing.position.y = 1.33;
+    pedestalGroup.add(plinthRing);
+
+    const plinthTopPlate = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.15, 0.26, 48), stoneMat);
+    plinthTopPlate.position.y = 1.45;
+    pedestalGroup.add(plinthTopPlate);
+
+    /**
+     * ============================================================================
+     * 7. ĐỒNG HỒ CÁT PHA LÊ 3D (LATHE CAPS + 3 TUBE PILLARS + GLSL FRESNEL GLASS)
+     * ============================================================================
+     */
+    const HOURGLASS_CENTER_Y = 4.48;
+    const BULB_H = 2.62;
+    const CAP_TOP_Y = 3.12;
+
+    function getGlassBulbRadius(t) {
+      // t in [0..1] từ eo (y=0) đến đỉnh bầu (y=BULB_H)
+      return 0.19 + 1.50 * Math.pow(Math.sin(t * Math.PI * 0.78), 0.72);
+    }
+
+    const hourglassGroup = new THREE.Group();
+    hourglassGroup.position.set(0, HOURGLASS_CENTER_Y, 0);
+    hourglassGroup.scale.setScalar(0.88);
+    worldStageGroup.add(hourglassGroup);
+
+    const hourglassFrameGroup = new THREE.Group();
+    hourglassGroup.add(hourglassFrameGroup);
+
+    // GLSL Fresnel Glass ShaderMaterial (chạy mượt 60fps)
+    const glassUniforms = {
+      uTime: { value: 0 },
+      uTint: { value: new THREE.Color(THEMES.rose_gold.glassTint) },
+      uGlow: { value: new THREE.Color(THEMES.rose_gold.sandB) },
+      uBrightness: { value: 0.2 }
+    };
+
+    const glassMat = new THREE.ShaderMaterial({
+      uniforms: glassUniforms,
+      vertexShader: `
+        varying vec3 vNormalView;
+        varying vec3 vViewPos;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          vViewPos = -mvPos.xyz;
+          vNormalView = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uTint;
+        uniform vec3 uGlow;
+        uniform float uBrightness;
+        varying vec3 vNormalView;
+        varying vec3 vViewPos;
+        varying vec2 vUv;
+        void main() {
+          vec3 N = normalize(vNormalView);
+          if (!gl_FrontFacing) N = -N;
+          vec3 V = normalize(vViewPos);
+          float fresnel = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 2.35);
+
+          vec3 lightDir1 = normalize(vec3(0.55, 0.75, 0.85));
+          vec3 lightDir2 = normalize(vec3(-0.7, 0.35, -0.5));
+          vec3 H1 = normalize(lightDir1 + V);
+          vec3 H2 = normalize(lightDir2 + V);
+
+          float spec1 = pow(max(dot(N, H1), 0.0), 48.0);
+          float spec2 = pow(max(dot(N, H2), 0.0), 28.0);
+
+          float shimmer = 0.06 * sin(vUv.y * 18.0 - uTime * 1.4);
+          vec3 baseCol = mix(uTint, uGlow, 0.35 + uBrightness * 0.25);
+          vec3 finalCol = baseCol * (0.45 + fresnel * 0.95) + vec3(1.0, 0.98, 0.92) * (spec1 * 0.95 + spec2 * 0.45) + uGlow * shimmer;
+          float alpha = clamp(0.11 + fresnel * 0.68 + spec1 * 0.55 + spec2 * 0.22, 0.1, 0.92);
+          gl_FragColor = vec4(finalCol, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+
+    // Hai bầu thủy tinh đối xứng trên & dưới (LatheGeometry)
+    const upperBulbPoints = [];
+    const lowerBulbPoints = [];
+    const bulbSteps = 36;
+    for (let i = 0; i <= bulbSteps; i++) {
+      const t = i / bulbSteps;
+      const r = getGlassBulbRadius(t);
+      const y = t * BULB_H;
+      upperBulbPoints.push(new THREE.Vector2(r, y));
+      lowerBulbPoints.push(new THREE.Vector2(r, -y));
+    }
+    const upperBulbGeo = new THREE.LatheGeometry(upperBulbPoints, 56);
+    const lowerBulbGeo = new THREE.LatheGeometry(lowerBulbPoints, 56);
+
+    const upperGlassMesh = new THREE.Mesh(upperBulbGeo, glassMat);
+    const lowerGlassMesh = new THREE.Mesh(lowerBulbGeo, glassMat);
+    upperGlassMesh.renderOrder = 6;
+    lowerGlassMesh.renderOrder = 6;
+    hourglassFrameGroup.add(upperGlassMesh, lowerGlassMesh);
+
+    // Nắp & bệ gỗ đồng ánh kim bằng LatheGeometry
+    const capProfile = [
+      new THREE.Vector2(0.0, 2.58),
+      new THREE.Vector2(1.36, 2.58),
+      new THREE.Vector2(1.48, 2.66),
+      new THREE.Vector2(1.42, 2.74),
+      new THREE.Vector2(1.78, 2.86),
+      new THREE.Vector2(1.86, 2.98),
+      new THREE.Vector2(1.72, 3.12),
+      new THREE.Vector2(0.0, 3.12)
+    ];
+    const upperCapGeo = new THREE.LatheGeometry(capProfile, 56);
+    const lowerCapGeo = new THREE.LatheGeometry(capProfile.map((p) => new THREE.Vector2(p.x, -p.y)), 56);
+
+    const frameWoodMat = new THREE.MeshStandardMaterial({
+      map: createWoodMetalTexture(THEMES.rose_gold.frameColor, THEMES.rose_gold.brassColor),
+      roughness: 0.34,
+      metalness: 0.45
+    });
+
+    const upperCapMesh = new THREE.Mesh(upperCapGeo, frameWoodMat);
+    const lowerCapMesh = new THREE.Mesh(lowerCapGeo, frameWoodMat);
+    hourglassFrameGroup.add(upperCapMesh, lowerCapMesh);
+
+    // Vòng đồng ánh kim trên nắp & eo
+    const capCollarTop = new THREE.Mesh(new THREE.TorusGeometry(1.48, 0.055, 14, 56), brassTrimMat);
+    capCollarTop.rotation.x = Math.PI / 2;
+    capCollarTop.position.y = 2.66;
+    const capCollarBot = new THREE.Mesh(new THREE.TorusGeometry(1.48, 0.055, 14, 56), brassTrimMat);
+    capCollarBot.rotation.x = Math.PI / 2;
+    capCollarBot.position.y = -2.66;
+    const waistCollar = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.045, 12, 36), brassTrimMat);
+    waistCollar.rotation.x = Math.PI / 2;
+    hourglassFrameGroup.add(capCollarTop, capCollarBot, waistCollar);
+
+    // 3 trụ uốn cong TubeGeometry ôm lấy 2 bầu thủy tinh
+    const pillarAngles = [-Math.PI / 2, Math.PI / 6, (5 * Math.PI) / 6];
+    pillarAngles.forEach((ang) => {
+      const cosA = Math.cos(ang);
+      const sinA = Math.sin(ang);
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(cosA * 1.56, -2.86, sinA * 1.56),
+        new THREE.Vector3(cosA * 1.98, -1.55, sinA * 1.98),
+        new THREE.Vector3(cosA * 1.76, 0.0, sinA * 1.76),
+        new THREE.Vector3(cosA * 1.98, 1.55, sinA * 1.98),
+        new THREE.Vector3(cosA * 1.56, 2.86, sinA * 1.56)
+      ]);
+      const tubeGeo = new THREE.TubeGeometry(curve, 36, 0.075, 12, false);
+      const tubeMesh = new THREE.Mesh(tubeGeo, brassTrimMat);
+      hourglassFrameGroup.add(tubeMesh);
+
+      const midBead = new THREE.Mesh(new THREE.SphereGeometry(0.125, 14, 14), brassTrimMat);
+      midBead.position.set(cosA * 1.76, 0, sinA * 1.76);
+      hourglassFrameGroup.add(midBead);
+    });
+
+    // Vùng chạm vô hình cho Raycaster
+    const hourglassHitMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.05, 2.05, 6.4, 20),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    hourglassGroup.add(hourglassHitMesh);
+
+    /**
+     * ============================================================================
+     * 8. BỤI SAO TRONG ĐỒNG HỒ CÁT (UPPER SAND, LOWER CONE, STREAM, SWIRL)
+     * ============================================================================
+     */
+    const sandWorldGroup = new THREE.Group();
+    hourglassGroup.add(sandWorldGroup);
+
+    const sandShaderUniforms = {
+      uTime: { value: 0 },
+      uColorA: { value: new THREE.Color(THEMES.rose_gold.sandA) },
+      uColorB: { value: new THREE.Color(THEMES.rose_gold.sandB) },
+      uFillLevel: { value: 1.0 },
+      uSwirl: { value: 0.0 }
+    };
+
+    const upperSandMat = new THREE.ShaderMaterial({
+      uniforms: sandShaderUniforms,
+      vertexShader: `
+        varying vec3 vLocalPos;
+        varying vec3 vNormalView;
+        void main() {
+          vLocalPos = position;
+          vNormalView = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColorA;
+        uniform vec3 uColorB;
+        uniform float uFillLevel;
+        varying vec3 vLocalPos;
+        varying vec3 vNormalView;
+
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+        }
+
+        void main() {
+          if (uFillLevel <= 0.005) discard;
+          float topY = mix(0.05, 2.45, uFillLevel);
+          float rXZ = length(vLocalPos.xz);
+          float funnelDip = (1.0 - smoothstep(0.0, 0.95, rXZ)) * 0.24 * (1.0 - uFillLevel * 0.35);
+          if (vLocalPos.y > topY - funnelDip) discard;
+
+          float fineShimmer = 0.08 * sin(vLocalPos.x * 28.0 + uTime * 2.4) * cos(vLocalPos.z * 28.0 - uTime * 2.1);
+          float grad = clamp(vLocalPos.y / 2.45, 0.0, 1.0);
+          vec3 col = mix(uColorB, uColorA, grad * 0.72 + 0.28 + fineShimmer);
+          float rim = 0.72 + 0.28 * abs(vNormalView.z);
+          gl_FragColor = vec4(col * rim, 0.94);
+        }
+      `,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+
+    const upperSandProfile = [];
+    for (let i = 0; i <= 32; i++) {
+      const t = i / 32;
+      const r = Math.max(0.03, getGlassBulbRadius(t) - 0.11);
+      upperSandProfile.push(new THREE.Vector2(r, t * 2.48));
+    }
+    const upperSandMesh = new THREE.Mesh(new THREE.LatheGeometry(upperSandProfile, 44), upperSandMat);
+    upperSandMesh.renderOrder = 3;
+    sandWorldGroup.add(upperSandMesh);
+
+    // Mặt phễu cát bầu trên để luôn kín khối từ trên cao nhìn xuống
+    const funnelCapProfile = [
+      new THREE.Vector2(0.0, -0.18),
+      new THREE.Vector2(0.42, -0.09),
+      new THREE.Vector2(1.0, 0.0)
+    ];
+    const upperSandCapMat = new THREE.MeshBasicMaterial({
+      color: THEMES.rose_gold.sandA,
+      transparent: true,
+      opacity: 0.92,
+      side: THREE.DoubleSide
+    });
+    const upperSandCap = new THREE.Mesh(new THREE.LatheGeometry(funnelCapProfile, 40), upperSandCapMat);
+    upperSandCap.renderOrder = 3;
+    sandWorldGroup.add(upperSandCap);
+
+    // Nón cát bầu dưới dâng lên theo sandProgress
+    const lowerSandProfile = [
+      new THREE.Vector2(0.0, 1.0),
+      new THREE.Vector2(0.45, 0.65),
+      new THREE.Vector2(0.95, 0.25),
+      new THREE.Vector2(1.0, 0.0),
+      new THREE.Vector2(0.0, 0.0)
+    ];
+    const lowerSandMat = new THREE.ShaderMaterial({
+      uniforms: sandShaderUniforms,
+      vertexShader: `
+        varying vec3 vLocalPos;
+        varying vec3 vNormalView;
+        void main() {
+          vLocalPos = position;
+          vNormalView = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColorA;
+        uniform vec3 uColorB;
+        varying vec3 vLocalPos;
+        varying vec3 vNormalView;
+
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(41.1, 289.7))) * 43758.5453);
+        }
+
+        void main() {
+          float fineShimmer = 0.07 * sin(vLocalPos.x * 22.0 + vLocalPos.y * 16.0 + uTime * 2.2) * cos(vLocalPos.z * 22.0 - uTime * 1.8);
+          float h = clamp(vLocalPos.y, 0.0, 1.0);
+          vec3 col = mix(uColorB, uColorA, h * 0.78 + 0.22 + fineShimmer);
+          float lit = 0.76 + 0.24 * abs(vNormalView.z);
+          gl_FragColor = vec4(col * lit, 0.96);
+        }
+      `,
+      transparent: true
+    });
+    const lowerSandMesh = new THREE.Mesh(new THREE.LatheGeometry(lowerSandProfile, 44), lowerSandMat);
+    lowerSandMesh.position.y = -2.58;
+    lowerSandMesh.scale.set(0.01, 0.01, 0.01);
+    lowerSandMesh.visible = false;
+    lowerSandMesh.renderOrder = 3;
+    sandWorldGroup.add(lowerSandMesh);
+
+    // Tia sáng qua eo đồng hồ cát (`neckBeamMesh`)
+    const neckBeamMat = new THREE.MeshBasicMaterial({
+      color: THEMES.rose_gold.sandA,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const neckBeamMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.048, 2.5, 16), neckBeamMat);
+    neckBeamMesh.position.y = -1.25;
+    neckBeamMesh.renderOrder = 4;
+    sandWorldGroup.add(neckBeamMesh);
+
+    // Hạt bụi sao lấp lánh bầu trên + dòng cát chảy (`streamPoints`)
+    const upperStarCount = 260;
+    const upperStarGeo = new THREE.BufferGeometry();
+    const upperStarPos = new Float32Array(upperStarCount * 3);
+    const upperStarSeeds = [];
+    for (let i = 0; i < upperStarCount; i++) {
+      const t = 0.08 + Math.random() * 0.88;
+      const rMax = Math.max(0.05, getGlassBulbRadius(t) - 0.18);
+      const r = Math.sqrt(Math.random()) * rMax;
+      const a = Math.random() * Math.PI * 2;
+      upperStarPos[i * 3] = Math.cos(a) * r;
+      upperStarPos[i * 3 + 1] = t * 2.42;
+      upperStarPos[i * 3 + 2] = Math.sin(a) * r;
+      upperStarSeeds.push({ t, rFrac: r / Math.max(0.01, rMax), angle: a, speed: 0.7 + Math.random() * 1.4 });
+    }
+    upperStarGeo.setAttribute('position', new THREE.BufferAttribute(upperStarPos, 3));
+    const upperStarMat = new THREE.PointsMaterial({
+      map: softGlowSpriteTex,
+      color: 0xffffff,
+      size: 0.22,
+      transparent: true,
+      opacity: 0.88,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const upperSandPoints = new THREE.Points(upperStarGeo, upperStarMat);
+    upperSandPoints.renderOrder = 4;
+    sandWorldGroup.add(upperSandPoints);
+
+    // Dòng bụi sao chảy (`streamPoints`)
+    const streamCount = 170;
+    const streamGeo = new THREE.BufferGeometry();
+    const streamPos = new Float32Array(streamCount * 3);
+    const streamSeeds = [];
+    for (let i = 0; i < streamCount; i++) {
+      streamSeeds.push({
+        prog: Math.random(),
+        speed: 0.55 + Math.random() * 0.45,
+        ang: Math.random() * Math.PI * 2,
+        spread: Math.random() * 0.045
+      });
+    }
+    streamGeo.setAttribute('position', new THREE.BufferAttribute(streamPos, 3));
+    const streamMat = new THREE.PointsMaterial({
+      map: softGlowSpriteTex,
+      color: THEMES.rose_gold.sandA,
+      size: 0.24,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const streamPoints = new THREE.Points(streamGeo, streamMat);
+    streamPoints.renderOrder = 4;
+    sandWorldGroup.add(streamPoints);
+
+    // 9. BẢNG TÊN ĐÔI LỨA 3D PHÍA TRƯỚC & 4 QUẢ CẦU KÝ ỨC GỌN GÀNG, CÂN ĐỐI
+    const plaqueGroup = new THREE.Group();
+    plaqueGroup.position.set(0, 1.48, 3.05);
+    plaqueGroup.rotation.x = -0.18;
+    worldStageGroup.add(plaqueGroup);
+
+    const plaqueMat = new THREE.MeshBasicMaterial({
+      map: createCouplePlaqueTexture(state.sender, state.receiver, state.title3D, state.startDate),
+      transparent: true,
+      toneMapped: false
+    });
+    const plaqueMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.15, 1.30), plaqueMat);
+    plaqueGroup.add(plaqueMesh);
+
+    const plaqueStand = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.085, 1.1, 16), brassTrimMat);
+    plaqueStand.position.set(0, -0.68, -0.08);
+    plaqueGroup.add(plaqueStand);
+
+    function refreshCouplePlaque() {
+      const tex = createCouplePlaqueTexture(state.sender, state.receiver, state.title3D, state.startDate);
+      if (plaqueMat.map) plaqueMat.map.dispose();
+      plaqueMat.map = tex;
+      plaqueMat.needsUpdate = true;
+    }
+
+    // 4 Quả Cầu Ký Ức tinh tế quanh đồng hồ cát (tự dạt nhẹ ở desktop climax để nhường chỗ cho Khung Ảnh)
+    const orbCoords = [
+      { x: -4.25, y: 5.75, z: 0.45, cx: -4.45, cy: 5.85, cz: 0.35 }, // Trái trên
+      { x: 3.65, y: 3.10, z: 0.75, cx: 6.15, cy: 2.55, cz: -0.25 },  // Phải dưới -> dạt phải khi hiện ảnh
+      { x: -3.70, y: 3.10, z: 0.75, cx: -3.90, cy: 3.05, cz: 0.65 }, // Trái dưới
+      { x: 4.25, y: 5.75, z: 0.45, cx: 6.25, cy: 6.05, cz: -0.35 }   // Phải trên -> dạt phải khi hiện ảnh
+    ];
+
+    const memoryOrbs = [];
+    const orbHitMeshes = [];
+
+    orbCoords.forEach((pos, idx) => {
+      const orbGroup = new THREE.Group();
+      orbGroup.position.set(pos.x, pos.y, pos.z);
+      worldStageGroup.add(orbGroup);
+
+      const orbHex = THEMES[state.theme].orbColors[idx];
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: orbHex,
+        emissive: orbHex,
+        emissiveIntensity: 0.22,
+        roughness: 0.25,
+        metalness: 0.25
+      });
+      const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.28, 28, 28), coreMat);
+      orbGroup.add(coreMesh);
+
+      const shellMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.14,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const shellMesh = new THREE.Mesh(new THREE.SphereGeometry(0.35, 24, 24), shellMat);
+      orbGroup.add(shellMesh);
+
+      const ringMat = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        emissive: 0xfde047,
+        emissiveIntensity: 0.16,
+        metalness: 0.78,
+        roughness: 0.24
+      });
+      const ringMesh = new THREE.Mesh(new THREE.TorusGeometry(0.47, 0.024, 12, 48), ringMat);
+      ringMesh.rotation.x = Math.PI * 0.36;
+      ringMesh.rotation.y = idx % 2 === 0 ? 0.35 : -0.35;
+      orbGroup.add(ringMesh);
+
+      const auraMat = new THREE.SpriteMaterial({
+        map: softGlowSpriteTex,
+        color: orbHex,
+        transparent: true,
+        opacity: 0.15,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const auraSprite = new THREE.Sprite(auraMat);
+      auraSprite.scale.set(1.15, 1.15, 1);
+      orbGroup.add(auraSprite);
+
+      const hitMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.85, 14, 14),
+        new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+      );
+      hitMesh.userData = { orbIndex: idx };
+      orbGroup.add(hitMesh);
+      orbHitMeshes.push(hitMesh);
+
+      memoryOrbs.push({
+        idx,
+        basePos: new THREE.Vector3(pos.x, pos.y, pos.z),
+        climaxPos: new THREE.Vector3(pos.cx, pos.cy, pos.cz),
+        phase: idx * 1.4,
+        group: orbGroup,
+        coreMat,
+        shellMat,
+        ringMat,
+        ringMesh,
+        auraMat,
+        auraSprite,
+        hitMesh,
+        litLevel: 0,
+        litTarget: 0
+      });
+    });
+
+    /**
+     * ============================================================================
+     * 10. CAO TRÀO: MORPH HẠT NGÀY BẮT ĐẦU YÊU SẮC NÉT (~6400 ĐIỂM) & ẢNH HERO
+     * ============================================================================
+     */
+    const MORPH_COUNT = 6400;
+    const morphGeo = new THREE.BufferGeometry();
+    const morphCurrentPos = new Float32Array(MORPH_COUNT * 3);
+    const morphRenderPos = new Float32Array(MORPH_COUNT * 3);
+    const morphSpiralPos = new Float32Array(MORPH_COUNT * 3);
+    const morphTargetPos = new Float32Array(MORPH_COUNT * 3);
+    const morphColors = new Float32Array(MORPH_COUNT * 3);
+
+    function resetMorphParticlesToHourglass() {
+      const cA = new THREE.Color(THEMES[state.theme].sandA);
+      const cB = new THREE.Color(THEMES[state.theme].sandB);
+      for (let i = 0; i < MORPH_COUNT; i++) {
+        const ang = (i / MORPH_COUNT) * Math.PI * 18;
+        const rad = 0.2 + (i / MORPH_COUNT) * 1.25;
+        const y = HOURGLASS_CENTER_Y - 2.0 + Math.random() * 1.4;
+        morphCurrentPos[i * 3] = Math.cos(ang) * rad;
+        morphCurrentPos[i * 3 + 1] = y;
+        morphCurrentPos[i * 3 + 2] = Math.sin(ang) * rad;
+
+        morphRenderPos[i * 3] = morphCurrentPos[i * 3];
+        morphRenderPos[i * 3 + 1] = morphCurrentPos[i * 3 + 1];
+        morphRenderPos[i * 3 + 2] = morphCurrentPos[i * 3 + 2];
+
+        morphSpiralPos[i * 3] = Math.cos(ang) * (1.8 + Math.random() * 2.4);
+        morphSpiralPos[i * 3 + 1] = HOURGLASS_CENTER_Y + 0.4 + (i / MORPH_COUNT) * 5.2;
+        morphSpiralPos[i * 3 + 2] = Math.sin(ang) * (1.8 + Math.random() * 2.4);
+
+        const mixC = cA.clone().lerp(cB, Math.random());
+        morphColors[i * 3] = mixC.r;
+        morphColors[i * 3 + 1] = mixC.g;
+        morphColors[i * 3 + 2] = mixC.b;
+      }
+      morphGeo.setAttribute('position', new THREE.BufferAttribute(morphRenderPos, 3));
+      morphGeo.setAttribute('color', new THREE.BufferAttribute(morphColors, 3));
+    }
+
+    function sampleDatePoints(dateStr) {
+      const w = 1024;
+      const h = 256;
+      const cvs = document.createElement('canvas');
+      cvs.width = w;
+      cvs.height = h;
+      const ctx = cvs.getContext('2d');
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Chỉ lấy mẫu dải số Ngày Tháng Bắt Đầu Yêu Nhau cỡ lớn để bụi sao xếp siêu sắc nét
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 132px "Cinzel", "Playfair Display", serif';
+      ctx.fillText(dateStr, w / 2, h / 2, w - 64);
+
+      const imgData = ctx.getImageData(0, 0, w, h).data;
+      const hits = [];
+      const step = 2;
+      for (let py = 0; py < h; py += step) {
+        for (let px = 0; px < w; px += step) {
+          const alpha = imgData[(py * w + px) * 4 + 3];
+          if (alpha > 135) {
+            hits.push({ x: px, y: py });
+          }
+        }
+      }
+
+      const scaleW = isMobile ? 8.8 : 11.4;
+      const scaleH = scaleW * (h / w);
+      const centerY = isMobile ? 8.85 : 8.70;
+
+      for (let i = 0; i < MORPH_COUNT; i++) {
+        if (hits.length > 0) {
+          const pt = hits[Math.floor((i / MORPH_COUNT) * hits.length)];
+          const nx = (pt.x / w - 0.5) * scaleW + (Math.random() - 0.5) * 0.014;
+          const ny = centerY - (pt.y / h - 0.5) * scaleH + (Math.random() - 0.5) * 0.014;
+          const nz = -1.4 + (Math.random() - 0.5) * 0.08;
+          morphTargetPos[i * 3] = nx;
+          morphTargetPos[i * 3 + 1] = ny;
+          morphTargetPos[i * 3 + 2] = nz;
+        } else {
+          morphTargetPos[i * 3] = (Math.random() - 0.5) * 6;
+          morphTargetPos[i * 3 + 1] = centerY + (Math.random() - 0.5) * 1.5;
+          morphTargetPos[i * 3 + 2] = -1.4;
+        }
+      }
+    }
+
+    function createDaysCaptionTexture(daysText) {
+      const w = 1024;
+      const h = 160;
+      const cvs = document.createElement('canvas');
+      cvs.width = w;
+      cvs.height = h;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.rose_gold;
+
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(13, 8, 28, 0.80)';
+      ctx.beginPath();
+      ctx.roundRect(120, 22, w - 240, h - 44, 58);
+      ctx.fill();
+
+      ctx.strokeStyle = t.sandHexA;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = t.sandHexB;
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#fef3c7';
+      ctx.font = '800 48px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(`✨  ${daysText}  ✨`, w / 2, h / 2, w - 300);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    const daysCaptionMat = new THREE.MeshBasicMaterial({
+      map: createDaysCaptionTexture(`${computeDaysTogether(state.startDate)} NGÀY BÊN NHAU`),
+      transparent: true,
+      opacity: 0,
+      toneMapped: false
+    });
+    const daysCaptionMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 0.75), daysCaptionMat);
+    daysCaptionMesh.position.set(0, isMobile ? 7.85 : 7.55, -1.2);
+    daysCaptionMesh.visible = false;
+    worldStageGroup.add(daysCaptionMesh);
+
+    function refreshDaysCaptionTexture() {
+      const tex = createDaysCaptionTexture(`${computeDaysTogether(state.startDate)} NGÀY BÊN NHAU`);
+      if (daysCaptionMat.map) daysCaptionMat.map.dispose();
+      daysCaptionMat.map = tex;
+      daysCaptionMat.needsUpdate = true;
+    }
+
+    resetMorphParticlesToHourglass();
+    sampleDatePoints(formatDisplayDate(state.startDate));
+
+    const morphMat = new THREE.PointsMaterial({
+      map: pinpointStarTex,
+      size: isMobile ? 0.088 : 0.098,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    });
+    const morphPoints = new THREE.Points(morphGeo, morphMat);
+    morphPoints.visible = false;
+    morphPoints.renderOrder = 8;
+    worldStageGroup.add(morphPoints);
+
+    // Khung Ảnh Kỷ Niệm 3D chính (heroPhotoGroup) — đặt tách thoáng khỏi các quả cầu, click để ngắm cận cảnh
+    const heroPhotoGroup = new THREE.Group();
+    heroPhotoGroup.userData.targetPos = new THREE.Vector3(isMobile ? 0 : 4.15, isMobile ? 11.45 : 4.65, isMobile ? 0.65 : 0.95);
+    heroPhotoGroup.userData.targetScale = isMobile ? 0.76 : 0.90;
+    heroPhotoGroup.position.copy(heroPhotoGroup.userData.targetPos);
+    heroPhotoGroup.scale.set(0.001, 0.001, 0.001);
+    heroPhotoGroup.visible = false;
+    worldStageGroup.add(heroPhotoGroup);
+
+    const heroBackMat = new THREE.MeshStandardMaterial({
+      color: 0x1a0e32,
+      metalness: 0.45,
+      roughness: 0.35
+    });
+    const heroBackFrame = new THREE.Mesh(new THREE.BoxGeometry(2.74, 2.74, 0.10), heroBackMat);
+    heroPhotoGroup.add(heroBackFrame);
+
+    const heroGoldBorder = new THREE.Mesh(new THREE.BoxGeometry(2.86, 2.86, 0.06), brassTrimMat);
+    heroGoldBorder.position.z = -0.025;
+    heroPhotoGroup.add(heroGoldBorder);
+
+    const heroPhotoTex = new THREE.CanvasTexture(buildHeroPhotoCanvas(null));
+    heroPhotoTex.encoding = THREE.sRGBEncoding;
+    const heroPhotoMat = new THREE.MeshBasicMaterial({
+      map: heroPhotoTex,
+      toneMapped: false
+    });
+    const heroPhotoMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.56, 2.56), heroPhotoMat);
+    heroPhotoMesh.position.z = 0.06;
+    heroPhotoMesh.userData = { isHeroPhoto: true };
+    heroPhotoGroup.add(heroPhotoMesh);
+
+    const heroAuraSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowSpriteTex,
+      color: THEMES.rose_gold.sandA,
+      transparent: true,
+      opacity: 0.36,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    heroAuraSprite.scale.set(4.5, 4.5, 1);
+    heroAuraSprite.position.z = -0.18;
+    heroPhotoGroup.add(heroAuraSprite);
+
+    function refreshHeroPhotoTexture() {
+      const applyCvs = (cvs) => {
+        const tex = new THREE.CanvasTexture(cvs);
+        tex.encoding = THREE.sRGBEncoding;
+        if (heroPhotoMat.map) heroPhotoMat.map.dispose();
+        heroPhotoMat.map = tex;
+        heroPhotoMat.needsUpdate = true;
+        const thumb = document.getElementById('photo-thumb');
+        if (thumb) thumb.src = cvs.toDataURL('image/png');
+      };
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => applyCvs(buildHeroPhotoCanvas(img));
+        img.onerror = () => applyCvs(buildHeroPhotoCanvas(null));
+        img.src = state.photoDataUrl;
+      } else {
+        applyCvs(buildHeroPhotoCanvas(null));
+      }
+    }
+    refreshHeroPhotoTexture();
+    updateCameraAndLayout();
+
+    /**
+     * ============================================================================
+     * 11. QUẢN LÝ CHỦ ĐỀ MÀU, PHÁT SÁNG, DÒNG CÁT, CAO TRÀO & LẮC ĐIỆN THOẠI
+     * ============================================================================
+     */
+    let targetBrightness = 0;
+    let currentBrightness = 0;
+    let swirlEnergy = 0;
+    let climaxElapsed = 0;
+    let climaxWishTimer = null;
+    const burstEffects = [];
+
+    function spawnBurst(pos, hexColor, count = 42) {
+      const geo = new THREE.BufferGeometry();
+      const arr = new Float32Array(count * 3);
+      const vel = [];
+      for (let i = 0; i < count; i++) {
+        arr[i * 3] = pos.x;
+        arr[i * 3 + 1] = pos.y;
+        arr[i * 3 + 2] = pos.z;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const spd = 1.4 + Math.random() * 2.8;
+        vel.push(new THREE.Vector3(
+          Math.sin(phi) * Math.cos(theta) * spd,
+          Math.cos(phi) * spd + 0.5,
+          Math.sin(phi) * Math.sin(theta) * spd
+        ));
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+      const mat = new THREE.PointsMaterial({
+        map: softGlowSpriteTex,
+        color: hexColor,
+        size: 0.34,
+        transparent: true,
+        opacity: 1,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const pts = new THREE.Points(geo, mat);
+      worldStageGroup.add(pts);
+      burstEffects.push({ points: pts, vel, life: 1.0 });
+    }
+
+    function applyThemeColors(themeKey) {
+      const t = THEMES[themeKey] || THEMES.rose_gold;
+      sandShaderUniforms.uColorA.value.setHex(t.sandA);
+      sandShaderUniforms.uColorB.value.setHex(t.sandB);
+      upperSandCapMat.color.setHex(t.sandA);
+      neckBeamMat.color.setHex(t.sandA);
+      streamMat.color.setHex(t.sandA);
+      glassUniforms.uTint.value.setHex(t.glassTint);
+      glassUniforms.uGlow.value.setHex(t.sandB);
+
+      brassTrimMat.color.setHex(t.brassColor);
+      brassTrimMat.emissive.setHex(t.brassColor);
+      const newWoodTex = createWoodMetalTexture(t.frameColor, t.brassColor);
+      if (frameWoodMat.map) frameWoodMat.map.dispose();
+      frameWoodMat.map = newWoodTex;
+      frameWoodMat.needsUpdate = true;
+
+      warmCoreLight.color.setHex(t.warmLight);
+      rimLight.color.setHex(t.rimLight);
+      fireflyMat.color.setHex(t.firefly);
+      heroAuraSprite.material.color.setHex(t.sandA);
+
+      memoryOrbs.forEach((orb, idx) => {
+        const col = t.orbColors[idx % t.orbColors.length];
+        orb.coreMat.color.setHex(col);
+        orb.coreMat.emissive.setHex(col);
+        orb.auraMat.color.setHex(col);
+      });
+
+      const cA = new THREE.Color(t.sandA);
+      const cB = new THREE.Color(t.sandB);
+      const colAttr = morphGeo.attributes.color;
+      for (let i = 0; i < MORPH_COUNT; i++) {
+        const mc = cA.clone().lerp(cB, (i % 13) / 12);
+        colAttr.setXYZ(i, mc.r, mc.g, mc.b);
+      }
+      colAttr.needsUpdate = true;
+
+      refreshCouplePlaque();
+      refreshHeroPhotoTexture();
+    }
+
+    function setProgressiveBrightness(val) {
+      targetBrightness = Math.max(0, Math.min(1, val));
+      const skyLayer = document.getElementById('sky-radiance-layer');
+      if (skyLayer) {
+        skyLayer.style.opacity = (0.05 + targetBrightness * 0.85).toFixed(2);
+      }
+    }
+
+    function lightUpOrb(idx) {
+      if (state.litOrbs.has(idx)) return;
+      state.litOrbs.add(idx);
+      const orb = memoryOrbs[idx];
+      if (orb) {
+        orb.litTarget = 1;
+        spawnBurst(orb.basePos, THEMES[state.theme].orbColors[idx], 46);
+      }
+      sound.playOrbChime(idx);
+      const stepB = Math.min(0.84, 0.2 + state.litOrbs.size * 0.16);
+      setProgressiveBrightness(stepB);
+
+      if (state.phase === 'flowing' && !state.climaxTriggered) {
+        document.getElementById('action-hint-pill').innerHTML =
+          `🔮 Quả cầu ký ức #${idx + 1} vừa bừng sáng! Chạm vào quả cầu để xem kỷ niệm ✨`;
+      }
+    }
+
+    function startHourglassFlow() {
+      if (state.phase !== 'idle') return;
+      requestMotionPermissionIfNeeded();
+      sound.startFlowAudio();
+      state.phase = 'flowing';
+      state.isFlipping = true;
+      state.flipProgress = 0;
+      state.sandProgress = 0;
+      state.targetSandProgress = 0.02;
+      swirlEnergy = 1.0;
+
+      setProgressiveBrightness(0.14);
+      spawnBurst(new THREE.Vector3(0, HOURGLASS_CENTER_Y, 0), THEMES[state.theme].sandA, 55);
+      document.getElementById('action-hint-pill').innerHTML =
+        `⏳ Dòng cát ánh sao đang chảy... Chạm vào từng quả cầu phát sáng để khám phá ký ức!`;
+    }
+
+    function triggerClimaxPhase(autoOpenWish = true) {
+      if (state.climaxTriggered) return;
+      state.climaxTriggered = true;
+      state.phase = 'climax';
+      state.sandProgress = 1.0;
+      state.targetSandProgress = 1.0;
+      climaxElapsed = 0;
+
+      MILESTONES.forEach((_, idx) => lightUpOrb(idx));
+      setProgressiveBrightness(1.0);
+      sound.fadeOutSand();
+      sound.playClimaxFanfare();
+
+      const flashEl = document.getElementById('screen-flash');
+      if (flashEl) {
+        flashEl.classList.add('flash');
+        setTimeout(() => flashEl.classList.remove('flash'), 480);
+      }
+
+      sampleDatePoints(formatDisplayDate(state.startDate));
+      refreshDaysCaptionTexture();
+      daysCaptionMesh.visible = true;
+      resetMorphParticlesToHourglass();
+      morphPoints.visible = true;
+
+      heroPhotoGroup.visible = true;
+      heroPhotoGroup.scale.set(0.05, 0.05, 0.05);
+
+      spawnBurst(new THREE.Vector3(0, HOURGLASS_CENTER_Y + 2.5, 0), THEMES[state.theme].sandA, 72);
+      spawnBurst(heroPhotoGroup.userData.targetPos, THEMES[state.theme].sandB, 48);
+
+      document.getElementById('action-hint-pill').innerHTML =
+        `✨ <b>${formatDisplayDate(state.startDate)} • ${computeDaysTogether(state.startDate)} NGÀY BÊN NHAU!</b> Chạm vào khung ảnh để ngắm cận cảnh 💖`;
+
+      // Chỉ bật nhịp glow/pulse trên nút Tạo Link & QR duy nhất ở .bottom-dock
+      document.getElementById('btn-open-payment')?.classList.add('cta-pulse');
+
+      if (climaxWishTimer) clearTimeout(climaxWishTimer);
+      if (autoOpenWish) {
+        climaxWishTimer = setTimeout(() => {
+          openWishModal();
+        }, 2000);
+      }
+    }
+
+    // Hỗ trợ cảm biến lắc điện thoại (devicemotion) làm xoáy bụi sao
+    let motionPermissionRequested = false;
+    let lastShakeTime = 0;
+    function handleDeviceMotion(e) {
+      const acc = e.accelerationIncludingGravity || e.acceleration;
+      if (!acc) return;
+      const mag = Math.hypot(acc.x || 0, acc.y || 0, acc.z || 0);
+      const now = Date.now();
+      if (mag > 21 && now - lastShakeTime > 550) {
+        lastShakeTime = now;
+        swirlEnergy = 1.25;
+        spawnBurst(new THREE.Vector3(0, HOURGLASS_CENTER_Y + 0.6, 0), THEMES[state.theme].sandA, 32);
+      }
+    }
+    window.addEventListener('devicemotion', handleDeviceMotion);
+
+    function requestMotionPermissionIfNeeded() {
+      if (motionPermissionRequested) return;
+      motionPermissionRequested = true;
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().catch(() => {});
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 12. TƯƠNG TÁC RAYCASTER (PHÂN BIỆT CLICK DRAGDIST <= 6PX VS KÉO XOAY 3D)
+     * ============================================================================
+     */
+    const raycaster = new THREE.Raycaster();
+    const pointerNdc = new THREE.Vector2();
+    let isDragging = false;
+    let dragDist = 0;
+    let prevPtr = { x: 0, y: 0 };
+    let targetOrbitY = 0;
+    let currentOrbitY = 0;
+    let targetTiltX = 0;
+    let currentTiltX = 0;
+
+    canvas.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      dragDist = 0;
+      prevPtr = { x: e.clientX, y: e.clientY };
+      requestMotionPermissionIfNeeded();
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevPtr.x;
+      const dy = e.clientY - prevPtr.y;
+      dragDist += Math.hypot(dx, dy);
+      prevPtr = { x: e.clientX, y: e.clientY };
+
+      if (dragDist > 6) {
+        targetOrbitY += dx * 0.007;
+        targetTiltX = Math.max(-0.22, Math.min(0.26, targetTiltX + dy * 0.003));
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      const wasClick = dragDist <= 6;
+      isDragging = false;
+      if (!wasClick) return;
+      if (e.target !== canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointerNdc, camera);
+
+      // 1. Kiểm tra chạm Khung Ảnh 3D khi ở Cao trào
+      if (state.climaxTriggered && heroPhotoGroup.visible) {
+        const photoHit = raycaster.intersectObject(heroPhotoMesh, false);
+        if (photoHit.length > 0) {
+          openHeroPhotoZoomModal();
+          return;
+        }
+      }
+
+      // 2. Kiểm tra chạm 4 Quả Cầu Ký Ức
+      const orbHits = raycaster.intersectObjects(orbHitMeshes, false);
+      if (orbHits.length > 0) {
+        const idx = orbHits[0].object.userData.orbIndex;
+        if (state.phase === 'idle') {
+          startHourglassFlow();
+        }
+        lightUpOrb(idx);
+        const firstTime = !state.openedOrbs.has(idx);
+        state.openedOrbs.add(idx);
+        openOrbSpotlight(idx, firstTime);
+        return;
+      }
+
+      // 3. Kiểm tra chạm Đồng Hồ Cát
+      const hgHits = raycaster.intersectObject(hourglassHitMesh, false);
+      if (hgHits.length > 0) {
+        if (state.phase === 'idle') {
+          startHourglassFlow();
+        } else if (state.phase === 'flowing') {
+          swirlEnergy = 1.0;
+          spawnBurst(new THREE.Vector3(0, HOURGLASS_CENTER_Y, 0), THEMES[state.theme].sandA, 28);
+        }
+      }
+    });
+
+    /**
+     * ============================================================================
+     * 13. SPOTLIGHT MODAL (5S AUTO-CLOSE LẦN ĐẦU, KHÔNG CHỮ ĐẾM NGƯỢC) & TÂM THƯ
+     * ============================================================================
+     */
+    let spotlightTimer = null;
+
+    function clearSpotlightTimers() {
+      if (spotlightTimer) {
+        clearTimeout(spotlightTimer);
+        spotlightTimer = null;
+      }
+      const track = document.getElementById('spotlight-progress-track');
+      const fill = document.getElementById('spotlight-progress-fill');
+      if (track) track.classList.remove('active');
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+      }
+    }
+
+    function advanceFlowToNextMilestone() {
+      if (state.phase === 'idle') {
+        startHourglassFlow();
+      }
+      if (state.climaxTriggered) return;
+      const nextMilestone = MILESTONES.find((m) => m > state.sandProgress + 0.015);
+      if (nextMilestone !== undefined) {
+        state.targetSandProgress = Math.max(state.targetSandProgress, nextMilestone + 0.015);
+      } else {
+        state.targetSandProgress = 1.0;
+      }
+    }
+
+    function closeSpotlightModal(shouldAdvance = false) {
+      clearSpotlightTimers();
+      document.getElementById('spotlight-modal').classList.remove('active');
+      if (shouldAdvance) {
+        advanceFlowToNextMilestone();
+      }
+    }
+
+    function openOrbSpotlight(idx, shouldAutoClose = false) {
+      clearSpotlightTimers();
+
+      const mem = state.memories[idx % state.memories.length];
+      const spotCvs = document.getElementById('spotlight-canvas');
+      const sctx = spotCvs.getContext('2d');
+      const tempCvs = buildOrbSpotlightCanvas(idx, mem);
+      sctx.clearRect(0, 0, spotCvs.width, spotCvs.height);
+      sctx.drawImage(tempCvs, 0, 0, spotCvs.width, spotCvs.height);
+
+      document.getElementById('spotlight-badge').textContent = mem.badge || `🔮 Quả Cầu Ký Ức #${idx + 1}`;
+      document.getElementById('spotlight-caption').textContent = `"${mem.text}"`;
+      document.getElementById('spotlight-sub').textContent =
+        `${state.sender} ❤️ ${state.receiver} • ${formatDisplayDate(state.startDate)}`;
+      document.getElementById('btn-spotlight-continue').style.display = 'inline-flex';
+      document.getElementById('spotlight-modal').classList.add('active');
+
+      if (shouldAutoClose) {
+        const track = document.getElementById('spotlight-progress-track');
+        const fill = document.getElementById('spotlight-progress-fill');
+        if (track && fill) {
+          track.classList.add('active');
+          fill.style.transition = 'none';
+          fill.style.width = '0%';
+          void fill.offsetWidth;
+          fill.style.transition = 'width 5s linear';
+          fill.style.width = '100%';
+        }
+        spotlightTimer = setTimeout(() => {
+          closeSpotlightModal(false);
+        }, 5000);
+      }
+    }
+
+    function openHeroPhotoZoomModal() {
+      clearSpotlightTimers();
+      const spotCvs = document.getElementById('spotlight-canvas');
+      const sctx = spotCvs.getContext('2d');
+      const drawToSpotlight = (img) => {
+        const built = buildHeroPhotoCanvas(img);
+        sctx.clearRect(0, 0, spotCvs.width, spotCvs.height);
+        sctx.drawImage(built, 0, 0, spotCvs.width, spotCvs.height);
+      };
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => drawToSpotlight(img);
+        img.src = state.photoDataUrl;
+      } else {
+        drawToSpotlight(null);
+      }
+
+      document.getElementById('spotlight-badge').textContent = '🖼️ Khoảnh Khắc Vĩnh Cửu';
+      document.getElementById('spotlight-caption').textContent = `"${state.title3D}"`;
+      document.getElementById('spotlight-sub').textContent =
+        `${state.sender} ❤️ ${state.receiver} • ${computeDaysTogether(state.startDate)} Ngày Bên Nhau`;
+      document.getElementById('btn-spotlight-continue').style.display = 'none';
+      document.getElementById('spotlight-modal').classList.add('active');
+    }
+
+    document.getElementById('btn-close-spotlight').addEventListener('click', () => closeSpotlightModal(false));
+    document.getElementById('btn-spotlight-continue').addEventListener('click', () => closeSpotlightModal(true));
+    document.getElementById('btn-spotlight-letter').addEventListener('click', () => {
+      closeSpotlightModal(false);
+      openWishModal();
+    });
+
+    function openWishModal() {
+      document.getElementById('wish-card-badge').textContent = `⏳ ${state.title3D} ✨`;
+      document.getElementById('wish-card-title').textContent = `Gửi Tới ${state.receiver}`;
+      document.getElementById('wish-card-meta').textContent =
+        `${formatDisplayDate(state.startDate)} • ${computeDaysTogether(state.startDate)} Ngày Bên Nhau`;
+      document.getElementById('wish-card-content').textContent = state.wish;
+      document.getElementById('wish-card-sender').textContent = `${state.signOff}, ${state.sender}`;
+      document.getElementById('modal-wish-card').classList.add('active');
+    }
+
+    document.getElementById('btn-open-wish').addEventListener('click', openWishModal);
+    document.getElementById('btn-close-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+    });
+    document.getElementById('btn-relight-from-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+    });
+
+    /**
+     * ============================================================================
+     * 14. 4 PRESETS, MODAL TÙY CHỈNH (NÉN ẢNH 720PX JPEG 0.8) & GIFTSDK
+     * ============================================================================
+     */
+    function applyPreset(presetKey) {
+      const p = PRESETS[presetKey];
+      if (!p) return;
+
+      state.presetKey = presetKey;
+      state.sender = p.sender;
+      state.receiver = p.receiver;
+      state.startDate = p.startDate;
+      state.theme = p.theme;
+      state.title3D = p.title3D;
+      state.signOff = p.signOff;
+      state.musicMood = p.musicMood;
+      state.wish = p.wish;
+      state.memories = [...p.memories];
+
+      document.querySelectorAll('.preset-chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.preset === presetKey);
+      });
+      document.querySelectorAll('.modal-theme-chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.theme === state.theme);
+      });
+
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-start-date').value = state.startDate;
+      document.getElementById('in-wish').value = state.wish;
+
+      applyThemeColors(state.theme);
+      sampleDatePoints(formatDisplayDate(state.startDate));
+      refreshDaysCaptionTexture();
+
+      if (!state.climaxTriggered) {
+        document.getElementById('action-hint-pill').innerHTML =
+          state.phase === 'idle'
+            ? `⏳ Chủ đề <b>${p.title3D}</b> • Chạm đồng hồ cát để khai mở dòng chảy!`
+            : `⏳ Đã chuyển sang sắc thái <b>${p.title3D}</b> ✨`;
+      } else {
+        document.getElementById('action-hint-pill').innerHTML =
+          `✨ <b>${formatDisplayDate(state.startDate)} • ${computeDaysTogether(state.startDate)} NGÀY BÊN NHAU!</b>`;
+      }
+    }
+
+    document.querySelectorAll('.preset-chip').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        applyPreset(e.currentTarget.dataset.preset);
+      });
+    });
+
+    function openCustomizeModal() {
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-start-date').value = state.startDate;
+      document.getElementById('in-wish').value = state.wish;
+      document.getElementById('modal-customize').classList.add('active');
+    }
+
+    document.getElementById('btn-open-customize')?.addEventListener('click', openCustomizeModal);
+    document.getElementById('btn-close-customize')?.addEventListener('click', () => {
+      document.getElementById('modal-customize').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.theme = e.currentTarget.dataset.theme;
+        applyThemeColors(state.theme);
+      });
+    });
+
+    document.querySelectorAll('.art-preset-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.art-preset-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.artPreset = e.currentTarget.dataset.art;
+        state.photoDataUrl = null;
+        const fileEl = document.getElementById('in-photo');
+        if (fileEl) fileEl.value = '';
+        refreshHeroPhotoTexture();
+      });
+    });
+
+    document.getElementById('in-photo')?.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const rawImg = new Image();
+        rawImg.onload = () => {
+          const maxSide = 720;
+          let tw = rawImg.width;
+          let th = rawImg.height;
+          if (tw > maxSide || th > maxSide) {
+            if (tw >= th) {
+              th = Math.round((th * maxSide) / tw);
+              tw = maxSide;
+            } else {
+              tw = Math.round((tw * maxSide) / th);
+              th = maxSide;
+            }
+          }
+          const c = document.createElement('canvas');
+          c.width = tw;
+          c.height = th;
+          c.getContext('2d').drawImage(rawImg, 0, 0, tw, th);
+          state.photoDataUrl = c.toDataURL('image/jpeg', 0.8);
+          document.querySelectorAll('.art-preset-chip').forEach((ch) => ch.classList.remove('active'));
+          refreshHeroPhotoTexture();
+        };
+        rawImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function syncFormToState() {
+      state.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      state.startDate = document.getElementById('in-start-date').value || '2024-02-14';
+      state.wish = document.getElementById('in-wish').value.trim() || PRESETS.dating.wish;
+
+      refreshCouplePlaque();
+      refreshHeroPhotoTexture();
+      sampleDatePoints(formatDisplayDate(state.startDate));
+      refreshDaysCaptionTexture();
+    }
+
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      sound.initContext();
+      sound.startBallad();
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+
+      state.isFlipping = false;
+      state.flipProgress = 1;
+      hourglassFrameGroup.rotation.z = Math.PI;
+      if (!state.climaxTriggered) {
+        triggerClimaxPhase(false);
+      } else {
+        climaxElapsed = 0;
+        resetMorphParticlesToHourglass();
+        spawnBurst(heroPhotoGroup.userData.targetPos, THEMES[state.theme].sandA, 48);
+        document.getElementById('action-hint-pill').innerHTML =
+          `✨ <b>${formatDisplayDate(state.startDate)} • ${computeDaysTogether(state.startDate)} NGÀY BÊN NHAU!</b> Chạm vào khung ảnh để ngắm cận cảnh 💖`;
+      }
+    });
+
+    function openPaymentFlow() {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+        GiftSDK.openPayment({
+          templateId: state.templateId,
+          templateType: 'anniversary',
+          senderName: state.sender,
+          receiverName: state.receiver,
+          occasion: 'Kỷ Niệm Yêu • Đồng Hồ Cát Ánh Sáng 3D',
+          message: state.wish,
+          payload: {
+            presetKey: state.presetKey,
+            startDate: state.startDate,
+            theme: state.theme,
+            title3D: state.title3D,
+            artPreset: state.artPreset,
+            photoDataUrl: state.photoDataUrl
+          }
+        });
+      } else {
+        alert('Đang trong môi trường demo local.');
+      }
+    }
+
+    document.getElementById('customize-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sound.initContext();
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+      openPaymentFlow();
+    });
+
+    document.getElementById('btn-open-payment')?.addEventListener('click', openPaymentFlow);
+
+    document.getElementById('btn-replay')?.addEventListener('click', () => {
+      sound.stopAll();
+      clearSpotlightTimers();
+      if (climaxWishTimer) {
+        clearTimeout(climaxWishTimer);
+        climaxWishTimer = null;
+      }
+      document.getElementById('spotlight-modal').classList.remove('active');
+      document.getElementById('modal-wish-card').classList.remove('active');
+      document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+
+      state.phase = 'idle';
+      state.isFlipping = false;
+      state.flipProgress = 0;
+      state.sandProgress = 0;
+      state.targetSandProgress = 0;
+      state.litOrbs.clear();
+      state.openedOrbs.clear();
+      state.climaxTriggered = false;
+      climaxElapsed = 0;
+      swirlEnergy = 0;
+
+      hourglassFrameGroup.rotation.z = 0;
+      targetOrbitY = 0;
+      currentOrbitY = 0;
+      targetTiltX = 0;
+      currentTiltX = 0;
+
+      setProgressiveBrightness(0);
+      currentBrightness = 0;
+
+      memoryOrbs.forEach((orb) => {
+        orb.litLevel = 0;
+        orb.litTarget = 0;
+        orb.group.position.copy(orb.basePos);
+        orb.coreMat.emissiveIntensity = 0.22;
+        orb.auraMat.opacity = 0.15;
+        orb.auraSprite.scale.set(1.15, 1.15, 1);
+      });
+
+      morphPoints.visible = false;
+      morphMat.opacity = 0;
+      daysCaptionMesh.visible = false;
+      daysCaptionMat.opacity = 0;
+      heroPhotoGroup.visible = false;
+      heroPhotoGroup.scale.set(0.001, 0.001, 0.001);
+
+      updateCameraAndLayout();
+      document.getElementById('action-hint-pill').innerHTML =
+        `⏳ Chạm vào đồng hồ cát để khai mở dòng chảy thời gian...`;
+    });
+
+    document.getElementById('btn-sound')?.addEventListener('click', (e) => {
+      sound.initContext();
+      const muted = sound.toggleMute();
+      e.currentTarget.textContent = muted ? '🔇 Tắt Tiếng' : '🔊 Âm Thanh';
+    });
+
+    /**
+     * ============================================================================
+     * 15. VÒNG LẶP ANIMATION 60FPS (CLOCK + DT <= 0.05)
+     * ============================================================================
+     */
+    const clock = new THREE.Clock();
+    let elapsedTime = 0;
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      elapsedTime += dt;
+
+      // 1. Progressive Brightness
+      currentBrightness += (targetBrightness - currentBrightness) * Math.min(1, dt * 3.2);
+      const b = currentBrightness;
+
+      ambientLight.intensity = 0.28 + b * 0.65;
+      moonDirLight.intensity = 0.36 + b * 1.15;
+      warmCoreLight.intensity = 0.45 + b * 1.75;
+      rimLight.intensity = 0.38 + b * 0.82;
+      starMat.opacity = 0.34 + b * 0.56;
+      fireflyMat.opacity = 0.25 + b * 0.68;
+      glassUniforms.uTime.value = elapsedTime;
+      glassUniforms.uBrightness.value = b;
+      sandShaderUniforms.uTime.value = elapsedTime;
+
+      // 2. Xoay / lật đồng hồ cát 180 độ (0.9s easeOutCubic)
+      if (state.isFlipping) {
+        state.flipProgress = Math.min(1, state.flipProgress + dt / 0.9);
+        const eased = easeOutCubic(state.flipProgress);
+        hourglassFrameGroup.rotation.z = eased * Math.PI;
+        if (state.flipProgress >= 1) {
+          state.isFlipping = false;
+          hourglassFrameGroup.rotation.z = Math.PI;
+        }
+      }
+
+      // 3. Tiến trình dòng chảy cát ánh sao
+      if (state.phase === 'flowing' && !state.isFlipping) {
+        // Dòng chảy tự nhiên (~26s tổng thời gian) hoặc tiến nhanh khi bấm "Tiếp Tục Dòng Chảy"
+        state.targetSandProgress = Math.min(1.0, state.targetSandProgress + dt * 0.036);
+        state.sandProgress += (state.targetSandProgress - state.sandProgress) * Math.min(1, dt * 3.5);
+
+        MILESTONES.forEach((m, idx) => {
+          if (state.sandProgress >= m) {
+            lightUpOrb(idx);
+          }
+        });
+
+        if (state.sandProgress >= 0.995 && !state.climaxTriggered) {
+          triggerClimaxPhase(true);
+        }
+      }
+
+      const upperFill = Math.max(0, 1 - state.sandProgress);
+      sandShaderUniforms.uFillLevel.value = upperFill;
+
+      // Mặt phễu cát bầu trên hạ dần theo upperFill
+      if (upperFill > 0.02) {
+        upperSandCap.visible = true;
+        const capY = 0.05 + upperFill * 2.40;
+        const capT = capY / BULB_H;
+        const capRad = Math.max(0.05, getGlassBulbRadius(capT) - 0.12);
+        upperSandCap.position.y = capY;
+        upperSandCap.scale.set(capRad, 1, capRad);
+      } else {
+        upperSandCap.visible = false;
+      }
+
+      // Nón cát bầu dưới dâng lên theo sandProgress
+      if (state.sandProgress > 0.01) {
+        lowerSandMesh.visible = true;
+        const p = state.sandProgress;
+        const coneScaleR = 0.22 + Math.pow(p, 0.55) * 1.24;
+        const coneScaleH = 0.10 + p * 1.92;
+        lowerSandMesh.scale.set(coneScaleR, coneScaleH, coneScaleR);
+      } else {
+        lowerSandMesh.visible = false;
+      }
+
+      // Bụi sao xoáy nhẹ trong bầu trên (kể cả khi lắc điện thoại)
+      swirlEnergy = Math.max(0, swirlEnergy - dt * 0.55);
+      const uPos = upperStarGeo.attributes.position.array;
+      for (let i = 0; i < upperStarCount; i++) {
+        const s = upperStarSeeds[i];
+        const maxT = Math.max(0.06, upperFill * 0.92);
+        const curT = (s.t % maxT);
+        const rMax = Math.max(0.04, getGlassBulbRadius(curT) - 0.18);
+        const a = s.angle + elapsedTime * s.speed * (0.45 + swirlEnergy * 2.8);
+        const r = s.rFrac * rMax;
+        uPos[i * 3] = Math.cos(a) * r;
+        uPos[i * 3 + 1] = curT * 2.42;
+        uPos[i * 3 + 2] = Math.sin(a) * r;
+      }
+      upperStarGeo.attributes.position.needsUpdate = true;
+      upperSandPoints.visible = upperFill > 0.03;
+
+      // Dòng cát rơi từ eo xuống đỉnh nón bầu dưới
+      const isStreamActive = state.phase === 'flowing' && !state.isFlipping && state.sandProgress < 0.995;
+      const lowerPeakY = -2.58 + (0.10 + state.sandProgress * 1.92);
+      const streamSpan = Math.max(0.25, 0.04 - lowerPeakY);
+
+      neckBeamMat.opacity = isStreamActive ? (0.48 + Math.sin(elapsedTime * 10) * 0.14) : 0;
+      neckBeamMesh.scale.y = streamSpan / 2.5;
+      neckBeamMesh.position.y = 0.04 - streamSpan * 0.5;
+
+      streamMat.opacity = isStreamActive ? 0.92 : 0;
+      if (isStreamActive) {
+        const sArr = streamGeo.attributes.position.array;
+        for (let i = 0; i < streamCount; i++) {
+          const sd = streamSeeds[i];
+          sd.prog = (sd.prog + dt * sd.speed * 1.25) % 1;
+          const y = 0.05 - sd.prog * streamSpan;
+          const splash = sd.prog > 0.88 ? (sd.prog - 0.88) * 1.9 : 0;
+          const rad = sd.spread + splash;
+          sArr[i * 3] = Math.cos(sd.ang + elapsedTime * 4) * rad;
+          sArr[i * 3 + 1] = y;
+          sArr[i * 3 + 2] = Math.sin(sd.ang + elapsedTime * 4) * rad;
+        }
+        streamGeo.attributes.position.needsUpdate = true;
+      }
+
+      // 4. 4 Quả Cầu Ký Ức bay lơ lửng tinh tế & tự dạt thoáng ở desktop climax
+      memoryOrbs.forEach((orb) => {
+        orb.litLevel += (orb.litTarget - orb.litLevel) * Math.min(1, dt * 4.0);
+        const l = orb.litLevel;
+        const tgt = (!isMobile && state.climaxTriggered) ? orb.climaxPos : orb.basePos;
+        orb.group.position.x += (tgt.x - orb.group.position.x) * Math.min(1, dt * 3.0);
+        orb.group.position.z += (tgt.z - orb.group.position.z) * Math.min(1, dt * 3.0);
+        const tgtY = tgt.y + Math.sin(elapsedTime * 1.45 + orb.phase) * 0.15;
+        orb.group.position.y += (tgtY - orb.group.position.y) * Math.min(1, dt * 4.5);
+
+        orb.ringMesh.rotation.z = elapsedTime * (0.45 + l * 0.8);
+        orb.coreMat.emissiveIntensity = 0.22 + l * 0.95;
+        orb.ringMat.emissiveIntensity = 0.16 + l * 0.65;
+        orb.auraMat.opacity = 0.14 + l * 0.32;
+        const auraScale = 1.15 + l * 0.55 + Math.sin(elapsedTime * 3.0 + orb.phase) * 0.08;
+        orb.auraSprite.scale.set(auraScale, auraScale, 1);
+      });
+
+      // 5. Cao trào: Morph hạt xếp ngày tháng sắc nét & Khung ảnh 3D Hero
+      if (state.climaxTriggered) {
+        climaxElapsed += dt;
+        const spiralPhase = Math.min(1, climaxElapsed / 1.15);
+        const morphPhase = Math.max(0, Math.min(1, (climaxElapsed - 0.85) / 1.65));
+        const mPos = morphGeo.attributes.position.array;
+
+        for (let i = 0; i < MORPH_COUNT; i++) {
+          const ix = i * 3;
+          const sx = THREE.MathUtils.lerp(morphCurrentPos[ix], morphSpiralPos[ix], easeOutCubic(spiralPhase));
+          const sy = THREE.MathUtils.lerp(morphCurrentPos[ix + 1], morphSpiralPos[ix + 1], easeOutCubic(spiralPhase));
+          const sz = THREE.MathUtils.lerp(morphCurrentPos[ix + 2], morphSpiralPos[ix + 2], easeOutCubic(spiralPhase));
+
+          const tx = morphTargetPos[ix];
+          const ty = morphTargetPos[ix + 1];
+          const tz = morphTargetPos[ix + 2];
+
+          const floatY = Math.sin(elapsedTime * 1.8 + i * 0.025) * 0.02 * morphPhase;
+          mPos[ix] = THREE.MathUtils.lerp(sx, tx, easeOutCubic(morphPhase));
+          mPos[ix + 1] = THREE.MathUtils.lerp(sy, ty, easeOutCubic(morphPhase)) + floatY;
+          mPos[ix + 2] = THREE.MathUtils.lerp(sz, tz, easeOutCubic(morphPhase));
+        }
+        morphGeo.attributes.position.needsUpdate = true;
+        morphMat.opacity = Math.min(0.92, climaxElapsed * 1.2);
+        daysCaptionMat.opacity = Math.min(1, morphPhase * 1.25);
+
+        // Khung Ảnh 3D Hero bừng hiện & luôn quay mặt về camera
+        const tgtScale = heroPhotoGroup.userData.targetScale || 0.90;
+        const curS = heroPhotoGroup.scale.x + (tgtScale - heroPhotoGroup.scale.x) * Math.min(1, dt * 3.8);
+        heroPhotoGroup.scale.setScalar(curS);
+        heroPhotoGroup.position.x = heroPhotoGroup.userData.targetPos.x;
+        heroPhotoGroup.position.y = heroPhotoGroup.userData.targetPos.y + Math.sin(elapsedTime * 1.5) * 0.12;
+        heroPhotoGroup.position.z = heroPhotoGroup.userData.targetPos.z;
+        heroPhotoGroup.lookAt(camera.position);
+
+        // Cinematic Orbit Reveal (giữ nguyên khoảng nhìn thấp để Bảng tên 3D luôn nổi bật trên Bottom Dock)
+        const cinematicYaw = Math.sin(Math.min(Math.PI, climaxElapsed * 0.52)) * 0.18;
+        const pullZoom = Math.min(1, climaxElapsed / 2.2);
+        camera.position.x = baseCamPos.x + Math.sin(elapsedTime * 0.35) * 0.65 * pullZoom;
+        camera.position.y = baseCamPos.y + 0.15 * pullZoom;
+        camera.position.z = baseCamPos.z - 0.55 * pullZoom;
+        camera.lookAt(baseLookAt.x, baseLookAt.y + 0.12 * pullZoom, baseLookAt.z);
+        worldStageGroup.rotation.y = currentOrbitY + cinematicYaw;
+      } else {
+        currentOrbitY += (targetOrbitY - currentOrbitY) * Math.min(1, dt * 6);
+        currentTiltX += (targetTiltX - currentTiltX) * Math.min(1, dt * 6);
+        worldStageGroup.rotation.y = currentOrbitY + Math.sin(elapsedTime * 0.2) * 0.08;
+        worldStageGroup.rotation.x = currentTiltX;
+      }
+
+      // 6. Mặt hồ ánh trăng gợn sóng & 3 vòng sóng đồng tâm
+      const wArr = waterGeo.attributes.position.array;
+      for (let wi = 3; wi < wArr.length; wi += 3) {
+        const wx = waterBasePos[wi];
+        const wz = waterBasePos[wi + 2];
+        const dist = Math.hypot(wx, wz);
+        const shoreFade = Math.max(0, Math.min(1, (dist - 4.4) / 2.6)) * Math.max(0.15, 1 - dist / (WATER_RADIUS * 1.05));
+        const wave = Math.sin(dist * 1.8 - elapsedTime * 1.6) * 0.052 + Math.cos(wx * 0.7 + wz * 0.65 + elapsedTime * 1.1) * 0.022;
+        wArr[wi + 1] = WATER_Y + wave * shoreFade;
+      }
+      waterGeo.attributes.position.needsUpdate = true;
+      waterMat.emissiveIntensity = 0.32 + b * 0.45;
+
+      waterRippleRings.forEach((wr) => {
+        const prog = (elapsedTime * 0.16 + wr.phase) % 1;
+        const radScale = 5.3 + prog * 4.8;
+        wr.mesh.scale.set(radScale, radScale, 1);
+        wr.mat.opacity = Math.sin(prog * Math.PI) * (0.14 + b * 0.18);
+      });
+
+      // 7. Đom đóm & tia nổ hạt
+      const fArr = fireflyGeo.attributes.position.array;
+      fireflySeeds.forEach((s, i) => {
+        const t = elapsedTime * s.speed + s.phase;
+        fArr[i * 3] = s.baseX + Math.sin(t) * 1.9;
+        fArr[i * 3 + 1] = s.baseY + Math.cos(t * 1.2) * 1.1;
+        fArr[i * 3 + 2] = s.baseZ + Math.sin(t * 0.8) * 1.8;
+      });
+      fireflyGeo.attributes.position.needsUpdate = true;
+
+      for (let k = burstEffects.length - 1; k >= 0; k--) {
+        const br = burstEffects[k];
+        br.life -= dt * 1.15;
+        const pArr = br.points.geometry.attributes.position.array;
+        for (let j = 0; j < br.vel.length; j++) {
+          pArr[j * 3] += br.vel[j].x * dt;
+          pArr[j * 3 + 1] += br.vel[j].y * dt;
+          pArr[j * 3 + 2] += br.vel[j].z * dt;
+        }
+        br.points.geometry.attributes.position.needsUpdate = true;
+        br.points.material.opacity = Math.max(0, br.life);
+        if (br.life <= 0) {
+          worldStageGroup.remove(br.points);
+          br.points.geometry.dispose();
+          br.points.material.dispose();
+          burstEffects.splice(k, 1);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    /**
+     * ============================================================================
+     * 16. KHỞI TẠO GIFTSDK TỰ ĐỘNG KHI NGƯỜI NHẬN MỞ LINK QUÀ (?id=...)
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+        await GiftSDK.init({
+          templateId: state.templateId,
+          onGiftLoaded: (order) => {
+            if (order.sender_name) state.sender = order.sender_name;
+            if (order.receiver_name) state.receiver = order.receiver_name;
+            if (order.message) state.wish = order.message;
+            if (order.payload) {
+              if (order.payload.presetKey && PRESETS[order.payload.presetKey]) {
+                const pr = PRESETS[order.payload.presetKey];
+                state.presetKey = order.payload.presetKey;
+                state.memories = [...pr.memories];
+                state.signOff = pr.signOff;
+                state.musicMood = pr.musicMood;
+              }
+              if (order.payload.startDate) state.startDate = order.payload.startDate;
+              if (order.payload.title3D) state.title3D = order.payload.title3D;
+              if (order.payload.artPreset) state.artPreset = order.payload.artPreset;
+              if (order.payload.photoDataUrl) state.photoDataUrl = order.payload.photoDataUrl;
+              if (order.payload.theme) state.theme = order.payload.theme;
+            }
+            applyThemeColors(state.theme);
+            sampleDatePoints(formatDisplayDate(state.startDate));
+            refreshDaysCaptionTexture();
+          }
+        });
+      }
+    });
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

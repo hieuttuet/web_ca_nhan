@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bong Bóng Mùa Hè 3D • Chúc Mừng Sinh Nhật 🎈☀️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <script src="/shared/gift-sdk.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- 1. Vùng render Three.js 3D -->
+  <div id="stage-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+  <div class="summer-sky-overlay"></div>
+  <div class="screen-flash" id="screen-flash"></div>
+
+  <!-- 2. Top HUD chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Kho Mẫu Quà Tặng">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-replay" title="Thả lại đàn bóng bay">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật/Tắt Âm Thanh">🔊 Âm Thanh</button>
+      <!-- #btn-tiktok-mode 📹 được tự động gắn bởi tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 3. Bộ 4 Presets Chọn Nhanh Dành Cho Người Tặng -->
+  <section class="birthday-presets-bar creator-only" id="birthday-presets-bar" aria-label="Chọn nhanh đối tượng sinh nhật">
+    <button type="button" class="preset-chip active" data-preset="friend">🎂 Bạn Thân</button>
+    <button type="button" class="preset-chip" data-preset="lover">💕 Người Yêu</button>
+    <button type="button" class="preset-chip" data-preset="sister">👧 Bé Yêu / Em Gái</button>
+    <button type="button" class="preset-chip" data-preset="colleague">👑 Đồng Nghiệp / Sếp</button>
+  </section>
+
+  <!-- 4. Gợi ý hành động & Tiến trình khám phá bóng ẩn -->
+  <div class="stage-pills-wrap">
+    <div class="action-hint-pill" id="action-hint-pill">
+      🎈 Chạm vào các quả bóng phát sáng để nổ tung và khám phá bí mật!
+    </div>
+    <div class="progress-counter-badge" id="progress-badge">
+      ✨ Đã mở: 0 / 6 Điều ước & Kỷ niệm
+    </div>
+    <button type="button" class="btn-climax-trigger" id="btn-trigger-climax">
+      <span>🌟</span><span>MỞ BÓNG HOÀNG KIM KHỔNG LỒ</span>
+    </button>
+  </div>
+
+  <!-- 5. Bottom Dock chuẩn 1 hàng ngang per 3d-visual.md -->
+  <nav class="bottom-dock" aria-label="Thanh điều khiển quà sinh nhật">
+    <button type="button" class="dock-btn" id="btn-open-wish" title="Đọc trọn vẹn lời chúc tâm thư">
+      <span>💌</span><span>Lời Chúc</span>
+    </button>
+    <button type="button" class="dock-btn creator-only" id="btn-open-customize" title="Tùy chỉnh ảnh, tên và lời chúc">
+      <span>🎨</span><span>Tùy Chỉnh</span>
+    </button>
+    <button type="button" class="dock-btn primary-cta creator-only" id="btn-open-payment" title="Tạo mã QR và link thiệp riêng">
+      <span>✨ Tạo Link & QR</span>
+      <span class="dock-price-badge">29k</span>
+    </button>
+  </nav>
+
+  <!-- 6. Spotlight Modal khi nổ bóng hé lộ ảnh Polaroid 3D & lời chúc -->
+  <div class="spotlight-modal-backdrop" id="spotlight-modal">
+    <div class="polaroid-card">
+      <button type="button" class="modal-close-round" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="polaroid-badge" id="spotlight-badge">🎈 Điều Ước Bí Mật #1</div>
+      <div class="polaroid-photo-frame">
+        <canvas id="spotlight-photo-canvas" width="400" height="300"></canvas>
+      </div>
+      <div class="polaroid-caption" id="spotlight-caption">"Nụ cười của em thắp sáng cả mùa hè rực rỡ..."</div>
+      <div class="polaroid-sub" id="spotlight-receiver">Dành tặng: Minh Anh ❤️</div>
+      <div class="polaroid-actions">
+        <button type="button" class="polaroid-btn" id="btn-spotlight-continue">🎈 Bắn Bóng Tiếp</button>
+        <button type="button" class="polaroid-btn primary" id="btn-spotlight-wish">💌 Đọc Tâm Thư</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Modal Đọc Tâm Thư Sinh Nhật Quý Phái -->
+  <div class="modal-backdrop" id="modal-wish-card">
+    <div class="modal-card">
+      <button type="button" class="modal-close-round" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">💌 Lời Chúc Sinh Nhật Mùa Hè ☀️</div>
+      <h2 class="modal-title" id="wish-card-title">Gửi Tới Minh Anh</h2>
+      <div class="letter-box" id="wish-card-content">
+        Chúc bạn tuổi mới luôn rực rỡ như ánh nắng mùa hè, mọi ước mơ bay cao vút như những chùm bóng sắc màu và luôn tràn ngập tiếng cười hạnh phúc! ❤️
+      </div>
+      <div class="letter-sign" id="wish-card-sender">Thân thương, Bảo Nam</div>
+      <div style="margin-top: 18px; text-align: center;">
+        <button type="button" class="modal-btn-secondary" id="btn-relight-from-wish" style="width: 100%;">
+          🎈 Thả Thêm Bóng Bay Mùa Hè
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal Tùy Chỉnh & Cá Nhân Hóa (Dành cho Người tạo thiệp) -->
+  <div class="modal-backdrop creator-only" id="modal-customize">
+    <div class="modal-card">
+      <button type="button" class="modal-close-round" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">🎈 Cá Nhân Hóa Bong Bóng Mùa Hè 3D ✨</div>
+      <h2 class="modal-title">Tạo Thiệp Sinh Nhật 3D</h2>
+      <p class="modal-sub">
+        Nhập tên chủ nhân sinh nhật, số tuổi và thông điệp yêu thương. Chạm vào bóng bay để nổ tung hé lộ 6 ảnh kỷ niệm và quả bóng hoàng kim khổng lồ!
+      </p>
+
+      <form id="customize-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên chủ nhân sinh nhật *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Minh Anh" value="Minh Anh" maxlength="24" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên người gửi (Bạn) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Bảo Nam" value="Bảo Nam" maxlength="24" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-age">Số tuổi mới mừng sinh nhật:</label>
+          <input type="number" id="in-age" class="modal-input" placeholder="VD: 20" value="20" min="1" max="100" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Lời chúc tâm thư ngọt ngào:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập lời chúc sinh nhật..." required>Chúc bạn tuổi mới luôn rực rỡ như ánh nắng mùa hè, mọi ước mơ bay cao vút như những chùm bóng sắc màu và luôn tràn ngập tiếng cười hạnh phúc! ❤️</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Chọn Tone Màu Bóng Bay Mùa Hè:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="modal-theme-chip active" data-theme="summer_glow">☀️ Mùa Hè Rực Rỡ</button>
+            <button type="button" class="modal-theme-chip" data-theme="sweet_pastel">🍬 Kẹo Ngọt Pastel</button>
+            <button type="button" class="modal-theme-chip" data-theme="sunset_coral">🌅 Hoàng Hôn San Hô</button>
+            <button type="button" class="modal-theme-chip" data-theme="royal_gold">👑 Hoàng Kim Vương Giả</button>
+          </div>
+        </div>
+
+        <div class="modal-btn-actions">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            👁️ Xem Thử 3D
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Mã QR & Link (29k)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. HỆ THỐNG PRESET 1-CHẠM THEO ĐỐI TƯỢNG NHẬN
+     * ============================================================================
+     */
+    const PRESETS = {
+      friend: {
+        receiver: 'Minh Anh',
+        sender: 'Bảo Nam',
+        age: 20,
+        titleBadge: '🎂 Bạn Thân Tri Kỷ',
+        theme: 'summer_glow',
+        wish: 'Chúc người bạn chí cốt của tôi tuổi mới luôn rực rỡ như ánh nắng mùa hè, tài khoản nảy số liên tục và luôn tràn đầy năng lượng tươi vui! ❤️',
+        memories: [
+          { title: 'Kỷ Niệm #1', text: 'Mùa hè rực rỡ và những chuyến đi thanh xuân 🏖️' },
+          { title: 'Kỷ Niệm #2', text: 'Nụ cười tỏa nắng ấm áp hơn cả ánh dương ☀️' },
+          { title: 'Kỷ Niệm #3', text: 'Những buổi chiều la cà trà sữa bất tận 🧋' },
+          { title: 'Kỷ Niệm #4', text: 'Cùng nhau ngắm ráng chiều hoàng hôn mùa hạ 🌅' },
+          { title: 'Kỷ Niệm #5', text: 'Ước mơ tuổi mới sẽ bay cao vút như bóng bay 🎈' },
+          { title: 'Kỷ Niệm #6', text: 'Mãi là bạn tốt cùng nhau già đi nhé! 🥂' }
+        ]
+      },
+      lover: {
+        receiver: 'Em Yêu',
+        sender: 'Anh',
+        age: 22,
+        titleBadge: '💕 Người Yêu Dấu',
+        theme: 'sweet_pastel',
+        wish: 'Chúc công chúa của anh tuổi mới luôn xinh đẹp, bình yên và hạnh phúc. Cảm ơn em đã đến và thắp sáng thế giới của anh! Yêu em nhiều ❤️',
+        memories: [
+          { title: 'Kỷ Niệm #1', text: 'Khoảnh khắc lần đầu chạm ánh mắt ngọt ngào 💘' },
+          { title: 'Kỷ Niệm #2', text: 'Bàn tay nhỏ luôn sưởi ấm trái tim anh 🤝' },
+          { title: 'Kỷ Niệm #3', text: 'Những que kem mát lạnh ngày nắng hạ 🍦' },
+          { title: 'Kỷ Niệm #4', text: 'Đêm hè ngắm sao và thì thầm lời yêu thương ✨' },
+          { title: 'Kỷ Niệm #5', text: 'Nụ cười của em là điều quý giá nhất trần đời 🌸' },
+          { title: 'Kỷ Niệm #6', text: 'Nắm tay anh đi qua thêm thật nhiều mùa sinh nhật nhé! 💍' }
+        ]
+      },
+      sister: {
+        receiver: 'Bé Bắp',
+        sender: 'Anh Hai',
+        age: 18,
+        titleBadge: '👧 Bé Yêu Dễ Thương',
+        theme: 'sweet_pastel',
+        wish: 'Chúc em gái tuổi mới luôn vui tươi, học giỏi, đạt được mọi ước mơ và lúc nào cũng là cô bé đáng yêu nhất nhà! 🎈🎂',
+        memories: [
+          { title: 'Kỷ Niệm #1', text: 'Cô bé nhỏ ríu rít cả ngày như chim non 🐥' },
+          { title: 'Kỷ Niệm #2', text: 'Nụ cười răng khểnh lúc nào cũng tít mắt 🍭' },
+          { title: 'Kỷ Niệm #3', text: 'Những món quà sinh nhật bất ngờ mỗi năm 🎁' },
+          { title: 'Kỷ Niệm #4', text: 'Tuổi mới xinh đẹp rạng rỡ như đóa hướng dương 🌻' },
+          { title: 'Kỷ Niệm #5', text: 'Cả nhà luôn yêu thương và tự hào về em! 👨‍👩‍👧' },
+          { title: 'Kỷ Niệm #6', text: 'Tuổi mới mọi điều ngọt ngào nhất sẽ đến! 💖' }
+        ]
+      },
+      colleague: {
+        receiver: 'Chị Mai',
+        sender: 'Team Marketing',
+        age: 28,
+        titleBadge: '👑 Đồng Nghiệp Tuyệt Vời',
+        theme: 'royal_gold',
+        wish: 'Chúc chị tuổi mới luôn rạng ngời nhan sắc, sự nghiệp thăng hoa rực rỡ, vạn dặm bình an và gặt hái thêm nhiều thành công đỉnh cao! 🥂✨',
+        memories: [
+          { title: 'Kỷ Niệm #1', text: 'Người thuyền trưởng luôn truyền cảm hứng tuyệt vời 🌟' },
+          { title: 'Kỷ Niệm #2', text: 'Những buổi brainstorm đầy ắp tiếng cười vui 💡' },
+          { title: 'Kỷ Niệm #3', text: 'Bữa tiệc ăn mừng dự án đại thành công 🍕' },
+          { title: 'Kỷ Niệm #4', text: 'Phong thái tự tin và bản lĩnh phi thường 👑' },
+          { title: 'Kỷ Niệm #5', text: 'Tuổi mới bứt phá doanh số rực rỡ 🚀' },
+          { title: 'Kỷ Niệm #6', text: 'Cảm ơn vì đã luôn đồng hành cùng team! ❤️' }
+        ]
+      }
+    };
+
+    /**
+     * ============================================================================
+     * 2. STATE VÀ DỮ LIỆU CÁ NHÂN HÓA
+     * ============================================================================
+     */
+    const state = {
+      templateId: 'birthday_summer_balloons_3d',
+      receiver: 'Minh Anh',
+      sender: 'Bảo Nam',
+      age: 20,
+      titleBadge: '🎂 Bạn Thân Tri Kỷ',
+      theme: 'summer_glow',
+      wish: 'Chúc bạn tuổi mới luôn rực rỡ như ánh nắng mùa hè, mọi ước mơ bay cao vút như những chùm bóng sắc màu và luôn tràn ngập tiếng cười hạnh phúc! ❤️',
+      memories: [...PRESETS.friend.memories],
+      openedIndices: new Set(),
+      isClimax: false
+    };
+
+    /**
+     * ============================================================================
+     * 3. SOUND CONTROLLER (Web Audio API Thuần 100%)
+     * ============================================================================
+     */
+    class SoundController {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.noiseBuffer = null;
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            const bufferSize = Math.floor(this.ctx.sampleRate * 1.5);
+            this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const output = this.noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              output[i] = Math.random() * 2 - 1;
+            }
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playPopSound() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.noiseBuffer) return;
+        const now = this.ctx.currentTime;
+
+        // 1. Tiếng nén khí cao tần (Noise burst)
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(1400, now);
+        filter.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+
+        const gainN = this.ctx.createGain();
+        gainN.gain.setValueAtTime(0.35, now);
+        gainN.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+        noise.connect(filter);
+        filter.connect(gainN);
+        gainN.connect(this.ctx.destination);
+        noise.start(now);
+        noise.stop(now + 0.085);
+
+        // 2. Tiếng nổ trầm "Bụp!" áp suất màng cao su
+        const osc = this.ctx.createOscillator();
+        const gainO = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(75, now + 0.09);
+
+        gainO.gain.setValueAtTime(0.4, now);
+        gainO.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+        osc.connect(gainO);
+        gainO.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.095);
+      }
+
+      playChimeSound() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const freqs = [659.25, 783.99, 987.77, 1318.51];
+        freqs.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now + idx * 0.06);
+
+          gain.gain.setValueAtTime(0.001, now + idx * 0.06);
+          gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.06 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.7);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + idx * 0.06 + 0.75);
+        });
+      }
+
+      playGiantPop() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.noiseBuffer) return;
+        const now = this.ctx.currentTime;
+
+        // Sub bass nổ rền vang
+        const sub = this.ctx.createOscillator();
+        const subGain = this.ctx.createGain();
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(140, now);
+        sub.frequency.exponentialRampToValueAtTime(32, now + 0.85);
+
+        subGain.gain.setValueAtTime(0.65, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+
+        sub.connect(subGain);
+        subGain.connect(this.ctx.destination);
+        sub.start(now);
+        sub.stop(now + 0.9);
+
+        // Tiếng pháo hoa rực rỡ
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, now);
+        filter.frequency.exponentialRampToValueAtTime(120, now + 1.1);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.45, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+        noise.stop(now + 1.15);
+      }
+
+      playTropicalMelody() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+
+        const melody = [
+          { f: 523.25, d: 0.22 }, { f: 523.25, d: 0.14 }, { f: 587.33, d: 0.36 }, { f: 523.25, d: 0.36 }, { f: 698.46, d: 0.36 }, { f: 659.25, d: 0.72 },
+          { f: 523.25, d: 0.22 }, { f: 523.25, d: 0.14 }, { f: 587.33, d: 0.36 }, { f: 523.25, d: 0.36 }, { f: 783.99, d: 0.36 }, { f: 698.46, d: 0.72 },
+          { f: 523.25, d: 0.22 }, { f: 523.25, d: 0.14 }, { f: 1046.5, d: 0.36 }, { f: 880.00, d: 0.36 }, { f: 698.46, d: 0.36 }, { f: 659.25, d: 0.36 }, { f: 587.33, d: 0.72 }
+        ];
+
+        let offset = 0;
+        melody.forEach((n) => {
+          const t = this.ctx.currentTime + offset;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(n.f, t);
+
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.linearRampToValueAtTime(0.14, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + n.d * 1.3);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + n.d * 1.35);
+
+          offset += n.d * 0.95;
+        });
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
+      }
+    }
+
+    const sound = new SoundController();
+
+    /**
+     * ============================================================================
+     * 4. BẢNG MÀU BÓNG BAY MÙA HÈ
+     * ============================================================================
+     */
+    const THEMES = {
+      summer_glow: [0xfacc15, 0xfb7185, 0x2dd4bf, 0xf97316, 0x38bdf8, 0xc084fc],
+      sweet_pastel: [0xf472b6, 0x93c5fd, 0xfde047, 0xa78bfa, 0x6ee7b7, 0xfca5a5],
+      sunset_coral: [0xf43f5e, 0xf97316, 0xfbbf24, 0xdb2777, 0xec4899, 0xfdba74],
+      royal_gold: [0xfde047, 0xf59e0b, 0xd97706, 0xfef08a, 0xfbbf24, 0xffedd5]
+    };
+
+    /**
+     * ============================================================================
+     * 5. VẼ PROCEDURAL TEXTURES CHO ẢNH POLAROID 3D
+     * ============================================================================
+     */
+    function createPolaroidCanvasTexture(idx, title, caption) {
+      const cvs = document.createElement('canvas');
+      cvs.width = 512;
+      cvs.height = 512;
+      const ctx = cvs.getContext('2d');
+
+      // Nền ảnh Polaroid hoàng hôn mùa hè rực rỡ
+      const grads = [
+        ['#ff7e5f', '#feb47b', '🏖️'],
+        ['#f857a6', '#ff5858', '☀️'],
+        ['#4facfe', '#00f2fe', '🍦'],
+        ['#fa709a', '#fee140', '🌅'],
+        ['#667eea', '#764ba2', '🎈'],
+        ['#b176ba', '#ffb199', '✨']
+      ];
+      const g = grads[idx % grads.length];
+
+      const bg = ctx.createLinearGradient(0, 0, 512, 512);
+      bg.addColorStop(0, g[0]);
+      bg.addColorStop(1, g[1]);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Mặt trời & vệt sáng
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+      ctx.beginPath();
+      ctx.arc(256, 190, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Emoji lớn ở tâm
+      ctx.font = '120px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(g[2], 256, 190);
+
+      // Tiêu đề & Lời nhắn Polaroid
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 30px "Quicksand", sans-serif';
+      ctx.fillText(title, 256, 350);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.font = 'italic 22px "Playfair Display", serif';
+      const words = caption.split(' ');
+      let line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+      let line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
+      ctx.fillText(line1, 256, 395);
+      if (line2) ctx.fillText(line2, 256, 430);
+
+      return cvs;
+    }
+
+    /**
+     * ============================================================================
+     * 6. THREE.JS 3D STAGE & ENGINE
+     * ============================================================================
+     */
+    const canvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    function updateCamera() {
+      const isMobile = window.innerWidth < 768;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.fov = isMobile ? 65 : 55;
+      camera.position.set(0, isMobile ? 1.5 : 0.8, isMobile ? 32 : 25);
+      camera.lookAt(0, isMobile ? 2 : 1, 0);
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.addEventListener('resize', updateCamera);
+    updateCamera();
+
+    // 6.1. Ánh sáng chuẩn 3d-visual.md
+    const ambientLight = new THREE.AmbientLight(0xfff7ed, 0.8);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffae0, 1.35);
+    sunLight.position.set(12, 28, 16);
+    scene.add(sunLight);
+
+    const rimLight = new THREE.PointLight(0x38bdf8, 0.9, 50);
+    rimLight.position.set(-16, 10, -10);
+    scene.add(rimLight);
+
+    const warmLight = new THREE.PointLight(0xff2a85, 0.8, 45);
+    warmLight.position.set(15, -6, 8);
+    scene.add(warmLight);
+
+    // 6.2. Hạt bụi nắng hè lấp lánh (Summer Sun Dust)
+    const dustCount = 180;
+    const dustGeo = new THREE.BufferGeometry();
+    const dustPositions = new Float32Array(dustCount * 3);
+    for (let i = 0; i < dustCount * 3; i += 3) {
+      dustPositions[i] = (Math.random() - 0.5) * 40;
+      dustPositions[i + 1] = (Math.random() - 0.5) * 35;
+      dustPositions[i + 2] = (Math.random() - 0.5) * 30;
+    }
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+    const dustMat = new THREE.PointsMaterial({
+      color: 0xfde047,
+      size: 0.35,
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const dustParticles = new THREE.Points(dustGeo, dustMat);
+    scene.add(dustParticles);
+
+    // 6.3. BONG BÓNG BAY 3D
+    const balloonsGroup = new THREE.Group();
+    scene.add(balloonsGroup);
+
+    const balloonGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+    balloonGeometry.scale(1.0, 1.28, 1.0);
+
+    const knotGeometry = new THREE.ConeGeometry(0.2, 0.28, 16);
+    knotGeometry.rotateX(Math.PI);
+    knotGeometry.translate(0, -1.5, 0);
+
+    // Tạo sprite vòng hào quang tâm bóng
+    function createGlowSprite(colorHex) {
+      const s = 64;
+      const c = document.createElement('canvas');
+      c.width = s;
+      c.height = s;
+      const gctx = c.getContext('2d');
+      const grad = gctx.createRadialGradient(s / 2, s / 2, 2, s / 2, s / 2, s / 2);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.35, colorHex);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      gctx.fillStyle = grad;
+      gctx.fillRect(0, 0, s, s);
+
+      const tex = new THREE.CanvasTexture(c);
+      const mat = new THREE.SpriteMaterial({
+        map: tex,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        opacity: 0.75
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(3.2, 3.2, 1);
+      return sprite;
+    }
+
+    const balloons = [];
+    const SECRET_COUNT = 6;
+    let secretAssigned = 0;
+
+    function buildBalloon(index, isSecret = false) {
+      const palette = THEMES[state.theme] || THEMES.summer_glow;
+      const colorHex = palette[index % palette.length];
+
+      const material = new THREE.MeshPhysicalMaterial({
+        color: colorHex,
+        roughness: 0.1,
+        metalness: 0.05,
+        transmission: 0.32,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.08,
+        reflectivity: 0.85,
+        transparent: true,
+        opacity: 0.92
+      });
+
+      const root = new THREE.Group();
+      const body = new THREE.Mesh(balloonGeometry, material);
+      body.castShadow = true;
+      root.add(body);
+
+      const knot = new THREE.Mesh(knotGeometry, material);
+      root.add(knot);
+
+      // Sợi dây bóng mềm mại
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -1.55, 0),
+        new THREE.Vector3(0.12, -2.5, 0.05),
+        new THREE.Vector3(-0.08, -3.6, -0.05),
+        new THREE.Vector3(0.05, -4.8, 0)
+      ]);
+      const stringGeo = new THREE.TubeGeometry(curve, 16, 0.015, 6, false);
+      const stringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.45 });
+      const stringMesh = new THREE.Mesh(stringGeo, stringMat);
+      root.add(stringMesh);
+
+      // Lõi phát sáng
+      const glow = createGlowSprite('#' + new THREE.Color(colorHex).getHexString());
+      glow.position.set(0, 0.2, 0);
+      root.add(glow);
+
+      // Nếu là bóng chứa bí mật, thêm vòng sáng vàng kim quay quanh
+      if (isSecret) {
+        const ringGeo = new THREE.TorusGeometry(1.4, 0.035, 8, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI / 2.3;
+        ring.name = 'secret_ring';
+        root.add(ring);
+      }
+
+      root.userData = {
+        index,
+        isSecret,
+        secretIndex: isSecret ? secretAssigned++ : -1,
+        speed: 1.8 + Math.random() * 1.5,
+        swaySpeed: 1.2 + Math.random() * 1.6,
+        swayAmp: 0.8 + Math.random() * 0.8,
+        seed: Math.random() * 20,
+        baseX: (Math.random() - 0.5) * 22,
+        baseZ: (Math.random() - 0.5) * 16,
+        isPopped: false
+      };
+
+      root.position.set(
+        root.userData.baseX,
+        -18 + Math.random() * 32,
+        root.userData.baseZ
+      );
+
+      balloonsGroup.add(root);
+      balloons.push(root);
+      return root;
+    }
+
+    function initBalloons() {
+      // Dọn dẹp cũ
+      while (balloonsGroup.children.length > 0) {
+        balloonsGroup.remove(balloonsGroup.children[0]);
+      }
+      balloons.length = 0;
+      secretAssigned = 0;
+      state.openedIndices.clear();
+      updateProgressDisplay();
+
+      const TOTAL = 24;
+      const secretIndices = new Set([2, 5, 9, 14, 18, 22]);
+
+      for (let i = 0; i < TOTAL; i++) {
+        buildBalloon(i, secretIndices.has(i));
+      }
+    }
+    initBalloons();
+
+    // 6.4. HỆ THỐNG VỤN NỔ KIM TUYẾN KHI BÓNG VỠ (Confetti Burst System)
+    const bursts = [];
+    const burstCount = 80;
+    const burstGeo = new THREE.BufferGeometry();
+    const burstPos = new Float32Array(burstCount * 3);
+    const burstVel = [];
+    for (let i = 0; i < burstCount; i++) {
+      burstVel.push(new THREE.Vector3());
+    }
+    burstGeo.setAttribute('position', new THREE.BufferAttribute(burstPos, 3));
+
+    function spawnPopBurst(origin, colorHex) {
+      const count = 90;
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      const vel = [];
+      const colors = new Float32Array(count * 3);
+
+      const baseCol = new THREE.Color(colorHex);
+      const goldCol = new THREE.Color(0xfde047);
+
+      for (let i = 0; i < count; i++) {
+        pos[i * 3] = origin.x;
+        pos[i * 3 + 1] = origin.y;
+        pos[i * 3 + 2] = origin.z;
+
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        const spd = 3.5 + Math.random() * 6.5;
+
+        vel.push(new THREE.Vector3(
+          Math.sin(phi) * Math.cos(theta) * spd,
+          Math.sin(phi) * Math.sin(theta) * spd,
+          Math.cos(phi) * spd
+        ));
+
+        const c = Math.random() < 0.4 ? goldCol : baseCol;
+        colors[i * 3] = c.r;
+        colors[i * 3 + 1] = c.g;
+        colors[i * 3 + 2] = c.b;
+      }
+
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.45,
+        vertexColors: true,
+        transparent: true,
+        opacity: 1.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      const p = new THREE.Points(geo, mat);
+      scene.add(p);
+
+      bursts.push({
+        points: p,
+        vel,
+        life: 1.0,
+        decay: 0.024
+      });
+    }
+
+    // 6.5. KHUNG ẢNH 3D HÉ LỘ TẠI VỊ TRÍ NỔ (Floating Polaroid 3D)
+    const revealedCards = [];
+    function spawnFloatingPolaroid(origin, memoryIdx) {
+      const memory = state.memories[memoryIdx % state.memories.length];
+      const texCanvas = createPolaroidCanvasTexture(memoryIdx, memory.title, memory.text);
+      const tex = new THREE.CanvasTexture(texCanvas);
+      tex.encoding = THREE.sRGBEncoding;
+
+      const cardGeo = new THREE.PlaneGeometry(3.6, 3.6);
+      const cardMat = new THREE.MeshBasicMaterial({
+        map: tex,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.05
+      });
+      const cardMesh = new THREE.Mesh(cardGeo, cardMat);
+      cardMesh.position.copy(origin);
+      cardMesh.scale.set(0.2, 0.2, 0.2);
+      scene.add(cardMesh);
+
+      revealedCards.push({
+        mesh: cardMesh,
+        targetPos: new THREE.Vector3(
+          origin.x * 0.4,
+          Math.max(0.5, origin.y * 0.6),
+          Math.min(origin.z * 0.3 + 8, 14)
+        ),
+        targetScale: 1.0,
+        rotSpeed: (Math.random() - 0.5) * 0.015,
+        memoryIdx
+      });
+
+      // Mở modal spotlight sau 0.8s
+      setTimeout(() => {
+        openSpotlight(memoryIdx);
+      }, 750);
+    }
+
+    // 6.6. QUẢ BÓNG HOÀNG KIM KHỔNG LỒ (GRAND CLIMAX)
+    let giantBalloon = null;
+    let giantNameMesh = null;
+    let climaxConfetti = [];
+
+    function triggerGrandClimax() {
+      if (state.isClimax) return;
+      state.isClimax = true;
+
+      // Ẩn nút kích hoạt
+      document.getElementById('btn-trigger-climax').style.display = 'none';
+
+      sound.initContext();
+      sound.playGiantPop();
+
+      // Screen flash
+      const flash = document.getElementById('screen-flash');
+      flash.classList.add('flash');
+      setTimeout(() => flash.classList.remove('flash'), 500);
+
+      document.getElementById('action-hint-pill').innerHTML =
+        `🎉 <b>CHÚC MỪNG SINH NHẬT ${state.receiver.toUpperCase()}!</b> BƯỚC SANG TUỔI ${state.age} RỰC RỠ ✨`;
+
+      // Tạo bóng khổng lồ giữa không gian
+      const giantGeo = new THREE.SphereGeometry(3.8, 48, 48);
+      giantGeo.scale(1.0, 1.25, 1.0);
+      const giantMat = new THREE.MeshPhysicalMaterial({
+        color: 0xfde047,
+        roughness: 0.08,
+        metalness: 0.25,
+        transmission: 0.2,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05,
+        reflectivity: 0.95,
+        transparent: true,
+        opacity: 0.95
+      });
+      giantBalloon = new THREE.Mesh(giantGeo, giantMat);
+      giantBalloon.position.set(0, -15, 0);
+      scene.add(giantBalloon);
+
+      // Billboard Text 3D in tên người nhận
+      const textCvs = document.createElement('canvas');
+      textCvs.width = 1024;
+      textCvs.height = 512;
+      const tctx = textCvs.getContext('2d');
+      tctx.textAlign = 'center';
+      tctx.textBaseline = 'middle';
+
+      tctx.fillStyle = '#ffffff';
+      tctx.font = '800 68px "Quicksand", sans-serif';
+      tctx.fillText('HAPPY BIRTHDAY', 512, 140);
+
+      tctx.fillStyle = '#ff2a85';
+      tctx.font = '800 96px "Quicksand", sans-serif';
+      tctx.fillText(`${state.receiver.toUpperCase()} ❤️`, 512, 255);
+
+      tctx.fillStyle = '#ffd043';
+      tctx.font = 'italic 700 52px "Playfair Display", serif';
+      tctx.fillText(`Tuổi ${state.age} Rực Rỡ Ánh Dương ✨`, 512, 365);
+
+      const textTex = new THREE.CanvasTexture(textCvs);
+      textTex.encoding = THREE.sRGBEncoding;
+
+      const textGeo = new THREE.PlaneGeometry(10, 5);
+      const textMat = new THREE.MeshBasicMaterial({
+        map: textTex,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+      giantNameMesh = new THREE.Mesh(textGeo, textMat);
+      giantNameMesh.position.set(0, 2.5, 5);
+      giantNameMesh.scale.set(0.01, 0.01, 0.01);
+      scene.add(giantNameMesh);
+
+      // Cơn mưa pháo giấy 3D phủ kín trời
+      const confettiGeo = new THREE.BufferGeometry();
+      const cCount = 220;
+      const cPos = new Float32Array(cCount * 3);
+      const cVel = [];
+      const cCols = new Float32Array(cCount * 3);
+
+      const pCol = [new THREE.Color(0xfacc15), new THREE.Color(0xfb7185), new THREE.Color(0x2dd4bf), new THREE.Color(0xff2a85), new THREE.Color(0xffffff)];
+      for (let i = 0; i < cCount; i++) {
+        cPos[i * 3] = (Math.random() - 0.5) * 36;
+        cPos[i * 3 + 1] = 12 + Math.random() * 15;
+        cPos[i * 3 + 2] = (Math.random() - 0.5) * 24;
+        cVel.push(new THREE.Vector3((Math.random() - 0.5) * 0.8, -(1.8 + Math.random() * 2.2), (Math.random() - 0.5) * 0.8));
+
+        const col = pCol[i % pCol.length];
+        cCols[i * 3] = col.r;
+        cCols[i * 3 + 1] = col.g;
+        cCols[i * 3 + 2] = col.b;
+      }
+      confettiGeo.setAttribute('position', new THREE.BufferAttribute(cPos, 3));
+      confettiGeo.setAttribute('color', new THREE.BufferAttribute(cCols, 3));
+
+      const cMat = new THREE.PointsMaterial({
+        size: 0.5,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.95
+      });
+      const cPoints = new THREE.Points(confettiGeo, cMat);
+      scene.add(cPoints);
+      climaxConfetti.push({ points: cPoints, vel: cVel });
+
+      // Nhạc Tropical vui nhộn
+      setTimeout(() => {
+        sound.playTropicalMelody();
+      }, 350);
+    }
+
+    /**
+     * ============================================================================
+     * 7. TƯƠNG TÁC CHẠM NỔ BÓNG (RAYCASTER)
+     * ============================================================================
+     */
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function onPointerDown(event) {
+      sound.initContext();
+
+      const rect = canvas.getBoundingClientRect();
+      const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+      const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+
+      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      // Thu thập toàn bộ mesh quả bóng
+      const targets = [];
+      balloons.forEach((b) => {
+        if (!b.userData.isPopped) {
+          b.children.forEach((c) => {
+            if (c.isMesh) {
+              c.userData.parentBalloon = b;
+              targets.push(c);
+            }
+          });
+        }
+      });
+
+      const intersects = raycaster.intersectObjects(targets);
+      if (intersects.length > 0) {
+        const hitMesh = intersects[0].object;
+        const b = hitMesh.userData.parentBalloon;
+        if (b && !b.userData.isPopped) {
+          popBalloon(b);
+        }
+      }
+    }
+
+    function popBalloon(b) {
+      b.userData.isPopped = true;
+      sound.playPopSound();
+
+      const origin = b.position.clone();
+      const col = b.children[0].material.color.getHex();
+      spawnPopBurst(origin, col);
+
+      // Ẩn bóng đã nổ
+      b.visible = false;
+
+      // Nếu là bóng bí mật
+      if (b.userData.isSecret) {
+        sound.playChimeSound();
+        state.openedIndices.add(b.userData.secretIndex);
+        updateProgressDisplay();
+        spawnFloatingPolaroid(origin, b.userData.secretIndex);
+      }
+
+      // Tự động hồi sinh bóng mới sau 3.5s
+      setTimeout(() => {
+        b.position.set((Math.random() - 0.5) * 24, -18, (Math.random() - 0.5) * 16);
+        b.visible = true;
+        b.userData.isPopped = false;
+      }, 3500);
+    }
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+
+    function updateProgressDisplay() {
+      const count = state.openedIndices.size;
+      const badge = document.getElementById('progress-badge');
+      badge.textContent = `✨ Đã mở: ${count} / ${SECRET_COUNT} Kỷ Niệm & Điều Ước`;
+
+      const climaxBtn = document.getElementById('btn-trigger-climax');
+      if (count >= 3 || state.isClimax) {
+        climaxBtn.classList.add('visible');
+      } else {
+        climaxBtn.classList.remove('visible');
+      }
+    }
+
+    document.getElementById('btn-trigger-climax').addEventListener('click', triggerGrandClimax);
+
+    /**
+     * ============================================================================
+     * 8. VÒNG LẶP RENDER CHÍNH (ANIMATION LOOP)
+     * ============================================================================
+     */
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const time = clock.getElapsedTime();
+
+      // 1. Bay hạt bụi nắng
+      const pos = dustGeo.attributes.position.array;
+      for (let i = 1; i < dustCount * 3; i += 3) {
+        pos[i] += dt * 0.45;
+        if (pos[i] > 18) pos[i] = -18;
+      }
+      dustGeo.attributes.position.needsUpdate = true;
+
+      // 2. Bay bóng bay 3D
+      balloons.forEach((b) => {
+        if (!b.userData.isPopped && b.visible) {
+          b.position.y += b.userData.speed * dt;
+          b.position.x = b.userData.baseX + Math.sin(time * b.userData.swaySpeed + b.userData.seed) * b.userData.swayAmp;
+          b.position.z = b.userData.baseZ + Math.cos(time * (b.userData.swaySpeed * 0.8) + b.userData.seed) * (b.userData.swayAmp * 0.6);
+          b.rotation.z = Math.sin(time * 2 + b.userData.seed) * 0.08;
+
+          // Xoay vòng bí mật
+          const ring = b.getObjectByName('secret_ring');
+          if (ring) {
+            ring.rotation.z += dt * 1.8;
+          }
+
+          if (b.position.y > 22) {
+            b.position.y = -18;
+            b.userData.baseX = (Math.random() - 0.5) * 24;
+            b.userData.baseZ = (Math.random() - 0.5) * 16;
+          }
+        }
+      });
+
+      // 3. Cập nhật vụn nổ kim tuyến
+      for (let i = bursts.length - 1; i >= 0; i--) {
+        const item = bursts[i];
+        const pArr = item.points.geometry.attributes.position.array;
+        item.life -= item.decay;
+        item.points.material.opacity = Math.max(0, item.life);
+
+        for (let j = 0; j < item.vel.length; j++) {
+          item.vel[j].y -= dt * 6.5; // Trọng lực
+          item.vel[j].multiplyScalar(0.96); // Cản gió
+          pArr[j * 3] += item.vel[j].x * dt;
+          pArr[j * 3 + 1] += item.vel[j].y * dt;
+          pArr[j * 3 + 2] += item.vel[j].z * dt;
+        }
+        item.points.geometry.attributes.position.needsUpdate = true;
+
+        if (item.life <= 0) {
+          scene.remove(item.points);
+          bursts.splice(i, 1);
+        }
+      }
+
+      // 4. Khung ảnh Polaroid 3D hé lộ
+      revealedCards.forEach((rc) => {
+        rc.mesh.position.lerp(rc.targetPos, 0.06);
+        const curScale = rc.mesh.scale.x;
+        const newScale = curScale + (rc.targetScale - curScale) * 0.06;
+        rc.mesh.scale.set(newScale, newScale, newScale);
+        rc.mesh.material.opacity = Math.min(1.0, rc.mesh.material.opacity + 0.04);
+        rc.mesh.rotation.y += rc.rotSpeed;
+      });
+
+      // 5. Hiệu ứng Cao Trào (Grand Climax Giant Balloon)
+      if (giantBalloon) {
+        if (giantBalloon.position.y < 1.2) {
+          giantBalloon.position.y += (1.2 - giantBalloon.position.y) * 0.05;
+        }
+        const pulse = 1 + Math.sin(time * 4) * 0.03;
+        giantBalloon.scale.set(pulse, pulse * 1.25, pulse);
+        giantBalloon.rotation.y += dt * 0.4;
+      }
+
+      if (giantNameMesh) {
+        if (giantNameMesh.scale.x < 1.0) {
+          const s = giantNameMesh.scale.x + (1.0 - giantNameMesh.scale.x) * 0.06;
+          giantNameMesh.scale.set(s, s, s);
+        }
+        giantNameMesh.position.y = 2.0 + Math.sin(time * 2) * 0.2;
+      }
+
+      climaxConfetti.forEach((cc) => {
+        const cArr = cc.points.geometry.attributes.position.array;
+        for (let j = 0; j < cc.vel.length; j++) {
+          cArr[j * 3] += cc.vel[j].x * dt;
+          cArr[j * 3 + 1] += cc.vel[j].y * dt;
+          cArr[j * 3 + 2] += cc.vel[j].z * dt;
+          if (cArr[j * 3 + 1] < -16) {
+            cArr[j * 3 + 1] = 16;
+          }
+        }
+        cc.points.geometry.attributes.position.needsUpdate = true;
+      });
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    /**
+     * ============================================================================
+     * 9. SPOTLIGHT MODAL & TÂM THƯ
+     * ============================================================================
+     */
+    function openSpotlight(idx) {
+      const memory = state.memories[idx % state.memories.length];
+      const spotCanvas = document.getElementById('spotlight-photo-canvas');
+      const sctx = spotCanvas.getContext('2d');
+      const tempCvs = createPolaroidCanvasTexture(idx, memory.title, memory.text);
+      sctx.drawImage(tempCvs, 0, 0, spotCanvas.width, spotCanvas.height);
+
+      document.getElementById('spotlight-badge').textContent = `🎈 Điều Ước & Kỷ Niệm #${idx + 1}`;
+      document.getElementById('spotlight-caption').textContent = `"${memory.text}"`;
+      document.getElementById('spotlight-receiver').textContent = `Dành tặng: ${state.receiver} ❤️`;
+
+      document.getElementById('spotlight-modal').classList.add('active');
+    }
+
+    document.getElementById('btn-close-spotlight').addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+    });
+    document.getElementById('btn-spotlight-continue').addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+    });
+    document.getElementById('btn-spotlight-wish').addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+      openWishModal();
+    });
+
+    function openWishModal() {
+      document.getElementById('wish-card-title').textContent = `Gửi Tới ${state.receiver}`;
+      document.getElementById('wish-card-content').textContent = state.wish;
+      document.getElementById('wish-card-sender').textContent = `Thân thương, ${state.sender}`;
+      document.getElementById('modal-wish-card').classList.add('active');
+    }
+
+    document.getElementById('btn-open-wish').addEventListener('click', openWishModal);
+    document.getElementById('btn-close-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+    });
+    document.getElementById('btn-relight-from-wish').addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      initBalloons();
+    });
+
+    /**
+     * ============================================================================
+     * 10. MODAL TÙY CHỈNH & PRESETS CHO NGƯỜI TẶNG
+     * ============================================================================
+     */
+    function applyPreset(presetKey) {
+      const p = PRESETS[presetKey];
+      if (!p) return;
+
+      state.receiver = p.receiver;
+      state.sender = p.sender;
+      state.age = p.age;
+      state.wish = p.wish;
+      state.theme = p.theme;
+      state.memories = [...p.memories];
+
+      document.querySelectorAll('.preset-chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.preset === presetKey);
+      });
+
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-age').value = state.age;
+      document.getElementById('in-wish').value = state.wish;
+
+      document.querySelectorAll('.modal-theme-chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.theme === state.theme);
+      });
+
+      initBalloons();
+      document.getElementById('action-hint-pill').innerHTML =
+        `🎈 Đã chuyển sang chế độ <b>${p.titleBadge}</b> cho ${state.receiver}! Chạm bóng bay nào!`;
+    }
+
+    document.querySelectorAll('.preset-chip').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        applyPreset(e.currentTarget.dataset.preset);
+      });
+    });
+
+    function openCustomizeModal() {
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-age').value = state.age;
+      document.getElementById('in-wish').value = state.wish;
+      document.getElementById('modal-customize').classList.add('active');
+    }
+
+    document.getElementById('btn-open-customize')?.addEventListener('click', openCustomizeModal);
+    document.getElementById('btn-close-customize')?.addEventListener('click', () => {
+      document.getElementById('modal-customize').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.theme = e.currentTarget.dataset.theme;
+        initBalloons();
+      });
+    });
+
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      sound.initContext();
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      state.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      state.age = parseInt(document.getElementById('in-age').value, 10) || 20;
+      state.wish = document.getElementById('in-wish').value.trim();
+
+      document.getElementById('modal-customize').classList.remove('active');
+      initBalloons();
+      triggerGrandClimax();
+    });
+
+    document.getElementById('customize-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sound.initContext();
+
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Minh Anh';
+      state.sender = document.getElementById('in-sender').value.trim() || 'Bảo Nam';
+      state.age = parseInt(document.getElementById('in-age').value, 10) || 20;
+      state.wish = document.getElementById('in-wish').value.trim();
+
+      document.getElementById('modal-customize').classList.remove('active');
+      openPaymentFlow();
+    });
+
+    function openPaymentFlow() {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+        GiftSDK.openPayment({
+          templateId: state.templateId,
+          templateType: 'birthday',
+          senderName: state.sender,
+          receiverName: state.receiver,
+          occasion: 'Bong Bóng Mùa Hè • Happy Birthday',
+          message: state.wish,
+          payload: {
+            age: state.age,
+            theme: state.theme
+          }
+        });
+      } else {
+        alert('Đang trong môi trường demo local.');
+      }
+    }
+
+    document.getElementById('btn-open-payment')?.addEventListener('click', openPaymentFlow);
+
+    // Nút xem lại & Âm thanh
+    document.getElementById('btn-replay')?.addEventListener('click', () => {
+      sound.initContext();
+      state.isClimax = false;
+      if (giantBalloon) scene.remove(giantBalloon);
+      if (giantNameMesh) scene.remove(giantNameMesh);
+      climaxConfetti.forEach((cc) => scene.remove(cc.points));
+      climaxConfetti = [];
+      giantBalloon = null;
+      giantNameMesh = null;
+      initBalloons();
+    });
+
+    document.getElementById('btn-sound')?.addEventListener('click', (e) => {
+      sound.initContext();
+      const isMuted = sound.toggleMute();
+      e.currentTarget.textContent = isMuted ? '🔇 Tắt Tiếng' : '🔊 Âm Thanh';
+    });
+
+    /**
+     * ============================================================================
+     * 11. KHỞI TẠO TỰ ĐỘNG VỚI GIFTSDK KHI MỞ LINK TẶNG
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+        await GiftSDK.init({
+          templateId: state.templateId,
+          onGiftLoaded: (order) => {
+            if (order.receiver_name) state.receiver = order.receiver_name;
+            if (order.sender_name) state.sender = order.sender_name;
+            if (order.message) state.wish = order.message;
+            if (order.payload && order.payload.age) state.age = order.payload.age;
+            if (order.payload && order.payload.theme) state.theme = order.payload.theme;
+
+            initBalloons();
+          }
+        });
+      }
+    });
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

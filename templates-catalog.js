@@ -51,6 +51,44 @@ const CONFESS_TEMPLATES = [
 // ============================================================================
 const ANNIVERSARY_TEMPLATES = [
   {
+    id: 'anniversary_star_hourglass_3d',
+    category: 'anniversary',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Đồng Hồ Cát Ánh Sáng 3D • Dòng Chảy Thời Gian',
+    subtitle: 'Lật đồng hồ cát pha lê 3D dưới bầu trời sao & mặt hồ ánh trăng, đánh thức 4 quả cầu ký ức trước khi bụi sao xếp thành ngày kỷ niệm & khung ảnh 3D của hai bạn',
+    badge: '⏳ Mẫu 3D Mới',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/anniversary/star-hourglass-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #090418 0%, #9d174d 50%, #fbbf24 100%)',
+    previewEmoji: '⏳',
+    features: ['Đồng hồ cát pha lê GLSL Fresnel & Bụi sao 3D', '4 Quả cầu ký ức + Âm thanh cát chảy & Ballad 68 BPM', 'Morph 3.800 hạt thành Ngày Yêu & Khung ảnh 3D'],
+    preset: {
+      occasion: 'Kỷ Niệm Yêu • Đồng Hồ Cát Ánh Sáng 3D',
+      theme: 'rose_gold'
+    }
+  },
+  {
+    id: 'anniversary_love_tree_3d',
+    category: 'anniversary',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Cây Tình Yêu 3D • Đâm Chồi Nảy Lộc',
+    subtitle: 'Mầm cây ánh sáng 3D sinh trưởng đâm chồi nở hoa anh đào, treo 6 chiếc đèn lồng kỷ niệm phát sáng lung linh dưới ánh trăng cùng tiếng Piano êm ái',
+    badge: '🏮 Mẫu 3D Mới',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/anniversary/love-tree-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #090414 0%, #f43f5e 50%, #fde047 100%)',
+    previewEmoji: '🏮',
+    features: ['Cây hoa anh đào 3D nở hoa dưới ánh trăng', '6 Đèn lồng phát sáng lưu giữ kỷ niệm', 'Nhạc đệm Piano êm ái & Bảng tên đôi lứa 3D'],
+    preset: {
+      occasion: 'Kỷ Niệm Yêu • Cây Tình Yêu 3D',
+      theme: 'emerald_gold'
+    }
+  },
+  {
     id: 'anniversary_galaxy_flight',
     category: 'anniversary',
     isHot: true,
@@ -97,6 +135,25 @@ const ANNIVERSARY_TEMPLATES = [
 // 3. SỰ KIỆN SINH NHẬT (BIRTHDAY) -> Thư mục: templates/birthday/
 // ============================================================================
 const BIRTHDAY_TEMPLATES = [
+  {
+    id: 'birthday_summer_balloons_3d',
+    category: 'birthday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Bong Bóng Mùa Hè 3D • Kỷ Niệm Tuổi Mới',
+    subtitle: 'Hàng chục quả bóng bay 3D phát sáng bay theo làn gió hè, chạm nổ giòn tan hé lộ album ảnh & quả bóng hoàng kim khổng lồ!',
+    badge: '🎈 Mẫu 3D Mới',
+    price: 29000,
+    oldPrice: 49000,
+    engineUrl: 'templates/birthday/summer-balloons-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 45%, #4a154b 100%)',
+    previewEmoji: '🎈',
+    features: ['Three.js 3D toàn diện', 'Chạm nổ bóng âm thanh POP!', 'Hé lộ 6 ảnh & bóng hoàng kim'],
+    preset: {
+      occasion: 'Happy Birthday • Bong Bóng Mùa Hè',
+      theme: 'summer_glow'
+    }
+  },
   {
     id: 'birthday_cake_interactive',
     category: 'birthday',

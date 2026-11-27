@@ -5,8 +5,9 @@ globs: "templates/**/*.html, templates/**/*.js"
 
 # Quy Chuẩn Đồ Họa 3D & Hiệu Ứng Thị Giác Toàn Dự Án (`3d-visual.md`)
 
-Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng, chuyển động, âm thanh và trải nghiệm người dùng cho toàn bộ các template trong dự án **Web Cá Nhân Hóa**, được đúc kết từ 2 mẫu chuẩn:
+Tài liệu này quy định chuẩn kỹ thuật đồ họa 2D/3D, ánh sáng, chuyển động, âm thanh và trải nghiệm người dùng cho toàn bộ các template trong dự án **Web Cá Nhân Hóa**, được đúc kết từ các mẫu chuẩn:
 - **Chuẩn Three.js 3D & Tương tác**: `templates/holiday/christmas-tree-3d/index.html` (*Cây Thông Noel 3D Hoàng Gia & Cử Chỉ Tay*)
+- **Chuẩn Cảnh Đêm Tự Nhiên, Cây Hoa, Mặt Nước & Trăng Tròn 3D**: `templates/anniversary/love-tree-3d/index.html` (*Cây Tình Yêu 3D & Ánh Trăng*)
 - **Chuẩn Canvas Hiệu Ứng Ánh Sáng & Vật Lý**: `templates/holiday/tet-fireworks/index.html` (*Pháo Hoa Giao Thừa & Countdown Tết 2027*)
 
 ---
@@ -120,3 +121,26 @@ Mỗi template không được dừng ở mức "cảnh 3D tĩnh/lặp lại nh�
 3. **Mồi Chuyển Đổi Mua Hàng (Live Climax Preview — Không Lặp Nút CTA)**:
    - Khi người dùng nhập thử Tên người nhận + tải ảnh trong modal **Tùy Chỉnh** và bấm **Áp dụng & Xem thử**, tự động tái hiện ngay khoảnh khắc cao trào 3D với đúng tên và ảnh vừa nhập.
    - Ở đỉnh cao cảm xúc (khi tên & ảnh người nhận tỏa sáng rực rỡ nhất), chỉ tạo hiệu ứng phát sáng/nhấn nhẹ (glow/pulse) ngay trên **nút `✨ Tạo Link & QR` duy nhất ở `.bottom-dock`** — tuyệt đối **không** sinh thêm thanh banner hay nút `Tạo Link & QR` thứ hai đè lên cảnh 3D.
+
+---
+
+## 9. Chuẩn Thiết Kế Bầu Trời, Cây 3D, Mặt Nước & Mặt Trăng *(Chuẩn `love-tree-3d`)*
+
+Áp dụng cho các template có bối cảnh thiên nhiên ban đêm, cây 3D, vật thể treo phát sáng và bầu trời ánh trăng:
+
+1. **Bầu Trời Đêm & Chuyển Sắc Độ Sáng Tiến Trình (Progressive Luminance)**:
+   - **Tối dịu lúc khởi đầu → Bừng sáng theo tiến trình**: Khởi tạo bầu trời, cây, trăng và vật thể treo ở sắc tối dịu (`targetBrightness = 0`) với nền trời đêm sâu (`radial-gradient`) + lớp hào quang bầu trời tách biệt (`#sky-radiance-layer`), trường sao nhấp nháy và đom đóm vàng nhẹ.
+   - Khi người dùng tương tác thắp sáng từng điểm kỷ niệm (ví dụ từng chiếc đèn lồng), nội suy `currentBrightness` mượt mà để bầu trời, tán cây, bảng tên và ánh sáng môi trường sáng dần lên theo từng bước.
+   - Bảng tên 3D khắc đôi lứa gắn trên giá gỗ tự nhiên dựng trên gò đất, cao vừa đủ để không bị mép cỏ hay nước che mất dấu chữ tiếng Việt.
+
+2. **Cây Cổ Thụ 3D, Vật Thể Treo & Làn Nước Gợn Nhẹ**:
+   - **Khởi đầu bằng Cây Con 3D**: Tránh dùng khối cầu đơn giản làm mầm; tạo hình **cây con 3D** có thân mảnh, tán lá non và quầng sáng mời chạm trước khi vươn thành cây trưởng thành.
+   - **Tán cây tròn đầy & cành nhánh tự nhiên**: Thân cây uốn lượn tự nhiên kết hợp bộ rễ bám nổi theo hàm địa hình `getGroundY(x, z)`. Tán lá/hoa (`THREE.Points`) phải phủ khối vòm tròn đầy (`volumetric dome`) kết hợp các cụm hoa gối nối (`cloudClusters`), đầu nhánh cấp cuối uốn gọn vào lòng tán để không bị lòi cành hay lõm vai tán.
+   - **Vật thể treo 3D so le cao – thấp**: Các đèn lồng/vật phẩm treo phải dựng khối 3D thực (`LatheGeometry`, dây nối đúng điểm neo trên cành, móc/tua rua, hào quang nến bên trong) và bố trí **treo cái cao cái thấp** tự nhiên dưới vòm cành. Khi mở thẻ kỷ niệm lần đầu dùng **thanh load tiến trình 5s** tự đóng gọn (không in chữ đếm ngược lộ thiên); mở lại lần sau giữ nguyên để người dùng đọc.
+   - **Đồi cỏ tự nhiên & Làn nước gợn nhẹ dưới gốc**: Phủ thảm rêu cỏ hữu cơ, đá rêu, bụi cỏ 3D và cánh hoa rơi theo `getGroundY`. Bao quanh chân đảo cỏ là **mặt nước hồ trăng gợn sóng nhẹ** (`waterMesh` bo mờ viền hòa vào nền đêm, gợn sóng mềm theo `time`, kèm các vòng sóng đồng tâm `waterRippleRings` lan nhẹ quanh bờ cỏ) — tránh để đáy đảo thành hình nón lơ lửng giữa khoảng trống.
+
+3. **Mặt Trăng 3D Độc Lập, Trạng Thái Chờ Click & Cao Trào Hiện Ảnh**:
+   - **Vị trí tách biệt khỏi tán cây**: Đặt `moonGroup` trên bầu trời thoáng bên phải (`z = -22`), tự tính tọa độ `moonX / moonY` theo `fov` và `aspect` (cả desktop lẫn mobile) sao cho **tán cây lớn không bao giờ che khuất Mặt Trăng** và trăng không bị chạm mép màn hình khi phóng to.
+   - **Texture Equirectangular & Hào quang Sprite chuẩn**: Texture bề mặt trăng phải vẽ phủ kín khung hình chữ nhật `2:1` (`1024×512`, không cắt hình tròn) để khi bọc lên `SphereGeometry` không sinh góc tam giác tối; quầng sáng dùng `THREE.Sprite` đặt phía sau khối cầu (`z < 0`, `AdditiveBlending`, `depthWrite: false`) thay cho `PlaneGeometry` để tránh lỗi cắt xéo khối cầu.
+   - **Giữ Trăng tối đến khi người dùng click trực tiếp**: Tách riêng biến độ sáng Mặt Trăng (`currentMoonBrightness`) khỏi độ sáng khu vườn. Sau khi thắp xong đèn lồng cuối, **Mặt Trăng vẫn giữ sắc tối dịu** kèm vòng mời chạm nhẹ và dòng gợi ý ngắn gọn (*"Hãy thắp sáng ánh trăng nữa nhé"*).
+   - **Bừng sáng, hiện ảnh trên Trăng & mở Tâm Thư**: Chỉ khi người dùng click trực tiếp vào Mặt Trăng (`raycaster` kèm vùng chạm rộng `moonHitMesh`), trăng mới bừng sáng rực rỡ (`currentMoonBrightness → 1.0`), phóng lớn nhẹ nhàng, hiển thị **ảnh kỷ niệm đã chọn bên trong lòng Mặt Trăng** (`moonFaceGroup.lookAt(camera.position)`), thả mưa cánh hoa và sau ~`1.8–1.9s` tự động mở modal **Tâm Thư** trên nền tối mờ nhẹ xuyên thấu được cây và ảnh trăng phía sau.

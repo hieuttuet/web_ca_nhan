@@ -1,0 +1,829 @@
+:root {
+  --accent-primary: #2dd4bf;
+  --accent-gold: #fde047;
+  --accent-cyan: #38bdf8;
+  --accent-rose: #f472b6;
+  --glass-bg: rgba(5, 16, 32, 0.78);
+  --glass-border: rgba(148, 226, 232, 0.22);
+  --glass-shadow: 0 18px 44px rgba(0, 0, 0, 0.68);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at 54% 22%, #0d2b45 0%, #051426 48%, #020612 100%);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==================== 1. KIẾN TRÚC 3 LỚP XẾP CHỒNG (Z-INDEX 1..6) ==================== */
+#sky-radiance-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.18;
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), background 0.8s ease;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(45, 212, 191, 0.28) 0%, transparent 48%),
+    radial-gradient(circle at 78% 18%, rgba(253, 224, 71, 0.20) 0%, transparent 42%),
+    radial-gradient(circle at 24% 66%, rgba(56, 189, 248, 0.22) 0%, transparent 54%);
+}
+
+#webgl-canvas,
+#trails-canvas,
+#morph-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#webgl-canvas {
+  z-index: 2;
+  pointer-events: none;
+}
+
+#trails-canvas {
+  z-index: 3;
+  pointer-events: none;
+}
+
+#morph-canvas {
+  z-index: 4;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.magic-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.7;
+  background: radial-gradient(circle at 50% 45%, transparent 44%, rgba(2, 6, 18, 0.78) 100%);
+}
+
+.screen-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.55s ease-out;
+  background: radial-gradient(circle at 50% 36%, rgba(255, 252, 240, 0.95), rgba(45, 212, 191, 0.62) 44%, transparent 82%);
+}
+
+.screen-flash.flash {
+  opacity: 0.26;
+}
+
+/* ==================== 2. TOP HUD CHUẨN 3D-VISUAL.MD ==================== */
+.top-hud {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  left: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.top-hud > * {
+  pointer-events: auto;
+}
+
+.top-hud-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-btn {
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hud-btn:hover {
+  background: rgba(45, 212, 191, 0.24);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(45, 212, 191, 0.35);
+}
+
+.hud-btn.hidden {
+  display: none !important;
+}
+
+/* ==================== 3. BỘ 4 PRESETS 1-CHẠM (.preset-bar) ==================== */
+.preset-bar {
+  position: fixed;
+  top: max(58px, calc(env(safe-area-inset-top) + 46px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(5, 16, 32, 0.78);
+  border: 1px solid rgba(148, 226, 232, 0.18);
+  padding: 5px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.preset-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.preset-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.preset-chip:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.preset-chip.active {
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 55%, #ec4899 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.42);
+}
+
+/* ==================== 4. PHASE PILL ĐẶT GỌN TRÊN BOTTOM DOCK ==================== */
+.phase-pill-wrap {
+  position: fixed;
+  bottom: max(74px, calc(env(safe-area-inset-bottom) + 68px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  width: 92%;
+  max-width: 560px;
+}
+
+#phase-pill {
+  padding: 7px 17px;
+  border-radius: 999px;
+  background: rgba(5, 16, 32, 0.84);
+  border: 1px solid rgba(45, 212, 191, 0.48);
+  color: #e0f2fe;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.38;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 18px rgba(45, 212, 191, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: pulseHint 2.6s infinite ease-in-out;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+@keyframes pulseHint {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(45, 212, 191, 0.18);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 24px rgba(253, 224, 71, 0.3);
+  }
+}
+
+/* ==================== 5. BOTTOM DOCK (1 HÀNG NGANG CHUẨN 3D-VISUAL.MD) ==================== */
+.bottom-dock {
+  position: fixed;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  max-width: calc(100vw - 18px);
+}
+
+.dock-btn {
+  height: 40px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dock-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+}
+
+.dock-btn.cta-pulse {
+  animation: ctaClimaxPulse 1.7s infinite ease-in-out;
+  border-color: rgba(253, 224, 71, 0.72);
+  box-shadow: 0 6px 22px rgba(45, 212, 191, 0.45);
+}
+
+.dock-btn.primary-cta {
+  background: linear-gradient(135deg, #0d9488 0%, #ec4899 58%, #f59e0b 100%);
+  border-color: rgba(253, 224, 71, 0.7);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.38), 0 0 18px rgba(236, 72, 153, 0.34);
+}
+
+.dock-btn.primary-cta:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(45, 212, 191, 0.56), 0 0 26px rgba(236, 72, 153, 0.52);
+}
+
+@keyframes ctaClimaxPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 22px rgba(45, 212, 191, 0.42), 0 0 16px rgba(236, 72, 153, 0.42);
+  }
+  50% {
+    transform: scale(1.045);
+    box-shadow: 0 10px 32px rgba(253, 224, 71, 0.75), 0 0 28px rgba(45, 212, 191, 0.75);
+  }
+}
+
+.dock-price-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.36);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fde047;
+}
+
+/* ==================== 6. MODALS (TÂM THƯ, SPOTLIGHT & TÙY CHỈNH) ==================== */
+.modal-backdrop,
+.spotlight-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(2, 8, 22, 0.76);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-backdrop.active,
+.spotlight-modal.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.modal-box,
+.wish-card,
+.spotlight-card {
+  position: relative;
+  width: 100%;
+  max-width: 490px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(7, 20, 40, 0.95);
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 26px;
+  padding: 26px 22px;
+  color: #ffffff;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 36px rgba(45, 212, 191, 0.22);
+}
+
+.spotlight-card,
+.wish-card {
+  text-align: center;
+}
+
+.modal-box::-webkit-scrollbar,
+.wish-card::-webkit-scrollbar,
+.spotlight-card::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal-box::-webkit-scrollbar-thumb,
+.wish-card::-webkit-scrollbar-thumb {
+  background: rgba(45, 212, 191, 0.35);
+  border-radius: 999px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(45, 212, 191, 0.32);
+  border-color: #2dd4bf;
+}
+
+.sparkle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.16);
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  color: #99f6e4;
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.wish-card-title,
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.45rem, 4.5vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.3;
+  background: linear-gradient(135deg, #ffffff 0%, #99f6e4 52%, #fde047 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.modal-sub {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.wish-card-divider {
+  width: 72px;
+  height: 2px;
+  margin: 10px auto 14px;
+  background: linear-gradient(90deg, transparent, #fde047, #2dd4bf, transparent);
+}
+
+.wish-card-highlight {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fde047;
+  margin-bottom: 12px;
+}
+
+.wish-card-content {
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 15px 16px;
+  margin-bottom: 14px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.wish-card-sender {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: #99f6e4;
+  margin-bottom: 18px;
+}
+
+.wish-reply-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.reply-btn {
+  padding: 12px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: all 0.22s ease;
+}
+
+.reply-btn.yes {
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  color: #ffffff;
+  border-color: rgba(253, 224, 71, 0.65);
+  box-shadow: 0 8px 22px rgba(236, 72, 153, 0.42);
+}
+
+.reply-btn.yes:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(236, 72, 153, 0.62);
+}
+
+.reply-btn.think {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.reply-btn.think:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+/* Spotlight Modal */
+.spotlight-photo-frame {
+  width: 100%;
+  max-width: 310px;
+  margin: 0 auto 14px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(253, 224, 71, 0.65);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65), 0 0 24px rgba(45, 212, 191, 0.28);
+}
+
+#spotlight-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.spotlight-caption {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: #fef3c7;
+  margin-bottom: 6px;
+}
+
+.spotlight-sub {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+/* Form Tùy Chỉnh */
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-group {
+  margin-bottom: 13px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #99f6e4;
+  margin-bottom: 5px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+  transition: all 0.2s ease;
+}
+
+.modal-input:focus {
+  border-color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.28);
+}
+
+.modal-textarea {
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.5;
+}
+
+.photo-picker-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.photo-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(253, 224, 71, 0.55);
+  flex-shrink: 0;
+}
+
+.photo-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.photo-upload-btn,
+.photo-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.photo-upload-btn {
+  background: rgba(45, 212, 191, 0.2);
+  border: 1px solid rgba(45, 212, 191, 0.5);
+  color: #99f6e4;
+}
+
+.photo-upload-btn:hover {
+  background: rgba(45, 212, 191, 0.34);
+}
+
+.photo-clear-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+}
+
+.photo-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.theme-chips-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.modal-theme-chip {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.modal-theme-chip:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.modal-theme-chip.active {
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.26), rgba(253, 224, 71, 0.22));
+  border-color: #2dd4bf;
+  color: #fde047;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.28);
+}
+
+.modal-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-btn-secondary,
+.modal-btn-primary {
+  padding: 12px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  text-align: center;
+}
+
+.modal-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+}
+
+.modal-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.modal-btn-primary {
+  border: 1px solid rgba(253, 224, 71, 0.65);
+  background: linear-gradient(135deg, #0d9488 0%, #ec4899 58%, #f59e0b 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.42);
+}
+
+.modal-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(45, 212, 191, 0.62);
+}
+
+/* ==================== 7. TOAST THÔNG BÁO ==================== */
+.ocean-toast {
+  position: fixed;
+  top: max(62px, calc(env(safe-area-inset-top) + 48px));
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 150;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(5, 16, 32, 0.92);
+  border: 1px solid rgba(45, 212, 191, 0.55);
+  color: #fde047;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+}
+
+.ocean-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==================== 8. RESPONSIVE MOBILE ==================== */
+@media (max-width: 520px) {
+  .top-hud {
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
+  }
+  .top-hud-group {
+    gap: 5px;
+  }
+  .hud-btn {
+    height: 31px;
+    padding: 0 9px;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  .preset-bar {
+    top: max(46px, calc(env(safe-area-inset-top) + 38px));
+    padding: 4px 7px;
+    gap: 5px;
+  }
+  .preset-chip {
+    padding: 5px 10px;
+    font-size: 0.71rem;
+  }
+  .phase-pill-wrap {
+    bottom: max(64px, calc(env(safe-area-inset-bottom) + 58px));
+  }
+  #phase-pill {
+    padding: 6px 13px;
+    font-size: 0.73rem;
+  }
+  .bottom-dock {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .dock-btn {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 0.73rem;
+    gap: 4px;
+  }
+  .dock-price-badge {
+    padding: 1px 5px;
+    font-size: 0.66rem;
+  }
+  .form-row-2col,
+  .wish-reply-actions,
+  .modal-actions-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 375px) {
+  .bottom-dock {
+    gap: 4px;
+    padding: 5px 7px;
+  }
+  .dock-btn {
+    height: 32px;
+    padding: 0 8px;
+    font-size: 0.69rem;
+    gap: 3px;
+  }
+}

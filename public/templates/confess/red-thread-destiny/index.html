@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sợi Chỉ Đỏ Duyên Phận • Nút Thắt Vĩnh Cửu 3D 🪢✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/gift-sdk.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- 1. Ngăn xếp Layer (z-index 1..6) -->
+  <div id="sky-radiance-layer"></div>
+  <canvas id="webgl-canvas"></canvas>
+  <canvas id="trails-canvas"></canvas>
+  <canvas id="morph-canvas"></canvas>
+  <div class="magic-vignette"></div>
+  <div class="screen-flash" id="screen-flash"></div>
+
+  <!-- 2. Top HUD chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Trang Chủ">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-skip-climax" title="Thắt Nút Vĩnh Cửu ngay">⏭️ Thắt Duyên</button>
+      <button type="button" class="hud-btn" id="btn-replay" title="Xem lại từ đầu">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật/Tắt Âm Thanh">🔊 Âm Thanh</button>
+      <!-- #btn-tiktok-mode 📹 được gắn tự động bởi shared/tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 3. Bộ 4 Preset 1-chạm dành cho người tạo -->
+  <section class="preset-bar creator-only" id="preset-bar" aria-label="Chọn nhanh kịch bản Sợi Chỉ Đỏ Duyên Phận">
+    <button type="button" class="preset-chip active" data-preset="red_thread_destiny">🪢 Chỉ Đỏ Duyên Phận</button>
+    <button type="button" class="preset-chip" data-preset="two_halves_destiny">💙❤️ Hai Nửa Định Mệnh</button>
+    <button type="button" class="preset-chip" data-preset="moon_elder_wish">🏮 Ước Nguyện Nguyệt Lão</button>
+    <button type="button" class="preset-chip" data-preset="eternal_knot">✨ Nút Thắt Vĩnh Cửu</button>
+  </section>
+
+  <!-- 4. Phase Pill dẫn dắt kịch bản 4 Pha -->
+  <div class="phase-pill-wrap">
+    <div id="phase-pill">🪢 Chạm nhẹ vào vòng ánh sáng để hai dải tơ duyên tìm thấy nhau...</div>
+  </div>
+
+  <!-- 5. Bottom Dock 1 hàng ngang chuẩn 3d-visual.md -->
+  <nav class="bottom-dock" aria-label="Thanh điều khiển chính">
+    <button type="button" class="dock-btn" id="btn-open-wish" title="Đọc tâm thư tỏ tình">
+      <span>💌</span><span>Tâm Thư</span>
+    </button>
+    <button type="button" class="dock-btn creator-only" id="btn-open-customize" title="Tùy chỉnh tên, ngày yêu, ảnh & tone màu">
+      <span>🎨</span><span>Tùy Chỉnh</span>
+    </button>
+    <button type="button" class="dock-btn primary-cta creator-only" id="btn-open-payment" title="Tạo Link & Mã QR gửi người thương">
+      <span>✨ Tạo Link &amp; QR</span>
+      <span class="dock-price-badge">29k</span>
+    </button>
+  </nav>
+
+  <!-- 6. Modal Spotlight (Chạm khung ảnh kỷ niệm 3D ở Pha 3) -->
+  <div class="spotlight-modal" id="spotlight-modal" role="dialog" aria-modal="true" aria-labelledby="spotlight-caption">
+    <div class="spotlight-card">
+      <button type="button" class="modal-close-btn" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="spotlight-badge">🪢 Kỷ Niệm Sợi Chỉ Đỏ Duyên Phận</div>
+      <div class="spotlight-photo-frame">
+        <canvas id="spotlight-canvas" width="512" height="512"></canvas>
+      </div>
+      <p class="spotlight-caption" id="spotlight-caption">"Duyên mình đã định từ kiếp này"</p>
+      <div class="spotlight-sub" id="spotlight-sub">Minh Khang ❤️ Ngọc Diệp</div>
+      <button type="button" class="modal-btn-primary" id="btn-spotlight-letter" style="width:100%;">
+        💌 Đọc Tâm Thư &amp; Hồi Đáp
+      </button>
+    </div>
+  </div>
+
+  <!-- 7. Modal Tâm Thư (Chứa 2 nút hồi đáp ngọt ngào) -->
+  <div class="modal-backdrop" id="modal-wish-card" role="dialog" aria-modal="true" aria-labelledby="wish-card-title">
+    <div class="wish-card">
+      <button type="button" class="modal-close-btn" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="wish-card-badge">🪢 Nút Thắt Vĩnh Cửu Dưới Ánh Trăng 🏮</div>
+      <h2 class="wish-card-title" id="wish-card-title">Gửi Ngọc Diệp Thương Mến</h2>
+      <div class="wish-card-divider"></div>
+      <div class="wish-card-highlight" id="wish-card-highlight">"Duyên mình đã định từ kiếp này"</div>
+      <p class="wish-card-content" id="wish-card-content">
+        Người ta nói giữa thế gian rộng lớn này, có một sợi chỉ đỏ vô hình luôn lặng lẽ nối liền hai trái tim thuộc về nhau. Từ khoảnh khắc ánh mắt anh chạm vào em, anh biết sợi tơ duyên của đời mình đã tìm đúng người. Hãy để anh buộc chặt nút thắt vĩnh cửu này cùng em nhé! 🪢❤️
+      </p>
+      <div class="wish-card-sender" id="wish-card-sender">— Từ Minh Khang ❤️</div>
+      <div class="wish-reply-actions">
+        <button type="button" class="reply-btn yes" id="btn-reply-yes">💖 Buộc chặt duyên này!</button>
+        <button type="button" class="reply-btn think" id="btn-reply-think">✨ Giữ mãi sợi chỉ đỏ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal Tùy Chỉnh dành cho người tạo -->
+  <div class="modal-backdrop creator-only" id="modal-customize" role="dialog" aria-modal="true" aria-labelledby="modal-customize-title">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">🪢 Cá Nhân Hóa Sợi Chỉ Đỏ Duyên Phận ✨</div>
+      <h2 class="modal-title" id="modal-customize-title">Thắt Chặt Sợi Tơ Hồng Của Hai Bạn</h2>
+      <p class="modal-sub">
+        Tùy chỉnh tên đôi lứa, ngày bắt đầu, lời tỏ tình trên bảng tên 3D và ảnh kỷ niệm. Bấm "Áp Dụng &amp; Xem Thử" để chiêm ngưỡng ngay khoảnh khắc thắt nút vĩnh cửu!
+      </p>
+
+      <form id="customize-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên bạn (Dải Xanh Dương) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Minh Khang" value="Minh Khang" maxlength="20" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên người ấy (Dải Đỏ Thắm) *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Ngọc Diệp" value="Ngọc Diệp" maxlength="20" required />
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-start-date">📅 Ngày định duyên / Bắt đầu:</label>
+            <input type="date" id="in-start-date" class="modal-input" value="2025-02-14" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-confess-line">✨ Câu tỏ tình trên bảng 3D *</label>
+            <input type="text" id="in-confess-line" class="modal-input" placeholder="VD: Duyên mình đã định từ kiếp này" value="Duyên mình đã định từ kiếp này" maxlength="44" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Tâm thư gửi người ấy:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập lời tâm sự gửi người thương..." required>Người ta nói giữa thế gian rộng lớn này, có một sợi chỉ đỏ vô hình luôn lặng lẽ nối liền hai trái tim thuộc về nhau. Từ khoảnh khắc ánh mắt anh chạm vào em, anh biết sợi tơ duyên của đời mình đã tìm đúng người. Hãy để anh buộc chặt nút thắt vĩnh cửu này cùng em nhé! 🪢❤️</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🖼️ Ảnh Kỷ Niệm (Nổi dưới Trái Tim ở Pha 3):</label>
+          <div class="photo-picker-box">
+            <img id="photo-thumb" class="photo-thumb" alt="Ảnh kỷ niệm" />
+            <div class="photo-actions-row">
+              <label class="photo-upload-btn" for="in-photo">📸 Chọn Ảnh</label>
+              <input type="file" id="in-photo" accept="image/*" style="display:none;" />
+              <button type="button" class="photo-clear-btn" id="btn-clear-photo">🗑️ Khôi Phục Tranh Mặc Định</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🎨 Bảng Màu Á Đông &amp; Dải Sáng:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="modal-theme-chip active" data-theme="crimson_azure">🪢 Đỏ Thắm &amp; Xanh Dương</button>
+            <button type="button" class="modal-theme-chip" data-theme="lantern_gold">🏮 Lồng Đèn Hoàng Kim</button>
+            <button type="button" class="modal-theme-chip" data-theme="jade_lotus">🪷 Ngọc Bích Liên Hoa</button>
+            <button type="button" class="modal-theme-chip" data-theme="violet_silk">🌸 Tử La Lụa Tím</button>
+          </div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            🪢 Áp Dụng &amp; Xem Thử
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Link &amp; QR (29.000đ)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Toast Thông Báo -->
+  <div id="silk-toast" class="silk-toast"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. BẢNG MÀU (4 THEMES) & 4 PRESETS TỎ TÌNH 1-CHẠM
+     * ============================================================================
+     */
+    const THEMES = {
+      crimson_azure: {
+        name: 'Đỏ Thắm & Xanh Dương',
+        skyBg: 'radial-gradient(circle at 50% 24%, #250819 0%, #0d071c 48%, #03040d 100%)',
+        radianceBg: 'radial-gradient(circle at 24% 52%, rgba(56, 189, 248, 0.25) 0%, transparent 48%), radial-gradient(circle at 76% 52%, rgba(244, 63, 94, 0.28) 0%, transparent 48%), radial-gradient(circle at 50% 24%, rgba(253, 224, 71, 0.20) 0%, transparent 44%)',
+        azureHex: '#38bdf8',
+        azureDeep: '#0284c7',
+        crimsonHex: '#f43f5e',
+        crimsonDeep: '#be123c',
+        goldHex: '#fde047',
+        lakeDeep: '#050717',
+        lakeShallow: '#141333',
+        lanternColor: '#fb923c',
+        sparks: ['#38bdf8', '#f43f5e', '#fde047', '#ffffff', '#fb7185']
+      },
+      lantern_gold: {
+        name: 'Lồng Đèn Hoàng Kim',
+        skyBg: 'radial-gradient(circle at 50% 24%, #31100e 0%, #150918 50%, #05030b 100%)',
+        radianceBg: 'radial-gradient(circle at 24% 52%, rgba(96, 165, 250, 0.24) 0%, transparent 48%), radial-gradient(circle at 76% 52%, rgba(251, 113, 133, 0.26) 0%, transparent 48%), radial-gradient(circle at 50% 24%, rgba(251, 191, 36, 0.28) 0%, transparent 44%)',
+        azureHex: '#60a5fa',
+        azureDeep: '#2563eb',
+        crimsonHex: '#fb7185',
+        crimsonDeep: '#e11d48',
+        goldHex: '#fbbf24',
+        lakeDeep: '#090714',
+        lakeShallow: '#211328',
+        lanternColor: '#f59e0b',
+        sparks: ['#fde047', '#fb923c', '#60a5fa', '#fb7185', '#ffffff']
+      },
+      jade_lotus: {
+        name: 'Ngọc Bích Liên Hoa',
+        skyBg: 'radial-gradient(circle at 50% 24%, #08292c 0%, #091326 50%, #030610 100%)',
+        radianceBg: 'radial-gradient(circle at 24% 52%, rgba(45, 212, 191, 0.26) 0%, transparent 48%), radial-gradient(circle at 76% 52%, rgba(244, 114, 182, 0.26) 0%, transparent 48%), radial-gradient(circle at 50% 24%, rgba(253, 224, 71, 0.20) 0%, transparent 44%)',
+        azureHex: '#2dd4bf',
+        azureDeep: '#0d9488',
+        crimsonHex: '#f472b6',
+        crimsonDeep: '#db2777',
+        goldHex: '#fef08a',
+        lakeDeep: '#04121b',
+        lakeShallow: '#102b36',
+        lanternColor: '#fbbf24',
+        sparks: ['#2dd4bf', '#f472b6', '#fef08a', '#ffffff', '#67e8f9']
+      },
+      violet_silk: {
+        name: 'Tử La Lụa Tím',
+        skyBg: 'radial-gradient(circle at 50% 24%, #240c38 0%, #0c0924 50%, #03040f 100%)',
+        radianceBg: 'radial-gradient(circle at 24% 52%, rgba(129, 140, 248, 0.26) 0%, transparent 48%), radial-gradient(circle at 76% 52%, rgba(236, 72, 153, 0.28) 0%, transparent 48%), radial-gradient(circle at 50% 24%, rgba(253, 224, 71, 0.20) 0%, transparent 44%)',
+        azureHex: '#818cf8',
+        azureDeep: '#4f46e5',
+        crimsonHex: '#ec4899',
+        crimsonDeep: '#be185d',
+        goldHex: '#fde68a',
+        lakeDeep: '#07061a',
+        lakeShallow: '#1c1138',
+        lanternColor: '#f472b6',
+        sparks: ['#818cf8', '#ec4899', '#fde68a', '#ffffff', '#c084fc']
+      }
+    };
+
+    const PRESETS = {
+      red_thread_destiny: {
+        sender: 'Minh Khang',
+        receiver: 'Ngọc Diệp',
+        startDate: '2025-02-14',
+        confessLine: 'Duyên mình đã định từ kiếp này',
+        theme: 'crimson_azure',
+        badgeLabel: '🪢 Chỉ Đỏ Duyên Phận',
+        wish: 'Người ta nói giữa thế gian rộng lớn này, có một sợi chỉ đỏ vô hình luôn lặng lẽ nối liền hai trái tim thuộc về nhau. Từ khoảnh khắc ánh mắt anh chạm vào em, anh biết sợi tơ duyên của đời mình đã tìm đúng người. Hãy để anh buộc chặt nút thắt vĩnh cửu này cùng em nhé! 🪢❤️'
+      },
+      two_halves_destiny: {
+        sender: 'Gia Bảo',
+        receiver: 'Khánh Vy',
+        startDate: '2025-05-20',
+        confessLine: 'Hai nửa linh hồn thuộc về nhau',
+        theme: 'violet_silk',
+        badgeLabel: '💙❤️ Hai Nửa Định Mệnh',
+        wish: 'Như sắc xanh bình yên hòa quyện vào ánh đỏ nồng nàn, anh và em vốn là hai nửa riêng biệt chờ ngày đan vào nhau thành một trái tim trọn vẹn. Cảm ơn em đã xuất hiện để thế giới của anh trở nên rực rỡ hơn bao giờ hết. Làm người yêu anh nhé! 💙❤️'
+      },
+      moon_elder_wish: {
+        sender: 'Tuấn Kiệt',
+        receiver: 'Thanh Trúc',
+        startDate: '2024-11-11',
+        confessLine: 'Dưới ánh trăng Nguyệt Lão, làm người yêu anh nhé',
+        theme: 'lantern_gold',
+        badgeLabel: '🏮 Ước Nguyện Nguyệt Lão',
+        wish: 'Đêm nay hàng chục ngọn đèn trời cùng ánh trăng Nguyệt Lão làm chứng cho lời tỏ tình chân thành nhất của anh. Chẳng cầu điều gì xa xôi, chỉ mong từ hôm nay mọi chặng đường phía trước đều có tên hai đứa mình song hành! 🏮💛'
+      },
+      eternal_knot: {
+        sender: 'Anh',
+        receiver: 'Em',
+        startDate: '2025-01-01',
+        confessLine: 'Thắt chặt sợi tơ hồng trọn kiếp này',
+        theme: 'jade_lotus',
+        badgeLabel: '✨ Nút Thắt Vĩnh Cửu',
+        wish: 'Dù thời gian có trôi qua bao mùa trăng tròn khuyết, nút thắt tơ duyên hôm nay anh trao em sẽ mãi không bao giờ phai nhạt. Cầm tay anh thật chặt để mình viết tiếp câu chuyện của riêng hai ta em nhé! ✨🪷'
+      }
+    };
+
+    /**
+     * ============================================================================
+     * 2. TRẠNG THÁI ỨNG DỤNG & KỊCH BẢN 4 PHA
+     * ============================================================================
+     */
+    const state = {
+      templateId: 'confess_red_thread_destiny',
+      presetKey: 'red_thread_destiny',
+      sender: PRESETS.red_thread_destiny.sender,
+      receiver: PRESETS.red_thread_destiny.receiver,
+      startDate: PRESETS.red_thread_destiny.startDate,
+      confessLine: PRESETS.red_thread_destiny.confessLine,
+      wish: PRESETS.red_thread_destiny.wish,
+      theme: PRESETS.red_thread_destiny.theme,
+      photoDataUrl: null,
+
+      // 0: AWAIT_CONNECT | 1: DANCE_APPROACH (3 nhịp) | 2: INTERTWINE_TYING (~1.6s) | 3: ETERNAL_KNOT_HEART
+      phase: 0,
+      danceBeat: 0,
+      danceBeatProgress: 0,
+      phase2Elapsed: 0,
+      phase2Duration: 1.6,
+      phase3Elapsed: 0,
+      frameRevealed: false,
+      acceptedCelebration: false
+    };
+
+    let targetBrightness = 0.22;
+    let currentBrightness = 0.22;
+
+    function showToast(msg) {
+      const el = document.getElementById('silk-toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function setPhasePill(text) {
+      const pill = document.getElementById('phase-pill');
+      if (pill) pill.textContent = text;
+    }
+
+    function computeLoveDaysText(dateStr) {
+      if (!dateStr) return 'Định Mệnh Hôm Nay';
+      const parsed = new Date(dateStr + 'T00:00:00');
+      if (Number.isNaN(parsed.getTime())) return 'Duyên Trời Định';
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.floor((today - parsed) / 86400000);
+      if (diffDays <= 0) return 'Ngày Đầu Định Duyên';
+      return `${diffDays + 1} Ngày Duyên Phận`;
+    }
+
+    /**
+     * ============================================================================
+     * 3. ÂM THANH WEB AUDIO API (SilkDestinyAudioEngine: Đàn Tranh + Strings + Piano 72 BPM)
+     * ============================================================================
+     */
+    class SilkDestinyAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.noiseBuffer = null;
+        this.musicRunning = false;
+        this.musicTimer = null;
+        this.musicStep = 0;
+        this.musicBus = null;
+        this.musicFilter = null;
+        this.targetCutoff = 900;
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          this.ctx = new AudioCtx();
+
+          const sr = this.ctx.sampleRate;
+          const len = Math.floor(sr * 2.5);
+          this.noiseBuffer = this.ctx.createBuffer(1, len, sr);
+          const data = this.noiseBuffer.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0;
+          for (let i = 0; i < len; i++) {
+            const w = Math.random() * 2 - 1;
+            b0 = 0.997 * b0 + w * 0.029;
+            b1 = 0.985 * b1 + w * 0.032;
+            b2 = 0.950 * b2 + w * 0.048;
+            data[i] = (b0 + b1 + b2 + w * 0.18) * 0.25;
+          }
+
+          this.musicFilter = this.ctx.createBiquadFilter();
+          this.musicFilter.type = 'lowpass';
+          this.musicFilter.frequency.setValueAtTime(this.targetCutoff, this.ctx.currentTime);
+          this.musicFilter.Q.setValueAtTime(0.65, this.ctx.currentTime);
+
+          this.musicBus = this.ctx.createGain();
+          this.musicBus.gain.setValueAtTime(0.75, this.ctx.currentTime);
+          this.musicBus.connect(this.musicFilter);
+          this.musicFilter.connect(this.ctx.destination);
+        }
+
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      setPhaseMood(phase) {
+        if (phase === 0) this.targetCutoff = 850;
+        else if (phase === 1) this.targetCutoff = 1250;
+        else if (phase === 2) this.targetCutoff = 1950;
+        else this.targetCutoff = 2850;
+
+        if (this.ctx && this.musicFilter) {
+          this.musicFilter.frequency.setTargetAtTime(this.targetCutoff, this.ctx.currentTime, 0.5);
+        }
+      }
+
+      // Tiếng Đàn Tranh Ngũ Cung ngân thanh thoát (plucked string harmonics)
+      playGuzhengPluck(freq, delay = 0, duration = 2.1, velocity = 0.075, bypassFilter = false) {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime + delay;
+
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const osc3 = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+        const g2 = this.ctx.createGain();
+        const g3 = this.ctx.createGain();
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq * 1.006, now);
+        osc1.frequency.exponentialRampToValueAtTime(freq, now + 0.045);
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+        g2.gain.setValueAtTime(0.32, now);
+
+        osc3.type = 'sine';
+        osc3.frequency.setValueAtTime(freq * 3, now);
+        g3.gain.setValueAtTime(0.11, now);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(Math.min(4800, freq * 6.5), now);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(480, freq * 1.6), now + duration * 0.75);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(velocity, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc1.connect(filter);
+        osc2.connect(g2);
+        g2.connect(filter);
+        osc3.connect(g3);
+        g3.connect(filter);
+        filter.connect(gain);
+        gain.connect(bypassFilter || !this.musicBus ? this.ctx.destination : this.musicBus);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc3.start(now);
+        osc1.stop(now + duration + 0.05);
+        osc2.stop(now + duration + 0.05);
+        osc3.stop(now + duration + 0.05);
+      }
+
+      // Đàn Tranh lướt dây ngũ cung (Pentatonic Glissando)
+      playPentatonicGlissando() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        // Ngũ cung C-D-E-G-A
+        const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+        notes.forEach((f, idx) => {
+          this.playGuzhengPluck(f, idx * 0.052, 2.3, 0.068, true);
+        });
+      }
+
+      // Piano Arpeggio êm ái 72 BPM
+      playPianoNote(freq, delay = 0, duration = 2.0, velocity = 0.055) {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const over = this.ctx.createOscillator();
+        const overGain = this.ctx.createGain();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        over.type = 'triangle';
+        over.frequency.setValueAtTime(freq * 2, now);
+        overGain.gain.setValueAtTime(0.16, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(velocity, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        over.connect(overGain);
+        overGain.connect(gain);
+        gain.connect(this.musicBus || this.ctx.destination);
+
+        osc.start(now);
+        over.start(now);
+        osc.stop(now + duration + 0.05);
+        over.stop(now + duration + 0.05);
+      }
+
+      // Classical Strings / Cello pad mềm mại
+      playStringsChord(freqs, duration = 3.4) {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const lp = this.ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(760, now);
+
+        const padGain = this.ctx.createGain();
+        padGain.gain.setValueAtTime(0.0001, now);
+        padGain.gain.linearRampToValueAtTime(0.042, now + 0.72);
+        padGain.gain.setValueAtTime(0.042, now + duration - 0.9);
+        padGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        lp.connect(padGain);
+        padGain.connect(this.musicBus || this.ctx.destination);
+
+        freqs.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          osc.type = idx === 0 ? 'sawtooth' : 'triangle';
+          osc.frequency.setValueAtTime(f, now);
+          osc.detune.setValueAtTime((idx % 2 === 0 ? -4 : 4), now);
+          osc.connect(lp);
+          osc.start(now);
+          osc.stop(now + duration + 0.06);
+        });
+      }
+
+      startEnsembleMusic() {
+        this.initContext();
+        if (this.musicRunning) return;
+        this.musicRunning = true;
+        this.musicStep = 0;
+
+        // Vòng hợp âm cổ điển: Cadd9 -> Am7 -> Fmaj7 -> G6
+        const progression = [
+          {
+            pad: [130.81, 196.00, 261.63, 293.66],
+            arp: [261.63, 293.66, 329.63, 392.00, 523.25, 587.33]
+          },
+          {
+            pad: [110.00, 196.00, 220.00, 261.63],
+            arp: [220.00, 261.63, 329.63, 392.00, 440.00, 523.25]
+          },
+          {
+            pad: [174.61, 220.00, 261.63, 329.63],
+            arp: [174.61, 220.00, 261.63, 329.63, 440.00, 523.25]
+          },
+          {
+            pad: [196.00, 246.94, 293.66, 329.63],
+            arp: [196.00, 246.94, 293.66, 329.63, 392.00, 587.33]
+          }
+        ];
+
+        // 72 BPM -> 1 nhịp 8th-note = 60000 / 72 / 2 ≈ 417ms
+        const stepMs = 417;
+
+        const tick = () => {
+          if (!this.musicRunning) return;
+          const bar = Math.floor(this.musicStep / 8) % progression.length;
+          const beat = this.musicStep % 8;
+          const cur = progression[bar];
+
+          if (!this.muted && this.ctx) {
+            if (beat === 0) {
+              this.playStringsChord(cur.pad, 3.4);
+              this.playPianoNote(cur.arp[0] * 0.5, 0, 2.8, 0.068);
+            }
+            const note = cur.arp[beat % cur.arp.length];
+            this.playPianoNote(note, 0, 1.85, 0.048);
+
+            // Điểm xuyết Đàn Tranh ngũ cung ở phách 2 và phách 6
+            if (beat === 2 || beat === 6) {
+              const gzNote = cur.arp[3 + (beat % 3)];
+              this.playGuzhengPluck(gzNote, 0.03, 1.9, 0.042);
+            }
+          }
+
+          this.musicStep++;
+          this.musicTimer = setTimeout(tick, stepMs);
+        };
+        tick();
+      }
+
+      playSilkWhoosh() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.noiseBuffer) return;
+        const now = this.ctx.currentTime;
+
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noiseBuffer;
+
+        const bp = this.ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.setValueAtTime(280, now);
+        bp.frequency.exponentialRampToValueAtTime(1650, now + 0.55);
+        bp.frequency.exponentialRampToValueAtTime(520, now + 1.35);
+        bp.Q.setValueAtTime(1.8, now);
+
+        const g = this.ctx.createGain();
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.24, now + 0.42);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 1.45);
+
+        src.connect(bp);
+        bp.connect(g);
+        g.connect(this.ctx.destination);
+        src.start(now);
+        src.stop(now + 1.5);
+      }
+
+      playJadeChime() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        // Trống trầm cộng hưởng nhẹ
+        const sub = this.ctx.createOscillator();
+        const subG = this.ctx.createGain();
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(140, now);
+        sub.frequency.exponentialRampToValueAtTime(48, now + 0.9);
+        subG.gain.setValueAtTime(0.28, now);
+        subG.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
+        sub.connect(subG);
+        subG.connect(this.ctx.destination);
+        sub.start(now);
+        sub.stop(now + 1.0);
+
+        // Chuông ngọc thanh khiết ngân vang
+        const bells = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+        bells.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + idx * 0.05);
+          g.gain.setValueAtTime(0.0001, now + idx * 0.05);
+          g.gain.linearRampToValueAtTime(0.075, now + idx * 0.05 + 0.015);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.05 + 2.4);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(now + idx * 0.05);
+          osc.stop(now + idx * 0.05 + 2.45);
+        });
+      }
+
+      playTapSparkle(stepIndex = 0) {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+        const f = scale[stepIndex % scale.length];
+        this.playGuzhengPluck(f, 0, 1.5, 0.075, true);
+        this.playGuzhengPluck(f * 1.5, 0.04, 1.2, 0.036, true);
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.ctx && this.musicBus) {
+          this.musicBus.gain.setTargetAtTime(this.muted ? 0.0001 : 0.75, this.ctx.currentTime, 0.12);
+        }
+        return this.muted;
+      }
+    }
+
+    const audio = new SilkDestinyAudioEngine();
+
+    /**
+     * ============================================================================
+     * 4. TEXTURE THỦ CÔNG (SOFT GLOW, MẶT TRĂNG 1024x512, BẢNG TÊN 1200x340, ẢNH)
+     * ============================================================================
+     */
+    function createSoftGlowTexture() {
+      const s = 64;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.28, 'rgba(255, 245, 225, 0.92)');
+      g.addColorStop(0.62, 'rgba(244, 63, 94, 0.34)');
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+    const softGlowTex = createSoftGlowTexture();
+
+    // Mặt Trăng equirectangular 1024x512 (tỷ lệ 2:1 chuẩn không tam giác đen)
+    function createMoonTexture() {
+      const w = 1024;
+      const h = 512;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+
+      const bg = ctx.createLinearGradient(0, 0, 0, h);
+      bg.addColorStop(0, '#ede9fe');
+      bg.addColorStop(0.5, '#fffbeb');
+      bg.addColorStop(1, '#e2e8f0');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const maria = [
+        [230, 215, 92, 54, 0.13],
+        [435, 175, 118, 66, 0.12],
+        [635, 240, 130, 74, 0.14],
+        [790, 200, 94, 56, 0.12],
+        [340, 320, 78, 48, 0.12],
+        [545, 350, 98, 52, 0.10]
+      ];
+      maria.forEach(([mx, my, rx, ry, alpha]) => {
+        const g = ctx.createRadialGradient(mx, my, 4, mx, my, rx);
+        g.addColorStop(0, `rgba(148, 163, 184, ${alpha})`);
+        g.addColorStop(0.65, `rgba(148, 163, 184, ${alpha * 0.45})`);
+        g.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(mx, my, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      for (let i = 0; i < 40; i++) {
+        const cx = 60 + Math.random() * (w - 120);
+        const cy = 60 + Math.random() * (h - 120);
+        const cr = 8 + Math.random() * 24;
+        const cg = ctx.createRadialGradient(cx - cr * 0.2, cy - cr * 0.2, 1, cx, cy, cr);
+        cg.addColorStop(0, 'rgba(255, 255, 255, 0.28)');
+        cg.addColorStop(0.75, 'rgba(148, 163, 184, 0.15)');
+        cg.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        ctx.fillStyle = cg;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Label Sprite 256x80 cho 2 quả cầu dẫn đường
+    function createOrbLabelTexture(labelText, accentHex) {
+      const w = 256;
+      const h = 80;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(10, 6, 20, 0.72)';
+      ctx.strokeStyle = accentHex;
+      ctx.lineWidth = 3;
+      const r = 24;
+      ctx.beginPath();
+      ctx.moveTo(14 + r, 14);
+      ctx.lineTo(w - 14 - r, 14);
+      ctx.quadraticCurveTo(w - 14, 14, w - 14, 14 + r);
+      ctx.lineTo(w - 14, h - 14 - r);
+      ctx.quadraticCurveTo(w - 14, h - 14, w - 14 - r, h - 14);
+      ctx.lineTo(14 + r, h - 14);
+      ctx.quadraticCurveTo(14, h - 14, 14, h - 14 - r);
+      ctx.lineTo(14, 14 + r);
+      ctx.quadraticCurveTo(14, 14, 14 + r, 14);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      let fontSize = 26;
+      const clean = (labelText || '').trim() || 'Người Thương';
+      while (fontSize > 14) {
+        ctx.font = `700 ${fontSize}px "Plus Jakarta Sans", sans-serif`;
+        if (ctx.measureText(clean).width <= w - 44) break;
+        fontSize -= 1;
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(clean, w / 2, h / 2);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Bảng Tên Đôi Lứa & Câu Tỏ Tình 3D (1200x340, padding trên/dưới >= 44px giữ 100% dấu tiếng Việt)
+    function createCouplePlaqueTexture() {
+      const w = 1200;
+      const h = 340;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.crimson_azure;
+
+      // Nền sơn mài Á Đông sang trọng
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, 'rgba(12, 16, 42, 0.92)');
+      bg.addColorStop(0.5, 'rgba(26, 8, 28, 0.94)');
+      bg.addColorStop(1, 'rgba(38, 8, 22, 0.92)');
+      ctx.fillStyle = bg;
+
+      const pad = 12;
+      const rad = 34;
+      ctx.beginPath();
+      ctx.moveTo(pad + rad, pad);
+      ctx.lineTo(w - pad - rad, pad);
+      ctx.quadraticCurveTo(w - pad, pad, w - pad, pad + rad);
+      ctx.lineTo(w - pad, h - pad - rad);
+      ctx.quadraticCurveTo(w - pad, h - pad, w - pad - rad, h - pad);
+      ctx.lineTo(pad + rad, h - pad);
+      ctx.quadraticCurveTo(pad, h - pad, pad, h - pad - rad);
+      ctx.lineTo(pad, pad + rad);
+      ctx.quadraticCurveTo(pad, pad, pad + rad, pad);
+      ctx.closePath();
+      ctx.fill();
+
+      // Viền ánh kim + hai sắc Xanh/Đỏ
+      const borderGrad = ctx.createLinearGradient(0, 0, w, 0);
+      borderGrad.addColorStop(0, t.azureHex);
+      borderGrad.addColorStop(0.5, t.goldHex);
+      borderGrad.addColorStop(1, t.crimsonHex);
+      ctx.strokeStyle = borderGrad;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(26, 26, w - 52, h - 52);
+
+      const fitFont = (text, family, weight, startSize, minSize, maxW) => {
+        let size = startSize;
+        while (size > minSize) {
+          ctx.font = `${weight} ${size}px ${family}`;
+          if (ctx.measureText(text).width <= maxW) break;
+          size -= 2;
+        }
+        return `${weight} ${size}px ${family}`;
+      };
+
+      const maxTextW = w - 120;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Dòng 1: y = 78 (>= 44px top padding cho dấu mũ tiếng Việt)
+      const daysLabel = computeLoveDaysText(state.startDate);
+      const line1 = `🪢 Sợi Tơ Duyên Đã Thắt Chặt • ${daysLabel}`;
+      ctx.font = fitFont(line1, '"Plus Jakarta Sans", sans-serif', '700', 30, 20, maxTextW);
+      ctx.fillStyle = t.goldHex;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+      ctx.shadowBlur = 10;
+      ctx.fillText(line1, w / 2, 78);
+
+      // Dòng 2: Tên đôi lứa (y = 166)
+      const line2 = `${state.sender} ❤️ ${state.receiver}`;
+      ctx.font = fitFont(line2, '"Playfair Display", serif', '800', 58, 30, maxTextW);
+      const nameGrad = ctx.createLinearGradient(w * 0.2, 0, w * 0.8, 0);
+      nameGrad.addColorStop(0, '#e0f2fe');
+      nameGrad.addColorStop(0.5, '#ffffff');
+      nameGrad.addColorStop(1, '#ffe4e6');
+      ctx.fillStyle = nameGrad;
+      ctx.fillText(line2, w / 2, 166);
+
+      // Dòng 3: Câu tỏ tình (y = 254 -> bottom padding 86px >= 44px cho nét dưới g, y, p, q)
+      const line3 = `“${state.confessLine}”`;
+      ctx.font = fitFont(line3, '"Playfair Display", serif', 'italic 700', 36, 20, maxTextW);
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillText(line3, w / 2, 254);
+      ctx.shadowBlur = 0;
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Tranh Á Đông mặc định (4 biến thể theo theme) hoặc ảnh upload crop vuông
+    function buildMemoryPhotoCanvas(photoImg) {
+      const s = 768;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.crimson_azure;
+
+      if (photoImg) {
+        const ratio = photoImg.width / Math.max(1, photoImg.height);
+        let sw = photoImg.width, sh = photoImg.height, sx = 0, sy = 0;
+        if (ratio > 1) {
+          sw = photoImg.height;
+          sx = (photoImg.width - sw) / 2;
+        } else {
+          sh = photoImg.width;
+          sy = (photoImg.height - sh) / 2;
+        }
+        ctx.drawImage(photoImg, sx, sy, sw, sh, 0, 0, s, s);
+
+        const vig = ctx.createRadialGradient(s / 2, s / 2, s * 0.32, s / 2, s / 2, s * 0.56);
+        vig.addColorStop(0, 'rgba(0,0,0,0)');
+        vig.addColorStop(1, 'rgba(10, 4, 16, 0.35)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, s, s);
+      } else {
+        // Nền tranh Á Đông theo theme
+        const bg = ctx.createRadialGradient(s / 2, s * 0.35, 36, s / 2, s / 2, s * 0.65);
+        bg.addColorStop(0, '#fef9c3');
+        bg.addColorStop(0.24, t.crimsonDeep);
+        bg.addColorStop(0.65, t.lakeShallow);
+        bg.addColorStop(1, '#040510');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, s, s);
+
+        // Vầng trăng tròn phía sau
+        ctx.fillStyle = 'rgba(255, 251, 235, 0.92)';
+        ctx.shadowColor = t.goldHex;
+        ctx.shadowBlur = 42;
+        ctx.beginPath();
+        ctx.arc(s / 2, s * 0.34, 118, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Hai dải lụa Xanh & Đỏ đan xen tạo nút thắt Á Đông
+        ctx.lineWidth = 16;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = t.azureHex;
+        ctx.beginPath();
+        ctx.moveTo(90, s * 0.54);
+        ctx.bezierCurveTo(s * 0.35, s * 0.16, s * 0.62, s * 0.54, s / 2, s * 0.36);
+        ctx.stroke();
+
+        ctx.strokeStyle = t.crimsonHex;
+        ctx.beginPath();
+        ctx.moveTo(s - 90, s * 0.54);
+        ctx.bezierCurveTo(s * 0.65, s * 0.16, s * 0.38, s * 0.54, s / 2, s * 0.36);
+        ctx.stroke();
+
+        // Họa tiết biến thể riêng cho từng theme
+        if (state.theme === 'lantern_gold') {
+          [[175, 190, 22], [600, 210, 20], [230, 120, 14], [550, 130, 16]].forEach(([lx, ly, lr]) => {
+            ctx.fillStyle = '#fb923c';
+            ctx.beginPath();
+            ctx.ellipse(lx, ly, lr, lr * 1.25, 0, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (state.theme === 'jade_lotus') {
+          ctx.fillStyle = 'rgba(45, 212, 191, 0.25)';
+          ctx.beginPath();
+          ctx.ellipse(s / 2, s * 0.58, 240, 32, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (state.theme === 'violet_silk') {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+          [[160, 160], [610, 150], [210, 270], [560, 260]].forEach(([sx, sy]) => {
+            ctx.beginPath();
+            ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '106px sans-serif';
+        ctx.fillText('🪢', s / 2, s * 0.36);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(4, 2, 12, 0.92)';
+        ctx.shadowBlur = 14;
+        ctx.font = '800 38px "Playfair Display", serif';
+        ctx.fillText(`${state.sender}  ❤️  ${state.receiver}`, s / 2, s * 0.69, s - 92);
+
+        ctx.fillStyle = t.goldHex;
+        ctx.font = 'italic 700 27px "Playfair Display", serif';
+        ctx.fillText(`“${state.confessLine}”`, s / 2, s * 0.80, s - 98);
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.88)';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(14, 14, s - 28, s - 28);
+      return cvs;
+    }
+
+    /**
+     * ============================================================================
+     * 5. LỚP 1 (#webgl-canvas): BỐI CẢNH Á ĐÔNG 3D, RIBBONS, NÚT THẮT & 4.500 HẠT
+     * ============================================================================
+     */
+    const webglCanvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas: webglCanvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / Math.max(1, window.innerHeight), 0.1, 1000);
+
+    // Hệ thống ánh sáng 4 nguồn
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.62);
+    scene.add(ambientLight);
+
+    const knotWarmLight = new THREE.PointLight(0xfde047, 1.15, 42);
+    knotWarmLight.position.set(0, 2.2, 2.5);
+    scene.add(knotWarmLight);
+
+    const azureRimLight = new THREE.PointLight(0x38bdf8, 1.05, 50);
+    azureRimLight.position.set(-10, 5.5, -6);
+    scene.add(azureRimLight);
+
+    const crimsonRimLight = new THREE.PointLight(0xf43f5e, 1.05, 50);
+    crimsonRimLight.position.set(10, 5.5, -6);
+    scene.add(crimsonRimLight);
+
+    // 5.1. starPoints (850 sao ShaderMaterial)
+    const STAR_COUNT = 850;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(STAR_COUNT * 3);
+    const starPhase = new Float32Array(STAR_COUNT);
+    const starSpeed = new Float32Array(STAR_COUNT);
+    const starSize = new Float32Array(STAR_COUNT);
+    const starColor = new Float32Array(STAR_COUNT * 3);
+    const starPalette = [
+      new THREE.Color('#ffffff'),
+      new THREE.Color('#fef08a'),
+      new THREE.Color('#bae6fd'),
+      new THREE.Color('#fecdd3')
+    ];
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 96;
+      starPos[i * 3 + 1] = -2 + Math.random() * 52;
+      starPos[i * 3 + 2] = -40 + (Math.random() - 0.5) * 24;
+      starPhase[i] = Math.random() * Math.PI * 2;
+      starSpeed[i] = 1.0 + Math.random() * 2.4;
+      starSize[i] = 0.8 + Math.random() * 1.8;
+      const sc = starPalette[i % starPalette.length];
+      starColor[i * 3] = sc.r;
+      starColor[i * 3 + 1] = sc.g;
+      starColor[i * 3 + 2] = sc.b;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    starGeo.setAttribute('aPhase', new THREE.BufferAttribute(starPhase, 1));
+    starGeo.setAttribute('aSpeed', new THREE.BufferAttribute(starSpeed, 1));
+    starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSize, 1));
+    starGeo.setAttribute('aColor', new THREE.BufferAttribute(starColor, 3));
+
+    const starUniforms = {
+      uTime: { value: 0 },
+      uPixelRatio: { value: dpr },
+      uBoost: { value: 0.65 }
+    };
+    const starMat = new THREE.ShaderMaterial({
+      uniforms: starUniforms,
+      vertexShader: `
+        attribute float aPhase;
+        attribute float aSpeed;
+        attribute float aSize;
+        attribute vec3 aColor;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vColor = aColor;
+          float tw = 0.45 + 0.55 * sin(uTime * aSpeed + aPhase);
+          vAlpha = tw;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (0.85 + 0.35 * tw) * uPixelRatio * (18.0 / max(1.0, -mvPos.z));
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform float uBoost;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          float core = 1.0 - smoothstep(0.05, 0.5, d);
+          gl_FragColor = vec4(vColor, core * vAlpha * uBoost);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const starPoints = new THREE.Points(starGeo, starMat);
+    scene.add(starPoints);
+
+    // 5.2. moonGroup (z = -24, equirectangular 1024x512 + moonHaloSprite ở z = -0.25)
+    const moonGroup = new THREE.Group();
+    scene.add(moonGroup);
+
+    const moonMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(2.15, 36, 36),
+      new THREE.MeshBasicMaterial({
+        map: createMoonTexture(),
+        color: 0xfffbeb,
+        toneMapped: false
+      })
+    );
+    moonGroup.add(moonMesh);
+
+    const moonHaloMat = new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xfef08a,
+      transparent: true,
+      opacity: 0.48,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const moonHaloSprite = new THREE.Sprite(moonHaloMat);
+    moonHaloSprite.scale.set(9.2, 9.2, 1);
+    moonHaloSprite.position.set(0, 0, -0.25);
+    moonGroup.add(moonHaloSprite);
+
+    // 5.3. moonLakeGroup (y = -4.6) + PlaneGeometry(92, 64, 72, 48) + 3 waterRippleRings
+    const LAKE_Y = -4.6;
+    const moonLakeGroup = new THREE.Group();
+    moonLakeGroup.position.set(0, LAKE_Y, 0);
+    scene.add(moonLakeGroup);
+
+    const lakeUniforms = {
+      uTime: { value: 0 },
+      uMoonPos: { value: new THREE.Vector3(12, 11, -24) },
+      uDeepColor: { value: new THREE.Color(THEMES.crimson_azure.lakeDeep) },
+      uShallowColor: { value: new THREE.Color(THEMES.crimson_azure.lakeShallow) },
+      uAzureColor: { value: new THREE.Color(THEMES.crimson_azure.azureHex) },
+      uCrimsonColor: { value: new THREE.Color(THEMES.crimson_azure.crimsonHex) },
+      uGoldColor: { value: new THREE.Color(THEMES.crimson_azure.goldHex) },
+      uLuminance: { value: 0.28 },
+      uBurstRipple: { value: 0.0 }
+    };
+
+    const lakeGeo = new THREE.PlaneGeometry(92, 64, 72, 48);
+    const lakeMat = new THREE.ShaderMaterial({
+      uniforms: lakeUniforms,
+      vertexShader: `
+        uniform float uTime;
+        varying vec3 vWorldPos;
+        varying vec3 vNormalW;
+        varying float vWaveH;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          float w1 = sin(wp.x * 0.34 + wp.z * 0.24 + uTime * 1.1) * 0.07;
+          float w2 = cos(wp.x * -0.28 + wp.z * 0.42 - uTime * 0.95) * 0.05;
+          float h = w1 + w2;
+          wp.y += h;
+          float dx = cos(wp.x * 0.34 + wp.z * 0.24 + uTime * 1.1) * 0.024 + sin(wp.x * -0.28 + wp.z * 0.42 - uTime * 0.95) * 0.014;
+          float dz = cos(wp.x * 0.34 + wp.z * 0.24 + uTime * 1.1) * 0.017 - sin(wp.x * -0.28 + wp.z * 0.42 - uTime * 0.95) * 0.021;
+          vNormalW = normalize(vec3(-dx, 1.0, -dz));
+          vWorldPos = wp.xyz;
+          vWaveH = h;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uMoonPos;
+        uniform vec3 uDeepColor;
+        uniform vec3 uShallowColor;
+        uniform vec3 uAzureColor;
+        uniform vec3 uCrimsonColor;
+        uniform vec3 uGoldColor;
+        uniform float uLuminance;
+        uniform float uBurstRipple;
+        varying vec3 vWorldPos;
+        varying vec3 vNormalW;
+        varying float vWaveH;
+
+        void main() {
+          vec3 V = normalize(cameraPosition - vWorldPos);
+          vec3 N = normalize(vNormalW);
+
+          float microX = sin(vWorldPos.x * 2.5 + vWorldPos.z * 1.6 + uTime * 2.4) * 0.06;
+          float microZ = cos(vWorldPos.x * 2.1 - vWorldPos.z * 2.9 - uTime * 2.0) * 0.06;
+          vec3 Nglit = normalize(N + vec3(microX, 0.0, microZ));
+
+          float crest = smoothstep(-0.12, 0.14, vWaveH);
+          vec3 col = mix(uDeepColor, uShallowColor, crest);
+
+          // Phản chiếu ánh trăng trên mặt hồ
+          vec3 Lmoon = normalize(vec3(uMoonPos.x, max(6.0, uMoonPos.y), uMoonPos.z) - vWorldPos);
+          vec3 Hmoon = normalize(Lmoon + V);
+          float moonBroad = pow(max(dot(N, Hmoon), 0.0), 26.0);
+          float moonGlitter = pow(max(dot(Nglit, Hmoon), 0.0), 140.0);
+          col += uGoldColor * (moonBroad * 0.28 + moonGlitter * 0.85);
+
+          // Phản chiếu ánh Xanh Dương bên trái & Đỏ Thắm bên phải
+          float leftGlow = 1.0 - smoothstep(-1.5, 11.0, vWorldPos.x);
+          float rightGlow = smoothstep(-1.5, 11.0, vWorldPos.x);
+          float centerProximity = exp(-length(vWorldPos.xz - vec2(0.0, 0.0)) * 0.09);
+          float rippleWave = 0.5 + 0.5 * sin(length(vWorldPos.xz) * 2.4 - uTime * 3.6);
+
+          col += uAzureColor * leftGlow * centerProximity * (0.24 + uLuminance * 0.34);
+          col += uCrimsonColor * rightGlow * centerProximity * (0.24 + uLuminance * 0.34);
+          col += uGoldColor * centerProximity * uBurstRipple * rippleWave * 0.42;
+
+          // Bo mờ viền chân trời & 2 bên
+          float horizonFade = smoothstep(-39.0, -18.0, vWorldPos.z);
+          float nearFade = 1.0 - smoothstep(12.0, 20.0, vWorldPos.z);
+          float sideFade = 1.0 - smoothstep(26.0, 44.0, abs(vWorldPos.x));
+          float alpha = horizonFade * nearFade * sideFade * 0.94;
+
+          gl_FragColor = vec4(col, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false
+    });
+    const lakeMesh = new THREE.Mesh(lakeGeo, lakeMat);
+    lakeMesh.rotation.x = -Math.PI / 2;
+    lakeMesh.position.set(0, 0, -10);
+    moonLakeGroup.add(lakeMesh);
+
+    // 3 waterRippleRings tại (0, -4.55, 0) (y = 0.05 trong moonLakeGroup)
+    const waterRippleRings = [];
+    for (let i = 0; i < 3; i++) {
+      const rMat = new THREE.MeshBasicMaterial({
+        color: i === 0 ? 0xfde047 : (i === 1 ? 0x38bdf8 : 0xf43f5e),
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const rMesh = new THREE.Mesh(new THREE.RingGeometry(0.85, 0.96, 64), rMat);
+      rMesh.rotation.x = -Math.PI / 2;
+      rMesh.position.set(0, 0.05, 0);
+      rMesh.userData = { phaseOffset: i * 0.333 };
+      moonLakeGroup.add(rMesh);
+      waterRippleRings.push(rMesh);
+    }
+
+    // 5.4. Hậu cảnh: 36 đèn trời (z ∈ [-30, -12]) & 140 đom đóm ánh kim (fireflyPoints)
+    const LANTERN_COUNT = 36;
+    const skyLanterns = [];
+    const lanternGroup = new THREE.Group();
+    scene.add(lanternGroup);
+
+    const lanternBodyGeo = new THREE.CylinderGeometry(0.18, 0.12, 0.36, 10, 1, false);
+    const lanternBodyMat = new THREE.MeshBasicMaterial({
+      color: 0xfb923c,
+      transparent: true,
+      opacity: 0.85,
+      toneMapped: false
+    });
+
+    for (let i = 0; i < LANTERN_COUNT; i++) {
+      const lWrap = new THREE.Group();
+      const body = new THREE.Mesh(lanternBodyGeo, lanternBodyMat);
+      lWrap.add(body);
+
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: softGlowTex,
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.42,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      }));
+      halo.scale.set(1.15, 1.15, 1);
+      lWrap.add(halo);
+
+      const lx = (Math.random() - 0.5) * 44;
+      const ly = -3.6 + Math.random() * 17;
+      const lz = -30 + Math.random() * 18;
+      lWrap.position.set(lx, ly, lz);
+      const sc = 0.72 + Math.random() * 0.65;
+      lWrap.scale.setScalar(sc);
+      lWrap.userData = {
+        baseX: lx,
+        speedY: 0.22 + Math.random() * 0.35,
+        swayAmp: 0.25 + Math.random() * 0.45,
+        swayFreq: 0.4 + Math.random() * 0.7,
+        phase: Math.random() * Math.PI * 2
+      };
+      lanternGroup.add(lWrap);
+      skyLanterns.push(lWrap);
+    }
+
+    // 140 đom đóm ánh kim (fireflyPoints)
+    const FIREFLY_COUNT = 140;
+    const fireflyGeo = new THREE.BufferGeometry();
+    const fireflyPos = new Float32Array(FIREFLY_COUNT * 3);
+    const fireflySeeds = [];
+    for (let i = 0; i < FIREFLY_COUNT; i++) {
+      const fx = (Math.random() - 0.5) * 28;
+      const fy = -4.2 + Math.random() * 10.5;
+      const fz = -16 + Math.random() * 20;
+      fireflyPos[i * 3] = fx;
+      fireflyPos[i * 3 + 1] = fy;
+      fireflyPos[i * 3 + 2] = fz;
+      fireflySeeds.push({
+        bx: fx,
+        by: fy,
+        bz: fz,
+        phase: Math.random() * Math.PI * 2,
+        sx: 0.4 + Math.random() * 0.7,
+        sy: 0.5 + Math.random() * 0.8
+      });
+    }
+    fireflyGeo.setAttribute('position', new THREE.BufferAttribute(fireflyPos, 3));
+    const fireflyMat = new THREE.PointsMaterial({
+      map: softGlowTex,
+      color: 0xfde047,
+      size: 0.28,
+      transparent: true,
+      opacity: 0.82,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    });
+    const fireflyPoints = new THREE.Points(fireflyGeo, fireflyMat);
+    scene.add(fireflyPoints);
+
+    // 5.5. Vòng mời chạm ở tâm (Pha 0: inviteRingGroup)
+    const inviteRingGroup = new THREE.Group();
+    scene.add(inviteRingGroup);
+
+    const inviteOuterRing = new THREE.Mesh(
+      new THREE.TorusGeometry(1.15, 0.028, 12, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.72,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    inviteRingGroup.add(inviteOuterRing);
+
+    const inviteInnerRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.76, 0.022, 12, 48),
+      new THREE.MeshBasicMaterial({
+        color: 0xf43f5e,
+        transparent: true,
+        opacity: 0.68,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    inviteRingGroup.add(inviteInnerRing);
+
+    const inviteGlowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xfde047,
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    inviteGlowSprite.scale.set(3.2, 3.2, 1);
+    inviteRingGroup.add(inviteGlowSprite);
+
+    // 5.6. Hai dải sáng Xanh Dương & Đỏ Thắm (blueRibbonGroup & redRibbonGroup)
+    const RIBBON_SEGMENTS = 48;
+
+    function createSilkRibbonSystem(colorHex, labelName, isLeftDefault) {
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // Ribbon Strip động 48 x 2
+      const vertCount = RIBBON_SEGMENTS * 2;
+      const positions = new Float32Array(vertCount * 3);
+      const uvs = new Float32Array(vertCount * 2);
+      const indices = [];
+
+      for (let i = 0; i < RIBBON_SEGMENTS; i++) {
+        const u = i / (RIBBON_SEGMENTS - 1);
+        uvs[i * 4] = u;
+        uvs[i * 4 + 1] = 0;
+        uvs[i * 4 + 2] = u;
+        uvs[i * 4 + 3] = 1;
+        if (i < RIBBON_SEGMENTS - 1) {
+          const a = i * 2;
+          const b = a + 1;
+          const c = a + 2;
+          const d = a + 3;
+          indices.push(a, b, c, b, d, c);
+        }
+      }
+
+      const stripGeo = new THREE.BufferGeometry();
+      stripGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      stripGeo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      stripGeo.setIndex(indices);
+
+      const stripUniforms = {
+        uColor: { value: new THREE.Color(colorHex) },
+        uGold: { value: new THREE.Color(0xfde047) },
+        uOpacity: { value: 0.92 },
+        uTime: { value: 0 }
+      };
+
+      const stripMat = new THREE.ShaderMaterial({
+        uniforms: stripUniforms,
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uColor;
+          uniform vec3 uGold;
+          uniform float uOpacity;
+          uniform float uTime;
+          varying vec2 vUv;
+          void main() {
+            float edgeDist = abs(vUv.y - 0.5) * 2.0;
+            float core = 1.0 - smoothstep(0.0, 0.85, edgeDist);
+            float tailFade = 1.0 - smoothstep(0.15, 1.0, vUv.x);
+            float shimmer = 0.85 + 0.15 * sin(vUv.x * 18.0 - uTime * 8.0);
+            vec3 col = mix(uColor, vec3(1.0, 0.98, 0.92), pow(core, 2.2) * 0.72);
+            col += uGold * (1.0 - smoothstep(0.0, 0.25, vUv.x)) * 0.35;
+            float alpha = core * tailFade * shimmer * uOpacity;
+            gl_FragColor = vec4(col, alpha);
+          }
+        `,
+        transparent: true,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      const stripMesh = new THREE.Mesh(stripGeo, stripMat);
+      stripMesh.frustumCulled = false;
+      group.add(stripMesh);
+
+      // Orb dẫn đường (IcosahedronGeometry + vòng nhẫn + hào quang Sprite)
+      const orbGroup = new THREE.Group();
+      group.add(orbGroup);
+
+      const orbCoreMat = new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: colorHex,
+        emissiveIntensity: 1.1,
+        roughness: 0.15,
+        metalness: 0.3
+      });
+      const orbMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.24, 1), orbCoreMat);
+      orbGroup.add(orbMesh);
+
+      const orbRingMat = new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.82,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const orbRing = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.025, 10, 32), orbRingMat);
+      orbRing.rotation.x = Math.PI * 0.35;
+      orbGroup.add(orbRing);
+
+      const orbHaloMat = new THREE.SpriteMaterial({
+        map: softGlowTex,
+        color: colorHex,
+        transparent: true,
+        opacity: 0.88,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const orbHalo = new THREE.Sprite(orbHaloMat);
+      orbHalo.scale.set(2.4, 2.4, 1);
+      orbGroup.add(orbHalo);
+
+      // Label Sprite 256x80
+      const labelMat = new THREE.SpriteMaterial({
+        map: createOrbLabelTexture(labelName, colorHex),
+        transparent: true,
+        opacity: 0.95,
+        toneMapped: false,
+        depthWrite: false
+      });
+      const labelSprite = new THREE.Sprite(labelMat);
+      labelSprite.scale.set(2.55, 0.80, 1);
+      group.add(labelSprite);
+
+      // Khởi tạo 48 điểm lịch sử quỹ đạo
+      const startX = isLeftDefault ? -5.5 : 5.5;
+      const trail = [];
+      for (let i = 0; i < RIBBON_SEGMENTS; i++) {
+        trail.push(new THREE.Vector3(startX, 2.2, 0));
+      }
+
+      return {
+        group,
+        stripGeo,
+        stripMat,
+        stripUniforms,
+        orbGroup,
+        orbMesh,
+        orbCoreMat,
+        orbRing,
+        orbHalo,
+        orbHaloMat,
+        labelSprite,
+        labelMat,
+        trail,
+        headPos: new THREE.Vector3(startX, 2.2, 0)
+      };
+    }
+
+    const blueRibbon = createSilkRibbonSystem(THEMES.crimson_azure.azureHex, state.sender, true);
+    const redRibbon = createSilkRibbonSystem(THEMES.crimson_azure.crimsonHex, state.receiver, false);
+
+    function updateRibbonGeometry(ribbon, dt, elapsed) {
+      // Dịch lịch sử điểm mượt theo frame
+      for (let i = RIBBON_SEGMENTS - 1; i > 0; i--) {
+        ribbon.trail[i].lerp(ribbon.trail[i - 1], Math.min(1, dt * 26));
+      }
+      ribbon.trail[0].copy(ribbon.headPos);
+
+      const posAttr = ribbon.stripGeo.attributes.position;
+      const arr = posAttr.array;
+      const camDir = new THREE.Vector3();
+      const tangent = new THREE.Vector3();
+      const sideVec = new THREE.Vector3();
+
+      for (let i = 0; i < RIBBON_SEGMENTS; i++) {
+        const p = ribbon.trail[i];
+        const pNext = ribbon.trail[Math.min(RIBBON_SEGMENTS - 1, i + 1)];
+        const pPrev = ribbon.trail[Math.max(0, i - 1)];
+        tangent.subVectors(pPrev, pNext);
+        if (tangent.lengthSq() < 0.00001) tangent.set(0, 1, 0);
+        tangent.normalize();
+
+        camDir.subVectors(camera.position, p).normalize();
+        sideVec.crossVectors(tangent, camDir).normalize();
+
+        const u = i / (RIBBON_SEGMENTS - 1);
+        const halfWidth = (0.34 * (1 - u * 0.88)) * (0.85 + 0.15 * Math.sin(u * 10 - elapsed * 5));
+
+        const idxA = i * 6;
+        const idxB = idxA + 3;
+        arr[idxA] = p.x + sideVec.x * halfWidth;
+        arr[idxA + 1] = p.y + sideVec.y * halfWidth;
+        arr[idxA + 2] = p.z + sideVec.z * halfWidth;
+
+        arr[idxB] = p.x - sideVec.x * halfWidth;
+        arr[idxB + 1] = p.y - sideVec.y * halfWidth;
+        arr[idxB + 2] = p.z - sideVec.z * halfWidth;
+      }
+      posAttr.needsUpdate = true;
+
+      ribbon.orbGroup.position.copy(ribbon.headPos);
+      ribbon.orbMesh.rotation.y += dt * 2.2;
+      ribbon.orbMesh.rotation.x += dt * 1.4;
+      ribbon.orbRing.rotation.z += dt * 2.6;
+      ribbon.labelSprite.position.set(ribbon.headPos.x, ribbon.headPos.y + 0.78, ribbon.headPos.z);
+    }
+
+    // 5.7. 4.500 hạt destinyParticles (0..2249 Xanh, 2250..4499 Đỏ, Morph Trái Tim 3D)
+    const PARTICLE_COUNT = 4500;
+    const destinyGeo = new THREE.BufferGeometry();
+    const dPos = new Float32Array(PARTICLE_COUNT * 3);
+    const dTarget = new Float32Array(PARTICLE_COUNT * 3);
+    const dSide = new Float32Array(PARTICLE_COUNT);
+    const dStream = new Float32Array(PARTICLE_COUNT);
+    const dPhase = new Float32Array(PARTICLE_COUNT);
+    const dSize = new Float32Array(PARTICLE_COUNT);
+
+    let heartCenterY = 2.2;
+
+    function buildHeartTargets(centerY, mobileMode) {
+      const scale = mobileMode ? 0.152 : 0.175;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const isRed = i >= 2250;
+        const localIdx = isRed ? (i - 2250) : i;
+        const frac = localIdx / 2250;
+
+        // Nửa trái Xanh (t ∈ [π, 2π]), nửa phải Đỏ (t ∈ [0, π])
+        const t = isRed ? (frac * Math.PI) : (Math.PI + frac * Math.PI);
+        const hx = 16 * Math.pow(Math.sin(t), 3);
+        const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+
+        const isStream = (i % 4 === 0);
+        dStream[i] = isStream ? 1.0 : 0.0;
+
+        let px, py, pz;
+        if (!isStream) {
+          // 75% vỏ & viền trái tim 3D có độ dày mịn
+          const shellJitter = 0.88 + Math.random() * 0.22;
+          px = hx * scale * shellJitter + (Math.random() - 0.5) * 0.16;
+          py = centerY + hy * scale * shellJitter + (Math.random() - 0.5) * 0.16;
+          pz = (Math.random() - 0.5) * 0.72 * (1 - Math.abs(frac - 0.5) * 0.7);
+        } else {
+          // 25% luồng hội tụ từ đường viền trái tim vào tâm Nút Thắt
+          const pull = 0.12 + Math.random() * 0.78;
+          px = hx * scale * pull + (Math.random() - 0.5) * 0.18;
+          py = centerY + hy * scale * pull + (Math.random() - 0.5) * 0.18;
+          pz = (Math.random() - 0.5) * 0.52;
+        }
+
+        dTarget[i * 3] = px;
+        dTarget[i * 3 + 1] = py;
+        dTarget[i * 3 + 2] = pz;
+      }
+      destinyGeo.userData.heartTargets = dTarget;
+      if (destinyGeo.attributes.aTarget) {
+        destinyGeo.attributes.aTarget.needsUpdate = true;
+      }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const isRed = i >= 2250;
+      dSide[i] = isRed ? 1.0 : 0.0;
+      dPhase[i] = Math.random() * Math.PI * 2;
+      dSize[i] = 1.15 + Math.random() * 1.95;
+
+      const x0 = isRed ? 5.5 : -5.5;
+      dPos[i * 3] = x0 + (Math.random() - 0.5) * 0.6;
+      dPos[i * 3 + 1] = 2.2 + (Math.random() - 0.5) * 0.6;
+      dPos[i * 3 + 2] = (Math.random() - 0.5) * 0.6;
+    }
+
+    buildHeartTargets(heartCenterY, false);
+
+    destinyGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3));
+    destinyGeo.setAttribute('aTarget', new THREE.BufferAttribute(dTarget, 3));
+    destinyGeo.setAttribute('aSide', new THREE.BufferAttribute(dSide, 1));
+    destinyGeo.setAttribute('aStream', new THREE.BufferAttribute(dStream, 1));
+    destinyGeo.setAttribute('aPhase', new THREE.BufferAttribute(dPhase, 1));
+    destinyGeo.setAttribute('aSize', new THREE.BufferAttribute(dSize, 1));
+
+    const destinyUniforms = {
+      uTime: { value: 0 },
+      uPixelRatio: { value: dpr },
+      uMorph: { value: 0 },
+      uPulse: { value: 1.0 },
+      uHeartCenterY: { value: heartCenterY },
+      uBlueColor: { value: new THREE.Color(THEMES.crimson_azure.azureHex) },
+      uRedColor: { value: new THREE.Color(THEMES.crimson_azure.crimsonHex) },
+      uGoldColor: { value: new THREE.Color(THEMES.crimson_azure.goldHex) }
+    };
+
+    const destinyMat = new THREE.ShaderMaterial({
+      uniforms: destinyUniforms,
+      vertexShader: `
+        attribute vec3 aTarget;
+        attribute float aSide;
+        attribute float aStream;
+        attribute float aPhase;
+        attribute float aSize;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uMorph;
+        uniform float uPulse;
+        uniform float uHeartCenterY;
+        varying float vSide;
+        varying float vGoldMix;
+        varying float vAlpha;
+
+        void main() {
+          vec3 center = vec3(0.0, uHeartCenterY, 0.0);
+          vec3 pulsedTarget = center + (aTarget - center) * uPulse;
+          vec3 finalPos = mix(position, pulsedTarget, uMorph);
+
+          // Giao thoa Vàng Kim ở vùng tâm trái tim
+          float distC = length(aTarget - center);
+          float centerGold = 1.0 - smoothstep(0.15, 1.45, distC);
+          vGoldMix = clamp(centerGold * 0.85 + aStream * 0.25, 0.0, 1.0) * uMorph;
+          vSide = aSide;
+
+          float twinkle = 0.65 + 0.35 * sin(uTime * 3.8 + aPhase);
+          vAlpha = twinkle * (0.76 + 0.24 * uMorph);
+
+          vec4 mvPos = modelViewMatrix * vec4(finalPos, 1.0);
+          gl_PointSize = aSize * (0.9 + 0.3 * twinkle) * uPixelRatio * (24.0 / max(1.0, -mvPos.z));
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uBlueColor;
+        uniform vec3 uRedColor;
+        uniform vec3 uGoldColor;
+        varying float vSide;
+        varying float vGoldMix;
+        varying float vAlpha;
+
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          float core = 1.0 - smoothstep(0.04, 0.5, d);
+          vec3 baseCol = mix(uBlueColor, uRedColor, vSide);
+          vec3 col = mix(baseCol, uGoldColor, vGoldMix);
+          col = mix(col, vec3(1.0), pow(core, 2.5) * 0.45);
+          gl_FragColor = vec4(col, core * vAlpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const destinyParticles = new THREE.Points(destinyGeo, destinyMat);
+    destinyParticles.frustumCulled = false;
+    scene.add(destinyParticles);
+
+    // 5.8. eternalKnotGroup tại (0, heartCenterY, 0.15): 2 CatmullRomCurve3 Torus Knot p=2, q=3
+    const eternalKnotGroup = new THREE.Group();
+    eternalKnotGroup.position.set(0, heartCenterY, 0.15);
+    eternalKnotGroup.visible = false;
+    eternalKnotGroup.scale.setScalar(0.01);
+    scene.add(eternalKnotGroup);
+
+    function createTorusKnotCurve(phaseOffset) {
+      const pts = [];
+      const R = 1.05;
+      const r = 0.42;
+      const p = 2;
+      const q = 3;
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        const theta = (i / count) * Math.PI * 2;
+        const t = theta + phaseOffset;
+        const x = (R + r * Math.cos(q * t)) * Math.cos(p * t);
+        const y = (R + r * Math.cos(q * t)) * Math.sin(p * t);
+        const z = r * Math.sin(q * t);
+        pts.push(new THREE.Vector3(x, y, z));
+      }
+      return new THREE.CatmullRomCurve3(pts, true);
+    }
+
+    const crimsonKnotMat = new THREE.MeshStandardMaterial({
+      color: THEMES.crimson_azure.crimsonHex,
+      emissive: THEMES.crimson_azure.crimsonDeep,
+      emissiveIntensity: 0.72,
+      metalness: 0.68,
+      roughness: 0.22
+    });
+    const crimsonKnotMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(createTorusKnotCurve(0), 180, 0.068, 16, true),
+      crimsonKnotMat
+    );
+    eternalKnotGroup.add(crimsonKnotMesh);
+
+    const azureKnotMat = new THREE.MeshStandardMaterial({
+      color: THEMES.crimson_azure.azureHex,
+      emissive: THEMES.crimson_azure.azureDeep,
+      emissiveIntensity: 0.72,
+      metalness: 0.68,
+      roughness: 0.22
+    });
+    const azureKnotMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(createTorusKnotCurve(Math.PI), 180, 0.068, 16, true),
+      azureKnotMat
+    );
+    eternalKnotGroup.add(azureKnotMesh);
+
+    const knotCoreGroup = new THREE.Group();
+    eternalKnotGroup.add(knotCoreGroup);
+
+    const knotGemMat = new THREE.MeshStandardMaterial({
+      color: 0xfde047,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.85,
+      metalness: 0.85,
+      roughness: 0.14
+    });
+    const knotGemMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.28, 1), knotGemMat);
+    knotCoreGroup.add(knotGemMesh);
+
+    const knotCoreHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xfde047,
+      transparent: true,
+      opacity: 0.78,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    knotCoreHalo.scale.set(2.4, 2.4, 1);
+    knotCoreGroup.add(knotCoreHalo);
+
+    // 5.9. Bảng Tên Đôi Lứa & Câu Tỏ Tình 3D (couplePlaqueGroup)
+    const couplePlaqueGroup = new THREE.Group();
+    couplePlaqueGroup.visible = false;
+    couplePlaqueGroup.scale.setScalar(0.001);
+    scene.add(couplePlaqueGroup);
+
+    const plaqueMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      toneMapped: false
+    });
+    const plaquePlane = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 1.92), plaqueMat);
+    couplePlaqueGroup.add(plaquePlane);
+
+    const plaqueHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xfde047,
+      transparent: true,
+      opacity: 0.28,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    plaqueHalo.scale.set(7.6, 2.8, 1);
+    plaqueHalo.position.z = -0.25;
+    couplePlaqueGroup.add(plaqueHalo);
+
+    function refreshCouplePlaqueTexture() {
+      const tex = createCouplePlaqueTexture();
+      if (plaqueMat.map) plaqueMat.map.dispose();
+      plaqueMat.map = tex;
+      plaqueMat.needsUpdate = true;
+    }
+
+    function refreshOrbLabelTextures() {
+      const t = THEMES[state.theme] || THEMES.crimson_azure;
+      if (blueRibbon.labelMat.map) blueRibbon.labelMat.map.dispose();
+      blueRibbon.labelMat.map = createOrbLabelTexture(state.sender, t.azureHex);
+      blueRibbon.labelMat.needsUpdate = true;
+
+      if (redRibbon.labelMat.map) redRibbon.labelMat.map.dispose();
+      redRibbon.labelMat.map = createOrbLabelTexture(state.receiver, t.crimsonHex);
+      redRibbon.labelMat.needsUpdate = true;
+    }
+
+    // 5.10. Khung Ảnh Kỷ Niệm 3D (memoryFrameGroup, bay nổi sau +1.6s ở Pha 3 dưới đáy Trái Tim)
+    const memoryFrameGroup = new THREE.Group();
+    memoryFrameGroup.visible = false;
+    memoryFrameGroup.scale.setScalar(0.001);
+    scene.add(memoryFrameGroup);
+
+    const memoryPhotoMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      toneMapped: false
+    });
+    const memoryPhotoPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 2.05), memoryPhotoMat);
+    memoryPhotoPlane.position.z = 0.08;
+    memoryFrameGroup.add(memoryPhotoPlane);
+
+    const frameBorderMat = new THREE.MeshStandardMaterial({
+      color: 0xfde047,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.36,
+      metalness: 0.78,
+      roughness: 0.22
+    });
+    const memoryBackingMesh = new THREE.Mesh(new THREE.BoxGeometry(2.26, 2.26, 0.10), frameBorderMat);
+    memoryFrameGroup.add(memoryBackingMesh);
+
+    const memoryGlowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xf43f5e,
+      transparent: true,
+      opacity: 0.56,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    memoryGlowSprite.scale.set(4.2, 4.2, 1);
+    memoryGlowSprite.position.z = -0.35;
+    memoryFrameGroup.add(memoryGlowSprite);
+
+    const cornerGemGeo = new THREE.OctahedronGeometry(0.10, 0);
+    [[-1.08, 1.08], [1.08, 1.08], [-1.08, -1.08], [1.08, -1.08]].forEach(([cx, cy]) => {
+      const gem = new THREE.Mesh(cornerGemGeo, frameBorderMat);
+      gem.position.set(cx, cy, 0.09);
+      memoryFrameGroup.add(gem);
+    });
+
+    const memoryHitMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.85, 2.85),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    memoryHitMesh.position.z = 0.14;
+    memoryFrameGroup.add(memoryHitMesh);
+
+    function refreshMemoryPhotoTexture() {
+      const applyCanvas = (img) => {
+        const cvs = buildMemoryPhotoCanvas(img);
+        const tex = new THREE.CanvasTexture(cvs);
+        tex.encoding = THREE.sRGBEncoding;
+        if (memoryPhotoMat.map) memoryPhotoMat.map.dispose();
+        memoryPhotoMat.map = tex;
+        memoryPhotoMat.needsUpdate = true;
+
+        const thumb = document.getElementById('photo-thumb');
+        if (thumb) thumb.src = cvs.toDataURL('image/jpeg', 0.8);
+      };
+
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => applyCanvas(img);
+        img.onerror = () => applyCanvas(null);
+        img.src = state.photoDataUrl;
+      } else {
+        applyCanvas(null);
+      }
+    }
+
+    // 5.11. Responsive Camera & Layout + Orbit Control
+    let cw = window.innerWidth;
+    let ch = window.innerHeight;
+    let isMobile = cw < 768 || (cw / Math.max(1, ch)) < 0.82;
+    let orbitYaw = 0;
+    let orbitPitch = 0;
+    let targetOrbitYaw = 0;
+    let targetOrbitPitch = 0;
+    const baseCamPos = new THREE.Vector3(0, 1.4, 17.5);
+    const camLookTarget = new THREE.Vector3(0, 1.1, 0);
+
+    function updateThreeLayout() {
+      cw = window.innerWidth;
+      ch = window.innerHeight;
+      const aspect = cw / Math.max(1, ch);
+      const prevMobile = isMobile;
+      isMobile = cw < 768 || aspect < 0.82;
+
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(cw, ch);
+      starUniforms.uPixelRatio.value = dpr;
+      destinyUniforms.uPixelRatio.value = dpr;
+
+      camera.aspect = aspect;
+      camera.fov = isMobile ? 56 : 45;
+      if (isMobile) {
+        baseCamPos.set(0, 1.3, 21.2);
+        camLookTarget.set(0, 1.0, 0);
+      } else {
+        baseCamPos.set(0, 1.4, 17.5);
+        camLookTarget.set(0, 1.1, 0);
+      }
+      camera.position.copy(baseCamPos);
+      camera.lookAt(camLookTarget);
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
+
+      heartCenterY = isMobile ? 2.4 : 2.2;
+      destinyUniforms.uHeartCenterY.value = heartCenterY;
+      eternalKnotGroup.position.set(0, heartCenterY, 0.15);
+      inviteRingGroup.position.set(0, heartCenterY, 0.15);
+      knotWarmLight.position.set(0, heartCenterY, 2.5);
+
+      if (prevMobile !== isMobile || !destinyGeo.userData.heartTargets) {
+        buildHeartTargets(heartCenterY, isMobile);
+      }
+
+      // Mặt Trăng z = -24 động theo fov/aspect để không cắt mép hay đè bảng tên
+      const zMoon = -24;
+      const distMoon = baseCamPos.z - zMoon;
+      const halfHMoon = distMoon * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const halfWMoon = halfHMoon * aspect;
+
+      if (isMobile) {
+        moonGroup.position.set(Math.min(halfWMoon * 0.56, 11.2), baseCamPos.y + halfHMoon * 0.44, zMoon);
+        moonGroup.scale.setScalar(0.84);
+      } else {
+        moonGroup.position.set(Math.min(halfWMoon * 0.62, 18.8), baseCamPos.y + halfHMoon * 0.42, zMoon);
+        moonGroup.scale.setScalar(1.0);
+      }
+      lakeUniforms.uMoonPos.value.copy(moonGroup.position);
+
+      // Bảng tên đôi lứa 3D phía trên Trái Tim
+      couplePlaqueGroup.position.set(0, isMobile ? 5.6 : 5.4, 0.8);
+      couplePlaqueGroup.userData.targetScale = isMobile ? 0.78 : 1.0;
+
+      // Khung ảnh kỷ niệm 3D phía dưới đáy Trái Tim (không che Nút Thắt / Trái Tim / Dock)
+      memoryFrameGroup.userData.baseY = isMobile ? -2.0 : -2.2;
+      memoryFrameGroup.position.set(0, memoryFrameGroup.userData.baseY, 1.1);
+      memoryFrameGroup.userData.targetScale = isMobile ? 0.86 : 1.0;
+    }
+
+    /**
+     * ============================================================================
+     * 6. LỚP 2 (#trails-canvas) & LỚP 3 (#morph-canvas)
+     * ============================================================================
+     */
+    const trailsCanvas = document.getElementById('trails-canvas');
+    const trailsCtx = trailsCanvas.getContext('2d');
+    const morphCanvas = document.getElementById('morph-canvas');
+    const morphCtx = morphCanvas.getContext('2d');
+    let burstSparks = [];
+
+    class BurstSpark {
+      constructor(originX, originY, color, isBig = false) {
+        this.x = originX;
+        this.y = originY;
+        this.prevX = originX;
+        this.prevY = originY;
+        const angle = Math.random() * Math.PI * 2;
+        const baseScale = Math.max(0.75, Math.min(cw, ch) / 680);
+        const speed = (isBig ? (5 + Math.random() * 14) : (3 + Math.random() * 8)) * baseScale;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.955;
+        this.gravity = 0.12;
+        this.alpha = 1.0;
+        this.decay = 0.011 + Math.random() * 0.012;
+        this.color = color;
+        this.radius = 1.2 + Math.random() * 1.1;
+      }
+
+      update() {
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+
+      draw(ctx) {
+        if (this.alpha <= 0) return;
+        const a = Math.max(0, this.alpha);
+        ctx.globalAlpha = a * 0.8;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+
+        ctx.globalAlpha = a;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.65, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function spawnSparkBurst(x, y, count = 24, isBig = false) {
+      const t = THEMES[state.theme] || THEMES.crimson_azure;
+      for (let i = 0; i < count; i++) {
+        burstSparks.push(new BurstSpark(x, y, t.sparks[i % t.sparks.length], isBig));
+      }
+    }
+
+    function resizeAllCanvases() {
+      updateThreeLayout();
+      trailsCanvas.width = Math.round(cw * dpr);
+      trailsCanvas.height = Math.round(ch * dpr);
+      trailsCanvas.style.width = cw + 'px';
+      trailsCanvas.style.height = ch + 'px';
+
+      morphCanvas.width = Math.round(cw * dpr);
+      morphCanvas.height = Math.round(ch * dpr);
+      morphCanvas.style.width = cw + 'px';
+      morphCanvas.style.height = ch + 'px';
+    }
+    window.addEventListener('resize', resizeAllCanvases);
+
+    /**
+     * ============================================================================
+     * 7. ÁP DỤNG THEME & KỊCH BẢN 4 PHA
+     * ============================================================================
+     */
+    function applyThemeVisuals(themeKey) {
+      const t = THEMES[themeKey] || THEMES.crimson_azure;
+      document.documentElement.style.background = t.skyBg;
+      document.body.style.background = t.skyBg;
+      const rad = document.getElementById('sky-radiance-layer');
+      if (rad) rad.style.background = t.radianceBg;
+
+      azureRimLight.color.set(t.azureHex);
+      crimsonRimLight.color.set(t.crimsonHex);
+      knotWarmLight.color.set(t.goldHex);
+
+      lakeUniforms.uDeepColor.value.set(t.lakeDeep);
+      lakeUniforms.uShallowColor.value.set(t.lakeShallow);
+      lakeUniforms.uAzureColor.value.set(t.azureHex);
+      lakeUniforms.uCrimsonColor.value.set(t.crimsonHex);
+      lakeUniforms.uGoldColor.value.set(t.goldHex);
+
+      lanternBodyMat.color.set(t.lanternColor);
+
+      blueRibbon.stripUniforms.uColor.value.set(t.azureHex);
+      blueRibbon.stripUniforms.uGold.value.set(t.goldHex);
+      blueRibbon.orbCoreMat.color.set(t.azureHex);
+      blueRibbon.orbCoreMat.emissive.set(t.azureHex);
+      blueRibbon.orbHaloMat.color.set(t.azureHex);
+
+      redRibbon.stripUniforms.uColor.value.set(t.crimsonHex);
+      redRibbon.stripUniforms.uGold.value.set(t.goldHex);
+      redRibbon.orbCoreMat.color.set(t.crimsonHex);
+      redRibbon.orbCoreMat.emissive.set(t.crimsonHex);
+      redRibbon.orbHaloMat.color.set(t.crimsonHex);
+
+      destinyUniforms.uBlueColor.value.set(t.azureHex);
+      destinyUniforms.uRedColor.value.set(t.crimsonHex);
+      destinyUniforms.uGoldColor.value.set(t.goldHex);
+
+      azureKnotMat.color.set(t.azureHex);
+      azureKnotMat.emissive.set(t.azureDeep);
+      crimsonKnotMat.color.set(t.crimsonHex);
+      crimsonKnotMat.emissive.set(t.crimsonDeep);
+      memoryGlowSprite.material.color.set(t.crimsonHex);
+
+      refreshOrbLabelTextures();
+      refreshCouplePlaqueTexture();
+      refreshMemoryPhotoTexture();
+    }
+
+    function updateSkipButtonVisibility() {
+      const skipBtn = document.getElementById('btn-skip-climax');
+      if (!skipBtn) return;
+      if (state.phase >= 2) skipBtn.classList.add('hidden');
+      else skipBtn.classList.remove('hidden');
+    }
+
+    let audioUnlocked = false;
+    function unlockAudioOnGesture() {
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      audio.initContext();
+      audio.startEnsembleMusic();
+      audio.setPhaseMood(state.phase);
+    }
+    window.addEventListener('pointerdown', unlockAudioOnGesture, { once: true });
+
+    function startPhase0AwaitConnect() {
+      state.phase = 0;
+      state.danceBeat = 0;
+      state.danceBeatProgress = 0;
+      state.phase2Elapsed = 0;
+      state.phase3Elapsed = 0;
+      state.frameRevealed = false;
+      state.acceptedCelebration = false;
+      targetBrightness = 0.22;
+
+      destinyUniforms.uMorph.value = 0;
+      destinyUniforms.uPulse.value = 1.0;
+      lakeUniforms.uBurstRipple.value = 0;
+
+      inviteRingGroup.visible = true;
+      inviteRingGroup.scale.setScalar(1.0);
+
+      blueRibbon.group.visible = true;
+      redRibbon.group.visible = true;
+      blueRibbon.labelSprite.visible = true;
+      redRibbon.labelSprite.visible = true;
+      blueRibbon.labelMat.opacity = 0.95;
+      redRibbon.labelMat.opacity = 0.95;
+      blueRibbon.stripUniforms.uOpacity.value = 0.92;
+      redRibbon.stripUniforms.uOpacity.value = 0.92;
+
+      eternalKnotGroup.visible = false;
+      eternalKnotGroup.scale.setScalar(0.01);
+      couplePlaqueGroup.visible = false;
+      couplePlaqueGroup.scale.setScalar(0.001);
+      memoryFrameGroup.visible = false;
+      memoryFrameGroup.scale.setScalar(0.001);
+
+      document.getElementById('btn-open-wish')?.classList.remove('cta-pulse');
+      document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+
+      if (audio.ctx) audio.setPhaseMood(0);
+      updateSkipButtonVisibility();
+      setPhasePill('🪢 Chạm nhẹ vào màn hình để hai dải tơ duyên bắt đầu tìm thấy nhau...');
+    }
+
+    function advancePhase1DanceBeat(tapX, tapY) {
+      audio.initContext();
+      audio.startEnsembleMusic();
+
+      if (state.phase === 0) {
+        state.phase = 1;
+        state.danceBeat = 1;
+        state.danceBeatProgress = 0;
+        targetBrightness = 0.42;
+        audio.setPhaseMood(1);
+        audio.playTapSparkle(0);
+        if (typeof tapX === 'number') spawnSparkBurst(tapX, tapY, 26, false);
+        setPhasePill('✨ Nhịp 1/3: Hai dải sáng Xanh & Đỏ đang tiến lại gần... Chạm tiếp để giao thoa!');
+        updateSkipButtonVisibility();
+        return;
+      }
+
+      if (state.phase === 1) {
+        state.danceBeat += 1;
+        state.danceBeatProgress = 0;
+        audio.playTapSparkle(state.danceBeat);
+        if (typeof tapX === 'number') spawnSparkBurst(tapX, tapY, 30, false);
+
+        if (state.danceBeat === 2) {
+          targetBrightness = 0.58;
+          setPhasePill('💫 Nhịp 2/3: Vòng cung duyên phận giao thoa! Chạm thêm 1 nhịp nữa để thắt nút...');
+        } else if (state.danceBeat >= 3) {
+          targetBrightness = 0.72;
+          setPhasePill('🌀 Nhịp 3/3: Sợi chỉ duyên đang xoắn kép hội tụ!');
+          setTimeout(() => {
+            if (state.phase === 1) triggerPhase2IntertwineTying();
+          }, 550);
+        }
+      }
+    }
+
+    function triggerPhase2IntertwineTying() {
+      if (state.phase >= 2) return;
+      audio.initContext();
+      audio.startEnsembleMusic();
+
+      state.phase = 2;
+      state.phase2Elapsed = 0;
+      targetBrightness = 0.78;
+      audio.setPhaseMood(2);
+      updateSkipButtonVisibility();
+
+      audio.playSilkWhoosh();
+      audio.playPentatonicGlissando();
+      setPhasePill('🪢 Hai sợi tơ duyên đang xoắn kép thắt Nút Thắt Vĩnh Cửu...');
+    }
+
+    function triggerPhase3EternalKnotHeart() {
+      if (state.phase === 3) return;
+      state.phase = 3;
+      state.phase3Elapsed = 0;
+      state.frameRevealed = false;
+      targetBrightness = 1.0;
+      audio.setPhaseMood(3);
+      updateSkipButtonVisibility();
+
+      inviteRingGroup.visible = false;
+      blueRibbon.labelSprite.visible = false;
+      redRibbon.labelSprite.visible = false;
+
+      eternalKnotGroup.visible = true;
+      couplePlaqueGroup.visible = true;
+      lakeUniforms.uBurstRipple.value = 1.0;
+
+      const flash = document.getElementById('screen-flash');
+      if (flash) {
+        flash.classList.add('flash');
+        setTimeout(() => flash.classList.remove('flash'), 380);
+      }
+
+      spawnSparkBurst(cw * 0.5, ch * 0.42, isMobile ? 130 : 185, true);
+      audio.playJadeChime();
+
+      setPhasePill('💖 Nút Thắt Vĩnh Cửu đã thành! Chạm khung ảnh 3D dưới Trái Tim hoặc mở Tâm Thư');
+    }
+
+    function replayFromStart() {
+      burstSparks = [];
+      targetOrbitYaw = 0;
+      targetOrbitPitch = 0;
+      document.getElementById('spotlight-modal')?.classList.remove('active');
+      document.getElementById('modal-wish-card')?.classList.remove('active');
+
+      trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      trailsCtx.clearRect(0, 0, cw, ch);
+      morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      morphCtx.clearRect(0, 0, cw, ch);
+
+      startPhase0AwaitConnect();
+    }
+
+    /**
+     * ============================================================================
+     * 8. TƯƠNG TÁC KÉO XOAY 3D (dragDist > 8px) & RAYCASTER CLICK (<= 8px)
+     * ============================================================================
+     */
+    const raycaster = new THREE.Raycaster();
+    const pointerNdc = new THREE.Vector2();
+    let pointerDownPos = null;
+    let lastDragPos = null;
+
+    morphCanvas.addEventListener('pointerdown', (e) => {
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+      lastDragPos = { x: e.clientX, y: e.clientY };
+    });
+
+    morphCanvas.addEventListener('pointermove', (e) => {
+      if (!lastDragPos) return;
+      const dx = e.clientX - lastDragPos.x;
+      const dy = e.clientY - lastDragPos.y;
+      lastDragPos = { x: e.clientX, y: e.clientY };
+
+      targetOrbitYaw = THREE.MathUtils.clamp(targetOrbitYaw - dx * 0.0045, -0.58, 0.58);
+      targetOrbitPitch = THREE.MathUtils.clamp(targetOrbitPitch + dy * 0.0032, -0.22, 0.34);
+    });
+
+    function handlePointerRelease(e) {
+      if (!pointerDownPos) return;
+      const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      pointerDownPos = null;
+      lastDragPos = null;
+      if (dist > 8) return;
+
+      if (state.phase === 0 || state.phase === 1) {
+        advancePhase1DanceBeat(e.clientX, e.clientY);
+        return;
+      }
+
+      if (state.phase === 3) {
+        audio.initContext();
+        if (memoryFrameGroup.visible) {
+          pointerNdc.x = (e.clientX / Math.max(1, cw)) * 2 - 1;
+          pointerNdc.y = -(e.clientY / Math.max(1, ch)) * 2 + 1;
+          raycaster.setFromCamera(pointerNdc, camera);
+          const hits = raycaster.intersectObject(memoryHitMesh, false);
+          if (hits.length > 0) {
+            openPhotoSpotlight();
+            return;
+          }
+        }
+        audio.playTapSparkle(Math.floor(Math.random() * 6));
+        spawnSparkBurst(e.clientX, e.clientY, 26, false);
+      }
+    }
+
+    morphCanvas.addEventListener('pointerup', handlePointerRelease);
+    morphCanvas.addEventListener('pointercancel', () => {
+      pointerDownPos = null;
+      lastDragPos = null;
+    });
+
+    /**
+     * ============================================================================
+     * 9. SPOTLIGHT ẢNH, MODAL TÂM THƯ (2 NÚT), TÙY CHỈNH, PRESETS & GIFTSDK
+     * ============================================================================
+     */
+    function openPhotoSpotlight() {
+      const spotCvs = document.getElementById('spotlight-canvas');
+      const sctx = spotCvs.getContext('2d');
+      const drawSpot = (img) => {
+        const built = buildMemoryPhotoCanvas(img);
+        sctx.clearRect(0, 0, spotCvs.width, spotCvs.height);
+        sctx.drawImage(built, 0, 0, spotCvs.width, spotCvs.height);
+      };
+
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => drawSpot(img);
+        img.onerror = () => drawSpot(null);
+        img.src = state.photoDataUrl;
+      } else {
+        drawSpot(null);
+      }
+
+      document.getElementById('spotlight-caption').textContent = `“${state.confessLine}”`;
+      document.getElementById('spotlight-sub').textContent = `${state.sender} ❤️ ${state.receiver} • ${computeLoveDaysText(state.startDate)}`;
+      document.getElementById('spotlight-modal').classList.add('active');
+    }
+
+    function openWishModal() {
+      document.getElementById('wish-card-title').textContent = `Gửi ${state.receiver} Thương Mến`;
+      document.getElementById('wish-card-highlight').textContent = `“${state.confessLine}”`;
+      document.getElementById('wish-card-content').textContent = state.wish;
+      document.getElementById('wish-card-sender').textContent = `— Từ ${state.sender} ❤️`;
+      document.getElementById('modal-wish-card').classList.add('active');
+    }
+
+    document.getElementById('btn-close-spotlight')?.addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+    });
+    document.getElementById('btn-spotlight-letter')?.addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+      openWishModal();
+    });
+
+    document.getElementById('btn-open-wish')?.addEventListener('click', openWishModal);
+    document.getElementById('btn-close-wish')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+    });
+
+    // 2 nút hồi đáp ngọt ngào trong Modal Tâm Thư
+    document.getElementById('btn-reply-yes')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      state.acceptedCelebration = true;
+      lakeUniforms.uBurstRipple.value = 1.0;
+      audio.playPentatonicGlissando();
+      audio.playJadeChime();
+
+      [
+        [cw * 0.25, ch * 0.28],
+        [cw * 0.75, ch * 0.28],
+        [cw * 0.50, ch * 0.20]
+      ].forEach(([bx, by], idx) => {
+        setTimeout(() => {
+          spawnSparkBurst(bx, by, 65, true);
+          audio.playTapSparkle(idx + 2);
+        }, idx * 240);
+      });
+
+      setPhasePill(`💖 ${state.receiver} đã buộc chặt duyên này cùng ${state.sender}! 🪢✨`);
+      showToast('💖 Nút thắt vĩnh cửu đã chứng giám cho hai bạn!');
+    });
+
+    document.getElementById('btn-reply-think')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      showToast('✨ Sợi chỉ đỏ sẽ luôn giữ nguyên lời hẹn ước đẹp nhất dành cho em!');
+    });
+
+    // Bộ 4 Preset 1-chạm
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      state.presetKey = key;
+      state.sender = p.sender;
+      state.receiver = p.receiver;
+      state.startDate = p.startDate;
+      state.confessLine = p.confessLine;
+      state.wish = p.wish;
+      state.theme = p.theme;
+
+      document.querySelectorAll('.preset-chip').forEach((el) => {
+        el.classList.toggle('active', el.dataset.preset === key);
+      });
+      document.querySelectorAll('.modal-theme-chip').forEach((el) => {
+        el.classList.toggle('active', el.dataset.theme === state.theme);
+      });
+
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-start-date').value = state.startDate;
+      document.getElementById('in-confess-line').value = state.confessLine;
+      document.getElementById('in-wish').value = state.wish;
+
+      applyThemeVisuals(state.theme);
+      showToast(`✨ Đã chọn chủ đề: ${p.badgeLabel}`);
+    }
+
+    document.querySelectorAll('.preset-chip').forEach((btn) => {
+      btn.addEventListener('click', (e) => applyPreset(e.currentTarget.dataset.preset));
+    });
+
+    // Modal Tùy Chỉnh
+    document.getElementById('btn-open-customize')?.addEventListener('click', () => {
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-start-date').value = state.startDate;
+      document.getElementById('in-confess-line').value = state.confessLine;
+      document.getElementById('in-wish').value = state.wish;
+      document.getElementById('modal-customize').classList.add('active');
+    });
+    document.getElementById('btn-close-customize')?.addEventListener('click', () => {
+      document.getElementById('modal-customize').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.theme = e.currentTarget.dataset.theme;
+        applyThemeVisuals(state.theme);
+      });
+    });
+
+    document.getElementById('in-photo')?.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const rawImg = new Image();
+        rawImg.onload = () => {
+          const maxSide = 720;
+          let tw = rawImg.width;
+          let th = rawImg.height;
+          if (tw > maxSide || th > maxSide) {
+            if (tw >= th) {
+              th = Math.round((th * maxSide) / tw);
+              tw = maxSide;
+            } else {
+              tw = Math.round((tw * maxSide) / th);
+              th = maxSide;
+            }
+          }
+          const c = document.createElement('canvas');
+          c.width = tw;
+          c.height = th;
+          c.getContext('2d').drawImage(rawImg, 0, 0, tw, th);
+          state.photoDataUrl = c.toDataURL('image/jpeg', 0.8);
+          refreshMemoryPhotoTexture();
+        };
+        rawImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btn-clear-photo')?.addEventListener('click', () => {
+      state.photoDataUrl = null;
+      const fileIn = document.getElementById('in-photo');
+      if (fileIn) fileIn.value = '';
+      refreshMemoryPhotoTexture();
+      showToast('🖼️ Đã khôi phục tranh nghệ thuật Á Đông mặc định');
+    });
+
+    function syncFormToState() {
+      state.sender = document.getElementById('in-sender').value.trim() || 'Minh Khang';
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Ngọc Diệp';
+      state.startDate = document.getElementById('in-start-date').value || '2025-02-14';
+      state.confessLine = document.getElementById('in-confess-line').value.trim() || 'Duyên mình đã định từ kiếp này';
+      state.wish = document.getElementById('in-wish').value.trim() || PRESETS.red_thread_destiny.wish;
+      refreshOrbLabelTextures();
+      refreshCouplePlaqueTexture();
+      refreshMemoryPhotoTexture();
+    }
+
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+      // Chạy ngay Pha 2 -> Pha 3 với thông tin vừa nhập
+      state.phase = 1;
+      state.frameRevealed = false;
+      state.acceptedCelebration = false;
+      destinyUniforms.uMorph.value = 0;
+      eternalKnotGroup.visible = false;
+      eternalKnotGroup.scale.setScalar(0.01);
+      couplePlaqueGroup.visible = false;
+      couplePlaqueGroup.scale.setScalar(0.001);
+      memoryFrameGroup.visible = false;
+      memoryFrameGroup.scale.setScalar(0.001);
+      document.getElementById('btn-open-wish')?.classList.remove('cta-pulse');
+      document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+      triggerPhase2IntertwineTying();
+    });
+
+    function openPaymentFlow() {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+        GiftSDK.openPayment({
+          templateId: state.templateId,
+          templateType: 'confess',
+          senderName: state.sender,
+          receiverName: state.receiver,
+          occasion: 'Tỏ Tình • Sợi Chỉ Đỏ Duyên Phận',
+          message: state.wish,
+          payload: {
+            presetKey: state.presetKey,
+            startDate: state.startDate,
+            confessLine: state.confessLine,
+            theme: state.theme,
+            photoDataUrl: state.photoDataUrl
+          }
+        });
+      } else {
+        showToast('💡 Đang ở chế độ xem thử local.');
+      }
+    }
+
+    document.getElementById('customize-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      audio.initContext();
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+      openPaymentFlow();
+    });
+
+    document.getElementById('btn-open-payment')?.addEventListener('click', openPaymentFlow);
+    document.getElementById('btn-skip-climax')?.addEventListener('click', triggerPhase2IntertwineTying);
+    document.getElementById('btn-replay')?.addEventListener('click', replayFromStart);
+    document.getElementById('btn-sound')?.addEventListener('click', (e) => {
+      audio.initContext();
+      const muted = audio.toggleMute();
+      e.currentTarget.textContent = muted ? '🔇 Tắt Tiếng' : '🔊 Âm Thanh';
+    });
+
+    /**
+     * ============================================================================
+     * 10. VÒNG LẶP ANIMATION 60FPS
+     * ============================================================================
+     */
+    const clock = new THREE.Clock();
+    let elapsedTime = 0;
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - x, 3);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      elapsedTime += dt;
+
+      // 1. Progressive Luminance & Camera Orbit
+      currentBrightness += (targetBrightness - currentBrightness) * Math.min(1, dt * 3.0);
+      const b = currentBrightness;
+
+      const radLayer = document.getElementById('sky-radiance-layer');
+      if (radLayer) radLayer.style.opacity = (0.18 + b * 0.56).toFixed(3);
+
+      ambientLight.intensity = 0.52 + b * 0.42;
+      knotWarmLight.intensity = 0.8 + b * 1.45;
+      starUniforms.uTime.value = elapsedTime;
+      starUniforms.uBoost.value = 0.55 + b * 0.45;
+      moonHaloMat.opacity = 0.42 + b * 0.34;
+
+      orbitYaw += (targetOrbitYaw - orbitYaw) * Math.min(1, dt * 6.0);
+      orbitPitch += (targetOrbitPitch - orbitPitch) * Math.min(1, dt * 6.0);
+      const camOffset = baseCamPos.clone().sub(camLookTarget);
+      const spherical = new THREE.Spherical().setFromVector3(camOffset);
+      spherical.theta += orbitYaw;
+      spherical.phi = THREE.MathUtils.clamp(spherical.phi + orbitPitch, 0.72, 1.85);
+      camera.position.copy(camLookTarget).add(new THREE.Vector3().setFromSpherical(spherical));
+      camera.lookAt(camLookTarget);
+
+      // 2. Mặt hồ, 3 waterRippleRings, 36 Đèn trời & 140 Đom đóm
+      lakeUniforms.uTime.value = elapsedTime;
+      lakeUniforms.uLuminance.value = b;
+      if (lakeUniforms.uBurstRipple.value > 0.001) {
+        lakeUniforms.uBurstRipple.value = Math.max(0, lakeUniforms.uBurstRipple.value - dt * 0.22);
+      }
+
+      waterRippleRings.forEach((ring) => {
+        const cycle = (elapsedTime * 0.36 + ring.userData.phaseOffset) % 1;
+        const sc = 0.8 + cycle * (state.phase === 3 ? 6.2 : 3.6);
+        ring.scale.setScalar(sc);
+        ring.material.opacity = (1 - cycle) * (0.28 + b * 0.36);
+      });
+
+      skyLanterns.forEach((l) => {
+        l.position.y += l.userData.speedY * dt;
+        l.position.x = l.userData.baseX + Math.sin(elapsedTime * l.userData.swayFreq + l.userData.phase) * l.userData.swayAmp;
+        if (l.position.y > 13.5) {
+          l.position.y = -3.8;
+        }
+      });
+
+      const ffArr = fireflyGeo.attributes.position.array;
+      for (let i = 0; i < FIREFLY_COUNT; i++) {
+        const s = fireflySeeds[i];
+        ffArr[i * 3] = s.bx + Math.sin(elapsedTime * s.sx + s.phase) * 0.75;
+        ffArr[i * 3 + 1] = s.by + Math.cos(elapsedTime * s.sy + s.phase) * 0.55;
+        ffArr[i * 3 + 2] = s.bz + Math.sin(elapsedTime * 0.5 + s.phase) * 0.45;
+      }
+      fireflyGeo.attributes.position.needsUpdate = true;
+
+      // 3. Quỹ đạo 2 Dải Sáng Xanh & Đỏ + 4.500 Hạt
+      blueRibbon.stripUniforms.uTime.value = elapsedTime;
+      redRibbon.stripUniforms.uTime.value = elapsedTime;
+
+      if (state.phase === 0) {
+        inviteOuterRing.rotation.z += dt * 0.8;
+        inviteInnerRing.rotation.z -= dt * 1.1;
+        inviteRingGroup.scale.setScalar(1.0 + Math.sin(elapsedTime * 2.8) * 0.06);
+
+        const symX = isMobile ? 4.2 : 5.5;
+        blueRibbon.headPos.set(
+          -symX + Math.sin(elapsedTime * 1.15) * 0.75,
+          heartCenterY + Math.sin(elapsedTime * 1.65) * 1.15,
+          Math.cos(elapsedTime * 1.1) * 1.1
+        );
+        redRibbon.headPos.set(
+          symX - Math.sin(elapsedTime * 1.15) * 0.75,
+          heartCenterY + Math.sin(elapsedTime * 1.65 + Math.PI) * 1.15,
+          -Math.cos(elapsedTime * 1.1) * 1.1
+        );
+      } else if (state.phase === 1) {
+        inviteRingGroup.scale.lerp(new THREE.Vector3(0.01, 0.01, 0.01), Math.min(1, dt * 6));
+        if (inviteRingGroup.scale.x < 0.03) inviteRingGroup.visible = false;
+
+        state.danceBeatProgress += dt;
+        const beat = state.danceBeat;
+        if (beat === 1) {
+          const rx = isMobile ? 3.2 : 3.9;
+          blueRibbon.headPos.set(
+            -rx + Math.sin(elapsedTime * 2.2) * 0.9,
+            heartCenterY + Math.sin(elapsedTime * 2.6) * 1.25,
+            Math.cos(elapsedTime * 2.0) * 1.5
+          );
+          redRibbon.headPos.set(
+            rx - Math.sin(elapsedTime * 2.2) * 0.9,
+            heartCenterY + Math.sin(elapsedTime * 2.6 + Math.PI) * 1.25,
+            -Math.cos(elapsedTime * 2.0) * 1.5
+          );
+        } else if (beat === 2) {
+          // Lướt vòng cung giao thoa qua tâm
+          const ang = elapsedTime * 2.5;
+          blueRibbon.headPos.set(
+            Math.cos(ang) * 3.1,
+            heartCenterY + Math.sin(ang * 2.0) * 1.15,
+            Math.sin(ang) * 2.1
+          );
+          redRibbon.headPos.set(
+            Math.cos(ang + Math.PI) * 3.1,
+            heartCenterY + Math.sin((ang + Math.PI) * 2.0) * 1.15,
+            Math.sin(ang + Math.PI) * 2.1
+          );
+        } else {
+          // Xoắn kép quanh tâm
+          const ang = elapsedTime * 3.6;
+          blueRibbon.headPos.set(
+            Math.cos(ang) * 1.85,
+            heartCenterY + Math.sin(ang * 1.5) * 0.95,
+            Math.sin(ang) * 1.85
+          );
+          redRibbon.headPos.set(
+            Math.cos(ang + Math.PI) * 1.85,
+            heartCenterY - Math.sin(ang * 1.5) * 0.95,
+            Math.sin(ang + Math.PI) * 1.85
+          );
+        }
+      } else if (state.phase === 2) {
+        state.phase2Elapsed += dt;
+        const prog = Math.min(1, state.phase2Elapsed / state.phase2Duration);
+        const ease = easeOutCubic(prog);
+        const radius = THREE.MathUtils.lerp(2.2, 0.12, ease);
+        const spin = elapsedTime * (4.5 + ease * 8.5);
+
+        blueRibbon.headPos.set(
+          Math.cos(spin) * radius,
+          heartCenterY + Math.sin(spin * 1.4) * (0.65 * (1 - ease)),
+          0.15 + Math.sin(spin) * radius
+        );
+        redRibbon.headPos.set(
+          Math.cos(spin + Math.PI) * radius,
+          heartCenterY - Math.sin(spin * 1.4) * (0.65 * (1 - ease)),
+          0.15 + Math.sin(spin + Math.PI) * radius
+        );
+
+        if (prog >= 1) {
+          triggerPhase3EternalKnotHeart();
+        }
+      } else if (state.phase === 3) {
+        state.phase3Elapsed += dt;
+        const morphVal = Math.min(1, state.phase3Elapsed / 1.15);
+        destinyUniforms.uMorph.value = easeOutCubic(morphVal);
+        destinyUniforms.uPulse.value = 1.0 + 0.032 * Math.sin(elapsedTime * 3.2) + 0.014 * Math.sin(elapsedTime * 6.4);
+
+        // Hai dải sáng lượn viền mờ dịu quanh Trái Tim ở Pha 3
+        blueRibbon.stripUniforms.uOpacity.value = Math.max(0.28, 0.92 - state.phase3Elapsed * 0.35);
+        redRibbon.stripUniforms.uOpacity.value = Math.max(0.28, 0.92 - state.phase3Elapsed * 0.35);
+
+        const ang = elapsedTime * 1.1;
+        const orbitR = isMobile ? 2.4 : 2.9;
+        blueRibbon.headPos.set(
+          Math.cos(ang) * orbitR,
+          heartCenterY + Math.sin(ang * 2.0) * 0.75,
+          Math.sin(ang) * 1.4
+        );
+        redRibbon.headPos.set(
+          Math.cos(ang + Math.PI) * orbitR,
+          heartCenterY - Math.sin(ang * 2.0) * 0.75,
+          Math.sin(ang + Math.PI) * 1.4
+        );
+
+        // Nút Thắt Vĩnh Cửu bung scale 0.01 -> 1.0 & xoay nhẹ uyển chuyển
+        const knotT = Math.min(1, state.phase3Elapsed / 0.85);
+        const knotScale = 0.01 + 0.99 * easeOutCubic(knotT);
+        eternalKnotGroup.scale.setScalar(knotScale);
+        eternalKnotGroup.rotation.y = Math.sin(elapsedTime * 0.75) * 0.35 + elapsedTime * 0.25;
+        eternalKnotGroup.rotation.x = Math.sin(elapsedTime * 0.9) * 0.14;
+        knotCoreGroup.rotation.y -= dt * 1.5;
+
+        // Bảng Tên Đôi Lứa 3D hiện rõ phía trên Trái Tim
+        const plaqueTargetScale = couplePlaqueGroup.userData.targetScale || 1.0;
+        const plaqueCur = couplePlaqueGroup.scale.x + (plaqueTargetScale - couplePlaqueGroup.scale.x) * Math.min(1, dt * 4.5);
+        couplePlaqueGroup.scale.setScalar(plaqueCur);
+        couplePlaqueGroup.position.y = (isMobile ? 5.6 : 5.4) + Math.sin(elapsedTime * 1.5) * 0.06;
+
+        // +1.6s ở Pha 3: Hiện memoryFrameGroup & .cta-pulse cho Tâm Thư / Tạo Link & QR
+        if (state.phase3Elapsed >= 1.6 && !state.frameRevealed) {
+          state.frameRevealed = true;
+          memoryFrameGroup.visible = true;
+          document.getElementById('btn-open-wish')?.classList.add('cta-pulse');
+          document.getElementById('btn-open-payment')?.classList.add('cta-pulse');
+        }
+
+        if (memoryFrameGroup.visible) {
+          const mfTarget = memoryFrameGroup.userData.targetScale || 1.0;
+          const mfCur = memoryFrameGroup.scale.x + (mfTarget - memoryFrameGroup.scale.x) * Math.min(1, dt * 4.2);
+          memoryFrameGroup.scale.setScalar(mfCur);
+          memoryFrameGroup.position.y = (memoryFrameGroup.userData.baseY || -2.2) + Math.sin(elapsedTime * 1.6) * 0.07;
+          memoryFrameGroup.lookAt(camera.position);
+        }
+
+        if (state.acceptedCelebration && Math.random() < 0.05) {
+          spawnSparkBurst(cw * (0.2 + Math.random() * 0.6), ch * (0.18 + Math.random() * 0.25), 16, false);
+        }
+      }
+
+      updateRibbonGeometry(blueRibbon, dt, elapsedTime);
+      updateRibbonGeometry(redRibbon, dt, elapsedTime);
+
+      // Cập nhật hạt dọc dải lụa trong Pha 0..2
+      if (state.phase < 3) {
+        const pArr = destinyGeo.attributes.position.array;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const isRed = i >= 2250;
+          const rib = isRed ? redRibbon : blueRibbon;
+          const segFloat = ((i % 2250) / 2250) * (RIBBON_SEGMENTS - 1);
+          const segIdx = Math.min(RIBBON_SEGMENTS - 1, Math.floor(segFloat));
+          const anchor = rib.trail[segIdx];
+          const ph = dPhase[i];
+          const spread = state.phase === 2 ? 0.36 : 0.48;
+          const tx = anchor.x + Math.cos(ph + elapsedTime * 2.5) * spread;
+          const ty = anchor.y + Math.sin(ph * 1.7 + elapsedTime * 2.1) * spread;
+          const tz = anchor.z + Math.sin(ph - elapsedTime * 2.3) * spread;
+          const follow = Math.min(1, dt * 9.5);
+          pArr[i * 3] += (tx - pArr[i * 3]) * follow;
+          pArr[i * 3 + 1] += (ty - pArr[i * 3 + 1]) * follow;
+          pArr[i * 3 + 2] += (tz - pArr[i * 3 + 2]) * follow;
+        }
+        destinyGeo.attributes.position.needsUpdate = true;
+      }
+
+      destinyUniforms.uTime.value = elapsedTime;
+
+      // Render Layer 1: #webgl-canvas
+      renderer.render(scene, camera);
+
+      // Render Layer 2: #trails-canvas (destination-out + lighter)
+      trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      trailsCtx.globalCompositeOperation = 'destination-out';
+      trailsCtx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+      trailsCtx.fillRect(0, 0, cw, ch);
+      trailsCtx.globalCompositeOperation = 'lighter';
+
+      for (let i = burstSparks.length - 1; i >= 0; i--) {
+        const s = burstSparks[i];
+        s.update();
+        s.draw(trailsCtx);
+        if (s.alpha <= 0) burstSparks.splice(i, 1);
+      }
+
+      // Render Layer 3: #morph-canvas giữ trong suốt sạch
+      morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      morphCtx.clearRect(0, 0, cw, ch);
+    }
+
+    /**
+     * ============================================================================
+     * 11. KHỞI TẠO & GIFTSDK
+     * ============================================================================
+     */
+    resizeAllCanvases();
+    applyThemeVisuals(state.theme);
+    startPhase0AwaitConnect();
+    requestAnimationFrame(animate);
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+        await GiftSDK.init({
+          templateId: state.templateId,
+          onGiftLoaded: (order) => {
+            if (order.sender_name) state.sender = order.sender_name;
+            if (order.receiver_name) state.receiver = order.receiver_name;
+            if (order.message) state.wish = order.message;
+            if (order.payload) {
+              if (order.payload.presetKey && PRESETS[order.payload.presetKey]) {
+                state.presetKey = order.payload.presetKey;
+              }
+              if (order.payload.startDate) state.startDate = order.payload.startDate;
+              if (order.payload.confessLine) state.confessLine = order.payload.confessLine;
+              if (order.payload.theme && THEMES[order.payload.theme]) state.theme = order.payload.theme;
+              if (order.payload.photoDataUrl) state.photoDataUrl = order.payload.photoDataUrl;
+            }
+            applyThemeVisuals(state.theme);
+          }
+        });
+      }
+    });
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

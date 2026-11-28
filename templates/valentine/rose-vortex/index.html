@@ -1,0 +1,2838 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lốc Xoáy Hoa Hồng • Vũ Điệu Waltz Valentine 14/2 🌹✨</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/gift-sdk.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- 1. Ngăn xếp Layer chuẩn 3d-visual.md (z-index 1..6) -->
+  <div id="sky-radiance-layer"></div>
+  <canvas id="webgl-canvas"></canvas>
+  <canvas id="trails-canvas"></canvas>
+  <canvas id="morph-canvas"></canvas>
+  <div class="magic-vignette"></div>
+  <div class="screen-flash" id="screen-flash"></div>
+
+  <!-- 2. Top HUD chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Kho Mẫu Quà Tặng">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-skip-climax" title="Nhảy nhanh tới khoảnh khắc Trái Tim Hoa Hồng nở rộ">
+        <span class="btn-icon">⏭️</span> <span class="btn-label">Nở Hoa Ngay</span>
+      </button>
+      <button type="button" class="hud-btn" id="btn-replay" title="Xem lại từ đầu">
+        <span class="btn-icon">🔄</span> <span class="btn-label">Xem Lại</span>
+      </button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật/Tắt Âm Thanh">
+        <span class="btn-icon">🔊</span> <span class="btn-label">Âm Thanh</span>
+      </button>
+      <!-- #btn-tiktok-mode 📹 được tự động gắn bởi shared/tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 3. Bộ 4 Preset 1-chạm dành cho Người tạo -->
+  <section class="preset-bar creator-only" id="preset-bar" aria-label="Chọn nhanh đối tượng Valentine">
+    <button type="button" class="preset-chip active" data-preset="lover">💕 Người Yêu</button>
+    <button type="button" class="preset-chip" data-preset="spouse">💍 Vợ / Chồng</button>
+    <button type="button" class="preset-chip" data-preset="confess">🌹 Tỏ Tình / Crush</button>
+    <button type="button" class="preset-chip" data-preset="anniversary">🥂 Kỷ Niệm Yêu</button>
+  </section>
+
+  <!-- 4. Phase Pill & Thanh Tiến Trình 3 Nhịp Waltz -->
+  <div class="phase-pill-wrap">
+    <div class="waltz-progress-row" id="waltz-progress-row">
+      <div class="waltz-beat-badge" id="waltz-beat-badge">💃 Nhịp Waltz: 0 / 3</div>
+      <div class="vortex-track" title="Độ cao Lốc Xoáy Hoa Hồng">
+        <div class="vortex-fill" id="vortex-fill"></div>
+      </div>
+    </div>
+    <div id="phase-pill">🌹 Chạm hoặc xoay vòng quanh Đóa Hồng để đánh thức Lốc Xoáy Waltz (Nhịp 1/3)</div>
+  </div>
+
+  <!-- 5. Bottom Dock 1 hàng ngang duy nhất (chuẩn 3d-visual.md) -->
+  <nav class="bottom-dock" aria-label="Thanh điều khiển chính">
+    <button type="button" class="dock-btn" id="btn-open-wish" title="Đọc trọn vẹn tâm thư Valentine">
+      <span>💌</span><span>Tâm Thư</span>
+    </button>
+    <button type="button" class="dock-btn creator-only" id="btn-open-customize" title="Tùy chỉnh tên, ngày yêu, ảnh & bảng màu">
+      <span>🎨</span><span>Tùy Chỉnh</span>
+    </button>
+    <button type="button" class="dock-btn primary-cta creator-only" id="btn-open-payment" title="Tạo Link & Mã QR gửi tặng 14/2">
+      <span>✨ Tạo Link &amp; QR</span>
+      <span class="dock-price-badge">39k</span>
+    </button>
+  </nav>
+
+  <!-- 6. Spotlight Split-View không che Trái Tim 3D (Desktop phải / Mobile nửa dưới) -->
+  <div class="spotlight-modal" id="spotlight-modal" role="dialog" aria-modal="false" aria-labelledby="spotlight-caption">
+    <div class="spotlight-card">
+      <button type="button" class="modal-close-btn" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="spotlight-badge">🌹 Kỷ Niệm Waltz #1</div>
+      <div class="spotlight-photo-frame">
+        <canvas id="spotlight-photo-canvas" width="512" height="512"></canvas>
+      </div>
+      <p class="spotlight-caption" id="spotlight-caption">"Khi 220 cánh hồng hòa chung một nhịp Waltz"</p>
+      <div class="spotlight-sub" id="spotlight-sub">Hoàng Huy ❤️ Quỳnh Phương • Happy Valentine 14/2</div>
+      <div class="spotlight-nav-row">
+        <button type="button" class="spotlight-nav-btn" id="btn-spotlight-prev">◀ Trước</button>
+        <button type="button" class="spotlight-nav-btn" id="btn-spotlight-next">Tiếp ▶</button>
+      </div>
+      <div class="spotlight-actions">
+        <button type="button" class="modal-btn-secondary" id="btn-spotlight-continue">🌹 Ngắm Tiếp 3D</button>
+        <button type="button" class="modal-btn-primary" id="btn-spotlight-wish">💌 Tâm Thư</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Modal Tâm Thư Valentine -->
+  <div class="modal-backdrop" id="modal-wish-card" role="dialog" aria-modal="true" aria-labelledby="wish-card-title">
+    <div class="wish-card">
+      <button type="button" class="modal-close-btn" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="wish-card-badge">🌹 Vũ Điệu Waltz Valentine 14/2 ✨</div>
+      <h2 class="wish-card-title" id="wish-card-title">Gửi Quỳnh Phương Thương Mến</h2>
+      <div class="wish-card-divider"></div>
+      <div class="wish-card-highlight" id="wish-card-highlight">💕 Người Yêu Dấu • 428 Ngày Bên Nhau</div>
+      <div class="wish-card-content" id="wish-card-content">
+        Giữa hàng triệu khoảnh khắc lướt qua, gặp được em là vũ điệu đẹp nhất đời anh. Chúc em một mùa Valentine 14/2 thật ngọt ngào, luôn rạng rỡ như đóa hồng nhung và mãi nắm tay anh qua mọi nhịp Waltz của cuộc đời! 🌹❤️
+      </div>
+      <div class="wish-card-sender" id="wish-card-sender">— Thương gửi từ Hoàng Huy 🌹</div>
+      <div class="wish-reply-actions">
+        <button type="button" class="reply-btn yes" id="btn-wish-burst">💖 Nhảy Tiếp Vũ Điệu Waltz!</button>
+        <button type="button" class="reply-btn think" id="btn-wish-close-keep">🌹 Ngắm Trái Tim 3D</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal Tùy Chỉnh Cá Nhân Hóa 3D -->
+  <div class="modal-backdrop creator-only" id="modal-customize" role="dialog" aria-modal="true" aria-labelledby="modal-customize-title">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">🌹 Cá Nhân Hóa Lốc Xoáy Hoa Hồng 3D ✨</div>
+      <h2 class="modal-title" id="modal-customize-title">Thiết Kế Vũ Điệu Valentine 14/2</h2>
+      <p class="modal-sub">
+        Tùy chỉnh tên đôi lứa, danh hiệu khắc trên bảng tên 3D, ngày bắt đầu yêu và tải tối đa 6 ảnh kỷ niệm viền vàng cổ điển. Bấm "Áp Dụng &amp; Xem Thử" để xem ngay khoảnh khắc Trái Tim Hoa Hồng nở rộ!
+      </p>
+
+      <form id="customize-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên người nhận (Nàng / Chàng) *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Quỳnh Phương" value="Quỳnh Phương" maxlength="32" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên người gửi (Bạn) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Hoàng Huy" value="Hoàng Huy" maxlength="32" required />
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-honorific">👑 Danh hiệu trên Bảng Tên 3D *</label>
+            <input type="text" id="in-honorific" class="modal-input" placeholder="VD: Người Yêu Dấu" value="Người Yêu Dấu" maxlength="36" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-start-date">📅 Ngày bắt đầu yêu:</label>
+            <input type="date" id="in-start-date" class="modal-input" value="2025-12-12" />
+            <div class="love-days-preview" id="love-days-preview">💕 352 Ngày Bên Nhau</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Tâm thư Valentine 14/2:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập lời chúc Valentine ngọt ngào..." required>Giữa hàng triệu khoảnh khắc lướt qua, gặp được em là vũ điệu đẹp nhất đời anh. Chúc em một mùa Valentine 14/2 thật ngọt ngào, luôn rạng rỡ như đóa hồng nhung và mãi nắm tay anh qua mọi nhịp Waltz của cuộc đời! 🌹❤️</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" id="photo-count-label">🖼️ Ảnh Kỷ Niệm 3D (0/6 ảnh đã tải • Mặc định 6 tranh nghệ thuật):</label>
+          <div class="photo-multi-box">
+            <div class="photo-actions-row">
+              <label class="photo-upload-btn" for="in-photos">📸 Tải Ảnh Lên (Tối đa 6)</label>
+              <input type="file" id="in-photos" accept="image/*" multiple style="display:none;" />
+              <button type="button" class="photo-clear-btn" id="btn-clear-photos">🗑️ Khôi Phục 6 Tranh Mặc Định</button>
+            </div>
+            <div class="photo-grid" id="photo-preview-grid"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🎨 4 Bảng Màu Hoa Hồng Dạ Hội:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="modal-theme-chip active" data-theme="crimson_velvet">🌹 Đỏ Nhung Dạ Hội</button>
+            <button type="button" class="modal-theme-chip" data-theme="champagne_rose">🥂 Hồng Champagne</button>
+            <button type="button" class="modal-theme-chip" data-theme="violet_waltz">💜 Tím Dạ Vũ Waltz</button>
+            <button type="button" class="modal-theme-chip" data-theme="blush_pearl">🤍 Hồng Ngọc Trai</button>
+          </div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            ✨ Áp Dụng &amp; Xem Thử
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Link &amp; QR (39.000đ)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Toast Thông Báo -->
+  <div id="rose-toast" class="rose-toast"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /**
+       * ============================================================================
+       * 1. 4 BẢNG MÀU DẠ HỘI & 4 PRESETS VALENTINE 1-CHẠM
+       * ============================================================================
+       */
+      const THEMES = {
+        crimson_velvet: {
+          name: 'Đỏ Nhung Dạ Hội',
+          skyBg: 'radial-gradient(circle at 50% 26%, #2b0511 0%, #120208 50%, #050103 100%)',
+          radianceBg:
+            'radial-gradient(circle at 50% 42%, rgba(225, 29, 72, 0.34) 0%, transparent 54%), radial-gradient(circle at 24% 62%, rgba(251, 113, 133, 0.2) 0%, transparent 48%), radial-gradient(circle at 76% 30%, rgba(253, 224, 71, 0.18) 0%, transparent 46%)',
+          petalPalette: ['#e11d48', '#be123c', '#f43f5e', '#fb7185', '#9f1239'],
+          petalEmissive: '#580a1d',
+          coreGold: '#fde047',
+          shellRose: ['#fb7185', '#f43f5e', '#ffe4e6', '#fda4af'],
+          warmLight: '#ff9e5e',
+          coolLight: '#60a5fa',
+          goldHex: '#fde047',
+          plaqueBgA: 'rgba(42, 6, 18, 0.94)',
+          plaqueBgB: 'rgba(18, 3, 9, 0.95)',
+          sparks: ['#f43f5e', '#fb7185', '#fde047', '#ffffff', '#fda4af']
+        },
+        champagne_rose: {
+          name: 'Hồng Champagne',
+          skyBg: 'radial-gradient(circle at 50% 26%, #2b1314 0%, #15080a 50%, #060204 100%)',
+          radianceBg:
+            'radial-gradient(circle at 50% 42%, rgba(251, 113, 133, 0.32) 0%, transparent 54%), radial-gradient(circle at 24% 62%, rgba(253, 186, 116, 0.22) 0%, transparent 48%), radial-gradient(circle at 76% 30%, rgba(254, 240, 138, 0.2) 0%, transparent 46%)',
+          petalPalette: ['#f43f5e', '#fb7185', '#fda4af', '#fb923c', '#e11d48'],
+          petalEmissive: '#62141f',
+          coreGold: '#fef08a',
+          shellRose: ['#fda4af', '#fb923c', '#fff1f2', '#f43f5e'],
+          warmLight: '#ffc078',
+          coolLight: '#93c5fd',
+          goldHex: '#fef08a',
+          plaqueBgA: 'rgba(44, 16, 18, 0.94)',
+          plaqueBgB: 'rgba(20, 8, 10, 0.95)',
+          sparks: ['#fb7185', '#fdba74', '#fef08a', '#ffffff', '#f43f5e']
+        },
+        violet_waltz: {
+          name: 'Tím Dạ Vũ Waltz',
+          skyBg: 'radial-gradient(circle at 50% 26%, #240834 0%, #100419 50%, #040108 100%)',
+          radianceBg:
+            'radial-gradient(circle at 50% 42%, rgba(236, 72, 153, 0.3) 0%, transparent 54%), radial-gradient(circle at 24% 62%, rgba(168, 85, 247, 0.24) 0%, transparent 48%), radial-gradient(circle at 76% 30%, rgba(253, 224, 71, 0.16) 0%, transparent 46%)',
+          petalPalette: ['#ec4899', '#db2777', '#f472b6', '#c084fc', '#be185d'],
+          petalEmissive: '#4c0b3a',
+          coreGold: '#fde68a',
+          shellRose: ['#f472b6', '#d946ef', '#fae8ff', '#fb7185'],
+          warmLight: '#f9a8d4',
+          coolLight: '#38bdf8',
+          goldHex: '#fde68a',
+          plaqueBgA: 'rgba(38, 10, 52, 0.94)',
+          plaqueBgB: 'rgba(16, 4, 24, 0.95)',
+          sparks: ['#ec4899', '#c084fc', '#fde68a', '#ffffff', '#f472b6']
+        },
+        blush_pearl: {
+          name: 'Hồng Ngọc Trai',
+          skyBg: 'radial-gradient(circle at 50% 26%, #2b0b1d 0%, #150510 50%, #050105 100%)',
+          radianceBg:
+            'radial-gradient(circle at 50% 42%, rgba(244, 114, 182, 0.32) 0%, transparent 54%), radial-gradient(circle at 24% 62%, rgba(254, 205, 211, 0.2) 0%, transparent 48%), radial-gradient(circle at 76% 30%, rgba(253, 224, 71, 0.18) 0%, transparent 46%)',
+          petalPalette: ['#f472b6', '#fb7185', '#fda4af', '#fecdd3', '#e11d48'],
+          petalEmissive: '#5d1230',
+          coreGold: '#fde047',
+          shellRose: ['#fecdd3', '#f472b6', '#ffffff', '#fb7185'],
+          warmLight: '#ffd6e0',
+          coolLight: '#7dd3fc',
+          goldHex: '#fde047',
+          plaqueBgA: 'rgba(46, 12, 30, 0.94)',
+          plaqueBgB: 'rgba(20, 5, 14, 0.95)',
+          sparks: ['#f472b6', '#fecdd3', '#fde047', '#ffffff', '#fb7185']
+        }
+      };
+
+      const PRESETS = {
+        lover: {
+          badge: '💕 Người Yêu',
+          receiver: 'Quỳnh Phương',
+          sender: 'Hoàng Huy',
+          honorific: 'Người Yêu Dấu',
+          startDate: '2025-12-12',
+          theme: 'crimson_velvet',
+          wish: 'Giữa hàng triệu khoảnh khắc lướt qua, gặp được em là vũ điệu đẹp nhất đời anh. Chúc em một mùa Valentine 14/2 thật ngọt ngào, luôn rạng rỡ như đóa hồng nhung và mãi nắm tay anh qua mọi nhịp Waltz của cuộc đời! 🌹❤️',
+          memories: [
+            { title: 'Ánh Nhìn Đầu Tiên', caption: '"Khoảnh khắc trái tim lỡ nhịp như nốt mở đầu bản Waltz mùa yêu"' },
+            { title: 'Buổi Hẹn Hoa Hồng', caption: '"Dưới ánh đèn vàng dịu, nụ cười của em khiến cả thế gian ngưng đọng"' },
+            { title: 'Tay Trong Tay', caption: '"Cảm ơn em đã bước cùng anh qua biết bao mùa gió ngọt ngào"' },
+            { title: 'Bí Mật Nhỏ', caption: '"Mỗi tin nhắn chúc ngủ ngon của em đều là phép màu mỗi tối"' },
+            { title: 'Lời Hứa 14/2', caption: '"Anh mong trăm mùa Valentine sau này vẫn được nắm tay riêng mình em"' },
+            { title: 'Mãi Yêu Em', caption: '"220 cánh hồng nở rộ cũng không sánh bằng một ánh mắt em cười!"' }
+          ]
+        },
+        spouse: {
+          badge: '💍 Vợ / Chồng',
+          receiver: 'Vợ Yêu Minh Anh',
+          sender: 'Ông Xã Quốc Bảo',
+          honorific: 'Bạn Đời Tri Kỷ',
+          startDate: '2022-02-14',
+          theme: 'champagne_rose',
+          wish: 'Cảm ơn Em đã đi cùng Anh từ những ngày đầu tiên cho đến mái ấm bình yên hôm nay. Dù năm tháng có trôi, mỗi mùa Valentine 14/2 anh vẫn muốn mời em nhảy lại điệu Waltz thuở ban đầu! 💍🌹',
+          memories: [
+            { title: 'Ngày Chung Đôi', caption: '"Khoảnh khắc thiêng liêng khi hai trái tim chính thức chung một mái nhà"' },
+            { title: 'Bữa Tối Ấm Áp', caption: '"Chỉ cần về nhà thấy ánh đèn và nụ cười em là mọi mệt mỏi tan biến"' },
+            { title: 'Đồng Hành Năm Tháng', caption: '"Cùng nhau vượt qua mọi thử thách để càng thêm trân quý từng phút giây"' },
+            { title: 'Chuyến Đi Kỷ Niệm', caption: '"Những cung đường đầy nắng gió và tiếng cười giòn tan của hai vợ chồng"' },
+            { title: 'Hạnh Phúc Giản Đơn', caption: '"Cảm ơn em đã luôn nâng niu tổ ấm bằng cả trái tim dịu dàng"' },
+            { title: 'Trăm Năm Tình Thâm', caption: '"Happy Valentine’s Day! Mãi yêu bạn đời tuyệt vời nhất của anh!"' }
+          ]
+        },
+        confess: {
+          badge: '🌹 Tỏ Tình / Crush',
+          receiver: 'Thảo Vy',
+          sender: 'Minh Quân',
+          honorific: 'Nàng Thơ Của Anh',
+          startDate: '2026-02-14',
+          theme: 'blush_pearl',
+          wish: 'Lốc xoáy 220 cánh hồng hôm nay là tất cả những rung động anh giấu kín bấy lâu. Valentine 14/2 này, cho phép anh được chính thức gọi tên em là "Người Yêu" và cùng em viết tiếp chương đầu tiên nhé? 🌹💌',
+          memories: [
+            { title: 'Rung Động Đầu Đời', caption: '"Từ giây phút em mỉm cười, cả thế giới của anh bỗng hóa mùa xuân"' },
+            { title: 'Những Lần Tình Cờ', caption: '"Mỗi lần vô tình chạm mặt là tim anh lại đánh trống liên hồi"' },
+            { title: 'Ánh Đèn Phố Đêm', caption: '"Chỉ mong một tối được đi dạo thật chậm và nghe em kể chuyện"' },
+            { title: 'Đóa Hồng Tỏ Tình', caption: '"Đóa hồng nhung này mang theo câu hỏi chân thành nhất từ trái tim anh"' },
+            { title: 'Khoảnh Khắc Ngưng Đọng', caption: '"Nếu thời gian ngừng lại, anh chỉ ước được đứng ngay cạnh em lúc này"' },
+            { title: 'Làm Người Yêu Anh Nhé', caption: '"Mở lòng đón nhận trái tim hoa hồng đang đập vì riêng mình em nhé!"' }
+          ]
+        },
+        anniversary: {
+          badge: '🥂 Kỷ Niệm Yêu',
+          receiver: 'Ngọc Hân',
+          sender: 'Đức Anh',
+          honorific: 'Tình Yêu Vĩnh Cửu',
+          startDate: '2024-02-14',
+          theme: 'violet_waltz',
+          wish: 'Chúc mừng ngày kỷ niệm tình yêu & Valentine 14/2 thật lộng lẫy của tụi mình! Cảm ơn em vì từng ngày đã qua đều rực sáng như pháo hoa và dịu êm như bản nhạc Waltz 3/4. Mãi bên nhau em nhé! 🥂💜',
+          memories: [
+            { title: 'Cột Mốc Ngày Đầu', caption: '"Ngày hai đứa chính thức gọi tên nhau là một nửa định mệnh"' },
+            { title: 'Bản Nhạc Của Đôi Ta', caption: '"Giai điệu Waltz 3/4 luôn vang lên mỗi khi anh nghĩ về em"' },
+            { title: 'Bốn Mùa Bên Nhau', caption: '"Xuân hạ thu đông đều đẹp hơn gấp bội vì có em song hành"' },
+            { title: 'Ngàn Lần Cưng Chiều', caption: '"Mong em luôn bình an, vô tư và được yêu thương trọn vẹn mỗi ngày"' },
+            { title: 'Ánh Sao Kỷ Niệm', caption: '"Từng khung hình đều lưu giữ thanh xuân rực rỡ nhất của hai ta"' },
+            { title: 'Hướng Về Tương Lai', caption: '"Vũ điệu của chúng mình sẽ còn kéo dài mãi qua thật nhiều năm nữa!"' }
+          ]
+        }
+      };
+
+      const state = {
+        templateId: 'valentine_rose_vortex',
+        presetKey: 'lover',
+        receiver: PRESETS.lover.receiver,
+        sender: PRESETS.lover.sender,
+        honorific: PRESETS.lover.honorific,
+        startDate: PRESETS.lover.startDate,
+        wish: PRESETS.lover.wish,
+        theme: PRESETS.lover.theme,
+        photos: [],
+        memories: PRESETS.lover.memories.map((m) => ({ ...m })),
+        phase: 0, // 0: Waltz Breath, 1: 3 Beats + Time Freeze, 2: Heart Bloom, 3: Interactive Waltz Heart
+        waltzStep: 0, // 0..3
+        isTimeFrozen: false,
+        freezeElapsed: 0,
+        phase2Elapsed: 0,
+        phase3Elapsed: 0,
+        ctaPulseTriggered: false,
+        activeSpotlightIdx: -1
+      };
+
+      function computeLoveDaysCount(dateStr) {
+        if (!dateStr) return 1;
+        const parsed = new Date(dateStr + 'T00:00:00');
+        if (isNaN(parsed.getTime())) return 1;
+        const today = new Date();
+        const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const diff = Math.floor((todayMid.getTime() - parsed.getTime()) / 86400000);
+        return Math.max(1, diff + 1);
+      }
+
+      function computeLoveDaysText(dateStr) {
+        const days = computeLoveDaysCount(dateStr);
+        return `${days.toLocaleString('vi-VN')} Ngày Bên Nhau`;
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('rose-toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+
+      /**
+       * ============================================================================
+       * 2. ÂM THANH WEB AUDIO THUẦN (WaltzRoseAudio - 108 BPM 3/4)
+       * ============================================================================
+       */
+      class WaltzRoseAudio {
+        constructor() {
+          this.ctx = null;
+          this.masterGain = null;
+          this.isMuted = false;
+          this.waltzTimer = null;
+          this.barIndex = 0;
+          this.beatInBar = 0;
+          this.moodPhase = 0;
+          this.bpm = 108;
+          this.beatSec = 60 / this.bpm; // 0.5556s
+          // Am - Dm7 - G7 - Cmaj7 - Fmaj7 - Bm7b5 - E7 - Am
+          this.progression = [
+            { root: 110.0, chord: [220.0, 261.63, 329.63], melody: [523.25, 659.25, 587.33] }, // Am
+            { root: 146.83, chord: [261.63, 293.66, 349.23], melody: [587.33, 698.46, 659.25] }, // Dm7
+            { root: 98.0, chord: [246.94, 293.66, 349.23], melody: [587.33, 493.88, 523.25] }, // G7
+            { root: 130.81, chord: [246.94, 261.63, 329.63], melody: [659.25, 783.99, 659.25] }, // Cmaj7
+            { root: 87.31, chord: [220.0, 261.63, 329.63], melody: [523.25, 659.25, 587.33] }, // Fmaj7
+            { root: 123.47, chord: [220.0, 293.66, 349.23], melody: [587.33, 523.25, 493.88] }, // Bm7b5
+            { root: 82.41, chord: [207.65, 246.94, 293.66], melody: [493.88, 659.25, 830.61] }, // E7
+            { root: 110.0, chord: [220.0, 261.63, 329.63], melody: [880.0, 659.25, 523.25] } // Am
+          ];
+        }
+
+        initContext() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return false;
+            this.ctx = new AudioCtx();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.value = this.isMuted ? 0 : 0.72;
+            this.masterGain.connect(this.ctx.destination);
+          }
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          if (!this.waltzTimer) {
+            this.startWaltzLoop();
+          }
+          return true;
+        }
+
+        toggleMute() {
+          this.isMuted = !this.isMuted;
+          if (this.masterGain && this.ctx) {
+            this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : 0.72, this.ctx.currentTime, 0.05);
+          }
+          return this.isMuted;
+        }
+
+        setPhase(p) {
+          this.moodPhase = p;
+        }
+
+        playPianoHarpNote(freq, startOffset = 0, duration = 0.85, gainAmt = 0.08, type = 'triangle') {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const t = this.ctx.currentTime + startOffset;
+          const osc = this.ctx.createOscillator();
+          const oscOver = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, t);
+          oscOver.type = 'sine';
+          oscOver.frequency.setValueAtTime(freq * 2, t);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(Math.min(4800, freq * 5.2), t);
+          filter.frequency.exponentialRampToValueAtTime(Math.max(400, freq * 1.6), t + duration);
+
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(gainAmt, t + 0.016);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+
+          const overGain = this.ctx.createGain();
+          overGain.gain.value = 0.22;
+
+          osc.connect(filter);
+          oscOver.connect(overGain);
+          overGain.connect(filter);
+          filter.connect(g);
+          g.connect(this.masterGain);
+
+          osc.start(t);
+          oscOver.start(t);
+          osc.stop(t + duration + 0.05);
+          oscOver.stop(t + duration + 0.05);
+        }
+
+        playStringPad(chordFreqs, duration = 1.65, gainAmt = 0.032) {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const t = this.ctx.currentTime;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1150, t);
+
+          const g = this.ctx.createGain();
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(gainAmt, t + 0.35);
+          g.gain.linearRampToValueAtTime(gainAmt * 0.72, t + duration * 0.75);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+
+          filter.connect(g);
+          g.connect(this.masterGain);
+
+          chordFreqs.forEach((f, idx) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(f * (idx === 0 ? 1 : 1.0018), t);
+            osc.connect(filter);
+            osc.start(t);
+            osc.stop(t + duration + 0.06);
+          });
+        }
+
+        playCelestaSparkle(freq, delay = 0) {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const t = this.ctx.currentTime + delay;
+          const osc = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.042, t + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.65);
+          osc.connect(g);
+          g.connect(this.masterGain);
+          osc.start(t);
+          osc.stop(t + 0.7);
+        }
+
+        startWaltzLoop() {
+          if (this.waltzTimer) return;
+          const stepMs = Math.round(this.beatSec * 1000);
+          const tick = () => {
+            if (!this.ctx || this.isMuted) return;
+            if (state.isTimeFrozen) return;
+
+            const bar = this.progression[this.barIndex % this.progression.length];
+            const b = this.beatInBar;
+
+            if (b === 0) {
+              // Nhịp 1 Waltz: Bass + Pad ấm
+              this.playPianoHarpNote(bar.root, 0, 1.3, 0.095, 'triangle');
+              this.playPianoHarpNote(bar.root * 2, 0.02, 0.9, 0.045, 'sine');
+              if (this.moodPhase >= 1) {
+                this.playStringPad(bar.chord, this.beatSec * 3.05, this.moodPhase >= 2 ? 0.036 : 0.024);
+              }
+              if (this.moodPhase >= 2) {
+                this.playPianoHarpNote(bar.melody[0], 0.01, 0.9, 0.055, 'triangle');
+              }
+            } else {
+              // Nhịp 2 & 3 Waltz: Hợp âm arpeggio uyển chuyển
+              bar.chord.forEach((cf, idx) => {
+                this.playPianoHarpNote(cf, idx * 0.028, 0.6, 0.032, 'triangle');
+              });
+              if (this.moodPhase >= 2) {
+                this.playPianoHarpNote(bar.melody[b], 0.015, 0.75, 0.045, 'sine');
+                if (b === 2) {
+                  this.playCelestaSparkle(bar.melody[2] * 2, 0.08);
+                }
+              }
+            }
+
+            this.beatInBar = (this.beatInBar + 1) % 3;
+            if (this.beatInBar === 0) {
+              this.barIndex = (this.barIndex + 1) % this.progression.length;
+            }
+          };
+          tick();
+          this.waltzTimer = setInterval(tick, stepMs);
+        }
+
+        playVortexWind(level = 1) {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const t = this.ctx.currentTime;
+          const dur = 0.55 + level * 0.14;
+          const bufLen = Math.floor(this.ctx.sampleRate * dur);
+          const buf = this.ctx.createBuffer(1, bufLen, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < bufLen; i++) {
+            data[i] = (Math.random() * 2 - 1) * (0.65 + 0.35 * Math.sin((i / bufLen) * Math.PI));
+          }
+          const src = this.ctx.createBufferSource();
+          src.buffer = buf;
+
+          const bp = this.ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          const baseFreq = 260 + level * 190;
+          bp.frequency.setValueAtTime(baseFreq, t);
+          bp.frequency.exponentialRampToValueAtTime(baseFreq * 2.4, t + dur);
+          bp.Q.value = 2.6;
+
+          const g = this.ctx.createGain();
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.11 + level * 0.04, t + 0.08);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+          src.connect(bp);
+          bp.connect(g);
+          g.connect(this.masterGain);
+          src.start(t);
+
+          // Nhấn thêm nốt đàn theo nhịp Waltz
+          const notes = [440, 523.25, 659.25];
+          this.playPianoHarpNote(notes[(level - 1) % 3], 0.02, 0.7, 0.075);
+        }
+
+        playTimeFreezeChime() {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const freqs = [1046.5, 1318.51, 1567.98, 2093.0];
+          freqs.forEach((f, idx) => {
+            const t = this.ctx.currentTime + idx * 0.045;
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(0.065 / (1 + idx * 0.3), t + 0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.15);
+            osc.connect(g);
+            g.connect(this.masterGain);
+            osc.start(t);
+            osc.stop(t + 1.2);
+          });
+        }
+
+        playHeartBloomChord() {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          // 9-note Harp Arpeggio lộng lẫy (Am9 -> Cmaj9 bloom)
+          const harpNotes = [220.0, 261.63, 329.63, 392.0, 440.0, 523.25, 659.25, 783.99, 1046.5];
+          harpNotes.forEach((f, idx) => {
+            this.playPianoHarpNote(f, idx * 0.062, 1.45, 0.078, 'triangle');
+            if (idx >= 5) {
+              this.playCelestaSparkle(f * 2, idx * 0.062 + 0.04);
+            }
+          });
+        }
+
+        playHeartRipple() {
+          if (!this.ctx || !this.masterGain || this.isMuted) return;
+          const scale = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5];
+          const base = scale[Math.floor(Math.random() * scale.length)];
+          this.playPianoHarpNote(base, 0, 1.0, 0.072, 'sine');
+          this.playCelestaSparkle(base * 1.5, 0.05);
+        }
+      }
+
+      const audio = new WaltzRoseAudio();
+
+      /**
+       * ============================================================================
+       * 3. PROCEDURAL TEXTURES & GEOMETRY HOA HỒNG 3D CONG (8x10)
+       * ============================================================================
+       */
+      function createSoftGlowTexture() {
+        const c = document.createElement('canvas');
+        c.width = 128;
+        c.height = 128;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 62);
+        g.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        g.addColorStop(0.28, 'rgba(255, 232, 238, 0.85)');
+        g.addColorStop(0.64, 'rgba(255, 160, 190, 0.25)');
+        g.addColorStop(1, 'rgba(255, 120, 160, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 128, 128);
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Texture gân cánh hoa hồng mềm mại (256x256, sRGBEncoding)
+      function createRosePetalVeinTexture() {
+        const s = 256;
+        const c = document.createElement('canvas');
+        c.width = s;
+        c.height = s;
+        const ctx = c.getContext('2d');
+
+        // Nền nhung hồng đậm vừa để nhân instanceColor cho sắc đỏ/hồng rực rỡ, không bị cháy trắng
+        const baseGrad = ctx.createLinearGradient(0, s, 0, 0);
+        baseGrad.addColorStop(0, '#8d4357');
+        baseGrad.addColorStop(0.28, '#be6b80');
+        baseGrad.addColorStop(0.76, '#e7a4b5');
+        baseGrad.addColorStop(1, '#f8cfd9');
+        ctx.fillStyle = baseGrad;
+        ctx.fillRect(0, 0, s, s);
+
+        // Gân cánh hoa tỏa hình quạt từ cuống lên mép trên
+        ctx.lineCap = 'round';
+        for (let i = -7; i <= 7; i++) {
+          const frac = i / 7;
+          ctx.strokeStyle = i === 0 ? 'rgba(255, 228, 236, 0.34)' : 'rgba(130, 50, 74, 0.24)';
+          ctx.lineWidth = i === 0 ? 2.2 : 1.25;
+          ctx.beginPath();
+          ctx.moveTo(s * 0.5 + frac * 12, s * 0.98);
+          ctx.quadraticCurveTo(
+            s * 0.5 + frac * 62,
+            s * 0.52,
+            s * 0.5 + frac * 114,
+            s * (0.05 + Math.abs(frac) * 0.14)
+          );
+          ctx.stroke();
+        }
+
+        // Lụa nhung nhẹ vùng rìa trên
+        const rimGlow = ctx.createRadialGradient(s * 0.5, s * 0.25, 18, s * 0.5, s * 0.45, s * 0.55);
+        rimGlow.addColorStop(0, 'rgba(255, 224, 232, 0.18)');
+        rimGlow.addColorStop(1, 'rgba(255, 224, 232, 0)');
+        ctx.fillStyle = rimGlow;
+        ctx.fillRect(0, 0, s, s);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Hình học Cánh Hoa Hồng 3D cong 2 chiều + lõm tim mép trên (lưới 8x10)
+      function createCurvedRosePetalGeometry(scaleW = 0.34, scaleH = 0.42) {
+        const segW = 8;
+        const segH = 10;
+        const geo = new THREE.BufferGeometry();
+        const positions = [];
+        const uvs = [];
+        const indices = [];
+
+        for (let iy = 0; iy <= segH; iy++) {
+          const v = iy / segH; // 0 (cuống) -> 1 (mép trên)
+          // Bề rộng cánh hoa: thon ở cuống, phồng tròn ở v=0.68, bo mềm lên đỉnh
+          const widthEnv = Math.sin(Math.pow(v, 0.72) * Math.PI * 0.92) * 0.88 + 0.16 * (1 - v);
+          for (let ix = 0; ix <= segW; ix++) {
+            const u = (ix / segW) * 2 - 1; // -1..1
+            const x = u * widthEnv * scaleW;
+
+            // Lõm tim mềm mại ở mép trên cánh hoa
+            const cleft = Math.exp(-u * u * 11.0) * Math.pow(v, 3.0) * 0.13 * scaleH;
+            const roundTip = (1 - u * u) * 0.08 * scaleH * Math.sin(v * Math.PI);
+            const y = (v - 0.36) * scaleH - cleft + roundTip;
+
+            // Độ cong 2 chiều: lòng chảo ôm theo chiều ngang + uốn ngửa ra ngoài ở mép trên
+            const cupZ = (1 - u * u) * Math.sin(v * Math.PI) * 0.12 * scaleH;
+            const curlOutZ = -Math.pow(v, 2.2) * 0.17 * scaleH;
+            const rippleZ = Math.sin(u * 3.8) * Math.pow(v, 1.5) * 0.022 * scaleH;
+            const z = cupZ + curlOutZ + rippleZ;
+
+            positions.push(x, y, z);
+            uvs.push(ix / segW, v);
+          }
+        }
+
+        const stride = segW + 1;
+        for (let iy = 0; iy < segH; iy++) {
+          for (let ix = 0; ix < segW; ix++) {
+            const a = iy * stride + ix;
+            const b = a + 1;
+            const c = a + stride;
+            const d = c + 1;
+            indices.push(a, b, d, a, d, c);
+          }
+        }
+
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geo.setIndex(indices);
+        geo.computeVertexNormals();
+        return geo;
+      }
+
+      // Texture sàn đá dạ hội Art Deco
+      function createArtDecoFloorTexture() {
+        const s = 512;
+        const c = document.createElement('canvas');
+        c.width = s;
+        c.height = s;
+        const ctx = c.getContext('2d');
+
+        const bg = ctx.createRadialGradient(s / 2, s / 2, 16, s / 2, s / 2, s / 2);
+        bg.addColorStop(0, '#3a0a1b');
+        bg.addColorStop(0.45, '#1d050f');
+        bg.addColorStop(0.85, '#100308');
+        bg.addColorStop(1, '#260813');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, s, s);
+
+        // Tia Art Deco vàng kim tỏa tâm
+        ctx.save();
+        ctx.translate(s / 2, s / 2);
+        for (let i = 0; i < 24; i++) {
+          ctx.rotate((Math.PI * 2) / 24);
+          ctx.strokeStyle = i % 2 === 0 ? 'rgba(253, 224, 71, 0.24)' : 'rgba(251, 113, 133, 0.14)';
+          ctx.lineWidth = i % 2 === 0 ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(46, 0);
+          ctx.lineTo(s * 0.48, 0);
+          ctx.stroke();
+        }
+
+        // Vòng tròn đồng tâm Art Deco
+        [88, 152, 212, 240].forEach((r, idx) => {
+          ctx.strokeStyle = idx % 2 === 0 ? 'rgba(253, 224, 71, 0.48)' : 'rgba(244, 63, 94, 0.34)';
+          ctx.lineWidth = idx === 3 ? 4 : 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+        ctx.restore();
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Bảng Khắc Tên Đôi Lứa 3D (1024x308, padding rộng giữ 100% dấu tiếng Việt & descender g, y, p, q)
+      function createCouplePlaqueTexture() {
+        const w = 1024;
+        const h = 308;
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d');
+        const t = THEMES[state.theme] || THEMES.crimson_velvet;
+
+        const bg = ctx.createLinearGradient(0, 0, w, h);
+        bg.addColorStop(0, t.plaqueBgA);
+        bg.addColorStop(0.5, 'rgba(34, 6, 18, 0.96)');
+        bg.addColorStop(1, t.plaqueBgB);
+        ctx.fillStyle = bg;
+
+        const pad = 12;
+        const rad = 32;
+        ctx.beginPath();
+        ctx.moveTo(pad + rad, pad);
+        ctx.lineTo(w - pad - rad, pad);
+        ctx.quadraticCurveTo(w - pad, pad, w - pad, pad + rad);
+        ctx.lineTo(w - pad, h - pad - rad);
+        ctx.quadraticCurveTo(w - pad, h - pad, w - pad - rad, h - pad);
+        ctx.lineTo(pad + rad, h - pad);
+        ctx.quadraticCurveTo(pad, h - pad, pad, h - pad - rad);
+        ctx.lineTo(pad, pad + rad);
+        ctx.quadraticCurveTo(pad, pad, pad + rad, pad);
+        ctx.closePath();
+        ctx.fill();
+
+        const borderGrad = ctx.createLinearGradient(0, 0, w, 0);
+        borderGrad.addColorStop(0, '#fb7185');
+        borderGrad.addColorStop(0.5, t.goldHex);
+        borderGrad.addColorStop(1, '#fb7185');
+        ctx.strokeStyle = borderGrad;
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.36)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(24, 24, w - 48, h - 48);
+
+        const fitFont = (text, family, weight, startSize, minSize, maxW) => {
+          let size = startSize;
+          while (size > minSize) {
+            ctx.font = `${weight} ${size}px ${family}`;
+            if (ctx.measureText(text).width <= maxW) break;
+            size -= 2;
+          }
+          return `${weight} ${size}px ${family}`;
+        };
+
+        const maxTextW = w - 120;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Dòng 1: y = 68 (>= 48px top padding bảo toàn dấu thanh hoa/thường)
+        const daysLabel = computeLoveDaysText(state.startDate);
+        const line1 = `🌹 ${state.honorific} • ${daysLabel}`;
+        ctx.font = fitFont(line1, '"Plus Jakarta Sans", sans-serif', '700', 27, 18, maxTextW);
+        ctx.fillStyle = t.goldHex;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 10;
+        ctx.fillText(line1, w / 2, 68);
+
+        // Dòng 2: Tên đôi lứa (y = 152, khoảng trống rộng cho dấu & nét dưới g, y, p, q)
+        const line2 = `${state.receiver} ❤️ ${state.sender}`;
+        ctx.font = fitFont(line2, '"Playfair Display", serif', '800', 52, 26, maxTextW);
+        const nameGrad = ctx.createLinearGradient(w * 0.2, 0, w * 0.8, 0);
+        nameGrad.addColorStop(0, '#ffe4e6');
+        nameGrad.addColorStop(0.5, '#ffffff');
+        nameGrad.addColorStop(1, '#fef08a');
+        ctx.fillStyle = nameGrad;
+        ctx.fillText(line2, w / 2, 152);
+
+        // Dòng 3: y = 236 (bottom margin = 72px >= 48px giữ trọn nét dưới g, y, p, q)
+        const line3 = 'Happy Valentine’s Day 14/2 • Vũ Điệu Waltz Tình Yêu';
+        ctx.font = fitFont(line3, '"Playfair Display", serif', 'italic 700', 28, 18, maxTextW);
+        ctx.fillStyle = '#fecdd3';
+        ctx.fillText(line3, w / 2, 236);
+        ctx.shadowBlur = 0;
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Tranh nghệ thuật mặc định cho 6 khung ảnh khi chưa upload ảnh thật
+      function buildDefaultValentineArt(idx) {
+        const s = 768;
+        const cvs = document.createElement('canvas');
+        cvs.width = s;
+        cvs.height = s;
+        const ctx = cvs.getContext('2d');
+        const t = THEMES[state.theme] || THEMES.crimson_velvet;
+        const mem = state.memories[idx % state.memories.length] || {
+          title: `Kỷ Niệm #${idx + 1}`,
+          caption: '"Khoảnh khắc hoa hồng nở rộ"'
+        };
+        const icons = ['🌹', '💃', '🥂', '💌', '💍', '❤️'];
+
+        const bg = ctx.createRadialGradient(s / 2, s * 0.36, 34, s / 2, s / 2, s * 0.72);
+        bg.addColorStop(0, t.goldHex);
+        bg.addColorStop(0.22, t.petalPalette[idx % t.petalPalette.length]);
+        bg.addColorStop(0.68, '#2d0614');
+        bg.addColorStop(1, '#090205');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, s, s);
+
+        // Vòng tròn hào quang Art Deco
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(s / 2, s * 0.36, 136, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 245, 248, 0.92)';
+        ctx.shadowColor = t.goldHex;
+        ctx.shadowBlur = 36;
+        ctx.beginPath();
+        ctx.arc(s / 2, s * 0.36, 102, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '96px sans-serif';
+        ctx.fillText(icons[idx % icons.length], s / 2, s * 0.37);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(6, 1, 5, 0.92)';
+        ctx.shadowBlur = 12;
+        ctx.font = '800 38px "Playfair Display", serif';
+        ctx.fillText(mem.title, s / 2, s * 0.67, s - 96);
+
+        ctx.fillStyle = t.goldHex;
+        ctx.font = 'italic 700 28px "Playfair Display", serif';
+        ctx.fillText(`${state.receiver} ❤️ ${state.sender}`, s / 2, s * 0.79, s - 96);
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.88)';
+        ctx.lineWidth = 14;
+        ctx.strokeRect(14, 14, s - 28, s - 28);
+        return cvs;
+      }
+
+      function buildPhotoCanvas(idx) {
+        const s = 768;
+        const dataUrl = state.photos[idx] || null;
+        if (!dataUrl) {
+          return Promise.resolve(buildDefaultValentineArt(idx));
+        }
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const cvs = document.createElement('canvas');
+            cvs.width = s;
+            cvs.height = s;
+            const ctx = cvs.getContext('2d');
+            const ratio = img.width / Math.max(1, img.height);
+            let sw = img.width, sh = img.height, sx = 0, sy = 0;
+            if (ratio > 1) {
+              sw = img.height;
+              sx = (img.width - sw) / 2;
+            } else {
+              sh = img.width;
+              sy = (img.height - sh) / 2;
+            }
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, s, s);
+            const vig = ctx.createRadialGradient(s / 2, s / 2, s * 0.34, s / 2, s / 2, s * 0.56);
+            vig.addColorStop(0, 'rgba(0,0,0,0)');
+            vig.addColorStop(1, 'rgba(14, 3, 9, 0.28)');
+            ctx.fillStyle = vig;
+            ctx.fillRect(0, 0, s, s);
+            resolve(cvs);
+          };
+          img.onerror = () => resolve(buildDefaultValentineArt(idx));
+          img.src = dataUrl;
+        });
+      }
+
+      /**
+       * ============================================================================
+       * 4. LỚP 1 (#webgl-canvas): SÂN KHẤU DẠ HỘI, 220 CÁNH HỒNG, 5.200 HẠT & TRÁI TIM 3D
+       * ============================================================================
+       */
+      const webglCanvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({
+        canvas: webglCanvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderer.setPixelRatio(dpr);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, window.innerWidth / Math.max(1, window.innerHeight), 0.1, 1000);
+
+      let cw = window.innerWidth;
+      let ch = window.innerHeight;
+      let isMobile = cw < 768;
+
+      const softGlowTex = createSoftGlowTexture();
+      const petalVeinTex = createRosePetalVeinTexture();
+
+      // Ánh sáng 3-Point + Tương phản Nóng/Lạnh
+      const ambientLight = new THREE.AmbientLight(0xffe4e6, 0.72);
+      scene.add(ambientLight);
+
+      const hemiLight = new THREE.HemisphereLight(0xfff1f2, 0x2c0613, 0.56);
+      scene.add(hemiLight);
+
+      const coreWarmLight = new THREE.PointLight(0xffaa66, 2.0, 44);
+      coreWarmLight.position.set(0, 0.8, 1.5);
+      scene.add(coreWarmLight);
+
+      const keyDirLight = new THREE.DirectionalLight(0xfff5f7, 1.15);
+      keyDirLight.position.set(6, 9, 10);
+      scene.add(keyDirLight);
+
+      const coolRimLight = new THREE.DirectionalLight(0x60a5fa, 0.9);
+      coolRimLight.position.set(-9, 6, -8);
+      scene.add(coolRimLight);
+
+      // 4.1. Trường sao nền lãng mạn
+      const STAR_COUNT = 720;
+      const starGeo = new THREE.BufferGeometry();
+      const starPos = new Float32Array(STAR_COUNT * 3);
+      const starPhase = new Float32Array(STAR_COUNT);
+      const starSize = new Float32Array(STAR_COUNT);
+      const starColor = new Float32Array(STAR_COUNT * 3);
+      const starPalette = [
+        new THREE.Color('#ffffff'),
+        new THREE.Color('#fecdd3'),
+        new THREE.Color('#fef08a'),
+        new THREE.Color('#bae6fd')
+      ];
+      for (let i = 0; i < STAR_COUNT; i++) {
+        starPos[i * 3] = (Math.random() - 0.5) * 90;
+        starPos[i * 3 + 1] = -8 + Math.random() * 54;
+        starPos[i * 3 + 2] = -36 + (Math.random() - 0.5) * 20;
+        starPhase[i] = Math.random() * Math.PI * 2;
+        starSize[i] = 0.8 + Math.random() * 1.9;
+        const sc = starPalette[i % starPalette.length];
+        starColor[i * 3] = sc.r;
+        starColor[i * 3 + 1] = sc.g;
+        starColor[i * 3 + 2] = sc.b;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      starGeo.setAttribute('aPhase', new THREE.BufferAttribute(starPhase, 1));
+      starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSize, 1));
+      starGeo.setAttribute('aColor', new THREE.BufferAttribute(starColor, 3));
+
+      const starUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: dpr },
+        uBoost: { value: 0.78 }
+      };
+      const starMat = new THREE.ShaderMaterial({
+        uniforms: starUniforms,
+        vertexShader: `
+          attribute float aPhase;
+          attribute float aSize;
+          attribute vec3 aColor;
+          uniform float uTime;
+          uniform float uPixelRatio;
+          varying vec3 vColor;
+          varying float vAlpha;
+          void main() {
+            vColor = aColor;
+            float tw = 0.48 + 0.52 * sin(uTime * 1.9 + aPhase);
+            vAlpha = tw;
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = aSize * (0.85 + 0.35 * tw) * uPixelRatio * (18.0 / max(1.0, -mvPos.z));
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform float uBoost;
+          varying vec3 vColor;
+          varying float vAlpha;
+          void main() {
+            float d = length(gl_PointCoord - vec2(0.5));
+            if (d > 0.5) discard;
+            float core = 1.0 - smoothstep(0.06, 0.5, d);
+            gl_FragColor = vec4(vColor, core * vAlpha * uBoost);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const starPoints = new THREE.Points(starGeo, starMat);
+      scene.add(starPoints);
+
+      // 4.2. Sàn Đá Dạ Hội & Bệ Pha Lê 2 Tầng (ballroomPedestalGroup tại y = -2.4)
+      const ballroomPedestalGroup = new THREE.Group();
+      ballroomPedestalGroup.position.set(0, -2.4, 0);
+      scene.add(ballroomPedestalGroup);
+
+      const floorTex = createArtDecoFloorTexture();
+      const danceFloorMat = new THREE.MeshStandardMaterial({
+        map: floorTex,
+        roughness: 0.35,
+        metalness: 0.45,
+        toneMapped: false
+      });
+      const danceFloorMesh = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.6, 0.18, 64), danceFloorMat);
+      danceFloorMesh.position.y = -0.09;
+      ballroomPedestalGroup.add(danceFloorMesh);
+
+      const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        emissive: 0x78350f,
+        emissiveIntensity: 0.35,
+        roughness: 0.28,
+        metalness: 0.85
+      });
+
+      const floorRimRing = new THREE.Mesh(new THREE.TorusGeometry(4.42, 0.045, 16, 84), goldMat);
+      floorRimRing.rotation.x = Math.PI / 2;
+      floorRimRing.position.y = 0.01;
+      ballroomPedestalGroup.add(floorRimRing);
+
+      // Bệ pha lê 2 tầng (nhóm riêng để hạ nhẹ xuống khi Bảng Tên 3D xuất hiện ở Pha 2-3, tránh cắt chữ)
+      const crystalPedestalGroup = new THREE.Group();
+      ballroomPedestalGroup.add(crystalPedestalGroup);
+
+      const crystalMat = new THREE.MeshPhongMaterial({
+        color: 0xfecdd3,
+        emissive: 0x4c0519,
+        emissiveIntensity: 0.35,
+        shininess: 110,
+        specular: 0xffffff,
+        transparent: true,
+        opacity: 0.84
+      });
+
+      const tier1Mesh = new THREE.Mesh(new THREE.CylinderGeometry(1.55, 1.82, 0.3, 48), crystalMat);
+      tier1Mesh.position.y = 0.15;
+      crystalPedestalGroup.add(tier1Mesh);
+
+      const tier1Gold = new THREE.Mesh(new THREE.TorusGeometry(1.56, 0.032, 12, 64), goldMat);
+      tier1Gold.rotation.x = Math.PI / 2;
+      tier1Gold.position.y = 0.3;
+      crystalPedestalGroup.add(tier1Gold);
+
+      const tier2Mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.18, 0.26, 48), crystalMat);
+      tier2Mesh.position.y = 0.43;
+      crystalPedestalGroup.add(tier2Mesh);
+
+      const tier2Gold = new THREE.Mesh(new THREE.TorusGeometry(0.96, 0.028, 12, 64), goldMat);
+      tier2Gold.rotation.x = Math.PI / 2;
+      tier2Gold.position.y = 0.56;
+      crystalPedestalGroup.add(tier2Gold);
+
+      // Vòng mời chạm / xoay vòng Waltz (inviteRingMesh)
+      const inviteRingMat = new THREE.MeshBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.72,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const inviteRingMesh = new THREE.Mesh(new THREE.TorusGeometry(2.38, 0.04, 16, 84), inviteRingMat);
+      inviteRingMesh.rotation.x = Math.PI / 2;
+      inviteRingMesh.position.y = 0.06;
+      ballroomPedestalGroup.add(inviteRingMesh);
+
+      const inviteHaloMat = new THREE.MeshBasicMaterial({
+        color: 0xf43f5e,
+        transparent: true,
+        opacity: 0.32,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const inviteHaloRing = new THREE.Mesh(new THREE.RingGeometry(2.15, 2.62, 64), inviteHaloMat);
+      inviteHaloRing.rotation.x = -Math.PI / 2;
+      inviteHaloRing.position.y = 0.04;
+      ballroomPedestalGroup.add(inviteHaloRing);
+
+      // 4.3. Đóa Hồng Nhung 3D Trung Tâm Pha 0 (centerRoseGroup - 28 cánh Góc Vàng)
+      const centerRoseGroup = new THREE.Group();
+      centerRoseGroup.position.set(0, -0.92, 0);
+      scene.add(centerRoseGroup);
+
+      const stemMat = new THREE.MeshStandardMaterial({
+        color: 0x166534,
+        roughness: 0.55,
+        metalness: 0.15
+      });
+      const stemMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.058, 0.98, 12), stemMat);
+      stemMesh.position.y = -0.46;
+      centerRoseGroup.add(stemMesh);
+
+      const calyxMesh = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.24, 16), stemMat);
+      calyxMesh.rotation.x = Math.PI;
+      calyxMesh.position.y = -0.02;
+      centerRoseGroup.add(calyxMesh);
+
+      const centerPetalGeo = createCurvedRosePetalGeometry(0.42, 0.54);
+      const centerRosePetals = [];
+      const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // 137.508°
+
+      for (let i = 0; i < 28; i++) {
+        const t = i / 27;
+        const mat = new THREE.MeshStandardMaterial({
+          map: petalVeinTex,
+          color: new THREE.Color('#e11d48'),
+          emissive: new THREE.Color('#4c0519'),
+          emissiveIntensity: 0.24,
+          roughness: 0.52,
+          metalness: 0.06,
+          side: THREE.DoubleSide
+        });
+        const holder = new THREE.Group();
+        const angle = i * GOLDEN_ANGLE;
+        holder.rotation.y = angle;
+
+        const petal = new THREE.Mesh(centerPetalGeo, mat);
+        const radial = 0.07 + t * 0.42;
+        const baseTilt = 0.28 + t * 0.96; // cánh trong khép kín, cánh ngoài xòe duyên dáng
+        const scale = 0.54 + t * 0.74;
+        petal.position.set(0, 0.14 + (1 - t) * 0.16, radial);
+        petal.rotation.x = baseTilt;
+        petal.scale.set(scale, scale, scale);
+        holder.add(petal);
+        centerRoseGroup.add(holder);
+
+        centerRosePetals.push({
+          holder,
+          mesh: petal,
+          mat,
+          t,
+          baseTilt,
+          baseRadial: radial,
+          baseScale: scale
+        });
+      }
+
+      const centerRoseGlow = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: softGlowTex,
+          color: 0xf43f5e,
+          transparent: true,
+          opacity: 0.55,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      centerRoseGlow.scale.set(2.3, 2.3, 1);
+      centerRoseGlow.position.set(0, 0.25, 0);
+      centerRoseGroup.add(centerRoseGlow);
+
+      // 4.4. Toán học Bề Mặt Trái Tim 3D Lộng Lẫy (Parametric Pillow-Heart Surface + Pháp Tuyến)
+      function sampleHeartSurfacePoint(uAngle, latAngle) {
+        // Đường viền Trái Tim chuẩn Valentine sắc nét (mũi nhọn đáy + khe tim sâu trên đỉnh)
+        const sU = Math.sin(uAngle);
+        const cU = Math.cos(uAngle);
+        const hx = Math.pow(sU, 3); // [-1, 1]
+        const hy = (13 * cU - 5 * Math.cos(2 * uAngle) - 2 * Math.cos(3 * uAngle) - Math.cos(4 * uAngle)) / 16 + 0.14;
+
+        const cLat = Math.cos(latAngle);
+        const sLat = Math.sin(latAngle);
+
+        // Độ dày 3D căng mịn ở giữa ngực tim, thuôn nhọn dần về mép viền & đỉnh đáy
+        const bulge = 0.56 * (0.42 + 0.58 * Math.max(0, 1 - Math.abs(hy) * 0.45));
+        const px = hx * cLat;
+        const py = hy * cLat;
+        const pz = sLat * bulge;
+
+        // Tính pháp tuyến ngoài từ đạo hàm tiếp tuyến (dP/du × dP/dlat)
+        const eps = 0.012;
+        const u2 = uAngle + eps;
+        const hx2 = Math.pow(Math.sin(u2), 3);
+        const hy2 = (13 * Math.cos(u2) - 5 * Math.cos(2 * u2) - 2 * Math.cos(3 * u2) - Math.cos(4 * u2)) / 16 + 0.14;
+        const duVec = new THREE.Vector3((hx2 - hx) * cLat, (hy2 - hy) * cLat, 0);
+
+        const l2 = latAngle + eps;
+        const dLatVec = new THREE.Vector3(
+          hx * (Math.cos(l2) - cLat),
+          hy * (Math.cos(l2) - cLat),
+          (Math.sin(l2) - sLat) * bulge
+        );
+
+        const normal = new THREE.Vector3().crossVectors(dLatVec, duVec);
+        if (normal.lengthSq() < 1e-8) {
+          normal.set(px, py, pz);
+        }
+        normal.normalize();
+        // Đảm bảo pháp tuyến luôn hướng ra ngoài so với tâm Trái Tim
+        if (normal.x * px + normal.y * py + normal.z * pz < 0) {
+          normal.negate();
+        }
+
+        return { pos: new THREE.Vector3(px, py, pz), normal };
+      }
+
+      // 4.5. 220 Cánh Hoa Hồng 3D Cong (THREE.InstancedMesh - LƯU Ý r128: chỉ dùng setColorAt, KHÔNG bật vertexColors)
+      const PETAL_COUNT = 220;
+      const vortexPetalGeo = createCurvedRosePetalGeometry(0.28, 0.36);
+      const vortexPetalMat = new THREE.MeshStandardMaterial({
+        map: petalVeinTex,
+        color: 0xffffff,
+        emissive: new THREE.Color(THEMES.crimson_velvet.petalEmissive),
+        emissiveIntensity: 0.24,
+        roughness: 0.52,
+        metalness: 0.08,
+        side: THREE.DoubleSide
+      });
+
+      const petalInstancedMesh = new THREE.InstancedMesh(vortexPetalGeo, vortexPetalMat, PETAL_COUNT);
+      petalInstancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      scene.add(petalInstancedMesh);
+
+      const petalData = [];
+      const dummyObj = new THREE.Object3D();
+      const tmpPos = new THREE.Vector3();
+      const tmpNormal = new THREE.Vector3();
+      const zAxis = new THREE.Vector3(0, 0, 1);
+      const targetQuat = new THREE.Quaternion();
+      const extraQuat = new THREE.Quaternion();
+      const tmpEuler = new THREE.Euler();
+
+      for (let i = 0; i < PETAL_COUNT; i++) {
+        // 35% cánh hoa ôm dọc viền Trái Tim để tạo đường nét cực sắc, 65% phủ đều mặt trước/sau
+        const isRim = i < Math.round(PETAL_COUNT * 0.35);
+        const uAngle = isRim
+          ? (i / Math.round(PETAL_COUNT * 0.35)) * Math.PI * 2
+          : ((i * 2.399963) % (Math.PI * 2));
+        const latAngle = isRim
+          ? ((i % 2 === 0 ? 1 : -1) * (0.04 + Math.random() * 0.24))
+          : (Math.asin(Math.max(-0.92, Math.min(0.92, ((i - PETAL_COUNT * 0.35) / (PETAL_COUNT * 0.65)) * 2 - 1))) * 0.92);
+
+        const surf = sampleHeartSurfacePoint(uAngle, latAngle);
+        const h = (i + 0.5) / PETAL_COUNT; // Chiều cao chuẩn hóa trong lốc xoáy [0..1]
+
+        petalData.push({
+          h,
+          baseAngle: Math.random() * Math.PI * 2,
+          orbitJitter: (Math.random() - 0.5) * 0.28,
+          spinRate: 1.4 + Math.random() * 2.2,
+          flutterPhase: Math.random() * Math.PI * 2,
+          stagger: Math.random() * 0.22,
+          scale: isRim ? 0.56 + Math.random() * 0.24 : 0.62 + Math.random() * 0.28,
+          heartLocalPos: surf.pos,
+          heartNormal: surf.normal,
+          heartTilt: (Math.random() - 0.5) * 0.45,
+          frozenPos: new THREE.Vector3(),
+          frozenQuat: new THREE.Quaternion(),
+          currentPos: new THREE.Vector3(),
+          currentQuat: new THREE.Quaternion()
+        });
+      }
+
+      // 4.6. 5.200 Hạt Ánh Sáng (THREE.Points: 28% lõi vàng champagne & 72% vỏ hồng ruby)
+      const PARTICLE_COUNT = 5200;
+      const CORE_COUNT = Math.round(PARTICLE_COUNT * 0.28); // 1.456 hạt lõi vàng champagne
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(PARTICLE_COUNT * 3);
+      const pColor = new Float32Array(PARTICLE_COUNT * 3);
+      const pSize = new Float32Array(PARTICLE_COUNT);
+      const pAlpha = new Float32Array(PARTICLE_COUNT);
+
+      const pMeta = {
+        h: new Float32Array(PARTICLE_COUNT),
+        angle: new Float32Array(PARTICLE_COUNT),
+        radiusOffset: new Float32Array(PARTICLE_COUNT),
+        stagger: new Float32Array(PARTICLE_COUNT),
+        phase: new Float32Array(PARTICLE_COUNT),
+        isCore: new Uint8Array(PARTICLE_COUNT),
+        heartX: new Float32Array(PARTICLE_COUNT),
+        heartY: new Float32Array(PARTICLE_COUNT),
+        heartZ: new Float32Array(PARTICLE_COUNT),
+        frozenX: new Float32Array(PARTICLE_COUNT),
+        frozenY: new Float32Array(PARTICLE_COUNT),
+        frozenZ: new Float32Array(PARTICLE_COUNT)
+      };
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const isCore = i < CORE_COUNT;
+        pMeta.isCore[i] = isCore ? 1 : 0;
+        pMeta.h[i] = Math.random();
+        pMeta.angle[i] = Math.random() * Math.PI * 2;
+        pMeta.radiusOffset[i] = (Math.random() - 0.5) * 0.42;
+        pMeta.stagger[i] = Math.random() * 0.24;
+        pMeta.phase[i] = Math.random() * Math.PI * 2;
+
+        const uAngle = Math.random() * Math.PI * 2;
+        // 42% hạt vỏ tập trung gần đường viền sắc nét của Trái Tim
+        const latAngle = !isCore && Math.random() < 0.42
+          ? (Math.random() - 0.5) * 0.48
+          : Math.asin(Math.random() * 2 - 1);
+        const surf = sampleHeartSurfacePoint(uAngle, latAngle);
+
+        const depthScale = isCore
+          ? 0.22 + Math.pow(Math.random(), 0.72) * 0.48
+          : 0.94 + Math.random() * 0.1;
+
+        pMeta.heartX[i] = surf.pos.x * depthScale;
+        pMeta.heartY[i] = surf.pos.y * depthScale;
+        pMeta.heartZ[i] = surf.pos.z * depthScale;
+
+        pSize[i] = isCore ? 1.5 + Math.random() * 1.4 : 1.05 + Math.random() * 1.3;
+        pAlpha[i] = isCore ? 0.92 : 0.86;
+      }
+
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      pGeo.setAttribute('aColor', new THREE.BufferAttribute(pColor, 3));
+      pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize, 1));
+      pGeo.setAttribute('aAlpha', new THREE.BufferAttribute(pAlpha, 1));
+
+      const particleUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: dpr },
+        uGlowBoost: { value: 1.0 }
+      };
+
+      const particleMat = new THREE.ShaderMaterial({
+        uniforms: particleUniforms,
+        vertexShader: `
+          attribute vec3 aColor;
+          attribute float aSize;
+          attribute float aAlpha;
+          uniform float uPixelRatio;
+          varying vec3 vColor;
+          varying float vAlpha;
+          void main() {
+            vColor = aColor;
+            vAlpha = aAlpha;
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = aSize * uPixelRatio * (28.0 / max(1.0, -mvPos.z));
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform float uGlowBoost;
+          varying vec3 vColor;
+          varying float vAlpha;
+          void main() {
+            float d = length(gl_PointCoord - vec2(0.5));
+            if (d > 0.5) discard;
+            float glow = 1.0 - smoothstep(0.06, 0.5, d);
+            gl_FragColor = vec4(vColor, glow * glow * vAlpha * uGlowBoost);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      const vortexParticles = new THREE.Points(pGeo, particleMat);
+      scene.add(vortexParticles);
+
+      // Hit sphere ẩn cho Trái Tim 3D (chạm để tạo sóng hạt + harp ripple ở Pha 3)
+      const heartHitMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(2.35, 16, 16),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      heartHitMesh.userData.isHeart = true;
+      scene.add(heartHitMesh);
+
+      // 4.7. Bảng Khắc Tên Đôi Lứa 3D (couplePlaqueGroup, 1024x308, toneMapped: false)
+      const couplePlaqueGroup = new THREE.Group();
+      couplePlaqueGroup.visible = false;
+      scene.add(couplePlaqueGroup);
+
+      const plaqueMat = new THREE.MeshBasicMaterial({
+        map: createCouplePlaqueTexture(),
+        transparent: true,
+        toneMapped: false
+      });
+      const plaqueMesh = new THREE.Mesh(new THREE.PlaneGeometry(5.1, 1.54), plaqueMat);
+      couplePlaqueGroup.add(plaqueMesh);
+
+      const plaqueFrameMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(5.26, 1.7),
+        new THREE.MeshBasicMaterial({
+          color: 0xfde047,
+          transparent: true,
+          opacity: 0.24,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      plaqueFrameMesh.position.z = -0.02;
+      couplePlaqueGroup.add(plaqueFrameMesh);
+
+      // 4.8. 6 Khung Ảnh Kỷ Niệm 3D Viền Vàng Cổ Điển (Quỹ đạo elip quanh Trái Tim)
+      const memoryFrames = [];
+      const memoryHitMeshes = [];
+      let activeZoomFrame = null;
+
+      function initMemoryFrames() {
+        const frameGoldMat = new THREE.MeshStandardMaterial({
+          color: 0xfbbf24,
+          emissive: 0x78350f,
+          emissiveIntensity: 0.35,
+          roughness: 0.26,
+          metalness: 0.85
+        });
+
+        for (let i = 0; i < 6; i++) {
+          const group = new THREE.Group();
+          group.visible = false;
+
+          // Viền vàng cổ điển 3D nổi khối
+          const outerBevel = new THREE.Mesh(new THREE.BoxGeometry(1.56, 1.56, 0.06), frameGoldMat);
+          outerBevel.position.z = -0.035;
+          group.add(outerBevel);
+
+          const innerMatte = new THREE.MeshBasicMaterial({ color: 0x2b0814 });
+          const matteMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.42, 1.42), innerMatte);
+          matteMesh.position.z = -0.002;
+          group.add(matteMesh);
+
+          const photoMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            toneMapped: false
+          });
+          const photoMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.32, 1.32), photoMat);
+          photoMesh.position.z = 0.012;
+          group.add(photoMesh);
+
+          // Góc hoa văn vàng 4 góc
+          const cornerGeo = new THREE.SphereGeometry(0.052, 10, 10);
+          [
+            [-0.74, 0.74],
+            [0.74, 0.74],
+            [-0.74, -0.74],
+            [0.74, -0.74]
+          ].forEach(([cx, cy]) => {
+            const cBead = new THREE.Mesh(cornerGeo, frameGoldMat);
+            cBead.position.set(cx, cy, 0.015);
+            group.add(cBead);
+          });
+
+          const hitMesh = new THREE.Mesh(
+            new THREE.PlaneGeometry(1.85, 1.85),
+            new THREE.MeshBasicMaterial({ visible: false })
+          );
+          hitMesh.position.z = 0.06;
+          hitMesh.userData.frameIdx = i;
+          group.add(hitMesh);
+          memoryHitMeshes.push(hitMesh);
+
+          scene.add(group);
+          memoryFrames.push({
+            idx: i,
+            group,
+            photoMat,
+            hitMesh,
+            orbitAngle: (i / 6) * Math.PI * 2 + Math.PI / 6,
+            yBobPhase: i * 1.15,
+            launchProgress: 0,
+            zooming: false
+          });
+        }
+      }
+
+      async function refreshAllPhotoTextures() {
+        for (let i = 0; i < memoryFrames.length; i++) {
+          const cvs = await buildPhotoCanvas(i);
+          const tex = new THREE.CanvasTexture(cvs);
+          tex.encoding = THREE.sRGBEncoding;
+          if (memoryFrames[i].photoMat.map) memoryFrames[i].photoMat.map.dispose();
+          memoryFrames[i].photoMat.map = tex;
+          memoryFrames[i].photoMat.needsUpdate = true;
+        }
+      }
+
+      function refreshCouplePlaqueTexture() {
+        const tex = createCouplePlaqueTexture();
+        if (plaqueMat.map) plaqueMat.map.dispose();
+        plaqueMat.map = tex;
+        plaqueMat.needsUpdate = true;
+      }
+
+      function applyThemeVisuals(themeKey) {
+        const t = THEMES[themeKey] || THEMES.crimson_velvet;
+        document.documentElement.style.background = t.skyBg;
+        document.body.style.background = t.skyBg;
+        const rad = document.getElementById('sky-radiance-layer');
+        if (rad) rad.style.background = t.radianceBg;
+
+        coreWarmLight.color.set(t.warmLight);
+        coolRimLight.color.set(t.coolLight);
+        vortexPetalMat.emissive.set(t.petalEmissive);
+
+        // Tô màu 28 cánh đóa hồng trung tâm
+        const pCols = t.petalPalette.map((hex) => new THREE.Color(hex));
+        centerRosePetals.forEach((p, idx) => {
+          const c = pCols[idx % pCols.length];
+          p.mat.color.copy(c);
+          p.mat.emissive.set(t.petalEmissive);
+        });
+        centerRoseGlow.material.color.set(t.petalPalette[0]);
+
+        // Tô màu 220 cánh hoa InstancedMesh qua setColorAt (chuẩn r128)
+        for (let i = 0; i < PETAL_COUNT; i++) {
+          const c = pCols[i % pCols.length].clone();
+          // Pha nhẹ ánh sáng theo lớp để tạo chiều sâu sống động
+          c.offsetHSL((Math.random() - 0.5) * 0.02, 0, (Math.random() - 0.45) * 0.08);
+          petalInstancedMesh.setColorAt(i, c);
+        }
+        if (petalInstancedMesh.instanceColor) {
+          petalInstancedMesh.instanceColor.needsUpdate = true;
+        }
+
+        // Tô màu 5.200 hạt ánh sáng (28% vàng champagne lõi + 72% hồng ruby vỏ)
+        const coreC = new THREE.Color(t.coreGold);
+        const shellCs = t.shellRose.map((h) => new THREE.Color(h));
+        const colArr = pGeo.attributes.aColor.array;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const c = pMeta.isCore[i] ? coreC : shellCs[i % shellCs.length];
+          colArr[i * 3] = c.r;
+          colArr[i * 3 + 1] = c.g;
+          colArr[i * 3 + 2] = c.b;
+        }
+        pGeo.attributes.aColor.needsUpdate = true;
+
+        refreshCouplePlaqueTexture();
+      }
+
+      // Responsive Layout & Camera
+      const baseCamPos = new THREE.Vector3(0, 1.35, 11.4);
+      const camLookTarget = new THREE.Vector3(0, 0.25, 0);
+      let heartCenterY = 0.68;
+      let heartScale = 2.25;
+      let orbitYaw = 0;
+      let targetOrbitYaw = 0;
+      let orbitPitch = 0;
+      let targetOrbitPitch = 0;
+      let tiltX = 0;
+      let tiltY = 0;
+
+      function updateThreeLayout() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        isMobile = cw < 768;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(cw, ch, false);
+        camera.aspect = cw / Math.max(1, ch);
+        starUniforms.uPixelRatio.value = dpr;
+        particleUniforms.uPixelRatio.value = dpr;
+
+        if (isMobile) {
+          baseCamPos.set(0, 1.65, 13.8);
+          camLookTarget.set(0, 0.45, 0);
+          heartCenterY = 1.12;
+          heartScale = 1.92;
+          couplePlaqueGroup.position.set(0, -1.72, 2.25);
+          couplePlaqueGroup.scale.setScalar(0.76);
+        } else {
+          baseCamPos.set(0, 1.35, 11.2);
+          camLookTarget.set(0, 0.35, 0);
+          heartCenterY = 0.96;
+          heartScale = 2.38;
+          couplePlaqueGroup.position.set(0, -1.86, 2.45);
+          couplePlaqueGroup.scale.setScalar(0.96);
+        }
+        heartHitMesh.position.set(0, heartCenterY, 0);
+        camera.updateProjectionMatrix();
+      }
+
+      /**
+       * ============================================================================
+       * 5. DUAL-CANVAS (#trails-canvas destination-out + #morph-canvas)
+       * ============================================================================
+       */
+      const trailsCanvas = document.getElementById('trails-canvas');
+      const trailsCtx = trailsCanvas.getContext('2d');
+      const morphCanvas = document.getElementById('morph-canvas');
+      const morphCtx = morphCanvas.getContext('2d');
+
+      let trailSparks = [];
+      let shockwaves = [];
+      let floatingTexts = [];
+
+      function resizeAllCanvases() {
+        updateThreeLayout();
+        [trailsCanvas, morphCanvas].forEach((cvs) => {
+          cvs.width = Math.round(cw * dpr);
+          cvs.height = Math.round(ch * dpr);
+          cvs.style.width = cw + 'px';
+          cvs.style.height = ch + 'px';
+        });
+      }
+      window.addEventListener('resize', resizeAllCanvases);
+
+      function worldToScreen(worldPos) {
+        const v = worldPos.clone().project(camera);
+        return {
+          x: (v.x * 0.5 + 0.5) * cw,
+          y: (-v.y * 0.5 + 0.5) * ch
+        };
+      }
+
+      class TrailSpark {
+        constructor(x, y, color, speedScale = 1.0, isSwipe = false) {
+          this.x = x;
+          this.y = y;
+          this.prevX = x;
+          this.prevY = y;
+          const ang = Math.random() * Math.PI * 2;
+          const spd = (isSwipe ? 1.2 + Math.random() * 2.8 : 2.2 + Math.random() * 6.4) * speedScale;
+          this.vx = Math.cos(ang) * spd;
+          this.vy = Math.sin(ang) * spd - (isSwipe ? 0.3 : 0.9);
+          this.friction = 0.945;
+          this.gravity = isSwipe ? 0.03 : 0.08;
+          this.alpha = 1.0;
+          this.decay = isSwipe ? 0.036 + Math.random() * 0.02 : 0.03 + Math.random() * 0.018;
+          this.color = color;
+          this.width = isSwipe ? 1.8 : 2.0;
+        }
+
+        update() {
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+        }
+
+        draw(ctx) {
+          if (this.alpha <= 0) return;
+          const a = Math.max(0, this.alpha);
+          ctx.globalAlpha = a * 0.88;
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = this.width;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(this.prevX, this.prevY);
+          ctx.lineTo(this.x, this.y);
+          ctx.stroke();
+
+          ctx.globalAlpha = a;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.width * 0.55, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function spawnVortexBurst(x, y, count = 24, isBig = false, labelText = null) {
+        const t = THEMES[state.theme] || THEMES.crimson_velvet;
+        for (let i = 0; i < count; i++) {
+          trailSparks.push(new TrailSpark(x, y, t.sparks[i % t.sparks.length], isBig ? 1.35 : 0.9, false));
+        }
+        shockwaves.push({
+          x,
+          y,
+          radius: 10,
+          maxRadius: isBig ? Math.min(cw, ch) * 0.36 : 86,
+          color: t.goldHex,
+          alpha: 0.92,
+          lineWidth: isBig ? 4.0 : 2.4
+        });
+        if (labelText) {
+          const padX = Math.min(cw * 0.28, 130);
+          const safeX = Math.max(padX, Math.min(cw - padX, x));
+          floatingTexts.push({
+            x: safeX,
+            y: Math.max(92, y - 16),
+            vy: -1.1,
+            text: labelText,
+            color: t.goldHex,
+            alpha: 1.0,
+            decay: 0.013
+          });
+        }
+      }
+
+      /**
+       * ============================================================================
+       * 6. ĐIỀU KHIỂN KỊCH BẢN WALTZ 3/4 (4 PHA + NGƯNG ĐỌNG THỜI GIAN 0.65s)
+       * ============================================================================
+       */
+      let vortexHeightRatio = 0.22;
+      let targetVortexHeight = 0.22;
+      let vortexOmega = 0.55;
+      let targetVortexOmega = 0.55;
+      let vortexSpinAngle = 0;
+      let bloomProgress = 0; // 0 = Lốc xoáy, 1 = Trái Tim 3D
+      let currentSkyLum = 0.24;
+      let targetSkyLum = 0.24;
+      let heartRippleIntensity = 0;
+      let camSweepAngle = 0;
+
+      function updateHudForPhase() {
+        const pill = document.getElementById('phase-pill');
+        const beatBadge = document.getElementById('waltz-beat-badge');
+        const vortexFill = document.getElementById('vortex-fill');
+        const progressRow = document.getElementById('waltz-progress-row');
+        const skipBtn = document.getElementById('btn-skip-climax');
+
+        if (skipBtn) skipBtn.classList.toggle('hidden', state.phase >= 2);
+        if (progressRow) progressRow.classList.toggle('hidden', state.phase >= 2);
+
+        if (state.phase === 0) {
+          if (beatBadge) beatBadge.textContent = '💃 Nhịp Waltz: 0 / 3';
+          if (vortexFill) vortexFill.style.width = '15%';
+          if (pill) pill.textContent = '🌹 Chạm hoặc xoay vòng quanh Đóa Hồng để đánh thức Lốc Xoáy Waltz (Nhịp 1/3)';
+        } else if (state.phase === 1) {
+          const pct = state.waltzStep === 1 ? 45 : state.waltzStep === 2 ? 85 : 100;
+          if (beatBadge) beatBadge.textContent = `💃 Nhịp Waltz: ${state.waltzStep} / 3`;
+          if (vortexFill) vortexFill.style.width = `${pct}%`;
+
+          if (state.isTimeFrozen) {
+            if (pill) pill.textContent = '✨ Ngưng đọng thời gian... Chuẩn bị khoảnh khắc Trái Tim nở rộ!';
+          } else if (state.waltzStep === 1) {
+            if (pill) pill.textContent = '🌪️ Nhịp 1/3 — Lốc xoáy nâng cao 45%! Xoay vòng hoặc chạm tiếp (2/3)';
+          } else if (state.waltzStep === 2) {
+            if (pill) pill.textContent = '🔥 Nhịp 2/3 — Lốc xoáy cuộn trào 85%! Chạm nhịp cuối (3/3) để BÙNG NỔ!';
+          } else {
+            if (pill) pill.textContent = '⚡ Nhịp 3/3 — Lốc xoáy cực đại 100%!';
+          }
+        } else if (state.phase === 2) {
+          if (pill) pill.textContent = '💖 220 Cánh Hồng & 5.200 Hạt đang kết thành Trái Tim Valentine 3D!';
+        } else {
+          if (pill) pill.textContent = '💘 Chạm Trái Tim để tỏa sóng ánh sáng • Chạm 6 Khung Ảnh Vàng để ngắm cận cảnh!';
+        }
+      }
+
+      let freezePendingTimer = null;
+
+      function startPhase0() {
+        if (freezePendingTimer) {
+          clearTimeout(freezePendingTimer);
+          freezePendingTimer = null;
+        }
+        state.phase = 0;
+        state.waltzStep = 0;
+        state.isTimeFrozen = false;
+        state.freezeElapsed = 0;
+        state.phase2Elapsed = 0;
+        state.phase3Elapsed = 0;
+        state.ctaPulseTriggered = false;
+        state.activeSpotlightIdx = -1;
+
+        vortexHeightRatio = 0.14;
+        targetVortexHeight = 0.14;
+        vortexOmega = 0.55;
+        targetVortexOmega = 0.55;
+        bloomProgress = 0;
+        currentSkyLum = 0.24;
+        targetSkyLum = 0.24;
+        heartRippleIntensity = 0;
+        camSweepAngle = 0;
+        targetOrbitYaw = 0;
+        targetOrbitPitch = 0;
+
+        crystalPedestalGroup.position.y = 0;
+        centerRoseGroup.visible = true;
+        centerRoseGroup.scale.setScalar(1);
+        inviteRingMesh.visible = true;
+        inviteHaloRing.visible = true;
+        couplePlaqueGroup.visible = false;
+        couplePlaqueGroup.scale.setScalar(0.001);
+
+        activeZoomFrame = null;
+        memoryFrames.forEach((mf) => {
+          mf.zooming = false;
+          mf.launchProgress = 0;
+          mf.group.visible = false;
+          mf.group.scale.setScalar(0.001);
+        });
+
+        document.getElementById('spotlight-modal')?.classList.remove('active');
+        document.getElementById('modal-wish-card')?.classList.remove('active');
+        document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+
+        trailSparks = [];
+        shockwaves = [];
+        floatingTexts = [];
+        trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        trailsCtx.clearRect(0, 0, cw, ch);
+        morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        morphCtx.clearRect(0, 0, cw, ch);
+
+        audio.setPhase(0);
+        updateHudForPhase();
+      }
+
+      function advanceWaltzStep() {
+        if (state.phase > 1 || state.isTimeFrozen || freezePendingTimer) return;
+        audio.initContext();
+        state.phase = 1;
+        state.waltzStep = Math.min(3, state.waltzStep + 1);
+        audio.setPhase(1);
+        audio.playVortexWind(state.waltzStep);
+
+        const scr = worldToScreen(new THREE.Vector3(0, -0.5, 0));
+
+        if (state.waltzStep === 1) {
+          targetVortexHeight = 0.45;
+          targetVortexOmega = 1.8;
+          targetSkyLum = 0.4;
+          camSweepAngle += 0.35;
+          spawnVortexBurst(scr.x, scr.y, 26, false, 'Nhịp Waltz 1/3 • 45% 🌹');
+          updateHudForPhase();
+        } else if (state.waltzStep === 2) {
+          targetVortexHeight = 0.85;
+          targetVortexOmega = 3.6;
+          targetSkyLum = 0.62;
+          camSweepAngle += 0.45;
+          spawnVortexBurst(scr.x, scr.y - 30, 38, false, 'Nhịp Waltz 2/3 • 85% 🔥');
+          updateHudForPhase();
+        } else if (state.waltzStep === 3) {
+          targetVortexHeight = 1.0;
+          targetVortexOmega = 5.8;
+          targetSkyLum = 0.78;
+          camSweepAngle += 0.55;
+          spawnVortexBurst(scr.x, scr.y - 50, 56, true, 'Nhịp Waltz 3/3 • 100% ✨');
+          updateHudForPhase();
+
+          // Sau 0.48s lốc xoáy cực đại -> NGƯNG ĐỌNG THỜI GIAN 0.65s!
+          freezePendingTimer = setTimeout(() => {
+            freezePendingTimer = null;
+            triggerTimeFreezeMoment();
+          }, 480);
+        }
+      }
+
+      function snapshotFrozenState() {
+        for (let i = 0; i < PETAL_COUNT; i++) {
+          petalData[i].frozenPos.copy(petalData[i].currentPos);
+          petalData[i].frozenQuat.copy(petalData[i].currentQuat);
+        }
+        const posArr = pGeo.attributes.position.array;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          pMeta.frozenX[i] = posArr[i * 3];
+          pMeta.frozenY[i] = posArr[i * 3 + 1];
+          pMeta.frozenZ[i] = posArr[i * 3 + 2];
+        }
+      }
+
+      function triggerTimeFreezeMoment() {
+        if (state.phase >= 2) return;
+        state.isTimeFrozen = true;
+        state.freezeElapsed = 0;
+        vortexOmega = 0;
+        targetVortexOmega = 0;
+        snapshotFrozenState();
+        audio.playTimeFreezeChime();
+        updateHudForPhase();
+      }
+
+      function triggerPhase2HeartBloom() {
+        if (freezePendingTimer) {
+          clearTimeout(freezePendingTimer);
+          freezePendingTimer = null;
+        }
+        if (state.phase >= 2) return;
+
+        // Nếu nhảy tắt trực tiếp bằng nút #btn-skip-climax thì chụp nhanh trạng thái hiện tại
+        if (!state.isTimeFrozen) {
+          snapshotFrozenState();
+        }
+
+        state.phase = 2;
+        state.waltzStep = 3;
+        state.isTimeFrozen = false;
+        state.phase2Elapsed = 0;
+        bloomProgress = 0;
+        targetSkyLum = 0.92;
+        inviteRingMesh.visible = false;
+        inviteHaloRing.visible = false;
+
+        audio.setPhase(2);
+        audio.playHeartBloomChord();
+
+        // Flash dịu + sóng hạt
+        const flashEl = document.getElementById('screen-flash');
+        if (flashEl) {
+          flashEl.classList.add('flash');
+          setTimeout(() => flashEl.classList.remove('flash'), 440);
+        }
+
+        const heartScr = worldToScreen(new THREE.Vector3(0, heartCenterY, 0));
+        spawnVortexBurst(heartScr.x, heartScr.y, 44, true, '💖 Trái Tim Hoa Hồng 3D!');
+
+        // Hiện Bảng Tên Đôi Lứa 3D & 6 Khung Ảnh Kỷ Niệm
+        couplePlaqueGroup.visible = true;
+        memoryFrames.forEach((mf) => {
+          mf.group.visible = true;
+          mf.launchProgress = 0;
+          mf.zooming = false;
+          mf.group.position.set(0, heartCenterY, 0);
+          mf.group.scale.setScalar(0.04);
+        });
+
+        updateHudForPhase();
+      }
+
+      /**
+       * ============================================================================
+       * 7. SPOTLIGHT SPLIT-VIEW, MODAL TÂM THƯ, TÙY CHỈNH 6 ẢNH & GIFTSDK
+       * ============================================================================
+       */
+      function drawSpotlightCanvas(idx) {
+        const cvs = document.getElementById('spotlight-photo-canvas');
+        if (!cvs) return;
+        const ctx = cvs.getContext('2d');
+        buildPhotoCanvas(idx).then((built) => {
+          ctx.clearRect(0, 0, cvs.width, cvs.height);
+          ctx.drawImage(built, 0, 0, cvs.width, cvs.height);
+        });
+      }
+
+      function openMemorySpotlight(idx) {
+        if (!memoryFrames[idx]) return;
+        memoryFrames.forEach((mf) => {
+          mf.zooming = mf.idx === idx;
+        });
+        activeZoomFrame = memoryFrames[idx];
+        state.activeSpotlightIdx = idx;
+
+        const mem = state.memories[idx % state.memories.length] || {
+          title: `Kỷ Niệm #${idx + 1}`,
+          caption: '"Khoảnh khắc hoa hồng nở rộ"'
+        };
+        document.getElementById('spotlight-badge').textContent = `🌹 Kỷ Niệm #${idx + 1} • ${mem.title}`;
+        document.getElementById('spotlight-caption').textContent = mem.caption;
+        document.getElementById('spotlight-sub').textContent = `${state.receiver} ❤️ ${state.sender} • ${computeLoveDaysText(state.startDate)}`;
+        drawSpotlightCanvas(idx);
+        document.getElementById('spotlight-modal').classList.add('active');
+        audio.playHeartRipple();
+      }
+
+      function closeMemorySpotlight() {
+        memoryFrames.forEach((mf) => {
+          mf.zooming = false;
+        });
+        activeZoomFrame = null;
+        state.activeSpotlightIdx = -1;
+        document.getElementById('spotlight-modal')?.classList.remove('active');
+      }
+
+      document.getElementById('btn-close-spotlight')?.addEventListener('click', closeMemorySpotlight);
+      document.getElementById('btn-spotlight-continue')?.addEventListener('click', closeMemorySpotlight);
+      document.getElementById('btn-spotlight-prev')?.addEventListener('click', () => {
+        const nextIdx = (state.activeSpotlightIdx + 5) % 6;
+        openMemorySpotlight(nextIdx);
+      });
+      document.getElementById('btn-spotlight-next')?.addEventListener('click', () => {
+        const nextIdx = (state.activeSpotlightIdx + 1) % 6;
+        openMemorySpotlight(nextIdx);
+      });
+      document.getElementById('btn-spotlight-wish')?.addEventListener('click', () => {
+        closeMemorySpotlight();
+        openWishModal();
+      });
+
+      function openWishModal() {
+        document.getElementById('wish-card-title').textContent = `Gửi ${state.receiver} Thương Mến`;
+        document.getElementById('wish-card-highlight').textContent = `💕 ${state.honorific} • ${computeLoveDaysText(state.startDate)}`;
+        document.getElementById('wish-card-content').textContent = state.wish;
+        document.getElementById('wish-card-sender').textContent = `— Thương gửi từ ${state.sender} 🌹`;
+        document.getElementById('modal-wish-card').classList.add('active');
+      }
+
+      document.getElementById('btn-open-wish')?.addEventListener('click', () => {
+        audio.initContext();
+        openWishModal();
+      });
+      document.getElementById('btn-close-wish')?.addEventListener('click', () => {
+        document.getElementById('modal-wish-card').classList.remove('active');
+      });
+      document.getElementById('btn-wish-close-keep')?.addEventListener('click', () => {
+        document.getElementById('modal-wish-card').classList.remove('active');
+      });
+      document.getElementById('btn-wish-burst')?.addEventListener('click', () => {
+        audio.initContext();
+        document.getElementById('modal-wish-card').classList.remove('active');
+        if (state.phase < 2) {
+          triggerPhase2HeartBloom();
+        } else {
+          heartRippleIntensity = 1.0;
+          audio.playHeartBloomChord();
+          const scr = worldToScreen(new THREE.Vector3(0, heartCenterY, 0));
+          spawnVortexBurst(scr.x, scr.y, 64, true, `💖 ${state.receiver} ❤️ ${state.sender}`);
+        }
+      });
+
+      // Upload tối đa 6 ảnh (maxSide = 800, JPEG 0.8)
+      function renderPhotoPreviewGrid() {
+        const grid = document.getElementById('photo-preview-grid');
+        const label = document.getElementById('photo-count-label');
+        if (!grid) return;
+        if (label) {
+          label.textContent = `🖼️ Ảnh Kỷ Niệm 3D (${state.photos.length}/6 ảnh đã tải • Mặc định 6 tranh nghệ thuật):`;
+        }
+        grid.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+          if (state.photos[i]) {
+            const slot = document.createElement('div');
+            slot.className = 'photo-slot';
+            const img = document.createElement('img');
+            img.src = state.photos[i];
+            img.alt = `Ảnh ${i + 1}`;
+            const rm = document.createElement('button');
+            rm.type = 'button';
+            rm.className = 'photo-slot-remove';
+            rm.textContent = '✕';
+            rm.title = 'Xóa ảnh này';
+            rm.addEventListener('click', () => {
+              state.photos.splice(i, 1);
+              renderPhotoPreviewGrid();
+              refreshAllPhotoTextures();
+            });
+            slot.appendChild(img);
+            slot.appendChild(rm);
+            grid.appendChild(slot);
+          } else {
+            const empty = document.createElement('div');
+            empty.className = 'photo-slot-empty';
+            empty.textContent = `#${i + 1}`;
+            grid.appendChild(empty);
+          }
+        }
+      }
+
+      document.getElementById('in-photos')?.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const remaining = 6 - state.photos.length;
+        if (remaining <= 0) {
+          showToast('⚠️ Đã đủ tối đa 6 ảnh kỷ niệm!');
+          return;
+        }
+        const slice = files.slice(0, remaining);
+        for (const file of slice) {
+          await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              const rawImg = new Image();
+              rawImg.onload = () => {
+                const maxSide = 800;
+                let tw = rawImg.width;
+                let th = rawImg.height;
+                if (tw > maxSide || th > maxSide) {
+                  if (tw >= th) {
+                    th = Math.round((th * maxSide) / tw);
+                    tw = maxSide;
+                  } else {
+                    tw = Math.round((tw * maxSide) / th);
+                    th = maxSide;
+                  }
+                }
+                const cvs = document.createElement('canvas');
+                cvs.width = tw;
+                cvs.height = th;
+                cvs.getContext('2d').drawImage(rawImg, 0, 0, tw, th);
+                state.photos.push(cvs.toDataURL('image/jpeg', 0.8));
+                resolve();
+              };
+              rawImg.onerror = () => resolve();
+              rawImg.src = ev.target.result;
+            };
+            reader.onerror = () => resolve();
+            reader.readAsDataURL(file);
+          });
+        }
+        e.target.value = '';
+        renderPhotoPreviewGrid();
+        refreshAllPhotoTextures();
+        showToast(`📸 Đã tải ${state.photos.length}/6 ảnh vào khung vàng 3D!`);
+      });
+
+      document.getElementById('btn-clear-photos')?.addEventListener('click', () => {
+        state.photos = [];
+        const inp = document.getElementById('in-photos');
+        if (inp) inp.value = '';
+        renderPhotoPreviewGrid();
+        refreshAllPhotoTextures();
+        showToast('🌹 Đã khôi phục 6 tranh nghệ thuật mặc định');
+      });
+
+      function updateLoveDaysPreviewUI() {
+        const dateEl = document.getElementById('in-start-date');
+        const prevEl = document.getElementById('love-days-preview');
+        if (dateEl && prevEl) {
+          prevEl.textContent = `💕 ${computeLoveDaysText(dateEl.value)}`;
+        }
+      }
+      document.getElementById('in-start-date')?.addEventListener('input', updateLoveDaysPreviewUI);
+      document.getElementById('in-start-date')?.addEventListener('change', updateLoveDaysPreviewUI);
+
+      function applyPreset(key) {
+        const p = PRESETS[key];
+        if (!p) return;
+        state.presetKey = key;
+        state.receiver = p.receiver;
+        state.sender = p.sender;
+        state.honorific = p.honorific;
+        state.startDate = p.startDate;
+        state.wish = p.wish;
+        state.theme = p.theme;
+        state.memories = p.memories.map((m) => ({ ...m }));
+
+        document.querySelectorAll('.preset-chip').forEach((el) => {
+          el.classList.toggle('active', el.dataset.preset === key);
+        });
+        document.querySelectorAll('.modal-theme-chip').forEach((el) => {
+          el.classList.toggle('active', el.dataset.theme === state.theme);
+        });
+
+        document.getElementById('in-receiver').value = state.receiver;
+        document.getElementById('in-sender').value = state.sender;
+        document.getElementById('in-honorific').value = state.honorific;
+        document.getElementById('in-start-date').value = state.startDate;
+        document.getElementById('in-wish').value = state.wish;
+        updateLoveDaysPreviewUI();
+
+        applyThemeVisuals(state.theme);
+        refreshAllPhotoTextures();
+        showToast(`🌹 Đã chọn chủ đề: ${p.badge}`);
+      }
+
+      document.querySelectorAll('.preset-chip').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          audio.initContext();
+          applyPreset(e.currentTarget.dataset.preset);
+        });
+      });
+
+      document.getElementById('btn-open-customize')?.addEventListener('click', () => {
+        document.getElementById('in-receiver').value = state.receiver;
+        document.getElementById('in-sender').value = state.sender;
+        document.getElementById('in-honorific').value = state.honorific;
+        document.getElementById('in-start-date').value = state.startDate;
+        document.getElementById('in-wish').value = state.wish;
+        updateLoveDaysPreviewUI();
+        renderPhotoPreviewGrid();
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => {
+          c.classList.toggle('active', c.dataset.theme === state.theme);
+        });
+        document.getElementById('modal-customize').classList.add('active');
+      });
+      document.getElementById('btn-close-customize')?.addEventListener('click', () => {
+        document.getElementById('modal-customize').classList.remove('active');
+      });
+
+      document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+        chip.addEventListener('click', (e) => {
+          document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          state.theme = e.currentTarget.dataset.theme;
+          applyThemeVisuals(state.theme);
+        });
+      });
+
+      function syncModalInputsToState() {
+        state.receiver = document.getElementById('in-receiver').value.trim() || 'Quỳnh Phương';
+        state.sender = document.getElementById('in-sender').value.trim() || 'Hoàng Huy';
+        state.honorific = document.getElementById('in-honorific').value.trim() || 'Người Yêu Dấu';
+        state.startDate = document.getElementById('in-start-date').value || '2025-12-12';
+        state.wish = document.getElementById('in-wish').value.trim() || PRESETS.lover.wish;
+        applyThemeVisuals(state.theme);
+        refreshAllPhotoTextures();
+      }
+
+      // ✨ Áp Dụng & Xem Thử -> đóng modal, tái hiện ngay khoảnh khắc cao trào Trái Tim Hoa Hồng
+      document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+        audio.initContext();
+        syncModalInputsToState();
+        document.getElementById('modal-customize').classList.remove('active');
+        startPhase0();
+        triggerPhase2HeartBloom();
+        document.getElementById('btn-open-payment')?.classList.add('cta-pulse');
+        state.ctaPulseTriggered = true;
+      });
+
+      function openPaymentFlow() {
+        if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+          GiftSDK.openPayment({
+            templateId: state.templateId,
+            templateType: 'valentine',
+            senderName: state.sender,
+            receiverName: state.receiver,
+            occasion: `Valentine 14/2 • ${state.honorific}`,
+            message: state.wish,
+            payload: {
+              presetKey: state.presetKey,
+              honorific: state.honorific,
+              startDate: state.startDate,
+              theme: state.theme,
+              photos: state.photos,
+              memories: state.memories
+            }
+          });
+        } else {
+          showToast('💡 Đang ở chế độ xem thử local.');
+        }
+      }
+
+      document.getElementById('customize-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        audio.initContext();
+        syncModalInputsToState();
+        document.getElementById('modal-customize').classList.remove('active');
+        openPaymentFlow();
+      });
+
+      document.getElementById('btn-open-payment')?.addEventListener('click', openPaymentFlow);
+      document.getElementById('btn-skip-climax')?.addEventListener('click', () => {
+        audio.initContext();
+        triggerPhase2HeartBloom();
+      });
+      document.getElementById('btn-replay')?.addEventListener('click', () => {
+        audio.initContext();
+        startPhase0();
+      });
+      document.getElementById('btn-sound')?.addEventListener('click', (e) => {
+        audio.initContext();
+        const isMuted = audio.toggleMute();
+        const iconEl = e.currentTarget.querySelector('.btn-icon');
+        const labelEl = e.currentTarget.querySelector('.btn-label');
+        if (iconEl) iconEl.textContent = isMuted ? '🔇' : '🔊';
+        if (labelEl) labelEl.textContent = isMuted ? 'Tắt Tiếng' : 'Âm Thanh';
+      });
+
+      /**
+       * ============================================================================
+       * 8. TƯƠNG TÁC XOAY VÒNG WALTZ (Δθ >= 95°), CHẠM, RAYCASTER & CẢM BIẾN NGHIÊNG
+       * ============================================================================
+       */
+      const raycaster = new THREE.Raycaster();
+      const pointerNdc = new THREE.Vector2();
+      let isPointerDown = false;
+      let downX = 0;
+      let downY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let dragDist = 0;
+      let prevPointerAngle = null;
+      let accumulatedSwirlRad = 0;
+      const SWIRL_THRESHOLD_RAD = (95 * Math.PI) / 180; // Δθ >= 95°
+      let sensorsInitDone = false;
+
+      function initSensorsOnce() {
+        if (sensorsInitDone) return;
+        sensorsInitDone = true;
+        if (typeof DeviceOrientationEvent !== 'undefined') {
+          if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+              .then((res) => {
+                if (res === 'granted') bindTiltListener();
+              })
+              .catch(() => {});
+          } else {
+            bindTiltListener();
+          }
+        }
+      }
+
+      function bindTiltListener() {
+        window.addEventListener('deviceorientation', (ev) => {
+          if (ev.gamma === null || ev.beta === null) return;
+          tiltX = THREE.MathUtils.clamp(ev.gamma / 45, -1, 1) * 0.14;
+          tiltY = THREE.MathUtils.clamp((ev.beta - 42) / 45, -1, 1) * 0.08;
+        });
+      }
+
+      function angleFromCenter(x, y) {
+        return Math.atan2(y - ch * 0.5, x - cw * 0.5);
+      }
+
+      function normalizeAngleDelta(d) {
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        return d;
+      }
+
+      morphCanvas.addEventListener('pointerdown', (e) => {
+        audio.initContext();
+        initSensorsOnce();
+        isPointerDown = true;
+        downX = e.clientX;
+        downY = e.clientY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        dragDist = 0;
+        prevPointerAngle = angleFromCenter(e.clientX, e.clientY);
+        accumulatedSwirlRad = 0;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isPointerDown) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        dragDist += Math.hypot(dx, dy);
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        if (state.phase <= 1 && !state.isTimeFrozen) {
+          // Theo dõi góc xoay vòng tròn quanh tâm (Δθ >= 95°)
+          const curAng = angleFromCenter(e.clientX, e.clientY);
+          if (prevPointerAngle !== null) {
+            const deltaAng = Math.abs(normalizeAngleDelta(curAng - prevPointerAngle));
+            accumulatedSwirlRad += deltaAng;
+
+            // Vệt sáng hoa hồng bám theo ngón tay trên #trails-canvas
+            const t = THEMES[state.theme] || THEMES.crimson_velvet;
+            if (Math.hypot(dx, dy) > 2) {
+              trailSparks.push(new TrailSpark(e.clientX, e.clientY, t.sparks[Math.floor(Math.random() * t.sparks.length)], 1.0, true));
+            }
+
+            if (accumulatedSwirlRad >= SWIRL_THRESHOLD_RAD) {
+              accumulatedSwirlRad = 0;
+              advanceWaltzStep();
+            }
+          }
+          prevPointerAngle = curAng;
+        } else {
+          // Pha 2-3: kéo xoay góc nhìn camera quanh Trái Tim 3D
+          targetOrbitYaw = THREE.MathUtils.clamp(targetOrbitYaw - dx * 0.0055, -0.85, 0.85);
+          targetOrbitPitch = THREE.MathUtils.clamp(targetOrbitPitch + dy * 0.0038, -0.28, 0.38);
+        }
+      });
+
+      function handlePointerEnd(e) {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        prevPointerAngle = null;
+
+        if (dragDist <= 8) {
+          if (state.phase <= 1) {
+            advanceWaltzStep();
+            return;
+          }
+
+          // Pha 2-3: Raycaster kiểm tra chạm Khung Ảnh Vàng 3D hoặc Trái Tim 3D
+          const rect = morphCanvas.getBoundingClientRect();
+          pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(pointerNdc, camera);
+
+          const frameTargets = memoryHitMeshes.filter((hm) => hm.parent && hm.parent.visible);
+          const frameHits = raycaster.intersectObjects(frameTargets, false);
+          if (frameHits.length > 0) {
+            openMemorySpotlight(frameHits[0].object.userData.frameIdx);
+            return;
+          }
+
+          const heartHits = raycaster.intersectObject(heartHitMesh, false);
+          if (heartHits.length > 0 || state.phase === 3) {
+            heartRippleIntensity = 1.0;
+            audio.playHeartRipple();
+            spawnVortexBurst(e.clientX, e.clientY, 34, false);
+          }
+        }
+      }
+
+      window.addEventListener('pointerup', handlePointerEnd);
+      window.addEventListener('pointercancel', () => {
+        isPointerDown = false;
+        prevPointerAngle = null;
+      });
+
+      /**
+       * ============================================================================
+       * 9. VÒNG LẶP ANIMATION 60FPS (THREE.Clock dt <= 0.05)
+       * ============================================================================
+       */
+      const clock = new THREE.Clock();
+      let elapsedTime = 0;
+      const waltzBeatSec = 60 / 108; // 0.5556s (108 BPM)
+      const waltzBarSec = waltzBeatSec * 3; // 1.6667s cho 1 ô nhịp 3/4
+
+      function easeInOutCubic(x) {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      }
+
+      function easeOutBack(x) {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      }
+
+      function easeOutCubic(x) {
+        return 1 - Math.pow(1 - x, 3);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        elapsedTime += dt;
+
+        // Nhịp Waltz 3/4 (108 BPM): Beat 1 phồng nhẹ, Beat 2-3 lơi duyên dáng
+        const barFrac = (elapsedTime % waltzBarSec) / waltzBarSec; // 0..1
+        const beat1Pulse = Math.exp(-barFrac * 5.2) * Math.sin(Math.min(1, barFrac * 3.0) * Math.PI);
+
+        // 1. Progressive Sky Radiance & Stars
+        currentSkyLum += (targetSkyLum - currentSkyLum) * Math.min(1, dt * 2.8);
+        const radLayer = document.getElementById('sky-radiance-layer');
+        if (radLayer) radLayer.style.opacity = currentSkyLum.toFixed(3);
+        starUniforms.uTime.value = elapsedTime;
+
+        // 2. Xử lý Ngưng Đọng Thời Gian (0.65s) & Chuyển Pha 2 -> Pha 3
+        if (state.phase === 1 && state.isTimeFrozen) {
+          state.freezeElapsed += dt;
+          if (state.freezeElapsed >= 0.65) {
+            triggerPhase2HeartBloom();
+          }
+        } else if (state.phase === 2) {
+          state.phase2Elapsed += dt;
+          bloomProgress = Math.min(1, state.phase2Elapsed / 1.45);
+          if (state.phase2Elapsed >= 1.5) {
+            state.phase = 3;
+            state.phase3Elapsed = 0;
+            bloomProgress = 1;
+            audio.setPhase(3);
+            updateHudForPhase();
+          }
+        } else if (state.phase === 3) {
+          state.phase3Elapsed += dt;
+          if (!state.ctaPulseTriggered && state.phase3Elapsed >= 1.5) {
+            state.ctaPulseTriggered = true;
+            document.getElementById('btn-open-payment')?.classList.add('cta-pulse');
+          }
+        }
+
+        const targetPedestalOffset = state.phase >= 2 ? -0.52 : 0;
+        crystalPedestalGroup.position.y += (targetPedestalOffset - crystalPedestalGroup.position.y) * Math.min(1, dt * 4.2);
+
+        // 3. Camera Orbit + Quét điện ảnh Pha 1 + Nghiêng thiết bị
+        orbitYaw += (targetOrbitYaw + tiltX - orbitYaw) * Math.min(1, dt * 5.2);
+        orbitPitch += (targetOrbitPitch + tiltY - orbitPitch) * Math.min(1, dt * 5.2);
+        const autoSweep = state.phase === 1 ? Math.sin(elapsedTime * 0.45) * 0.14 + camSweepAngle * 0.28 : 0;
+
+        const camOffset = baseCamPos.clone().sub(camLookTarget);
+        const spherical = new THREE.Spherical().setFromVector3(camOffset);
+        spherical.theta += orbitYaw + autoSweep;
+        spherical.phi = THREE.MathUtils.clamp(spherical.phi + orbitPitch, 0.72, 1.86);
+        camera.position.copy(camLookTarget).add(new THREE.Vector3().setFromSpherical(spherical));
+        camera.lookAt(camLookTarget);
+
+        // 4. Đóa Hồng Nhung Trung Tâm & Vòng Mời Chạm Pha 0-1
+        if (state.phase <= 1) {
+          const roseFade = state.waltzStep >= 3 ? Math.max(0.25, 1 - (vortexHeightRatio - 0.8) * 2.5) : 1.0;
+          centerRoseGroup.visible = true;
+          centerRoseGroup.scale.setScalar(roseFade);
+          centerRoseGroup.rotation.y += (state.isTimeFrozen ? 0 : (0.28 + vortexOmega * 0.32) * dt);
+          centerRosePetals.forEach((p) => {
+            const breathe = beat1Pulse * 0.095 * (0.4 + p.t * 0.8);
+            p.mesh.rotation.x = p.baseTilt + breathe;
+            p.mesh.position.z = p.baseRadial + breathe * 0.12;
+          });
+
+          const ringPulse = 1.0 + beat1Pulse * 0.09 + Math.sin(elapsedTime * 3.0) * 0.03;
+          inviteRingMesh.scale.setScalar(ringPulse);
+          inviteHaloRing.scale.setScalar(ringPulse * 1.02);
+          inviteRingMat.opacity = 0.55 + beat1Pulse * 0.35;
+        } else {
+          // Thu nhỏ mượt mà khi chuyển thành Trái Tim 3D
+          const sc = centerRoseGroup.scale.x * Math.max(0, 1 - dt * 5.5);
+          if (sc > 0.02) {
+            centerRoseGroup.scale.setScalar(sc);
+          } else {
+            centerRoseGroup.visible = false;
+          }
+        }
+
+        // 5. Cập nhật Lốc Xoáy & Biến Hình Trái Tim (220 Cánh Hoa Hồng + 5.200 Hạt Ánh Sáng)
+        if (!state.isTimeFrozen) {
+          vortexHeightRatio += (targetVortexHeight - vortexHeightRatio) * Math.min(1, dt * 4.5);
+          vortexOmega += (targetVortexOmega - vortexOmega) * Math.min(1, dt * 4.2);
+          vortexSpinAngle += vortexOmega * dt;
+        }
+
+        heartRippleIntensity = Math.max(0, heartRippleIntensity - dt * 1.15);
+        const waltzHeartScale = heartScale * (1.0 + beat1Pulse * 0.055 + heartRippleIntensity * 0.065);
+        const coneScale = isMobile ? 1.85 : 2.35;
+        const coneBottomY = -2.25;
+        const coneSpanY = 4.95 * vortexHeightRatio;
+        const heartBeatSpin = Math.sin(elapsedTime * 0.35) * 0.14;
+
+        // 220 Cánh Hoa Hồng 3D
+        for (let i = 0; i < PETAL_COUNT; i++) {
+          const pd = petalData[i];
+          if (state.phase <= 1) {
+            // Trạng thái Lốc xoáy nón ngược: r = 0.8 + h * 0.45
+            const r = (0.8 + pd.h * 0.45) * coneScale + pd.orbitJitter;
+            const ang = pd.baseAngle + vortexSpinAngle * (1.0 + (1 - pd.h) * 0.35) + pd.h * 4.8;
+            const x = Math.cos(ang) * r;
+            const z = Math.sin(ang) * r;
+            const y = coneBottomY + pd.h * coneSpanY + Math.sin(elapsedTime * 2.2 + pd.flutterPhase) * 0.08;
+
+            pd.currentPos.set(x, y, z);
+            tmpEuler.set(
+              Math.sin(elapsedTime * pd.spinRate + pd.flutterPhase) * 0.65,
+              ang + Math.PI * 0.5,
+              Math.cos(elapsedTime * pd.spinRate * 0.8 + pd.flutterPhase) * 0.55
+            );
+            pd.currentQuat.setFromEuler(tmpEuler);
+          } else {
+            // Chuyển hình từ vị trí đóng băng -> Bề mặt Trái Tim 3D (xoay ôm theo pháp tuyến)
+            const localProgress = THREE.MathUtils.clamp((bloomProgress - pd.stagger) / (1 - pd.stagger), 0, 1);
+            const ease = easeInOutCubic(localProgress);
+
+            // Tọa độ đích trên Trái Tim 3D
+            const hx = pd.heartLocalPos.x * waltzHeartScale;
+            const hy = pd.heartLocalPos.y * waltzHeartScale + heartCenterY;
+            const hz = pd.heartLocalPos.z * waltzHeartScale;
+            tmpPos.set(hx, hy, hz).applyAxisAngle(new THREE.Vector3(0, 1, 0), heartBeatSpin);
+
+            if (heartRippleIntensity > 0.01) {
+              tmpPos.addScaledVector(pd.heartNormal, Math.sin((1 - heartRippleIntensity) * Math.PI * 2 + pd.h * 4) * heartRippleIntensity * 0.24);
+            }
+
+            tmpNormal.copy(pd.heartNormal).applyAxisAngle(new THREE.Vector3(0, 1, 0), heartBeatSpin).normalize();
+            targetQuat.setFromUnitVectors(zAxis, tmpNormal);
+            extraQuat.setFromAxisAngle(zAxis, pd.heartTilt + Math.sin(elapsedTime * 1.4 + pd.flutterPhase) * 0.08);
+            targetQuat.multiply(extraQuat);
+
+            pd.currentPos.lerpVectors(pd.frozenPos, tmpPos, ease);
+            pd.currentQuat.slerpQuaternions(pd.frozenQuat, targetQuat, ease);
+          }
+
+          dummyObj.position.copy(pd.currentPos);
+          dummyObj.quaternion.copy(pd.currentQuat);
+          dummyObj.scale.setScalar(pd.scale);
+          dummyObj.updateMatrix();
+          petalInstancedMesh.setMatrixAt(i, dummyObj.matrix);
+        }
+        petalInstancedMesh.instanceMatrix.needsUpdate = true;
+
+        // 5.200 Hạt Ánh Sáng (28% lõi vàng champagne + 72% vỏ hồng ruby với stagger mượt mà)
+        const posArr = pGeo.attributes.position.array;
+        const cosSpin = Math.cos(heartBeatSpin);
+        const sinSpin = Math.sin(heartBeatSpin);
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          if (state.phase <= 1) {
+            if (!state.isTimeFrozen) {
+              const h = pMeta.h[i];
+              const r = (0.8 + h * 0.45) * coneScale + pMeta.radiusOffset[i];
+              const ang = pMeta.angle[i] + vortexSpinAngle * (1.05 + (1 - h) * 0.4) + h * 5.2;
+              posArr[i * 3] = Math.cos(ang) * r;
+              posArr[i * 3 + 1] = coneBottomY + h * coneSpanY;
+              posArr[i * 3 + 2] = Math.sin(ang) * r;
+            }
+          } else {
+            const st = pMeta.stagger[i];
+            const lp = THREE.MathUtils.clamp((bloomProgress - st) / (1 - st), 0, 1);
+            const ease = easeInOutCubic(lp);
+
+            const rx = pMeta.heartX[i] * waltzHeartScale;
+            const ry = pMeta.heartY[i] * waltzHeartScale + heartCenterY;
+            const rz = pMeta.heartZ[i] * waltzHeartScale;
+
+            let tx = rx * cosSpin + rz * sinSpin;
+            let ty = ry + Math.sin(elapsedTime * 2.0 + pMeta.phase[i]) * 0.025;
+            let tz = -rx * sinSpin + rz * cosSpin;
+
+            if (heartRippleIntensity > 0.01 && !pMeta.isCore[i]) {
+              const wave = 1.0 + Math.sin((1 - heartRippleIntensity) * Math.PI * 2 + pMeta.phase[i]) * heartRippleIntensity * 0.14;
+              tx *= wave;
+              tz *= wave;
+            }
+
+            posArr[i * 3] = pMeta.frozenX[i] + (tx - pMeta.frozenX[i]) * ease;
+            posArr[i * 3 + 1] = pMeta.frozenY[i] + (ty - pMeta.frozenY[i]) * ease;
+            posArr[i * 3 + 2] = pMeta.frozenZ[i] + (tz - pMeta.frozenZ[i]) * ease;
+          }
+        }
+        pGeo.attributes.position.needsUpdate = true;
+
+        // 6. Bảng Khắc Tên Đôi Lứa 3D (Nổi phía trước sân khấu, không giao cắt bệ pha lê)
+        if (couplePlaqueGroup.visible) {
+          const targetNpScale = isMobile ? 0.78 : 0.96;
+          const curS = couplePlaqueGroup.scale.x + (targetNpScale - couplePlaqueGroup.scale.x) * Math.min(1, dt * 5.0);
+          couplePlaqueGroup.scale.setScalar(curS);
+          couplePlaqueGroup.position.x = 0;
+          couplePlaqueGroup.position.z = isMobile ? 2.25 : 2.45;
+          couplePlaqueGroup.position.y = (isMobile ? -1.72 : -1.86) + Math.sin(elapsedTime * 1.5) * 0.04;
+          couplePlaqueGroup.lookAt(camera.position);
+        }
+
+        // 7. 6 Khung Ảnh Kỷ Niệm 3D Viền Vàng (Quỹ đạo elip quanh Trái Tim -> Spotlight Zoom)
+        const ellipseA = isMobile ? 2.85 : 4.65;
+        const ellipseB = isMobile ? 1.45 : 2.05;
+        memoryFrames.forEach((mf, idx) => {
+          if (!mf.group.visible) return;
+          if (mf.zooming && activeZoomFrame === mf) {
+            const zoomPos = isMobile ? new THREE.Vector3(0, 2.35, 5.2) : new THREE.Vector3(-2.95, 0.45, 5.1);
+            mf.group.position.lerp(zoomPos, Math.min(1, dt * 5.5));
+            const zoomScale = isMobile ? 1.25 : 1.75;
+            const curS = mf.group.scale.x + (zoomScale - mf.group.scale.x) * Math.min(1, dt * 5.5);
+            mf.group.scale.setScalar(curS);
+            mf.group.lookAt(camera.position);
+          } else {
+            mf.launchProgress = Math.min(1, mf.launchProgress + dt * (0.9 - idx * 0.04));
+            const lp = easeOutCubic(mf.launchProgress);
+            const curAngle = mf.orbitAngle + elapsedTime * 0.22;
+            const targetX = Math.cos(curAngle) * ellipseA;
+            const targetZ = Math.sin(curAngle) * ellipseB - 0.35;
+            const targetY = heartCenterY + Math.sin(curAngle * 2.0 + mf.yBobPhase) * (isMobile ? 0.85 : 1.05);
+
+            const px = targetX * lp;
+            const py = heartCenterY * (1 - lp) + targetY * lp;
+            const pz = targetZ * lp;
+
+            mf.group.position.set(px, py, pz);
+            // Phóng nhẹ những khung ở phía trước cho chiều sâu tự nhiên
+            const depthBoost = 0.84 + ((pz + ellipseB) / (ellipseB * 2)) * 0.24;
+            const baseFrameSc = (isMobile ? 0.66 : 0.88) * depthBoost;
+            mf.group.scale.setScalar(Math.max(0.05, easeOutBack(lp) * baseFrameSc));
+            mf.group.lookAt(camera.position);
+          }
+        });
+
+        // Render Layer 1: #webgl-canvas
+        renderer.render(scene, camera);
+
+        // Render Layer 2: #trails-canvas (BẮT BUỘC destination-out rgba(0,0,0,0.21) + lighter)
+        trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        trailsCtx.globalCompositeOperation = 'destination-out';
+        trailsCtx.fillStyle = 'rgba(0, 0, 0, 0.21)';
+        trailsCtx.fillRect(0, 0, cw, ch);
+        trailsCtx.globalCompositeOperation = 'lighter';
+
+        for (let i = trailSparks.length - 1; i >= 0; i--) {
+          const sp = trailSparks[i];
+          sp.update();
+          sp.draw(trailsCtx);
+          if (sp.alpha <= 0) trailSparks.splice(i, 1);
+        }
+
+        // Render Layer 3: #morph-canvas (Shockwaves & Floating Texts)
+        morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        morphCtx.clearRect(0, 0, cw, ch);
+
+        for (let i = shockwaves.length - 1; i >= 0; i--) {
+          const sw = shockwaves[i];
+          sw.radius += (sw.maxRadius - sw.radius) * 0.14 + 1.8;
+          sw.alpha -= 0.032;
+          if (sw.alpha <= 0) {
+            shockwaves.splice(i, 1);
+            continue;
+          }
+          morphCtx.save();
+          morphCtx.globalAlpha = Math.max(0, sw.alpha);
+          morphCtx.strokeStyle = sw.color;
+          morphCtx.lineWidth = sw.lineWidth;
+          morphCtx.beginPath();
+          morphCtx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+          morphCtx.stroke();
+          morphCtx.restore();
+        }
+
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+          const ft = floatingTexts[i];
+          ft.y += ft.vy;
+          ft.alpha -= ft.decay;
+          if (ft.alpha <= 0) {
+            floatingTexts.splice(i, 1);
+            continue;
+          }
+          morphCtx.save();
+          morphCtx.globalAlpha = Math.max(0, ft.alpha);
+          morphCtx.font = `800 ${isMobile ? 13 : 16}px "Plus Jakarta Sans", sans-serif`;
+          morphCtx.textAlign = 'center';
+          morphCtx.textBaseline = 'middle';
+          morphCtx.shadowColor = 'rgba(0, 0, 0, 0.88)';
+          morphCtx.shadowBlur = 8;
+          morphCtx.fillStyle = ft.color;
+          morphCtx.fillText(ft.text, ft.x, ft.y, cw - 36);
+          morphCtx.restore();
+        }
+      }
+
+      /**
+       * ============================================================================
+       * 10. KHỞI TẠO & GIFTSDK
+       * ============================================================================
+       */
+      resizeAllCanvases();
+      initMemoryFrames();
+      applyThemeVisuals(state.theme);
+      refreshAllPhotoTextures();
+      renderPhotoPreviewGrid();
+      updateLoveDaysPreviewUI();
+      startPhase0();
+      requestAnimationFrame(animate);
+
+      document.fonts?.ready?.then(() => {
+        refreshCouplePlaqueTexture();
+        refreshAllPhotoTextures();
+      });
+
+      window.addEventListener('DOMContentLoaded', async () => {
+        if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+          await GiftSDK.init({
+            templateId: state.templateId,
+            onGiftLoaded: (order) => {
+              if (order.receiver_name) state.receiver = order.receiver_name;
+              if (order.sender_name) state.sender = order.sender_name;
+              if (order.message) state.wish = order.message;
+              if (order.payload) {
+                if (order.payload.presetKey && PRESETS[order.payload.presetKey]) {
+                  state.presetKey = order.payload.presetKey;
+                }
+                if (order.payload.honorific) state.honorific = order.payload.honorific;
+                if (order.payload.startDate) state.startDate = order.payload.startDate;
+                if (order.payload.theme && THEMES[order.payload.theme]) state.theme = order.payload.theme;
+                if (Array.isArray(order.payload.photos)) state.photos = order.payload.photos.slice(0, 6);
+                if (Array.isArray(order.payload.memories) && order.payload.memories.length) {
+                  state.memories = order.payload.memories.map((m) => ({ ...m }));
+                }
+              }
+              applyThemeVisuals(state.theme);
+              refreshAllPhotoTextures();
+              startPhase0();
+            }
+          });
+        }
+      });
+    })();
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

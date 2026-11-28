@@ -26,6 +26,82 @@ const EVENT_CATEGORIES = [
 // ============================================================================
 const CONFESS_TEMPLATES = [
   {
+    id: 'confess_melting_ice_heart',
+    category: 'confess',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Trái Tim Băng Tan • Ánh Lửa Ấm Tình Yêu 3D',
+    subtitle: 'Chạm hoặc kéo ngọn lửa nhỏ sưởi ấm khối băng pha lê 3D rạn nứt ánh cam-vàng, vỡ tan thành 22 mảnh băng & 4.800 hạt Trái Tim đỏ rực đập nhịp lub-dub cùng đàn Acoustic 66 BPM',
+    badge: '🧊❤️ Trái Tim Băng Tan',
+    price: 29000,
+    oldPrice: 59000,
+    engineUrl: 'templates/confess/melting-ice-heart/index.html',
+    previewGradient: 'linear-gradient(135deg, #0c2340 0%, #9f1239 52%, #f97316 100%)',
+    previewEmoji: '🧊',
+    features: ['Khối băng GLSL rạn nứt + 22 mảnh băng vỡ & Ngọn lửa 3D', '4.800 hạt Trái Tim đập nhịp lub-dub + Bảng tên & Khung ảnh 3D', 'Âm thanh nứt băng + Acoustic Guitar 66 BPM & Nhịp tim'],
+    preset: {
+      occasion: 'Tỏ Tình • Trái Tim Băng Tan',
+      theme: 'ice_ember'
+    }
+  },
+  {
+    id: 'confess_red_thread_destiny',
+    category: 'confess',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Sợi Chỉ Đỏ Duyên Phận • Nút Thắt Vĩnh Cửu 3D',
+    subtitle: 'Hai dải sáng Xanh Dương & Đỏ Thắm uốn lượn giao thoa dưới ánh trăng và 36 đèn trời, xoắn kép thắt Nút Thắt Vĩnh Cửu & morph 4.500 hạt thành Trái Tim 3D cùng bảng tên đôi lứa',
+    badge: '🪢 Chỉ Đỏ Duyên Phận',
+    price: 29000,
+    oldPrice: 59000,
+    engineUrl: 'templates/confess/red-thread-destiny/index.html',
+    previewGradient: 'linear-gradient(135deg, #1b0510 0%, #9f1239 48%, #0284c7 100%)',
+    previewEmoji: '🪢',
+    features: ['2 Dải sáng Xanh & Đỏ thắt Nút Thắt Vĩnh Cửu 3D', '4.500 hạt Trái Tim + Bảng tên Đôi Lứa & Khung ảnh 3D', 'Hòa tấu Đàn Tranh Ngũ Cung + Strings/Piano 72 BPM'],
+    preset: {
+      occasion: 'Tỏ Tình • Sợi Chỉ Đỏ Duyên Phận',
+      theme: 'crimson_azure'
+    }
+  },
+  {
+    id: 'confess_love_letter_bottle',
+    category: 'confess',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Thư Tình Trong Chai • Ánh Sáng Đại Dương 3D',
+    subtitle: 'Chiếc chai thủy tinh phát sáng trôi dạt trên mặt biển đêm ánh trăng, bật nút chai vỡ òa thành lời tỏ tình hạt sao & khung ảnh kỷ niệm trên mặt sóng cùng tiếng sóng rì rào',
+    badge: '🍾 Thư Tình Trong Chai',
+    price: 29000,
+    oldPrice: 59000,
+    engineUrl: 'templates/confess/love-letter-bottle/index.html',
+    previewGradient: 'linear-gradient(135deg, #041526 0%, #0d4b5c 52%, #2dd4bf 100%)',
+    previewEmoji: '🍾',
+    features: ['Biển đêm ánh trăng & Chai Fresnel 3D', 'Bật nút chai vỡ òa chữ hạt & Khung ảnh 3D', 'Tiếng sóng biển vỗ + Nhạc Chill Rhodes'],
+    preset: {
+      occasion: 'Tỏ Tình • Thư Tình Trong Chai',
+      theme: 'moonlit_teal'
+    }
+  },
+  {
+    id: 'confess_wish_meteor_shower',
+    category: 'confess',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Mưa Sao Băng Điều Ước • Hai Ngôi Sao Va Chạm',
+    subtitle: 'Cơn mưa sao băng rực sáng trên đồi cỏ bông lau và đàn đom đóm lập lòe, dẫn tới khoảnh khắc 2 ngôi sao định mệnh va chạm vỡ òa thành lời tỏ tình & khung ảnh 3D',
+    badge: '🌠 Sao Băng Tỏ Tình',
+    price: 29000,
+    oldPrice: 59000,
+    engineUrl: 'templates/confess/wish-meteor-shower/index.html',
+    previewGradient: 'linear-gradient(135deg, #071326 0%, #311042 52%, #ec4899 100%)',
+    previewEmoji: '🌠',
+    features: ['Đồi cỏ bông lau đung đưa & Đom đóm bay', '2 Ngôi sao va chạm & Chữ hạt siêu nét', 'Khung ảnh 3D + Nhạc Lofi & Tiếng sao băng'],
+    preset: {
+      occasion: 'Tỏ Tình Dưới Mưa Sao Băng',
+      theme: 'starlight_rose'
+    }
+  },
+  {
     id: 'fireworks_confess',
     category: 'confess',
     isHot: true,
@@ -136,19 +212,57 @@ const ANNIVERSARY_TEMPLATES = [
 // ============================================================================
 const BIRTHDAY_TEMPLATES = [
   {
+    id: 'birthday_surprise_gift_box',
+    category: 'birthday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Hộp Quà Bất Ngờ 3D • Bật Tung Phép Màu Sinh Nhật',
+    subtitle: 'Chạm hoặc nhấn giữ nén lò xo xoắn ốc 9 vòng qua 3 nhịp hé nắp, bật tung nắp nơ 6 cánh 3D & 4.800 hạt Pháo Hoa Morphing 3 chương chữ kèm 6 Khung Ảnh Kỷ Niệm, Bảng Tên 3D & nhạc 114 BPM!',
+    badge: '🎁 Mẫu 3D Mới',
+    price: 29000,
+    oldPrice: 59000,
+    engineUrl: 'templates/birthday/surprise-gift-box/index.html',
+    previewGradient: 'linear-gradient(135deg, #be185d 0%, #7c3aed 52%, #22d3ee 100%)',
+    previewEmoji: '🎁',
+    features: ['Lò xo 9 vòng nén 3 nhịp + Nắp bản lề nơ 6 cánh bay parabol', '4.800 hạt Pháo Hoa Morphing 3 chương chữ & 6 Khung Ảnh 3D', '4 Preset + Tải 6 ảnh + Âm thanh Boinggg FM & Nhạc 114 BPM'],
+    preset: {
+      occasion: 'Happy Birthday • Hộp Quà Bất Ngờ 3D',
+      theme: 'party_neon'
+    }
+  },
+  {
+    id: 'birthday_zodiac_galaxy',
+    category: 'birthday',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Dải Ngân Hà Hoàng Đạo • 12 Chòm Sao 3D',
+    subtitle: 'Chạm nối từng ngôi sao để thắp sáng chòm sao bản mệnh theo ngày sinh giữa Dải Ngân Hà 9.000 hạt, vòng Astrolabe 12 cung, bảng khắc tên 3D & 6 khung ảnh kỷ niệm bay quanh!',
+    badge: '🌌 Mẫu 3D Mới',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/birthday/zodiac-galaxy/index.html',
+    previewGradient: 'linear-gradient(135deg, #240c45 0%, #7c3aed 52%, #ec4899 100%)',
+    previewEmoji: '🌌',
+    features: ['Đủ 12 Chòm Sao Hoàng Đạo & Tự suy ra từ ngày sinh', 'Ngân hà 9.000 hạt + Vòng Astrolabe + 6 Khung ảnh 3D', '4 Bảng màu + Nhạc Celesta/Harp 68 BPM Web Audio'],
+    preset: {
+      occasion: 'Happy Birthday • Dải Ngân Hà Hoàng Đạo',
+      theme: 'royal_amethyst'
+    }
+  },
+  {
     id: 'birthday_summer_balloons_3d',
     category: 'birthday',
     isHot: true,
     salesCount: 'Mới ra mắt',
     title: 'Bong Bóng Mùa Hè 3D • Kỷ Niệm Tuổi Mới',
-    subtitle: 'Hàng chục quả bóng bay 3D phát sáng bay theo làn gió hè, chạm nổ giòn tan hé lộ album ảnh & quả bóng hoàng kim khổng lồ!',
+    subtitle: '28 quả bóng bay Fresnel phát sáng ẩn chứa lõi Ngôi Sao & 6 Khung Ảnh Polaroid 3D bên trong, chạm nổ pháo hoa Dual-Canvas tới Quả Bóng Hoàng Kim bùng tỏa 4.200 hạt Số Tuổi & Trái Tim Nắng Hạ!',
     badge: '🎈 Mẫu 3D Mới',
     price: 29000,
     oldPrice: 49000,
     engineUrl: 'templates/birthday/summer-balloons-3d/index.html',
     previewGradient: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 45%, #4a154b 100%)',
     previewEmoji: '🎈',
-    features: ['Three.js 3D toàn diện', 'Chạm nổ bóng âm thanh POP!', 'Hé lộ 6 ảnh & bóng hoàng kim'],
+    features: ['28 Bóng Fresnel GLSL ẩn lõi Ảnh Polaroid & Ngôi Sao 3D', '4.200 Hạt Morphing Tuổi + Trái Tim Nắng Hạ & Pháo Hoa Dual-Canvas', 'Tải 6 ảnh thật + 4 Preset & Nhạc Marimba/EP 108 BPM Web Audio'],
     preset: {
       occasion: 'Happy Birthday • Bong Bóng Mùa Hè',
       theme: 'summer_glow'
@@ -178,6 +292,66 @@ const BIRTHDAY_TEMPLATES = [
 // 4. SỰ KIỆN VALENTINE 14/2 (VALENTINE) -> Thư mục: templates/valentine/
 // ============================================================================
 const VALENTINE_TEMPLATES = [
+  {
+    id: 'valentine_crystal_puzzle_heart',
+    category: 'valentine',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Mảnh Ghép Pha Lê • Trái Tim Rubik Thủy Tinh 3D',
+    subtitle: 'Chạm từng nhịp hoặc nhấn giữ tụ lực ghép 116 mảnh pha lê vát cạnh GLSL tán sắc cầu vồng quanh lõi 4.600 hạt ánh sáng, khóa Mảnh Khóa Tâm 180° "KENG!" và xoay Rubik 3 tầng trình diễn lăng kính cùng Glass Harmonica 86 BPM!',
+    badge: '💎 Hot Valentine 14/2',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/valentine/crystal-puzzle-heart/index.html',
+    previewGradient: 'linear-gradient(135deg, #0b1636 0%, #7c3aed 52%, #f472b6 100%)',
+    previewEmoji: '💎',
+    features: ['116 Mảnh Pha Lê vát cạnh GLSL tán sắc + Lõi 4.600 hạt ánh sáng', 'Xoay Rubik 3 tầng lệch pha 360° + Mảnh Khóa Tâm 180° & 6 Khung Ảnh 3D', '4 Preset + Âm thanh Crystal Clink & Glass Harmonica 86 BPM'],
+    preset: {
+      occasion: 'Happy Valentine’s Day 14/2 • Mảnh Ghép Pha Lê',
+      theme: 'prism_diamond',
+      melody: 'glass_harmonica'
+    }
+  },
+  {
+    id: 'valentine_love_book_3d',
+    category: 'valentine',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Cuốn Sách Tình Yêu • Sách Pop-Up 3D Cổ Tích',
+    subtitle: 'Chạm mở khóa mề đay trái tim vàng trên cuốn sách da 3D, lật trang giấy uốn cong mềm qua chuỗi 9 trang bay vù vù để dựng nổi Lâu Đài Cổ Tích, Trái Tim Giấy 3 lớp & 6 Khung Ảnh Kỷ Niệm dưới ánh nến ấm cùng Acoustic Guitar 90 BPM',
+    badge: '📖 Hot Valentine 14/2',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/valentine/love-book-3d/index.html',
+    previewGradient: 'linear-gradient(135deg, #2b0612 0%, #881337 54%, #fbbf24 100%)',
+    previewEmoji: '📖',
+    features: ['Sách Da 3D & Lật Trang Uốn Cong Mềm 9 Lá Liên Hoàn', 'Pop-Up Lâu Đài Cổ Tích + Trái Tim Giấy 3 Lớp & 6 Khung Ảnh 3D', 'Tiếng lật giấy Pink Noise + Acoustic Guitar 90 BPM & Thiệp QR 14/2'],
+    preset: {
+      occasion: 'Happy Valentine’s Day 14/2 • Cuốn Sách Tình Yêu',
+      theme: 'royal_burgundy',
+      melody: 'acoustic_90'
+    }
+  },
+  {
+    id: 'valentine_rose_vortex',
+    category: 'valentine',
+    isHot: true,
+    salesCount: 'Mới ra mắt',
+    title: 'Lốc Xoáy Hoa Hồng • Vũ Điệu Waltz 3D',
+    subtitle: 'Xoay vòng đánh thức lốc xoáy 220 cánh hoa hồng 3D & 5.200 hạt ánh sáng theo nhịp Waltz 3/4, ngưng đọng thời gian 0.65s rồi kết thành Trái Tim 3D lộng lẫy cùng bảng tên & 6 khung ảnh viền vàng cổ điển',
+    badge: '🌹 Hot Valentine 14/2',
+    price: 39000,
+    oldPrice: 69000,
+    engineUrl: 'templates/valentine/rose-vortex/index.html',
+    previewGradient: 'linear-gradient(135deg, #2b0511 0%, #be123c 54%, #fde047 100%)',
+    previewEmoji: '🌹',
+    features: ['220 Cánh Hoa Hồng 3D cong + 5.200 Hạt biến hình Trái Tim', 'Kịch bản Waltz 3/4 + Ngưng đọng thời gian & 6 Khung ảnh vàng', 'Nhạc Waltz 108 BPM Web Audio + Bảng tên & Thiệp QR 14/2'],
+    preset: {
+      occasion: 'Happy Valentine’s Day 14/2 • Lốc Xoáy Hoa Hồng',
+      theme: 'crimson_velvet',
+      melody: 'waltz'
+    }
+  },
   {
     id: 'valentine_cupid_arrow_3d',
     category: 'valentine',

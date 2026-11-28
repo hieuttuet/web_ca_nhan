@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Thư Tình Trong Chai • Ánh Sáng Đại Dương 3D 🍾🌊</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../../../templates-catalog.js"></script>
+  <script src="../../../shared/gift-sdk.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- 1. Kiến trúc 3 lớp xếp chồng (z-index 1..6) -->
+  <div id="sky-radiance-layer"></div>
+  <canvas id="webgl-canvas"></canvas>
+  <canvas id="trails-canvas"></canvas>
+  <canvas id="morph-canvas"></canvas>
+  <div class="magic-vignette"></div>
+  <div class="screen-flash" id="screen-flash"></div>
+
+  <!-- 2. Top HUD chuẩn 3d-visual.md -->
+  <header class="top-hud">
+    <div class="top-hud-group">
+      <a href="../../../index.html" class="hud-btn creator-only" id="btn-home" title="Về Trang Chủ">← Trang chủ</a>
+    </div>
+    <div class="top-hud-group">
+      <button type="button" class="hud-btn" id="btn-skip-climax" title="Mở nút chai để xem khoảnh khắc tỏ tình">⏭️ Mở Chai</button>
+      <button type="button" class="hud-btn" id="btn-replay" title="Xem lại từ đầu">🔄 Xem Lại</button>
+      <button type="button" class="hud-btn" id="btn-sound" title="Bật/Tắt Âm Thanh">🔊 Âm Thanh</button>
+      <!-- #btn-tiktok-mode 📹 được tự động gắn bởi shared/tiktok-mode.js -->
+    </div>
+  </header>
+
+  <!-- 3. Bộ 4 Preset 1-chạm dành cho người tạo -->
+  <section class="preset-bar creator-only" id="preset-bar" aria-label="Chọn nhanh kịch bản thư tình đại dương">
+    <button type="button" class="preset-chip active" data-preset="ocean_night_letter">🌊 Thư Biển Đêm</button>
+    <button type="button" class="preset-chip" data-preset="missing_sea">💌 Biển Nhớ Em</button>
+    <button type="button" class="preset-chip" data-preset="moon_over_sea">🌙 Trăng Trên Biển</button>
+    <button type="button" class="preset-chip" data-preset="ocean_promise">✨ Lời Hứa Đại Dương</button>
+  </section>
+
+  <!-- 4. Phase Pill dẫn dắt kịch bản 4 Pha -->
+  <div class="phase-pill-wrap">
+    <div id="phase-pill">🍾 Chiếc chai mang bí mật đang trôi vào... Chạm vào chai để mở thư tình!</div>
+  </div>
+
+  <!-- 5. Bottom Dock 1 hàng ngang chuẩn 3d-visual.md -->
+  <nav class="bottom-dock" aria-label="Thanh điều khiển chính">
+    <button type="button" class="dock-btn" id="btn-open-wish" title="Mở tâm thư trong chai">
+      <span>💌</span><span>Tâm Thư</span>
+    </button>
+    <button type="button" class="dock-btn creator-only" id="btn-open-customize" title="Tùy chỉnh tên, câu tỏ tình, ảnh & tone biển">
+      <span>🎨</span><span>Tùy Chỉnh</span>
+    </button>
+    <button type="button" class="dock-btn primary-cta creator-only" id="btn-open-payment" title="Tạo Link & Mã QR gửi người thương">
+      <span>✨ Tạo Link &amp; QR</span>
+      <span class="dock-price-badge">29k</span>
+    </button>
+  </nav>
+
+  <!-- 6. Modal Spotlight (Chạm khung ảnh 3D ở Pha 3 để xem cận cảnh) -->
+  <div class="spotlight-modal" id="spotlight-modal" role="dialog" aria-modal="true" aria-labelledby="spotlight-caption">
+    <div class="spotlight-card">
+      <button type="button" class="modal-close-btn" id="btn-close-spotlight" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="spotlight-badge">🍾 Kỷ Niệm Ánh Sáng Đại Dương</div>
+      <div class="spotlight-photo-frame">
+        <canvas id="spotlight-canvas" width="512" height="512"></canvas>
+      </div>
+      <p class="spotlight-caption" id="spotlight-caption">"Làm người yêu anh nhé"</p>
+      <div class="spotlight-sub" id="spotlight-sub">Hoàng Minh ♥ Thảo Vy</div>
+      <button type="button" class="modal-btn-primary" id="btn-spotlight-letter" style="width:100%;">
+        💌 Đọc Tâm Thư &amp; Hồi Đáp
+      </button>
+    </div>
+  </div>
+
+  <!-- 7. Modal Tâm Thư (Chứa 2 nút hồi đáp ngọt ngào) -->
+  <div class="modal-backdrop" id="modal-wish-card" role="dialog" aria-modal="true" aria-labelledby="wish-card-title">
+    <div class="wish-card">
+      <button type="button" class="modal-close-btn" id="btn-close-wish" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge" id="wish-card-badge">🍾 Bức Thư Trôi Dạt Từ Biển Đêm 🌊</div>
+      <h2 class="wish-card-title" id="wish-card-title">Gửi Thảo Vy Thương Mến</h2>
+      <div class="wish-card-divider"></div>
+      <div class="wish-card-highlight" id="wish-card-highlight">"Làm người yêu anh nhé"</div>
+      <p class="wish-card-content" id="wish-card-content">
+        Anh gửi bức thư nhỏ này theo những con sóng đêm đầy ánh trăng, hy vọng nó sẽ trôi đến chạm khẽ vào trái tim em. Giữa đại dương bao la ngoài kia, bến bờ bình yên nhất mà anh muốn neo đậu suốt đời chỉ có em thôi. Làm người yêu anh nhé! 🌊💖
+      </p>
+      <div class="wish-card-sender" id="wish-card-sender">— Từ Hoàng Minh ♥</div>
+      <div class="wish-reply-actions">
+        <button type="button" class="reply-btn yes" id="btn-reply-yes">💖 Em đồng ý!</button>
+        <button type="button" class="reply-btn think" id="btn-reply-think">🌊 Để em giữ chai kỷ niệm này nha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal Tùy Chỉnh dành cho người tạo -->
+  <div class="modal-backdrop creator-only" id="modal-customize" role="dialog" aria-modal="true" aria-labelledby="modal-customize-title">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" id="btn-close-customize" aria-label="Đóng">✕</button>
+      <div class="sparkle-badge">🍾 Cá Nhân Hóa Thư Tình Trong Chai 🌊</div>
+      <h2 class="modal-title" id="modal-customize-title">Gửi Lời Tỏ Tình Qua Sóng Biển</h2>
+      <p class="modal-sub">
+        Tùy chỉnh tên hai bạn, câu tỏ tình hạt ánh sáng, tâm thư và ảnh kỷ niệm. Bấm "Áp Dụng &amp; Xem Thử Mở Chai" để chiêm ngưỡng ngay khoảnh khắc cao trào!
+      </p>
+
+      <form id="customize-form" autocomplete="off">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="in-sender">Tên bạn (Người gửi) *</label>
+            <input type="text" id="in-sender" class="modal-input" placeholder="VD: Hoàng Minh" value="Hoàng Minh" maxlength="22" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-receiver">Tên người ấy (Người nhận) *</label>
+            <input type="text" id="in-receiver" class="modal-input" placeholder="VD: Thảo Vy" value="Thảo Vy" maxlength="22" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-confess-line">✨ Câu tỏ tình hiện bằng hạt ánh sáng *</label>
+          <input type="text" id="in-confess-line" class="modal-input" placeholder="VD: Làm người yêu anh nhé" value="Làm người yêu anh nhé" maxlength="38" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="in-wish">💌 Lời tâm thư trong chai thủy tinh:</label>
+          <textarea id="in-wish" class="modal-input modal-textarea" rows="3" placeholder="Nhập tâm thư gửi người ấy..." required>Anh gửi bức thư nhỏ này theo những con sóng đêm đầy ánh trăng, hy vọng nó sẽ trôi đến chạm khẽ vào trái tim em. Giữa đại dương bao la ngoài kia, bến bờ bình yên nhất mà anh muốn neo đậu suốt đời chỉ có em thôi. Làm người yêu anh nhé! 🌊💖</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🖼️ Ảnh Kỷ Niệm (Nổi trên mặt sóng ở Pha 3):</label>
+          <div class="photo-picker-box">
+            <img id="photo-thumb" class="photo-thumb" alt="Ảnh kỷ niệm" />
+            <div class="photo-actions-row">
+              <label class="photo-upload-btn" for="in-photo">📸 Chọn Ảnh</label>
+              <input type="file" id="in-photo" accept="image/*" style="display:none;" />
+              <button type="button" class="photo-clear-btn" id="btn-clear-photo">🗑️ Dùng Tranh Mặc Định</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🎨 Tone Màu Đại Dương &amp; Ánh Sáng:</label>
+          <div class="theme-chips-row">
+            <button type="button" class="modal-theme-chip active" data-theme="moonlit_teal">🌊 Ngọc Bích Ánh Trăng</button>
+            <button type="button" class="modal-theme-chip" data-theme="pearl_rose">🐚 Ngọc Trai Hồng</button>
+            <button type="button" class="modal-theme-chip" data-theme="golden_tide">✨ Thủy Triều Vàng</button>
+            <button type="button" class="modal-theme-chip" data-theme="bioluminescent_indigo">🌌 Lân Tinh Biển Sâu</button>
+          </div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button type="button" id="btn-preview-creator" class="modal-btn-secondary">
+            🍾 Áp Dụng &amp; Xem Thử Mở Chai
+          </button>
+          <button type="submit" id="btn-submit-creator" class="modal-btn-primary">
+            ✨ Tạo Link &amp; QR (29.000đ)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Toast Thông Báo -->
+  <div id="ocean-toast" class="ocean-toast"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. BẢNG MÀU ĐẠI DƯƠNG (4 THEMES) & 4 PRESETS TỎ TÌNH 1-CHẠM
+     * ============================================================================
+     */
+    const THEMES = {
+      moonlit_teal: {
+        name: 'Ngọc Bích Ánh Trăng',
+        skyBg: 'radial-gradient(circle at 54% 22%, #0d2b45 0%, #051426 48%, #020612 100%)',
+        radianceBg: 'radial-gradient(circle at 50% 34%, rgba(45, 212, 191, 0.30) 0%, transparent 48%), radial-gradient(circle at 78% 18%, rgba(253, 224, 71, 0.22) 0%, transparent 42%), radial-gradient(circle at 24% 66%, rgba(56, 189, 248, 0.24) 0%, transparent 54%)',
+        deepSea: '#031224',
+        shallowSea: '#0b384f',
+        biolumColor: '#2dd4bf',
+        moonSpecColor: '#fef9c3',
+        glassTint: '#5eead4',
+        glassRim: '#bae6fd',
+        sparks: ['#2dd4bf', '#fde047', '#ffffff', '#67e8f9', '#f472b6'],
+        tier1: ['#fef08a', '#99f6e4'],
+        tier2: ['#ffffff', '#5eead4', '#38bdf8'],
+        tier3: ['#fde68a', '#bae6fd'],
+        warmLight: 0x2dd4bf,
+        rimLight: 0xbae6fd,
+        starColor: 0x5eead4
+      },
+      pearl_rose: {
+        name: 'Ngọc Trai Hồng',
+        skyBg: 'radial-gradient(circle at 54% 22%, #29163b 0%, #0d1630 50%, #030614 100%)',
+        radianceBg: 'radial-gradient(circle at 50% 34%, rgba(244, 114, 182, 0.30) 0%, transparent 48%), radial-gradient(circle at 78% 18%, rgba(254, 240, 138, 0.20) 0%, transparent 42%), radial-gradient(circle at 24% 66%, rgba(167, 139, 250, 0.22) 0%, transparent 54%)',
+        deepSea: '#0b0e28',
+        shallowSea: '#2d1c45',
+        biolumColor: '#f472b6',
+        moonSpecColor: '#ffe4e6',
+        glassTint: '#fbcfe8',
+        glassRim: '#fde68a',
+        sparks: ['#f472b6', '#fbcfe8', '#fde047', '#ffffff', '#67e8f9'],
+        tier1: ['#fef08a', '#fbcfe8'],
+        tier2: ['#ffffff', '#fbcfe8', '#f472b6'],
+        tier3: ['#bae6fd', '#fde68a'],
+        warmLight: 0xf472b6,
+        rimLight: 0xe9d5ff,
+        starColor: 0xfbcfe8
+      },
+      golden_tide: {
+        name: 'Thủy Triều Vàng',
+        skyBg: 'radial-gradient(circle at 54% 22%, #1d2238 0%, #091529 50%, #030612 100%)',
+        radianceBg: 'radial-gradient(circle at 50% 34%, rgba(251, 191, 36, 0.28) 0%, transparent 48%), radial-gradient(circle at 78% 18%, rgba(253, 224, 71, 0.26) 0%, transparent 42%), radial-gradient(circle at 24% 66%, rgba(56, 189, 248, 0.20) 0%, transparent 54%)',
+        deepSea: '#061224',
+        shallowSea: '#18324a',
+        biolumColor: '#fbbf24',
+        moonSpecColor: '#fef08a',
+        glassTint: '#fde68a',
+        glassRim: '#bae6fd',
+        sparks: ['#fde047', '#fbbf24', '#ffffff', '#38bdf8', '#fda4af'],
+        tier1: ['#ffffff', '#fef08a'],
+        tier2: ['#fef08a', '#fbbf24', '#fde047'],
+        tier3: ['#bae6fd', '#fed7aa'],
+        warmLight: 0xfbbf24,
+        rimLight: 0x93c5fd,
+        starColor: 0xfde047
+      },
+      bioluminescent_indigo: {
+        name: 'Lân Tinh Biển Sâu',
+        skyBg: 'radial-gradient(circle at 54% 22%, #141a4a 0%, #060f2b 50%, #020410 100%)',
+        radianceBg: 'radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.30) 0%, transparent 48%), radial-gradient(circle at 78% 18%, rgba(192, 132, 252, 0.24) 0%, transparent 42%), radial-gradient(circle at 24% 66%, rgba(45, 212, 191, 0.22) 0%, transparent 54%)',
+        deepSea: '#040a24',
+        shallowSea: '#0f2357',
+        biolumColor: '#38bdf8',
+        moonSpecColor: '#e0f2fe',
+        glassTint: '#7dd3fc',
+        glassRim: '#c084fc',
+        sparks: ['#38bdf8', '#c084fc', '#2dd4bf', '#fde047', '#ffffff'],
+        tier1: ['#fef08a', '#bae6fd'],
+        tier2: ['#ffffff', '#67e8f9', '#818cf8'],
+        tier3: ['#e9d5ff', '#99f6e4'],
+        warmLight: 0x38bdf8,
+        rimLight: 0xc084fc,
+        starColor: 0x67e8f9
+      }
+    };
+
+    const PRESETS = {
+      ocean_night_letter: {
+        sender: 'Hoàng Minh',
+        receiver: 'Thảo Vy',
+        confessLine: 'Làm người yêu anh nhé',
+        theme: 'moonlit_teal',
+        badgeLabel: '🌊 Thư Biển Đêm',
+        wish: 'Anh gửi bức thư nhỏ này theo những con sóng đêm đầy ánh trăng, hy vọng nó sẽ trôi đến chạm khẽ vào trái tim em. Giữa đại dương bao la ngoài kia, bến bờ bình yên nhất mà anh muốn neo đậu suốt đời chỉ có em thôi. Làm người yêu anh nhé! 🌊💖'
+      },
+      missing_sea: {
+        sender: 'Bảo Nam',
+        receiver: 'Minh Anh',
+        confessLine: 'Biển đêm nhớ em thật nhiều',
+        theme: 'pearl_rose',
+        badgeLabel: '💌 Biển Nhớ Em',
+        wish: 'Mỗi con sóng vỗ bờ đêm nay đều mang theo tên em. Anh chẳng biết cách nói những lời hoa mỹ, chỉ biết gửi vào chiếc chai thủy tinh này tất cả nỗi nhớ dịu dàng nhất dành cho em. Cho anh cơ hội được ở bên cạnh chăm sóc em nhé! 🐚💗'
+      },
+      moon_over_sea: {
+        sender: 'Gia Huy',
+        receiver: 'Khánh Linh',
+        confessLine: 'Anh thích em từ lâu rồi',
+        theme: 'golden_tide',
+        badgeLabel: '🌙 Trăng Trên Biển',
+        wish: 'Ánh trăng dát vàng trên mặt biển đêm nay rực rỡ bao nhiêu, thì trong lòng anh hình bóng em cũng sáng ngời bấy nhiêu. Anh thích em từ lâu lắm rồi — đừng để chiếc chai này chỉ trôi ngang qua nhé, hãy mở lòng đón anh vào thế giới của em! 🌙💛'
+      },
+      ocean_promise: {
+        sender: 'Anh',
+        receiver: 'Em',
+        confessLine: 'Cùng anh đi hết đại dương nhé',
+        theme: 'bioluminescent_indigo',
+        badgeLabel: '✨ Lời Hứa Đại Dương',
+        wish: 'Dù biển đời có lúc êm đềm hay sóng gió, chỉ cần có em nắm tay đi cùng, anh chẳng ngại vượt qua bất cứ hải lý nào. Chiếc chai ánh sáng này là lời hứa đầu tiên anh gửi riêng cho em! 🌌✨'
+      }
+    };
+
+    /**
+     * ============================================================================
+     * 2. TRẠNG THÁI ỨNG DỤNG & KỊCH BẢN 4 PHA
+     * ============================================================================
+     */
+    const state = {
+      templateId: 'confess_love_letter_bottle',
+      presetKey: 'ocean_night_letter',
+      sender: PRESETS.ocean_night_letter.sender,
+      receiver: PRESETS.ocean_night_letter.receiver,
+      confessLine: PRESETS.ocean_night_letter.confessLine,
+      wish: PRESETS.ocean_night_letter.wish,
+      theme: PRESETS.ocean_night_letter.theme,
+      photoDataUrl: null,
+
+      // 0: IDLE_DRIFT | 1: APPROACHING_SHORE | 2: UNCORK_CHARGING | 3: BOTTLE_SHATTER_MORPH
+      phase: 0,
+      phase1Elapsed: 0,
+      approachDuration: 3.8,
+      bottleArrived: false,
+      phase2Elapsed: 0,
+      phase3Elapsed: 0,
+      acceptedCelebration: false,
+      frameRevealed: false
+    };
+
+    let targetBrightness = 0.14;
+    let currentBrightness = 0.14;
+
+    function showToast(msg) {
+      const el = document.getElementById('ocean-toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function setPhasePill(text) {
+      const pill = document.getElementById('phase-pill');
+      if (pill) pill.textContent = text;
+    }
+
+    /**
+     * ============================================================================
+     * 3. ÂM THANH WEB AUDIO API (OceanAudioEngine: OceanWaveSynth + Chill Rhodes + SFX)
+     * ============================================================================
+     */
+    class OceanAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.pinkBuffer = null;
+        this.whiteBuffer = null;
+        this.musicRunning = false;
+        this.musicTimer = null;
+        this.musicStep = 0;
+        this.musicBus = null;
+        this.musicFilter = null;
+        this.targetCutoff = 760;
+        this.waveStarted = false;
+        this.waveMasterGain = null;
+      }
+
+      initContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          this.ctx = new AudioCtx();
+
+          // Tạo 4 giây Pink/Brown noise (sóng biển) & 2 giây White noise (bọt sóng / nổ pha lê)
+          const sr = this.ctx.sampleRate;
+          const pinkLen = Math.floor(sr * 4);
+          this.pinkBuffer = this.ctx.createBuffer(1, pinkLen, sr);
+          const pData = this.pinkBuffer.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          for (let i = 0; i < pinkLen; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            pData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.09;
+            b6 = white * 0.115926;
+          }
+
+          const whiteLen = Math.floor(sr * 2);
+          this.whiteBuffer = this.ctx.createBuffer(1, whiteLen, sr);
+          const wData = this.whiteBuffer.getChannelData(0);
+          for (let i = 0; i < whiteLen; i++) {
+            wData[i] = Math.random() * 2 - 1;
+          }
+
+          // Bus nhạc nền Chill Acoustic / Rhodes qua lowpass ấm
+          this.musicFilter = this.ctx.createBiquadFilter();
+          this.musicFilter.type = 'lowpass';
+          this.musicFilter.frequency.setValueAtTime(this.targetCutoff, this.ctx.currentTime);
+          this.musicFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+
+          this.musicBus = this.ctx.createGain();
+          this.musicBus.gain.setValueAtTime(0.75, this.ctx.currentTime);
+          this.musicBus.connect(this.musicFilter);
+          this.musicFilter.connect(this.ctx.destination);
+        }
+
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.startOceanWaveSynth();
+      }
+
+      // OceanWaveSynth: 2 lớp noise (lowpass LFO ~0.14Hz 140Hz-580Hz + bọt sóng bandpass 1100Hz)
+      startOceanWaveSynth() {
+        if (this.waveStarted || !this.ctx || !this.pinkBuffer) return;
+        this.waveStarted = true;
+        const now = this.ctx.currentTime;
+
+        this.waveMasterGain = this.ctx.createGain();
+        this.waveMasterGain.gain.setValueAtTime(this.muted ? 0.0001 : 0.38, now);
+        this.waveMasterGain.connect(this.ctx.destination);
+
+        // Lớp 1: Tiếng sóng biển trầm ấm cuộn vào bờ
+        const waveSrc1 = this.ctx.createBufferSource();
+        waveSrc1.buffer = this.pinkBuffer;
+        waveSrc1.loop = true;
+
+        const lpWave = this.ctx.createBiquadFilter();
+        lpWave.type = 'lowpass';
+        lpWave.frequency.setValueAtTime(360, now);
+        lpWave.Q.setValueAtTime(0.65, now);
+
+        const lfo = this.ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(0.14, now);
+        const lfoDepth = this.ctx.createGain();
+        lfoDepth.gain.setValueAtTime(220, now); // Quét 140Hz -> 580Hz
+        lfo.connect(lfoDepth);
+        lfoDepth.connect(lpWave.frequency);
+
+        const gain1 = this.ctx.createGain();
+        gain1.gain.setValueAtTime(0.32, now);
+        waveSrc1.connect(lpWave);
+        lpWave.connect(gain1);
+        gain1.connect(this.waveMasterGain);
+
+        // Lớp 2: Lớp bọt sóng biển rì rào dịu nhẹ (bandpass 1100Hz)
+        const foamSrc = this.ctx.createBufferSource();
+        foamSrc.buffer = this.pinkBuffer;
+        foamSrc.loop = true;
+
+        const bpFoam = this.ctx.createBiquadFilter();
+        bpFoam.type = 'bandpass';
+        bpFoam.frequency.setValueAtTime(1100, now);
+        bpFoam.Q.setValueAtTime(1.15, now);
+
+        const foamGain = this.ctx.createGain();
+        foamGain.gain.setValueAtTime(0.055, now);
+        const foamLfoGain = this.ctx.createGain();
+        foamLfoGain.gain.setValueAtTime(0.035, now);
+        lfo.connect(foamLfoGain);
+        foamLfoGain.connect(foamGain.gain);
+
+        foamSrc.connect(bpFoam);
+        bpFoam.connect(foamGain);
+        foamGain.connect(this.waveMasterGain);
+
+        waveSrc1.start(now);
+        foamSrc.start(now, 1.3);
+        lfo.start(now);
+      }
+
+      setPhaseMood(phase) {
+        if (phase === 0) this.targetCutoff = 680;
+        else if (phase === 1) this.targetCutoff = 920;
+        else if (phase === 2) this.targetCutoff = 1650;
+        else this.targetCutoff = 2600;
+
+        if (this.ctx && this.musicFilter) {
+          this.musicFilter.frequency.setTargetAtTime(this.targetCutoff, this.ctx.currentTime, 0.55);
+        }
+      }
+
+      playRhodesNote(freq, delay = 0, duration = 2.0, velocity = 0.065, bypassFilter = false) {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime + delay;
+
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const tineGain = this.ctx.createGain();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+        tineGain.gain.setValueAtTime(0.14, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(velocity, now + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc1.connect(gain);
+        osc2.connect(tineGain);
+        tineGain.connect(gain);
+        gain.connect(bypassFilter || !this.musicBus ? this.ctx.destination : this.musicBus);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration + 0.05);
+        osc2.stop(now + duration + 0.05);
+      }
+
+      startChillMusic() {
+        this.initContext();
+        if (this.musicRunning) return;
+        this.musicRunning = true;
+        this.musicStep = 0;
+
+        // Vòng hợp âm Chill Acoustic/Rhodes: Fmaj7 -> Em7 -> Dm7 -> Cmaj9
+        const progression = [
+          [174.61, 220.00, 261.63, 329.63, 440.00], // Fmaj7
+          [164.81, 246.94, 293.66, 392.00, 493.88], // Em7
+          [146.83, 220.00, 261.63, 349.23, 523.25], // Dm7
+          [130.81, 246.94, 293.66, 392.00, 587.33]  // Cmaj9
+        ];
+        // ~64 BPM nhịp chậm êm dịu -> 1 bước arpeggio ~468ms
+        const stepMs = 468;
+
+        const tick = () => {
+          if (!this.musicRunning) return;
+          const bar = Math.floor(this.musicStep / 8) % progression.length;
+          const beatInBar = this.musicStep % 8;
+          const chord = progression[bar];
+
+          if (!this.muted && this.ctx) {
+            if (beatInBar === 0) {
+              this.playRhodesNote(chord[0] * 0.5, 0, 3.4, 0.095);
+              this.playRhodesNote(chord[1], 0.03, 2.9, 0.055);
+              this.playRhodesNote(chord[2], 0.06, 2.9, 0.045);
+            }
+            const arpIdx = 1 + (beatInBar % (chord.length - 1));
+            this.playRhodesNote(chord[arpIdx], 0, 1.75, 0.048);
+            if (beatInBar === 3 || beatInBar === 6) {
+              this.playRhodesNote(chord[chord.length - 1], 0.02, 2.1, 0.038);
+            }
+          }
+          this.musicStep++;
+          this.musicTimer = setTimeout(tick, stepMs);
+        };
+        tick();
+      }
+
+      playCorkPop() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.whiteBuffer) return;
+        const now = this.ctx.currentTime;
+
+        // Tiếng bật nút bần rỗng vang đặc trưng
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(210, now);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.045);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.14);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.32, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.19);
+
+        // Luồng khí bật nhẹ
+        const air = this.ctx.createBufferSource();
+        air.buffer = this.whiteBuffer;
+        const bp = this.ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.setValueAtTime(1400, now);
+        bp.Q.setValueAtTime(2.5, now);
+        const aGain = this.ctx.createGain();
+        aGain.gain.setValueAtTime(0.14, now);
+        aGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+        air.connect(bp);
+        bp.connect(aGain);
+        aGain.connect(this.ctx.destination);
+        air.start(now);
+        air.stop(now + 0.11);
+      }
+
+      playGlassChime() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const freqs = [880, 1318.51, 1760, 2637.02];
+        freqs.forEach((f, idx) => {
+          this.playRhodesNote(f, idx * 0.055, 1.35, 0.045, true);
+        });
+      }
+
+      playGlassShatterChime() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx || !this.whiteBuffer) return;
+        const now = this.ctx.currentTime;
+
+        // 1. Âm trầm lan sóng đại dương
+        const sub = this.ctx.createOscillator();
+        const subG = this.ctx.createGain();
+        sub.type = 'triangle';
+        sub.frequency.setValueAtTime(135, now);
+        sub.frequency.exponentialRampToValueAtTime(36, now + 0.95);
+        subG.gain.setValueAtTime(0.36, now);
+        subG.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+        sub.connect(subG);
+        subG.connect(this.ctx.destination);
+        sub.start(now);
+        sub.stop(now + 1.02);
+
+        // 2. Tia pha lê vỡ lấp lánh dịu tai
+        const sparkle = this.ctx.createBufferSource();
+        sparkle.buffer = this.whiteBuffer;
+        const hp = this.ctx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.setValueAtTime(2600, now);
+        const sG = this.ctx.createGain();
+        sG.gain.setValueAtTime(0.16, now);
+        sG.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+        sparkle.connect(hp);
+        hp.connect(sG);
+        sG.connect(this.ctx.destination);
+        sparkle.start(now);
+        sparkle.stop(now + 0.68);
+
+        // 3. Chuỗi chuông thủy tinh ngân vang hợp âm Cmaj9
+        const chimeNotes = [523.25, 659.25, 783.99, 987.77, 1174.66, 1567.98, 2093.0];
+        chimeNotes.forEach((f, i) => {
+          this.playRhodesNote(f, i * 0.045, 2.4, 0.068, true);
+        });
+      }
+
+      playAcceptFanfare() {
+        if (this.muted) return;
+        this.initContext();
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 987.77, 1046.5, 1318.51, 1567.98];
+        notes.forEach((freq, i) => {
+          this.playRhodesNote(freq, i * 0.08, 2.1, 0.082, true);
+        });
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.ctx && this.waveMasterGain) {
+          this.waveMasterGain.gain.setTargetAtTime(this.muted ? 0.0001 : 0.38, this.ctx.currentTime, 0.15);
+        }
+        return this.muted;
+      }
+    }
+
+    const audio = new OceanAudioEngine();
+
+    /**
+     * ============================================================================
+     * 4. CÁC HÀM TEXTURE THỦ CÔNG & KHUNG ẢNH KỶ NIỆM
+     * ============================================================================
+     */
+    function createSoftGlowTexture() {
+      const s = 64;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.28, 'rgba(235, 252, 255, 0.92)');
+      g.addColorStop(0.62, 'rgba(45, 212, 191, 0.36)');
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+    const softGlowTex = createSoftGlowTexture();
+
+    // Texture Mặt Trăng equirectangular 2:1 (1024x512, phủ kín không cắt hình tròn)
+    function createMoonTexture() {
+      const w = 1024;
+      const h = 512;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+
+      const bg = ctx.createLinearGradient(0, 0, 0, h);
+      bg.addColorStop(0, '#dce7f5');
+      bg.addColorStop(0.5, '#fffdf7');
+      bg.addColorStop(1, '#dce7f5');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const maria = [
+        [240, 210, 88, 52, 0.14],
+        [430, 175, 112, 65, 0.13],
+        [620, 240, 126, 72, 0.15],
+        [780, 200, 92, 58, 0.12],
+        [340, 315, 76, 48, 0.13],
+        [540, 345, 95, 50, 0.11]
+      ];
+      maria.forEach(([mx, my, rx, ry, alpha]) => {
+        const g = ctx.createRadialGradient(mx, my, 4, mx, my, rx);
+        g.addColorStop(0, `rgba(148, 163, 184, ${alpha})`);
+        g.addColorStop(0.65, `rgba(148, 163, 184, ${alpha * 0.45})`);
+        g.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(mx, my, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      for (let i = 0; i < 42; i++) {
+        const cx = 70 + Math.random() * (w - 140);
+        const cy = 60 + Math.random() * (h - 120);
+        const cr = 8 + Math.random() * 24;
+        const cg = ctx.createRadialGradient(cx - cr * 0.2, cy - cr * 0.2, 1, cx, cy, cr);
+        cg.addColorStop(0, 'rgba(255, 255, 255, 0.28)');
+        cg.addColorStop(0.75, 'rgba(148, 163, 184, 0.16)');
+        cg.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        ctx.fillStyle = cg;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Texture cuộn giấy thư cổ điển bên trong chai
+    function createParchmentTexture() {
+      const w = 256;
+      const h = 256;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#fef3c7');
+      grad.addColorStop(0.5, '#fde68a');
+      grad.addColorStop(1, '#f5d08a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(146, 64, 14, 0.22)';
+      ctx.lineWidth = 2;
+      for (let y = 34; y < h - 24; y += 22) {
+        ctx.beginPath();
+        ctx.moveTo(26, y);
+        ctx.lineTo(w - 26, y + (Math.random() - 0.5) * 3);
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Texture nút bần gỗ tự nhiên
+    function createCorkTexture() {
+      const s = 128;
+      const c = document.createElement('canvas');
+      c.width = s;
+      c.height = s;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#b47b48';
+      ctx.fillRect(0, 0, s, s);
+      for (let i = 0; i < 220; i++) {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(92, 52, 24, 0.35)' : 'rgba(232, 186, 134, 0.32)';
+        ctx.fillRect(Math.random() * s, Math.random() * s, 2 + Math.random() * 6, 1 + Math.random() * 3);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.encoding = THREE.sRGBEncoding;
+      return tex;
+    }
+
+    // Dựng Canvas ảnh kỷ niệm (cover-crop ảnh upload hoặc tranh thư tình đại dương mặc định)
+    function buildMemoryPhotoCanvas(photoImg) {
+      const s = 768;
+      const cvs = document.createElement('canvas');
+      cvs.width = s;
+      cvs.height = s;
+      const ctx = cvs.getContext('2d');
+      const t = THEMES[state.theme] || THEMES.moonlit_teal;
+
+      if (photoImg) {
+        const ratio = photoImg.width / Math.max(1, photoImg.height);
+        let sw = photoImg.width, sh = photoImg.height, sx = 0, sy = 0;
+        if (ratio > 1) {
+          sw = photoImg.height;
+          sx = (photoImg.width - sw) / 2;
+        } else {
+          sh = photoImg.width;
+          sy = (photoImg.height - sh) / 2;
+        }
+        ctx.drawImage(photoImg, sx, sy, sw, sh, 0, 0, s, s);
+
+        const vig = ctx.createRadialGradient(s / 2, s / 2, s * 0.30, s / 2, s / 2, s * 0.56);
+        vig.addColorStop(0, 'rgba(0,0,0,0)');
+        vig.addColorStop(1, 'rgba(3, 12, 28, 0.34)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, s, s);
+      } else {
+        const bg = ctx.createRadialGradient(s / 2, s * 0.36, 28, s / 2, s / 2, s * 0.62);
+        bg.addColorStop(0, '#fefce8');
+        bg.addColorStop(0.28, t.biolumColor);
+        bg.addColorStop(0.72, t.shallowSea);
+        bg.addColorStop(1, '#030918');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, s, s);
+
+        const glow = ctx.createRadialGradient(s / 2, s * 0.38, 12, s / 2, s * 0.38, 210);
+        glow.addColorStop(0, 'rgba(255,255,255,0.85)');
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(s / 2, s * 0.38, 210, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sóng biển ánh trăng nhẹ ở nửa dưới tranh mặc định
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.32)';
+        ctx.lineWidth = 4;
+        for (let row = 0; row < 3; row++) {
+          const wy = s * (0.50 + row * 0.045);
+          ctx.beginPath();
+          for (let wx = 80; wx <= s - 80; wx += 20) {
+            const yy = wy + Math.sin(wx * 0.025 + row) * 8;
+            if (wx === 80) ctx.moveTo(wx, yy);
+            else ctx.lineTo(wx, yy);
+          }
+          ctx.stroke();
+        }
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '148px sans-serif';
+        ctx.fillText('🍾', s / 2, s * 0.36);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(2, 8, 22, 0.92)';
+        ctx.shadowBlur = 14;
+        ctx.font = '800 38px "Playfair Display", serif';
+        ctx.fillText(`${state.sender}  ♥  ${state.receiver}`, s / 2, s * 0.67, s - 88);
+
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'italic 700 28px "Playfair Display", serif';
+        ctx.fillText(`"${state.confessLine}"`, s / 2, s * 0.79, s - 96);
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.88)';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(14, 14, s - 28, s - 28);
+
+      return cvs;
+    }
+
+    /**
+     * ============================================================================
+     * 5. LỚP 1 (#webgl-canvas): THREE.JS R128 BIỂN ĐÊM, TRĂNG, CHAI FRESNEL & KHUNG ẢNH 3D
+     * ============================================================================
+     */
+    const webglCanvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({
+      canvas: webglCanvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / Math.max(1, window.innerHeight), 0.1, 1000);
+
+    // 3-Point Lighting
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.56);
+    scene.add(ambientLight);
+
+    const warmLight = new THREE.PointLight(THEMES.moonlit_teal.warmLight, 0.95, 48);
+    warmLight.position.set(0, 3.6, 5.5);
+    scene.add(warmLight);
+
+    const moonDirLight = new THREE.DirectionalLight(0xbae6fd, 0.82);
+    moonDirLight.position.set(14, 16, -18);
+    scene.add(moonDirLight);
+
+    // 5.1. starFieldPoints (900 sao 3D nhấp nháy ShaderMaterial)
+    const STAR_COUNT = 900;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(STAR_COUNT * 3);
+    const starPhase = new Float32Array(STAR_COUNT);
+    const starSpeed = new Float32Array(STAR_COUNT);
+    const starSize = new Float32Array(STAR_COUNT);
+    const starColorAttr = new Float32Array(STAR_COUNT * 3);
+    const starPalette = [
+      new THREE.Color('#ffffff'),
+      new THREE.Color('#fef08a'),
+      new THREE.Color('#99f6e4'),
+      new THREE.Color('#bae6fd')
+    ];
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 100;
+      starPos[i * 3 + 1] = -2 + Math.random() * 54;
+      starPos[i * 3 + 2] = -42 + (Math.random() - 0.5) * 26;
+      starPhase[i] = Math.random() * Math.PI * 2;
+      starSpeed[i] = 1.0 + Math.random() * 2.6;
+      starSize[i] = 0.8 + Math.random() * 1.9;
+      const c = starPalette[i % starPalette.length];
+      starColorAttr[i * 3] = c.r;
+      starColorAttr[i * 3 + 1] = c.g;
+      starColorAttr[i * 3 + 2] = c.b;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    starGeo.setAttribute('aPhase', new THREE.BufferAttribute(starPhase, 1));
+    starGeo.setAttribute('aSpeed', new THREE.BufferAttribute(starSpeed, 1));
+    starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSize, 1));
+    starGeo.setAttribute('aColor', new THREE.BufferAttribute(starColorAttr, 3));
+
+    const starUniforms = {
+      uTime: { value: 0 },
+      uPixelRatio: { value: dpr },
+      uBoost: { value: 0.60 }
+    };
+    const starMat = new THREE.ShaderMaterial({
+      uniforms: starUniforms,
+      vertexShader: `
+        attribute float aPhase;
+        attribute float aSpeed;
+        attribute float aSize;
+        attribute vec3 aColor;
+        uniform float uTime;
+        uniform float uPixelRatio;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vColor = aColor;
+          float tw = 0.45 + 0.55 * sin(uTime * aSpeed + aPhase);
+          vAlpha = tw;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (0.85 + 0.35 * tw) * uPixelRatio * (18.0 / max(1.0, -mvPos.z));
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform float uBoost;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          float core = 1.0 - smoothstep(0.05, 0.5, d);
+          gl_FragColor = vec4(vColor, core * vAlpha * uBoost);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const starFieldPoints = new THREE.Points(starGeo, starMat);
+    scene.add(starFieldPoints);
+
+    // 5.2. moonGroup (SphereGeometry 1024x512 equirectangular 2:1 + Sprite hào quang z = -2.6)
+    const moonGroup = new THREE.Group();
+    scene.add(moonGroup);
+
+    const moonMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(2.25, 36, 36),
+      new THREE.MeshBasicMaterial({
+        map: createMoonTexture(),
+        color: 0xeff6ff,
+        toneMapped: false
+      })
+    );
+    moonGroup.add(moonMesh);
+
+    const moonHaloMat = new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0xe0f2fe,
+      transparent: true,
+      opacity: 0.48,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const moonHalo = new THREE.Sprite(moonHaloMat);
+    moonHalo.scale.set(9.4, 9.4, 1);
+    moonHalo.position.set(0, 0, -2.6);
+    moonGroup.add(moonHalo);
+
+    // 5.3. oceanMesh: PlaneGeometry(90, 62, 128, 96) tại y = -2.45 + ShaderMaterial sóng đa tần số
+    const OCEAN_Y = -2.45;
+    const rippleOrigin = new THREE.Vector2(0, 2.0);
+    let rippleTime = 0;
+    let rippleStrength = 0;
+
+    function getWaveDisp(x, z, t) {
+      const w1 = Math.sin(x * 0.26 + z * 0.14 + t * 1.15) * 0.16;
+      const w2 = Math.sin(x * -0.18 + z * 0.34 - t * 0.92) * 0.11;
+      const w3 = Math.cos(x * 0.48 + z * 0.42 + t * 1.62) * 0.055;
+      const w4 = Math.sin(x * 0.82 - z * 0.58 + t * 2.08) * 0.025;
+      return w1 + w2 + w3 + w4;
+    }
+
+    function getRippleDisp(x, z, ox, oz, rt, rStrength) {
+      if (rStrength <= 0.001) return 0;
+      const dist = Math.hypot(x - ox, z - oz);
+      const front = dist - rt * 11.0;
+      const env = Math.exp(-Math.abs(front) * 0.44) * Math.exp(-dist * 0.055) * rStrength;
+      return Math.sin(front * 2.4) * 0.36 * env;
+    }
+
+    function getWaveHeight(x, z, t) {
+      return OCEAN_Y + getWaveDisp(x, z, t) + getRippleDisp(x, z, rippleOrigin.x, rippleOrigin.y, rippleTime, rippleStrength);
+    }
+
+    function getWaveSlope(x, z, t) {
+      const eps = 0.22;
+      const dhdx = (getWaveHeight(x + eps, z, t) - getWaveHeight(x - eps, z, t)) / (2 * eps);
+      const dhdz = (getWaveHeight(x, z + eps, t) - getWaveHeight(x, z - eps, t)) / (2 * eps);
+      return { dhdx, dhdz };
+    }
+
+    const oceanUniforms = {
+      uTime: { value: 0 },
+      uRippleOrigin: { value: rippleOrigin },
+      uRippleTime: { value: 0 },
+      uRippleStrength: { value: 0 },
+      uMoonPos: { value: new THREE.Vector3(14, 12, -24) },
+      uDeepColor: { value: new THREE.Color(THEMES.moonlit_teal.deepSea) },
+      uShallowColor: { value: new THREE.Color(THEMES.moonlit_teal.shallowSea) },
+      uBiolumColor: { value: new THREE.Color(THEMES.moonlit_teal.biolumColor) },
+      uMoonSpecColor: { value: new THREE.Color(THEMES.moonlit_teal.moonSpecColor) },
+      uLuminance: { value: 0.25 }
+    };
+
+    const oceanGeo = new THREE.PlaneGeometry(90, 62, 128, 96);
+    const oceanMat = new THREE.ShaderMaterial({
+      uniforms: oceanUniforms,
+      vertexShader: `
+        uniform float uTime;
+        uniform vec2 uRippleOrigin;
+        uniform float uRippleTime;
+        uniform float uRippleStrength;
+        varying vec3 vWorldPos;
+        varying vec3 vNormalW;
+        varying float vWaveH;
+        varying float vRippleCrest;
+
+        float waveDisp(vec2 xz, float t) {
+          float w1 = sin(xz.x * 0.26 + xz.y * 0.14 + t * 1.15) * 0.16;
+          float w2 = sin(xz.x * -0.18 + xz.y * 0.34 - t * 0.92) * 0.11;
+          float w3 = cos(xz.x * 0.48 + xz.y * 0.42 + t * 1.62) * 0.055;
+          float w4 = sin(xz.x * 0.82 - xz.y * 0.58 + t * 2.08) * 0.025;
+          return w1 + w2 + w3 + w4;
+        }
+
+        float rippleDisp(vec2 xz, out float envOut) {
+          if (uRippleStrength <= 0.001) {
+            envOut = 0.0;
+            return 0.0;
+          }
+          float dist = length(xz - uRippleOrigin);
+          float front = dist - uRippleTime * 11.0;
+          float env = exp(-abs(front) * 0.44) * exp(-dist * 0.055) * uRippleStrength;
+          envOut = env * (0.5 + 0.5 * sin(front * 2.4));
+          return sin(front * 2.4) * 0.36 * env;
+        }
+
+        float totalH(vec2 xz, out float rCrest) {
+          float envOut = 0.0;
+          float r = rippleDisp(xz, envOut);
+          rCrest = envOut;
+          return waveDisp(xz, uTime) + r;
+        }
+
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          float rCrest = 0.0;
+          float h = totalH(wp.xz, rCrest);
+          wp.y += h;
+
+          float eps = 0.25;
+          float d1 = 0.0;
+          float d2 = 0.0;
+          float hx = totalH(wp.xz + vec2(eps, 0.0), d1) - totalH(wp.xz - vec2(eps, 0.0), d2);
+          float hz = totalH(wp.xz + vec2(0.0, eps), d1) - totalH(wp.xz - vec2(0.0, eps), d2);
+          vNormalW = normalize(vec3(-hx / (2.0 * eps), 1.0, -hz / (2.0 * eps)));
+
+          vWorldPos = wp.xyz;
+          vWaveH = h;
+          vRippleCrest = rCrest;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uMoonPos;
+        uniform vec3 uDeepColor;
+        uniform vec3 uShallowColor;
+        uniform vec3 uBiolumColor;
+        uniform vec3 uMoonSpecColor;
+        uniform float uLuminance;
+        varying vec3 vWorldPos;
+        varying vec3 vNormalW;
+        varying float vWaveH;
+        varying float vRippleCrest;
+
+        void main() {
+          vec3 V = normalize(cameraPosition - vWorldPos);
+          vec3 N = normalize(vNormalW);
+
+          // Micro-ripple để ánh trăng phản chiếu lấp lánh trên từng gợn sóng
+          float microX = sin(vWorldPos.x * 2.3 + vWorldPos.z * 1.4 + uTime * 2.6) * 0.08
+                       + cos(vWorldPos.x * 4.7 - vWorldPos.z * 2.8 - uTime * 3.1) * 0.04;
+          float microZ = cos(vWorldPos.x * 1.9 + vWorldPos.z * 3.2 - uTime * 2.2) * 0.08;
+          vec3 Nglitter = normalize(N + vec3(microX, 0.0, microZ));
+
+          // Màu nước sâu + độ sáng đỉnh sóng
+          float crestMix = smoothstep(-0.22, 0.28, vWaveH);
+          vec3 baseCol = mix(uDeepColor, uShallowColor, crestMix);
+
+          // Fresnel bầu trời đêm phản chiếu trên mặt nước
+          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+          baseCol = mix(baseCol, uShallowColor * 1.35 + vec3(0.04, 0.08, 0.14), fresnel * 0.55);
+
+          // Dải phản chiếu ánh trăng lấp lánh (Moonlit specular glitter path)
+          vec3 L = normalize(vec3(uMoonPos.x, max(6.5, uMoonPos.y), uMoonPos.z) - vWorldPos);
+          vec3 H = normalize(L + V);
+          float specBroad = pow(max(dot(N, H), 0.0), 28.0);
+          float specGlitter = pow(max(dot(Nglitter, H), 0.0), 170.0);
+          float sparkleGate = smoothstep(0.62, 0.96, sin(vWorldPos.x * 5.2 + uTime * 3.4) * cos(vWorldPos.z * 4.4 - uTime * 2.7) * 0.5 + 0.5);
+          vec3 moonPath = uMoonSpecColor * (specBroad * 0.36 + specGlitter * (1.25 + sparkleGate * 1.4));
+
+          // Ánh lân tinh đỉnh sóng & vòng sóng đồng tâm khi chai vỡ
+          float biolum = smoothstep(0.11, 0.34, vWaveH) * (0.28 + uLuminance * 0.52);
+          float rippleGlow = clamp(vRippleCrest * 1.65, 0.0, 1.2);
+          vec3 col = baseCol * (0.72 + uLuminance * 0.36) + moonPath + uBiolumColor * (biolum + rippleGlow);
+
+          // Bo mờ chân trời & 2 bên hòa vào nền đêm
+          float horizonFade = smoothstep(-41.5, -21.0, vWorldPos.z);
+          float nearFade = 1.0 - smoothstep(11.0, 18.5, vWorldPos.z);
+          float sideFade = 1.0 - smoothstep(26.0, 44.0, abs(vWorldPos.x));
+          float alpha = horizonFade * nearFade * sideFade * 0.95;
+
+          gl_FragColor = vec4(col, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false
+    });
+    const oceanMesh = new THREE.Mesh(oceanGeo, oceanMat);
+    oceanMesh.rotation.x = -Math.PI / 2;
+    oceanMesh.position.set(0, OCEAN_Y, -12);
+    scene.add(oceanMesh);
+
+    // 5.4. bottleGroup: LatheGeometry Fresnel Glass + Cuộn giấy thư + 40 hạt + Nút bần + Hitbox 2x
+    const bottleGroup = new THREE.Group();
+    scene.add(bottleGroup);
+
+    const bottleBodyGroup = new THREE.Group();
+    bottleGroup.add(bottleBodyGroup);
+
+    // Cuộn giấy thư cột ruy-băng bên trong chai
+    const scrollMat = new THREE.MeshStandardMaterial({
+      map: createParchmentTexture(),
+      color: 0xfffbeb,
+      emissive: 0xfef3c7,
+      emissiveIntensity: 0.22,
+      roughness: 0.72,
+      metalness: 0.05
+    });
+    const scrollMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.98, 24), scrollMat);
+    scrollMesh.position.set(0, -0.46, 0);
+    scrollMesh.rotation.z = 0.09;
+    scrollMesh.renderOrder = 1;
+    bottleBodyGroup.add(scrollMesh);
+
+    const ribbonMat = new THREE.MeshStandardMaterial({
+      color: 0xf43f5e,
+      emissive: 0xbe123c,
+      emissiveIntensity: 0.45,
+      roughness: 0.35
+    });
+    const scrollRibbon = new THREE.Mesh(new THREE.CylinderGeometry(0.162, 0.162, 0.09, 24), ribbonMat);
+    scrollRibbon.position.set(0, -0.46, 0);
+    scrollRibbon.rotation.z = 0.09;
+    scrollRibbon.renderOrder = 1;
+    bottleBodyGroup.add(scrollRibbon);
+
+    const waxSeal = new THREE.Mesh(new THREE.SphereGeometry(0.052, 12, 12), ribbonMat);
+    waxSeal.position.set(0.15, -0.46, 0.06);
+    waxSeal.renderOrder = 1;
+    bottleBodyGroup.add(waxSeal);
+
+    // 40 hạt sáng lấp lánh bên trong chai (bottleCoreSparks)
+    const BOTTLE_SPARK_COUNT = 40;
+    const bSparkGeo = new THREE.BufferGeometry();
+    const bSparkPos = new Float32Array(BOTTLE_SPARK_COUNT * 3);
+    const bSparkSeeds = [];
+    for (let i = 0; i < BOTTLE_SPARK_COUNT; i++) {
+      const ang = (i / BOTTLE_SPARK_COUNT) * Math.PI * 2;
+      const rad = 0.16 + Math.random() * 0.24;
+      const y = -1.02 + Math.random() * 1.25;
+      bSparkPos[i * 3] = Math.cos(ang) * rad;
+      bSparkPos[i * 3 + 1] = y;
+      bSparkPos[i * 3 + 2] = Math.sin(ang) * rad;
+      bSparkSeeds.push({ ang, rad, y, speed: 1.2 + Math.random() * 1.8, phase: Math.random() * Math.PI * 2 });
+    }
+    bSparkGeo.setAttribute('position', new THREE.BufferAttribute(bSparkPos, 3));
+    const bSparkMat = new THREE.PointsMaterial({
+      map: softGlowTex,
+      color: 0xfef08a,
+      size: 0.24,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    });
+    const bottleCoreSparks = new THREE.Points(bSparkGeo, bSparkMat);
+    bottleCoreSparks.renderOrder = 2;
+    bottleBodyGroup.add(bottleCoreSparks);
+
+    // Thân chai LatheGeometry cổ điển với GLSL Fresnel Glass ShaderMaterial
+    const bottleProfile = [
+      new THREE.Vector2(0.001, -1.25),
+      new THREE.Vector2(0.52, -1.25),
+      new THREE.Vector2(0.58, -1.16),
+      new THREE.Vector2(0.58, 0.08),
+      new THREE.Vector2(0.51, 0.34),
+      new THREE.Vector2(0.30, 0.58),
+      new THREE.Vector2(0.19, 0.78),
+      new THREE.Vector2(0.185, 1.24),
+      new THREE.Vector2(0.23, 1.30),
+      new THREE.Vector2(0.18, 1.34)
+    ];
+    const bottleGeo = new THREE.LatheGeometry(bottleProfile, 40);
+    const bottleGlassUniforms = {
+      uGlassTint: { value: new THREE.Color(THEMES.moonlit_teal.glassTint) },
+      uRimColor: { value: new THREE.Color(THEMES.moonlit_teal.glassRim) },
+      uChargeBoost: { value: 0.0 },
+      uTime: { value: 0.0 }
+    };
+    const bottleGlassMat = new THREE.ShaderMaterial({
+      uniforms: bottleGlassUniforms,
+      vertexShader: `
+        varying vec3 vNormalW;
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          vNormalW = normalize(mat3(modelMatrix) * normal);
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uGlassTint;
+        uniform vec3 uRimColor;
+        uniform float uChargeBoost;
+        uniform float uTime;
+        varying vec3 vNormalW;
+        varying vec3 vWorldPos;
+
+        void main() {
+          vec3 V = normalize(cameraPosition - vWorldPos);
+          vec3 N = normalize(vNormalW);
+          if (!gl_FrontFacing) N = -N;
+
+          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 2.35);
+          vec3 L1 = normalize(vec3(0.45, 0.85, 0.55));
+          vec3 L2 = normalize(vec3(-0.6, 0.35, -0.5));
+          vec3 H1 = normalize(L1 + V);
+          vec3 H2 = normalize(L2 + V);
+          float spec1 = pow(max(dot(N, H1), 0.0), 64.0);
+          float spec2 = pow(max(dot(N, H2), 0.0), 36.0);
+
+          float shimmer = 0.85 + 0.15 * sin(uTime * 3.0 + vWorldPos.y * 4.0);
+          vec3 col = mix(uGlassTint * 0.42, uRimColor, fresnel) * shimmer;
+          col += vec3(1.0, 0.99, 0.92) * (spec1 * 1.1 + spec2 * 0.45);
+          col += uRimColor * uChargeBoost * (0.45 + fresnel * 1.15);
+
+          float alpha = clamp(0.16 + fresnel * 0.68 + spec1 * 0.5 + uChargeBoost * 0.25, 0.0, 0.96);
+          gl_FragColor = vec4(col, alpha);
+        }
+      `,
+      side: THREE.DoubleSide,
+      transparent: true,
+      depthWrite: false
+    });
+    const bottleGlassMesh = new THREE.Mesh(bottleGeo, bottleGlassMat);
+    bottleGlassMesh.renderOrder = 3;
+    bottleBodyGroup.add(bottleGlassMesh);
+
+    // Nút bần gỗ trên cổ chai
+    const corkMat = new THREE.MeshStandardMaterial({
+      map: createCorkTexture(),
+      roughness: 0.85,
+      metalness: 0.04,
+      transparent: true,
+      opacity: 1.0
+    });
+    const corkMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.36, 20), corkMat);
+    corkMesh.position.set(0, 1.38, 0);
+    corkMesh.renderOrder = 4;
+    bottleBodyGroup.add(corkMesh);
+
+    // Quầng sáng dịu quanh chai để nổi bật trên biển đêm
+    const bottleWaterHaloMat = new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0x5eead4,
+      transparent: true,
+      opacity: 0.56,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const bottleWaterHalo = new THREE.Sprite(bottleWaterHaloMat);
+    bottleWaterHalo.scale.set(4.0, 4.0, 1);
+    bottleWaterHalo.position.set(0, -0.25, -0.35);
+    bottleBodyGroup.add(bottleWaterHalo);
+
+    // Hitbox ẩn ~2x kích thước chai để chạm nhạy trên mobile
+    const bottleHitMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.2, 1.2, 3.8, 12),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    bottleBodyGroup.add(bottleHitMesh);
+
+    const corkState = {
+      detached: false,
+      elapsed: 0,
+      vel: new THREE.Vector3()
+    };
+
+    // 5.5. memoryFrameGroup (ẩn trước Pha 3, trồi lên trên mặt sóng sau +1.5s ở Pha 3)
+    const memoryFrameGroup = new THREE.Group();
+    memoryFrameGroup.visible = false;
+    memoryFrameGroup.scale.set(0.001, 0.001, 0.001);
+    scene.add(memoryFrameGroup);
+
+    const memoryPhotoMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1,
+      toneMapped: false
+    });
+    const memoryPhotoPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), memoryPhotoMat);
+    memoryPhotoPlane.position.z = 0.08;
+    memoryFrameGroup.add(memoryPhotoPlane);
+
+    const frameBorderMat = new THREE.MeshStandardMaterial({
+      color: 0xfde047,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.35,
+      metalness: 0.78,
+      roughness: 0.22
+    });
+    const memoryBackingMesh = new THREE.Mesh(new THREE.BoxGeometry(2.44, 2.44, 0.11), frameBorderMat);
+    memoryBackingMesh.position.z = 0.0;
+    memoryFrameGroup.add(memoryBackingMesh);
+
+    const memoryGlowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softGlowTex,
+      color: 0x2dd4bf,
+      transparent: true,
+      opacity: 0.58,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    memoryGlowSprite.scale.set(4.6, 4.6, 1);
+    memoryGlowSprite.position.z = -0.35;
+    memoryFrameGroup.add(memoryGlowSprite);
+
+    const cornerGeo = new THREE.OctahedronGeometry(0.11, 0);
+    [[-1.16, 1.16], [1.16, 1.16], [-1.16, -1.16], [1.16, -1.16]].forEach(([cx, cy]) => {
+      const gem = new THREE.Mesh(cornerGeo, frameBorderMat);
+      gem.position.set(cx, cy, 0.09);
+      memoryFrameGroup.add(gem);
+    });
+
+    const memoryHitMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.0, 3.0),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    memoryHitMesh.position.z = 0.14;
+    memoryFrameGroup.add(memoryHitMesh);
+
+    memoryFrameGroup.userData.targetPos = new THREE.Vector3(0, -0.5, 1.2);
+    memoryFrameGroup.userData.targetScale = 1.0;
+
+    function refreshMemoryPhotoTexture() {
+      const applyCanvas = (img) => {
+        const cvs = buildMemoryPhotoCanvas(img);
+        const tex = new THREE.CanvasTexture(cvs);
+        tex.encoding = THREE.sRGBEncoding;
+        if (memoryPhotoMat.map) memoryPhotoMat.map.dispose();
+        memoryPhotoMat.map = tex;
+        memoryPhotoMat.needsUpdate = true;
+
+        const thumb = document.getElementById('photo-thumb');
+        if (thumb) thumb.src = cvs.toDataURL('image/jpeg', 0.8);
+      };
+
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => applyCanvas(img);
+        img.onerror = () => applyCanvas(null);
+        img.src = state.photoDataUrl;
+      } else {
+        applyCanvas(null);
+      }
+    }
+
+    // 5.6. Responsive Camera & Layout Projection
+    let cw = window.innerWidth;
+    let ch = window.innerHeight;
+    let isMobile = cw < 768 || (cw / Math.max(1, ch)) < 0.82;
+    const bottleChargeTargetPos = new THREE.Vector3(0, 1.6, 2.5);
+
+    function ndcToWorldAtZ(ndcX, ndcY, targetZ) {
+      const v = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(camera);
+      const dir = v.sub(camera.position).normalize();
+      const t = (targetZ - camera.position.z) / dir.z;
+      return camera.position.clone().add(dir.multiplyScalar(t));
+    }
+
+    function updateThreeLayout() {
+      cw = window.innerWidth;
+      ch = window.innerHeight;
+      const aspect = cw / Math.max(1, ch);
+      isMobile = cw < 768 || aspect < 0.82;
+
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(cw, ch);
+      starUniforms.uPixelRatio.value = dpr;
+
+      camera.aspect = aspect;
+      camera.fov = isMobile ? 56 : 45;
+      if (isMobile) {
+        camera.position.set(0, 0.28, 19.8);
+        camera.lookAt(0, 0.35, 0);
+      } else {
+        camera.position.set(0, 0.25, 17.5);
+        camera.lookAt(0, 0.35, 0);
+      }
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
+
+      // Đặt moonGroup ở góc trên-phải z = -24 không bị cắt mép
+      const zMoon = -24;
+      const distMoon = camera.position.z - zMoon;
+      const halfHMoon = distMoon * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const halfWMoon = halfHMoon * aspect;
+
+      if (isMobile) {
+        moonGroup.position.set(Math.min(halfWMoon * 0.54, 11.2), camera.position.y + halfHMoon * 0.44, zMoon);
+        moonGroup.scale.setScalar(0.84);
+      } else {
+        moonGroup.position.set(Math.min(halfWMoon * 0.60, 19.5), camera.position.y + halfHMoon * 0.43, zMoon);
+        moonGroup.scale.setScalar(1.0);
+      }
+      oceanUniforms.uMoonPos.value.copy(moonGroup.position);
+
+      // Tâm chiếu Pha 2 của chai thủy tinh tại (0.50w, 0.36h) -> NDC (0, 0.28)
+      bottleChargeTargetPos.copy(ndcToWorldAtZ(0, 0.28, 2.5));
+
+      // Vị trí khung ảnh kỷ niệm 3D tại targetNdcY (-0.23 mobile / -0.27 desktop)
+      const targetNdcY = isMobile ? -0.23 : -0.27;
+      memoryFrameGroup.userData.targetPos.copy(ndcToWorldAtZ(0, targetNdcY, 1.2));
+      memoryFrameGroup.userData.targetScale = isMobile ? 0.86 : 1.02;
+    }
+
+    /**
+     * ============================================================================
+     * 6. LỚP 2 (#trails-canvas): TIA SÁNG TỤ CHAI & BURSTSPARK 5 TẦNG
+     * ============================================================================
+     */
+    const trailsCanvas = document.getElementById('trails-canvas');
+    const trailsCtx = trailsCanvas.getContext('2d');
+    let burstSparks = [];
+    let chargeStreams = [];
+
+    class BurstSpark {
+      constructor(originX, originY, color, isBig = false) {
+        this.x = originX;
+        this.y = originY;
+        this.prevX = originX;
+        this.prevY = originY;
+
+        const angle = Math.random() * Math.PI * 2;
+        const baseScale = Math.max(0.8, Math.min(cw, ch) / 660);
+
+        const tier = Math.random();
+        let speedMult;
+        if (tier < 0.15) speedMult = Math.random() * 3.5 + 4.5;
+        else if (tier < 0.35) speedMult = Math.random() * 4.0 + 8.5;
+        else if (tier < 0.70) speedMult = Math.random() * 4.5 + 13.0;
+        else if (tier < 0.90) speedMult = Math.random() * 4.5 + 18.0;
+        else speedMult = Math.random() * 3.5 + 23.0;
+        if (isBig) speedMult *= 1.15;
+
+        const speed = speedMult * baseScale;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.958;
+        this.gravity = 0.145;
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.009 + 0.0085;
+        this.color = color;
+        this.radius = Math.random() * 0.65 + 1.35;
+      }
+
+      update() {
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+
+      draw(ctx) {
+        if (this.alpha <= 0) return;
+        const a = Math.max(0, this.alpha);
+
+        ctx.globalAlpha = a * 0.78;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+
+        ctx.globalAlpha = a;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius + 0.55, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Tia sáng xoắn ốc tích tụ về tâm chai ở Pha 2
+    class ChargeStream {
+      constructor(targetX, targetY, color) {
+        const ang = Math.random() * Math.PI * 2;
+        const dist = (isMobile ? 120 : 190) + Math.random() * 140;
+        this.x = targetX + Math.cos(ang) * dist;
+        this.y = targetY + Math.sin(ang) * dist;
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.tx = targetX;
+        this.ty = targetY;
+        this.color = color;
+        this.alpha = 0.95;
+        this.speed = 6.5 + Math.random() * 4.5;
+      }
+
+      update(dt) {
+        this.prevX = this.x;
+        this.prevY = this.y;
+        const dx = this.tx - this.x;
+        const dy = this.ty - this.y;
+        const d = Math.hypot(dx, dy) || 1;
+        this.x += (dx / d) * this.speed * dt * 60 + (-dy / d) * 2.2;
+        this.y += (dy / d) * this.speed * dt * 60 + (dx / d) * 2.2;
+        if (d < 14) this.alpha = 0;
+        else this.alpha -= dt * 0.95;
+      }
+
+      draw(ctx) {
+        if (this.alpha <= 0) return;
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2.0;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 7. LỚP 3 (#morph-canvas): TEXTPIXELSCANNER & MORPH HẠT CHỮ SẮC NÉT
+     * ============================================================================
+     */
+    const morphCanvas = document.getElementById('morph-canvas');
+    const morphCtx = morphCanvas.getContext('2d');
+
+    function blendWithWhite(hex, ratio) {
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      const nr = Math.min(255, Math.round(r + (255 - r) * ratio));
+      const ng = Math.min(255, Math.round(g + (255 - g) * ratio));
+      const nb = Math.min(255, Math.round(b + (255 - b) * ratio));
+      return `rgb(${nr}, ${ng}, ${nb})`;
+    }
+
+    const coreSpriteCache = {};
+    function getCoreSprite(color) {
+      const radius = isMobile ? 1.25 : 1.4;
+      const key = `${color}_${radius}`;
+      if (coreSpriteCache[key]) return coreSpriteCache[key];
+
+      const size = 8;
+      const c = document.createElement('canvas');
+      c.width = size;
+      c.height = size;
+      const sctx = c.getContext('2d');
+      const center = size / 2;
+
+      const grad = sctx.createRadialGradient(center, center, 0, center, center, radius);
+      grad.addColorStop(0, blendWithWhite(color, 0.62));
+      grad.addColorStop(0.54, color);
+      grad.addColorStop(0.88, color);
+      grad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+      sctx.fillStyle = grad;
+      sctx.fillRect(0, 0, size, size);
+
+      coreSpriteCache[key] = c;
+      return c;
+    }
+
+    class TextPixelScanner {
+      static formatProperName(rawName) {
+        if (!rawName) return 'Em';
+        const clean = rawName.trim().replace(/\s+/g, ' ');
+        if (!clean) return 'Em';
+        return clean
+          .split(' ')
+          .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
+          .join(' ');
+      }
+
+      static measureWithSpacing(octx, str, letterSpacing) {
+        let w = 0;
+        for (let i = 0; i < str.length; i++) {
+          w += octx.measureText(str[i]).width + (i < str.length - 1 ? letterSpacing : 0);
+        }
+        return w;
+      }
+
+      static wrapBalancedLines(octx, text, maxAllowedWidth, letterSpacing) {
+        const clean = (text || '').trim().replace(/\s+/g, ' ');
+        if (!clean) return ['Làm người yêu anh nhé'];
+        if (this.measureWithSpacing(octx, clean, letterSpacing) <= maxAllowedWidth) {
+          return [clean];
+        }
+        const words = clean.split(' ');
+        if (words.length <= 1) return [clean];
+
+        let bestPair = null;
+        let bestDiff = Infinity;
+        for (let i = 1; i < words.length; i++) {
+          const l1 = words.slice(0, i).join(' ');
+          const l2 = words.slice(i).join(' ');
+          const w1 = this.measureWithSpacing(octx, l1, letterSpacing);
+          const w2 = this.measureWithSpacing(octx, l2, letterSpacing);
+          const diff = Math.abs(w1 - w2);
+          if (w1 <= maxAllowedWidth && w2 <= maxAllowedWidth && diff < bestDiff) {
+            bestDiff = diff;
+            bestPair = [l1, l2];
+          }
+        }
+        if (bestPair) return bestPair;
+
+        const mid = Math.ceil(words.length / 2);
+        return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+      }
+
+      static sample3TierCoordinates(viewportWidth, viewportHeight) {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = viewportWidth;
+        offCanvas.height = viewportHeight;
+        const octx = offCanvas.getContext('2d');
+
+        const maxAllowedWidth = viewportWidth * 0.88;
+        const receiverProper = this.formatProperName(state.receiver);
+        const senderProper = this.formatProperName(state.sender);
+
+        const tier1Text = `${receiverProper} ơi,`;
+        const tier2Raw = (state.confessLine || 'Làm người yêu anh nhé').trim();
+        const tier3Text = `— Từ ${senderProper} ♥`;
+
+        let mainFontSize = viewportWidth < 600
+          ? Math.max(33, Math.min(Math.floor(viewportWidth * 0.094), 44))
+          : Math.max(46, Math.min(Math.floor(viewportWidth * 0.062), 66));
+
+        let letterSpacing = Math.max(2.5, mainFontSize * 0.06);
+        let tier2Lines = [];
+
+        while (mainFontSize >= 24) {
+          octx.font = `700 ${mainFontSize}px "Playfair Display", serif`;
+          letterSpacing = Math.max(2.5, mainFontSize * 0.06);
+          tier2Lines = this.wrapBalancedLines(octx, tier2Raw, maxAllowedWidth, letterSpacing);
+          const fits = tier2Lines.every((ln) => this.measureWithSpacing(octx, ln, letterSpacing) <= maxAllowedWidth);
+          if (fits) break;
+          mainFontSize -= 1;
+        }
+
+        let subFontSize1 = Math.max(22, Math.round(mainFontSize * 0.64));
+        octx.font = `700 ${subFontSize1}px "Plus Jakarta Sans", sans-serif`;
+        let ls1 = Math.max(2.5, subFontSize1 * 0.06);
+        while (subFontSize1 > 18 && this.measureWithSpacing(octx, tier1Text, ls1) > maxAllowedWidth) {
+          subFontSize1 -= 1;
+          octx.font = `700 ${subFontSize1}px "Plus Jakarta Sans", sans-serif`;
+          ls1 = Math.max(2.5, subFontSize1 * 0.06);
+        }
+
+        let subFontSize3 = Math.max(21, Math.round(mainFontSize * 0.60));
+        octx.font = `italic 600 ${subFontSize3}px "Playfair Display", serif`;
+        let ls3 = Math.max(2.5, subFontSize3 * 0.06);
+        while (subFontSize3 > 17 && this.measureWithSpacing(octx, tier3Text, ls3) > maxAllowedWidth) {
+          subFontSize3 -= 1;
+          octx.font = `italic 600 ${subFontSize3}px "Playfair Display", serif`;
+          ls3 = Math.max(2.5, subFontSize3 * 0.06);
+        }
+
+        const renderRows = [
+          {
+            text: tier1Text,
+            tier: 1,
+            font: `700 ${subFontSize1}px "Plus Jakarta Sans", sans-serif`,
+            fontSize: subFontSize1,
+            letterSpacing: ls1,
+            gapAfter: mainFontSize * 0.85
+          },
+          ...tier2Lines.map((ln, idx) => ({
+            text: ln,
+            tier: 2,
+            font: `700 ${mainFontSize}px "Playfair Display", serif`,
+            fontSize: mainFontSize,
+            letterSpacing: letterSpacing,
+            gapAfter: idx === tier2Lines.length - 1 ? mainFontSize * 0.82 : mainFontSize * 1.24
+          })),
+          {
+            text: tier3Text,
+            tier: 3,
+            font: `italic 600 ${subFontSize3}px "Playfair Display", serif`,
+            fontSize: subFontSize3,
+            letterSpacing: ls3,
+            gapAfter: 0
+          }
+        ];
+
+        const totalSpan = renderRows.reduce((acc, row) => acc + row.gapAfter, 0);
+        const centerX = viewportWidth / 2;
+        const centerY = isMobile ? viewportHeight * 0.33 : viewportHeight * 0.35;
+        let currentY = centerY - totalSpan / 2;
+
+        let minBoundY = Infinity;
+        let maxBoundY = -Infinity;
+
+        octx.textAlign = 'center';
+        octx.textBaseline = 'middle';
+        octx.fillStyle = '#ffffff';
+
+        renderRows.forEach((row) => {
+          octx.font = row.font;
+          row.y = currentY;
+          const totalW = this.measureWithSpacing(octx, row.text, row.letterSpacing);
+          let curX = centerX - totalW / 2;
+
+          for (let c = 0; c < row.text.length; c++) {
+            const chStr = row.text[c];
+            const metrics = octx.measureText(chStr);
+            const charW = metrics.width;
+            const ascent = metrics.actualBoundingBoxAscent || row.fontSize * 0.82;
+            const descent = metrics.actualBoundingBoxDescent || row.fontSize * 0.36;
+
+            minBoundY = Math.min(minBoundY, row.y - ascent);
+            maxBoundY = Math.max(maxBoundY, row.y + descent);
+
+            // Chỉ fillText thuần túy, không strokeText để giữ trọn dấu tiếng Việt sắc nét
+            octx.fillText(chStr, curX + charW / 2, row.y);
+            curX += charW + row.letterSpacing;
+          }
+
+          currentY += row.gapAfter;
+        });
+
+        const padY = Math.max(mainFontSize * 0.55, 28);
+        const minY = Math.max(0, Math.floor(minBoundY - padY));
+        const maxY = Math.min(viewportHeight, Math.ceil(maxBoundY + padY));
+        const minX = Math.max(0, Math.floor(centerX - maxAllowedWidth * 0.56));
+        const maxX = Math.min(viewportWidth, Math.ceil(centerX + maxAllowedWidth * 0.56));
+
+        const cropW = maxX - minX;
+        const cropH = maxY - minY;
+        if (cropW <= 0 || cropH <= 0) return [];
+
+        const tier1SplitY = renderRows[0].y + renderRows[0].gapAfter * 0.5;
+        const lastTier2Row = renderRows[renderRows.length - 2];
+        const tier3SplitY = lastTier2Row.y + lastTier2Row.gapAfter * 0.5;
+
+        const imgData = octx.getImageData(minX, minY, cropW, cropH).data;
+        const step = isMobile ? 1.65 : 1.85;
+        const coords = [];
+
+        for (let cy = 0; cy < cropH; cy += step) {
+          const iy = Math.floor(cy);
+          for (let cx = 0; cx < cropW; cx += step) {
+            const ix = Math.floor(cx);
+            const alpha = imgData[(iy * cropW + ix) * 4 + 3];
+            if (alpha >= 115) {
+              const realY = minY + iy;
+              const tier = realY < tier1SplitY ? 1 : (realY > tier3SplitY ? 3 : 2);
+              coords.push({
+                x: minX + ix,
+                y: realY,
+                tier
+              });
+            }
+          }
+        }
+
+        const maxParticles = isMobile ? 2450 : 3400;
+        if (coords.length > maxParticles) {
+          const ratio = coords.length / maxParticles;
+          const sampled = [];
+          for (let i = 0; i < maxParticles; i++) {
+            sampled.push(coords[Math.floor(i * ratio)]);
+          }
+          return sampled;
+        }
+        return coords;
+      }
+    }
+
+    class MorphParticle {
+      constructor(originX, originY, targetPt, index) {
+        this.x = originX;
+        this.y = originY;
+        this.tx = targetPt.x;
+        this.ty = targetPt.y;
+        this.tier = targetPt.tier || 2;
+        this.seed = index;
+
+        const angle = Math.random() * Math.PI * 2;
+        const baseScale = Math.max(0.8, Math.min(cw, ch) / 660);
+        const speed = (Math.random() * 9.5 + 4.5) * baseScale;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.friction = 0.94;
+        this.gravity = 0.11;
+
+        this.spring = 0.08 + Math.random() * 0.03;
+        this.phase = Math.random() * Math.PI * 2;
+        this.locked = false;
+        this.alpha = 0.95;
+        this.updateThemeColor();
+      }
+
+      updateThemeColor() {
+        const t = THEMES[state.theme] || THEMES.moonlit_teal;
+        const pal = this.tier === 1 ? t.tier1 : (this.tier === 3 ? t.tier3 : t.tier2);
+        this.color = pal[this.seed % pal.length];
+        this.sprite = getCoreSprite(this.color);
+      }
+
+      update(phase3Time, timeSec) {
+        if (phase3Time < 0.62) {
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          this.locked = false;
+        } else {
+          if (!this.locked) {
+            const dx = this.tx - this.x;
+            const dy = this.ty - this.y;
+            this.x += dx * this.spring;
+            this.y += dy * this.spring;
+            if (Math.hypot(dx, dy) < 1.2) {
+              this.x = this.tx;
+              this.y = this.ty;
+              this.locked = true;
+            }
+          }
+          this.alpha = 0.84 + 0.16 * Math.sin(timeSec * 3.2 + this.phase);
+        }
+      }
+    }
+
+    let morphParticles = [];
+
+    function resizeAllCanvases() {
+      updateThreeLayout();
+      trailsCanvas.width = Math.round(cw * dpr);
+      trailsCanvas.height = Math.round(ch * dpr);
+      trailsCanvas.style.width = cw + 'px';
+      trailsCanvas.style.height = ch + 'px';
+
+      morphCanvas.width = Math.round(cw * dpr);
+      morphCanvas.height = Math.round(ch * dpr);
+      morphCanvas.style.width = cw + 'px';
+      morphCanvas.style.height = ch + 'px';
+
+      if (state.phase === 3 && morphParticles.length > 0) {
+        recomputeMorphTargets();
+      }
+    }
+
+    async function recomputeMorphTargets() {
+      if (document.fonts) {
+        try {
+          await Promise.all([
+            document.fonts.load('700 48px "Playfair Display"'),
+            document.fonts.load('700 32px "Plus Jakarta Sans"')
+          ]);
+          await document.fonts.ready;
+        } catch (e) {}
+      }
+      const newCoords = TextPixelScanner.sample3TierCoordinates(cw, ch);
+      if (!newCoords.length) return;
+
+      if (morphParticles.length === 0) {
+        const originX = cw * 0.5;
+        const originY = ch * 0.36;
+        morphParticles = newCoords.map((pt, idx) => new MorphParticle(originX, originY, pt, idx));
+      } else {
+        const prevCount = morphParticles.length;
+        if (prevCount > newCoords.length) {
+          morphParticles.length = newCoords.length;
+        }
+        const sharedCount = Math.min(prevCount, newCoords.length);
+        for (let idx = 0; idx < sharedCount; idx++) {
+          const p = morphParticles[idx];
+          const pt = newCoords[idx];
+          p.tx = pt.x;
+          p.ty = pt.y;
+          p.tier = pt.tier || 2;
+          p.locked = false;
+          p.updateThemeColor();
+        }
+        if (newCoords.length > prevCount) {
+          for (let idx = prevCount; idx < newCoords.length; idx++) {
+            const pt = newCoords[idx];
+            const neighbor = morphParticles[idx % prevCount];
+            const ox = neighbor ? neighbor.x : cw * 0.5;
+            const oy = neighbor ? neighbor.y : ch * 0.36;
+            const added = new MorphParticle(ox, oy, pt, idx);
+            added.vx = 0;
+            added.vy = 0;
+            morphParticles.push(added);
+          }
+        }
+      }
+    }
+
+    window.addEventListener('resize', resizeAllCanvases);
+
+    /**
+     * ============================================================================
+     * 8. ĐIỀU KHIỂN KỊCH BẢN 4 PHA & ÁP DỤNG THEME
+     * ============================================================================
+     */
+    function applyThemeVisuals(themeKey) {
+      const t = THEMES[themeKey] || THEMES.moonlit_teal;
+      document.documentElement.style.background = t.skyBg;
+      document.body.style.background = t.skyBg;
+      const rad = document.getElementById('sky-radiance-layer');
+      if (rad) rad.style.background = t.radianceBg;
+
+      warmLight.color.setHex(t.warmLight);
+      moonDirLight.color.setHex(t.rimLight);
+      oceanUniforms.uDeepColor.value.set(t.deepSea);
+      oceanUniforms.uShallowColor.value.set(t.shallowSea);
+      oceanUniforms.uBiolumColor.value.set(t.biolumColor);
+      oceanUniforms.uMoonSpecColor.value.set(t.moonSpecColor);
+      bottleGlassUniforms.uGlassTint.value.set(t.glassTint);
+      bottleGlassUniforms.uRimColor.value.set(t.glassRim);
+      bottleWaterHaloMat.color.setHex(t.starColor);
+      bSparkMat.color.setHex(t.starColor);
+      memoryGlowSprite.material.color.setHex(t.warmLight);
+
+      morphParticles.forEach((p) => p.updateThemeColor());
+      refreshMemoryPhotoTexture();
+    }
+
+    function updateSkipButtonVisibility() {
+      const skipBtn = document.getElementById('btn-skip-climax');
+      if (!skipBtn) return;
+      if (state.phase >= 2) skipBtn.classList.add('hidden');
+      else skipBtn.classList.remove('hidden');
+    }
+
+    let audioUnlocked = false;
+    function unlockAudioOnGesture() {
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      audio.initContext();
+      audio.startChillMusic();
+      audio.setPhaseMood(state.phase);
+    }
+    window.addEventListener('pointerdown', unlockAudioOnGesture, { once: true });
+
+    function resetCorkToBottle() {
+      corkState.detached = false;
+      corkState.elapsed = 0;
+      corkState.vel.set(0, 0, 0);
+      if (corkMesh.parent !== bottleBodyGroup) {
+        bottleBodyGroup.add(corkMesh);
+      }
+      corkMesh.position.set(0, 1.38, 0);
+      corkMesh.rotation.set(0, 0, 0);
+      corkMesh.visible = true;
+      corkMat.opacity = 1.0;
+    }
+
+    function startPhase0IdleDrift() {
+      state.phase = 0;
+      state.phase1Elapsed = 0;
+      state.bottleArrived = false;
+      state.phase2Elapsed = 0;
+      state.phase3Elapsed = 0;
+      state.frameRevealed = false;
+      targetBrightness = 0.14;
+      bottleGroup.visible = true;
+      bottleGroup.position.set(-5, OCEAN_Y + 0.12, -14);
+      bottleBodyGroup.rotation.set(0.18, 0.25, -1.02);
+      bottleWaterHalo.scale.set(4.0, 4.0, 1);
+      bottleGlassUniforms.uChargeBoost.value = 0;
+      resetCorkToBottle();
+      updateSkipButtonVisibility();
+      setPhasePill('🍾 Chiếc chai mang bí mật đang trôi vào... Chạm vào chai để mở thư tình!');
+    }
+
+    function startPhase1Approaching(withAudio = true) {
+      if (withAudio) unlockAudioOnGesture();
+      state.phase = 1;
+      state.phase1Elapsed = 0;
+      state.bottleArrived = false;
+      targetBrightness = 0.34;
+      bottleGroup.visible = true;
+      bottleWaterHalo.scale.set(4.0, 4.0, 1);
+      bottleGlassUniforms.uChargeBoost.value = 0;
+      resetCorkToBottle();
+      if (audio.ctx) audio.setPhaseMood(1);
+      updateSkipButtonVisibility();
+      setPhasePill('🍾 Chiếc chai mang bí mật đang trôi vào... Chạm vào chai để mở thư tình!');
+    }
+
+    function triggerPhase2UncorkCharging() {
+      if (state.phase >= 2) return;
+      audio.initContext();
+      audio.startChillMusic();
+
+      state.phase = 2;
+      state.phase2Elapsed = 0;
+      targetBrightness = 0.72;
+      audio.setPhaseMood(2);
+      updateSkipButtonVisibility();
+      setPhasePill('✨ Nút chai bật mở! Điều ước đại dương sắp vỡ òa ánh sáng...');
+
+      // Bật nút bần bay lên khỏi cổ chai
+      bottleGroup.updateMatrixWorld(true);
+      const worldPos = new THREE.Vector3();
+      const worldQuat = new THREE.Quaternion();
+      corkMesh.getWorldPosition(worldPos);
+      corkMesh.getWorldQuaternion(worldQuat);
+      scene.add(corkMesh);
+      corkMesh.position.copy(worldPos);
+      corkMesh.quaternion.copy(worldQuat);
+      corkState.detached = true;
+      corkState.elapsed = 0;
+      corkState.vel.set(0.85, 5.4, 0.9);
+
+      audio.playCorkPop();
+      audio.playGlassChime();
+    }
+
+    async function triggerPhase3BottleShatterMorph() {
+      if (state.phase === 3) return;
+      state.phase = 3;
+      state.phase3Elapsed = 0;
+      state.frameRevealed = false;
+      bottleGroup.visible = false;
+      chargeStreams = [];
+      targetBrightness = 1.0;
+      audio.setPhaseMood(3);
+      updateSkipButtonVisibility();
+
+      // Vòng sóng đồng tâm lan tỏa trên mặt biển khi chai vỡ
+      rippleOrigin.set(0, 2.0);
+      rippleTime = 0;
+      rippleStrength = 1.0;
+
+      // Chớp sáng dịu <= 0.26
+      const flash = document.getElementById('screen-flash');
+      if (flash) {
+        flash.classList.add('flash');
+        setTimeout(() => flash.classList.remove('flash'), 340);
+      }
+
+      // Phóng BurstSpark 5 tầng tại (0.50w, 0.36h)
+      const ox = cw * 0.50;
+      const oy = ch * 0.36;
+      const t = THEMES[state.theme] || THEMES.moonlit_teal;
+      const sparkCount = isMobile ? 165 : 230;
+      for (let i = 0; i < sparkCount; i++) {
+        burstSparks.push(new BurstSpark(ox, oy, t.sparks[i % t.sparks.length], true));
+      }
+
+      audio.playGlassShatterChime();
+      setPhasePill('💖 Bức thư đã mở ra! Chạm khung ảnh 3D trên sóng hoặc mở Tâm Thư');
+
+      morphParticles = [];
+      await recomputeMorphTargets();
+    }
+
+    function replayFromStart() {
+      state.acceptedCelebration = false;
+      state.frameRevealed = false;
+      burstSparks = [];
+      chargeStreams = [];
+      morphParticles = [];
+      rippleStrength = 0;
+      rippleTime = 0;
+      oceanUniforms.uRippleStrength.value = 0;
+      audio.setPhaseMood(0);
+
+      memoryFrameGroup.visible = false;
+      memoryFrameGroup.scale.set(0.001, 0.001, 0.001);
+
+      document.getElementById('btn-open-wish')?.classList.remove('cta-pulse');
+      document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+      document.getElementById('spotlight-modal')?.classList.remove('active');
+      document.getElementById('modal-wish-card')?.classList.remove('active');
+
+      trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      trailsCtx.clearRect(0, 0, cw, ch);
+      morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      morphCtx.clearRect(0, 0, cw, ch);
+
+      startPhase0IdleDrift();
+      startPhase1Approaching(true);
+    }
+
+    /**
+     * ============================================================================
+     * 9. TƯƠNG TÁC RAYCASTER (dragDist <= 6px) CHẠM CHAI & KHUNG ẢNH 3D
+     * ============================================================================
+     */
+    const raycaster = new THREE.Raycaster();
+    const pointerNdc = new THREE.Vector2();
+    let pointerDownPos = null;
+
+    morphCanvas.addEventListener('pointerdown', (e) => {
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+    });
+
+    morphCanvas.addEventListener('pointerup', (e) => {
+      if (!pointerDownPos) return;
+      const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      pointerDownPos = null;
+      if (dist > 6) return;
+
+      audio.initContext();
+      pointerNdc.x = (e.clientX / Math.max(1, cw)) * 2 - 1;
+      pointerNdc.y = -(e.clientY / Math.max(1, ch)) * 2 + 1;
+      raycaster.setFromCamera(pointerNdc, camera);
+
+      if ((state.phase === 0 || state.phase === 1) && bottleGroup.visible) {
+        const bottleHits = raycaster.intersectObject(bottleHitMesh, false);
+        if (bottleHits.length > 0) {
+          triggerPhase2UncorkCharging();
+          return;
+        }
+        // Chạm nhẹ trên mặt biển tạo vệt bọt lân tinh nhỏ mời chạm chai
+        const t = THEMES[state.theme] || THEMES.moonlit_teal;
+        for (let i = 0; i < 18; i++) {
+          burstSparks.push(new BurstSpark(e.clientX, e.clientY, t.sparks[i % t.sparks.length], false));
+        }
+        showToast('🍾 Hãy chạm vào chiếc chai phát sáng để mở thư tình nhé!');
+        return;
+      }
+
+      if (state.phase === 3 && memoryFrameGroup.visible) {
+        const hits = raycaster.intersectObject(memoryHitMesh, false);
+        if (hits.length > 0) {
+          openPhotoSpotlight();
+          return;
+        }
+        // Chạm bất kỳ ở Pha 3 tung ánh sáng lân tinh
+        const t = THEMES[state.theme] || THEMES.moonlit_teal;
+        for (let i = 0; i < 24; i++) {
+          burstSparks.push(new BurstSpark(e.clientX, e.clientY, t.sparks[i % t.sparks.length], false));
+        }
+      }
+    });
+
+    /**
+     * ============================================================================
+     * 10. SPOTLIGHT ẢNH, MODAL TÂM THƯ (2 NÚT HỒI ĐÁP), TÙY CHỈNH & GIFTSDK
+     * ============================================================================
+     */
+    function openPhotoSpotlight() {
+      const spotCvs = document.getElementById('spotlight-canvas');
+      const sctx = spotCvs.getContext('2d');
+      const drawSpot = (img) => {
+        const built = buildMemoryPhotoCanvas(img);
+        sctx.clearRect(0, 0, spotCvs.width, spotCvs.height);
+        sctx.drawImage(built, 0, 0, spotCvs.width, spotCvs.height);
+      };
+
+      if (state.photoDataUrl) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => drawSpot(img);
+        img.onerror = () => drawSpot(null);
+        img.src = state.photoDataUrl;
+      } else {
+        drawSpot(null);
+      }
+
+      document.getElementById('spotlight-caption').textContent = `"${state.confessLine}"`;
+      document.getElementById('spotlight-sub').textContent = `${state.sender} ♥ ${state.receiver}`;
+      document.getElementById('spotlight-modal').classList.add('active');
+    }
+
+    function openWishModal() {
+      document.getElementById('wish-card-title').textContent = `Gửi ${state.receiver} Thương Mến`;
+      document.getElementById('wish-card-highlight').textContent = `"${state.confessLine}"`;
+      document.getElementById('wish-card-content').textContent = state.wish;
+      document.getElementById('wish-card-sender').textContent = `— Từ ${state.sender} ♥`;
+      document.getElementById('modal-wish-card').classList.add('active');
+    }
+
+    document.getElementById('btn-close-spotlight')?.addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+    });
+    document.getElementById('btn-spotlight-letter')?.addEventListener('click', () => {
+      document.getElementById('spotlight-modal').classList.remove('active');
+      openWishModal();
+    });
+
+    document.getElementById('btn-open-wish')?.addEventListener('click', openWishModal);
+    document.getElementById('btn-close-wish')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+    });
+
+    // 2 nút hồi đáp ngọt ngào trong Modal Tâm Thư
+    document.getElementById('btn-reply-yes')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      state.acceptedCelebration = true;
+      audio.playAcceptFanfare();
+
+      rippleOrigin.set(0, 1.5);
+      rippleTime = 0;
+      rippleStrength = 0.95;
+
+      const t = THEMES[state.theme] || THEMES.moonlit_teal;
+      const centers = [
+        [cw * 0.24, ch * 0.24],
+        [cw * 0.76, ch * 0.24],
+        [cw * 0.50, ch * 0.20]
+      ];
+      centers.forEach(([bx, by], idx) => {
+        setTimeout(() => {
+          for (let i = 0; i < 68; i++) {
+            burstSparks.push(new BurstSpark(bx, by, t.sparks[i % t.sparks.length], true));
+          }
+          audio.playGlassChime();
+        }, idx * 240);
+      });
+      setPhasePill(`💖 ${state.receiver} đã đồng ý! Cả đại dương ánh sáng đang chúc mừng hai bạn 🌊✨`);
+      showToast('💖 Tuyệt vời! Sóng biển ánh trăng đang chúc mừng hai bạn!');
+    });
+
+    document.getElementById('btn-reply-think')?.addEventListener('click', () => {
+      document.getElementById('modal-wish-card').classList.remove('active');
+      showToast('🌊 Chiếc chai kỷ niệm này sẽ luôn giữ nguyên lời nhắn đợi em nhé ✨');
+    });
+
+    // Bộ 4 Preset 1-chạm
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      state.presetKey = key;
+      state.sender = p.sender;
+      state.receiver = p.receiver;
+      state.confessLine = p.confessLine;
+      state.wish = p.wish;
+      state.theme = p.theme;
+
+      document.querySelectorAll('.preset-chip').forEach((el) => {
+        el.classList.toggle('active', el.dataset.preset === key);
+      });
+      document.querySelectorAll('.modal-theme-chip').forEach((el) => {
+        el.classList.toggle('active', el.dataset.theme === state.theme);
+      });
+
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-confess-line').value = state.confessLine;
+      document.getElementById('in-wish').value = state.wish;
+
+      applyThemeVisuals(state.theme);
+      if (state.phase === 3) {
+        recomputeMorphTargets();
+      }
+      showToast(`✨ Đã chọn chủ đề: ${p.badgeLabel}`);
+    }
+
+    document.querySelectorAll('.preset-chip').forEach((btn) => {
+      btn.addEventListener('click', (e) => applyPreset(e.currentTarget.dataset.preset));
+    });
+
+    // Modal Tùy Chỉnh
+    document.getElementById('btn-open-customize')?.addEventListener('click', () => {
+      document.getElementById('in-sender').value = state.sender;
+      document.getElementById('in-receiver').value = state.receiver;
+      document.getElementById('in-confess-line').value = state.confessLine;
+      document.getElementById('in-wish').value = state.wish;
+      document.getElementById('modal-customize').classList.add('active');
+    });
+    document.getElementById('btn-close-customize')?.addEventListener('click', () => {
+      document.getElementById('modal-customize').classList.remove('active');
+    });
+
+    document.querySelectorAll('.modal-theme-chip').forEach((chip) => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.modal-theme-chip').forEach((c) => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.theme = e.currentTarget.dataset.theme;
+        applyThemeVisuals(state.theme);
+      });
+    });
+
+    document.getElementById('in-photo')?.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const rawImg = new Image();
+        rawImg.onload = () => {
+          const maxSide = 720;
+          let tw = rawImg.width;
+          let th = rawImg.height;
+          if (tw > maxSide || th > maxSide) {
+            if (tw >= th) {
+              th = Math.round((th * maxSide) / tw);
+              tw = maxSide;
+            } else {
+              tw = Math.round((tw * maxSide) / th);
+              th = maxSide;
+            }
+          }
+          const c = document.createElement('canvas');
+          c.width = tw;
+          c.height = th;
+          c.getContext('2d').drawImage(rawImg, 0, 0, tw, th);
+          state.photoDataUrl = c.toDataURL('image/jpeg', 0.8);
+          refreshMemoryPhotoTexture();
+        };
+        rawImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btn-clear-photo')?.addEventListener('click', () => {
+      state.photoDataUrl = null;
+      const fileIn = document.getElementById('in-photo');
+      if (fileIn) fileIn.value = '';
+      refreshMemoryPhotoTexture();
+      showToast('🖼️ Đã khôi phục tranh nghệ thuật mặc định');
+    });
+
+    function syncFormToState() {
+      state.sender = document.getElementById('in-sender').value.trim() || 'Hoàng Minh';
+      state.receiver = document.getElementById('in-receiver').value.trim() || 'Thảo Vy';
+      state.confessLine = document.getElementById('in-confess-line').value.trim() || 'Làm người yêu anh nhé';
+      state.wish = document.getElementById('in-wish').value.trim() || PRESETS.ocean_night_letter.wish;
+      refreshMemoryPhotoTexture();
+    }
+
+    document.getElementById('btn-preview-creator')?.addEventListener('click', () => {
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+      // Chạy ngay Pha 2 -> Pha 3 với tên, câu tỏ tình & ảnh vừa nhập
+      state.phase = 1;
+      state.acceptedCelebration = false;
+      state.frameRevealed = false;
+      bottleGroup.visible = true;
+      bottleGroup.position.set(0, getWaveHeight(0, 2.5, elapsedTime) + 0.12, 2.5);
+      resetCorkToBottle();
+      memoryFrameGroup.visible = false;
+      memoryFrameGroup.scale.set(0.001, 0.001, 0.001);
+      document.getElementById('btn-open-wish')?.classList.remove('cta-pulse');
+      document.getElementById('btn-open-payment')?.classList.remove('cta-pulse');
+      morphParticles = [];
+      triggerPhase2UncorkCharging();
+    });
+
+    function openPaymentFlow() {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.openPayment) {
+        GiftSDK.openPayment({
+          templateId: state.templateId,
+          templateType: 'confess',
+          senderName: state.sender,
+          receiverName: state.receiver,
+          occasion: 'Tỏ Tình • Thư Tình Trong Chai',
+          message: state.wish,
+          payload: {
+            presetKey: state.presetKey,
+            confessLine: state.confessLine,
+            theme: state.theme,
+            photoDataUrl: state.photoDataUrl
+          }
+        });
+      } else {
+        showToast('💡 Đang ở chế độ xem thử local.');
+      }
+    }
+
+    document.getElementById('customize-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      audio.initContext();
+      syncFormToState();
+      document.getElementById('modal-customize').classList.remove('active');
+      openPaymentFlow();
+    });
+
+    document.getElementById('btn-open-payment')?.addEventListener('click', openPaymentFlow);
+    document.getElementById('btn-skip-climax')?.addEventListener('click', triggerPhase2UncorkCharging);
+    document.getElementById('btn-replay')?.addEventListener('click', replayFromStart);
+    document.getElementById('btn-sound')?.addEventListener('click', (e) => {
+      audio.initContext();
+      const muted = audio.toggleMute();
+      e.currentTarget.textContent = muted ? '🔇 Tắt Tiếng' : '🔊 Âm Thanh';
+    });
+
+    /**
+     * ============================================================================
+     * 11. VÒNG LẶP ANIMATION 60FPS (THREE.JS + TRAILS + MORPH TEXT)
+     * ============================================================================
+     */
+    const clock = new THREE.Clock();
+    let elapsedTime = 0;
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - x, 3);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      elapsedTime += dt;
+
+      // 1. Progressive Brightness & Ocean / Sky Uniforms
+      currentBrightness += (targetBrightness - currentBrightness) * Math.min(1, dt * 2.8);
+      const b = currentBrightness;
+
+      const radLayer = document.getElementById('sky-radiance-layer');
+      if (radLayer) radLayer.style.opacity = (0.14 + b * 0.54).toFixed(3);
+
+      ambientLight.intensity = 0.48 + b * 0.44;
+      warmLight.intensity = 0.72 + b * 1.25;
+      moonDirLight.intensity = 0.65 + b * 0.68;
+      starUniforms.uTime.value = elapsedTime;
+      starUniforms.uBoost.value = 0.56 + b * 0.44;
+      moonHaloMat.opacity = 0.42 + b * 0.34;
+
+      if (rippleStrength > 0.001) {
+        rippleTime += dt;
+        rippleStrength = Math.max(0, rippleStrength - dt * 0.22);
+      }
+      oceanUniforms.uTime.value = elapsedTime;
+      oceanUniforms.uRippleTime.value = rippleTime;
+      oceanUniforms.uRippleStrength.value = rippleStrength;
+      oceanUniforms.uLuminance.value = b;
+
+      bottleGlassUniforms.uTime.value = elapsedTime;
+
+      // 40 hạt sáng bên trong chai xoáy nhẹ
+      const bsArr = bSparkGeo.attributes.position.array;
+      const sparkSpeedMult = state.phase === 2 ? 3.2 : 1.0;
+      for (let i = 0; i < BOTTLE_SPARK_COUNT; i++) {
+        const s = bSparkSeeds[i];
+        const a = s.ang + elapsedTime * s.speed * sparkSpeedMult;
+        bsArr[i * 3] = Math.cos(a) * s.rad;
+        bsArr[i * 3 + 1] = s.y + Math.sin(elapsedTime * 2.2 + s.phase) * 0.08;
+        bsArr[i * 3 + 2] = Math.sin(a) * s.rad;
+      }
+      bSparkGeo.attributes.position.needsUpdate = true;
+
+      // 2. Pha 0 & Pha 1: Chai trôi từ (-5, -14) về gần bờ (0, 2.5) trong ~3.8s + bập bềnh theo độ dốc sóng
+      if (state.phase === 0 || state.phase === 1) {
+        let bx = -5;
+        let bz = -14;
+        if (state.phase === 1) {
+          state.phase1Elapsed += dt;
+          const tProg = Math.min(1, state.phase1Elapsed / state.approachDuration);
+          const eased = easeOutCubic(tProg);
+          bx = THREE.MathUtils.lerp(-5, 0, eased);
+          bz = THREE.MathUtils.lerp(-14, 2.5, eased);
+          if (tProg >= 1 && !state.bottleArrived) {
+            state.bottleArrived = true;
+            targetBrightness = 0.46;
+          }
+        } else {
+          bx = -5 + Math.sin(elapsedTime * 0.6) * 0.25;
+          bz = -14 + Math.cos(elapsedTime * 0.5) * 0.25;
+        }
+
+        const waveY = getWaveHeight(bx, bz, elapsedTime);
+        const slope = getWaveSlope(bx, bz, elapsedTime);
+        bottleGroup.position.set(bx, waveY + 0.12, bz);
+
+        // Pitch (rotation.x) & Roll (rotation.z) theo đúng độ dốc sóng biển thật
+        const targetPitch = Math.atan(slope.dhdz) * 1.35;
+        const targetRoll = -Math.atan(slope.dhdx) * 1.35;
+        bottleGroup.rotation.x += (targetPitch - bottleGroup.rotation.x) * Math.min(1, dt * 6);
+        bottleGroup.rotation.z += (targetRoll - bottleGroup.rotation.z) * Math.min(1, dt * 6);
+        bottleGroup.rotation.y = Math.sin(elapsedTime * 0.55) * 0.14;
+
+        bottleBodyGroup.rotation.z += (-1.02 - bottleBodyGroup.rotation.z) * Math.min(1, dt * 4);
+        bottleBodyGroup.rotation.x += (0.18 - bottleBodyGroup.rotation.x) * Math.min(1, dt * 4);
+        bottleBodyGroup.rotation.y = Math.sin(elapsedTime * 0.7) * 0.18;
+        bottleWaterHaloMat.opacity = 0.46 + 0.22 * Math.sin(elapsedTime * 2.8);
+      }
+
+      // 3. Pha 2: Nút bần bật bay mờ dần, chai nâng lên (0.50w, 0.36h) xoay nghiêng rực sáng trong ~1.0s
+      if (state.phase === 2) {
+        state.phase2Elapsed += dt;
+        const prog = Math.min(1, state.phase2Elapsed / 1.0);
+        const ease = easeOutCubic(prog);
+
+        bottleGroup.position.lerp(bottleChargeTargetPos, Math.min(1, dt * 5.2));
+        bottleGroup.rotation.x += (0 - bottleGroup.rotation.x) * Math.min(1, dt * 6);
+        bottleGroup.rotation.z += (0 - bottleGroup.rotation.z) * Math.min(1, dt * 6);
+        bottleBodyGroup.rotation.z += (-0.24 - bottleBodyGroup.rotation.z) * Math.min(1, dt * 5);
+        bottleBodyGroup.rotation.x += (0.12 - bottleBodyGroup.rotation.x) * Math.min(1, dt * 5);
+        bottleBodyGroup.rotation.y += dt * (3.0 + ease * 5.0);
+
+        bottleGlassUniforms.uChargeBoost.value = ease * 1.35;
+        bottleWaterHaloMat.opacity = 0.65 + ease * 0.35;
+        bottleWaterHalo.scale.setScalar(4.0 + ease * 2.8);
+
+        if (corkState.detached) {
+          corkState.elapsed += dt;
+          corkState.vel.y -= 7.8 * dt;
+          corkMesh.position.addScaledVector(corkState.vel, dt);
+          corkMesh.rotation.x += dt * 7.5;
+          corkMesh.rotation.z += dt * 5.2;
+          corkMat.opacity = Math.max(0, 1 - corkState.elapsed / 0.85);
+          if (corkMat.opacity <= 0.01) corkMesh.visible = false;
+        }
+
+        // Bắn tia sáng tích tụ về (0.50w, 0.36h)
+        if (Math.random() < 0.75) {
+          const t = THEMES[state.theme] || THEMES.moonlit_teal;
+          chargeStreams.push(new ChargeStream(cw * 0.50, ch * 0.36, t.sparks[Math.floor(Math.random() * t.sparks.length)]));
+        }
+
+        if (prog >= 1) {
+          triggerPhase3BottleShatterMorph();
+        }
+      }
+
+      // 4. Pha 3: Morph chữ sắc nét + Hiện memoryFrameGroup & .cta-pulse sau +1.5s
+      if (state.phase === 3) {
+        state.phase3Elapsed += dt;
+        for (let i = 0; i < morphParticles.length; i++) {
+          morphParticles[i].update(state.phase3Elapsed, elapsedTime);
+        }
+
+        if (state.phase3Elapsed >= 1.5 && !state.frameRevealed) {
+          state.frameRevealed = true;
+          memoryFrameGroup.visible = true;
+          document.getElementById('btn-open-wish')?.classList.add('cta-pulse');
+          document.getElementById('btn-open-payment')?.classList.add('cta-pulse');
+        }
+
+        if (memoryFrameGroup.visible) {
+          const tgtScale = memoryFrameGroup.userData.targetScale || 1.0;
+          const curS = memoryFrameGroup.scale.x + (tgtScale - memoryFrameGroup.scale.x) * Math.min(1, dt * 3.8);
+          memoryFrameGroup.scale.setScalar(curS);
+          memoryFrameGroup.position.x = memoryFrameGroup.userData.targetPos.x;
+          memoryFrameGroup.position.y = memoryFrameGroup.userData.targetPos.y + Math.sin(elapsedTime * 1.6) * 0.09;
+          memoryFrameGroup.position.z = memoryFrameGroup.userData.targetPos.z;
+          memoryFrameGroup.lookAt(camera.position);
+        }
+
+        if (state.acceptedCelebration && Math.random() < 0.045) {
+          const t = THEMES[state.theme] || THEMES.moonlit_teal;
+          burstSparks.push(new BurstSpark(cw * (0.2 + Math.random() * 0.6), ch * (0.18 + Math.random() * 0.25), t.sparks[Math.floor(Math.random() * t.sparks.length)], false));
+        }
+      }
+
+      // Render Layer 1: #webgl-canvas
+      renderer.render(scene, camera);
+
+      // Render Layer 2: #trails-canvas (destination-out trước rồi mới lighter để không che đen biển 3D!)
+      trailsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      trailsCtx.globalCompositeOperation = 'destination-out';
+      trailsCtx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+      trailsCtx.fillRect(0, 0, cw, ch);
+      trailsCtx.globalCompositeOperation = 'lighter';
+
+      for (let i = chargeStreams.length - 1; i >= 0; i--) {
+        const cs = chargeStreams[i];
+        cs.update(dt);
+        cs.draw(trailsCtx);
+        if (cs.alpha <= 0) chargeStreams.splice(i, 1);
+      }
+
+      for (let i = burstSparks.length - 1; i >= 0; i--) {
+        const s = burstSparks[i];
+        s.update();
+        s.draw(trailsCtx);
+        if (s.alpha <= 0) burstSparks.splice(i, 1);
+      }
+
+      // Render Layer 3: #morph-canvas (clearRect + source-over + sprite 8x8 sắc nét)
+      morphCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      morphCtx.clearRect(0, 0, cw, ch);
+
+      if (state.phase === 3 && morphParticles.length > 0) {
+        morphCtx.globalCompositeOperation = 'source-over';
+        for (let i = 0; i < morphParticles.length; i++) {
+          const p = morphParticles[i];
+          morphCtx.globalAlpha = p.alpha;
+          morphCtx.drawImage(p.sprite, p.x - 4, p.y - 4);
+        }
+        morphCtx.globalAlpha = 1.0;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * 12. KHỞI TẠO BAN ĐẦU & GIFTSDK
+     * ============================================================================
+     */
+    resizeAllCanvases();
+    applyThemeVisuals(state.theme);
+    startPhase0IdleDrift();
+    startPhase1Approaching(false);
+    requestAnimationFrame(animate);
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (typeof GiftSDK !== 'undefined' && GiftSDK.init) {
+        await GiftSDK.init({
+          templateId: state.templateId,
+          onGiftLoaded: (order) => {
+            if (order.sender_name) state.sender = order.sender_name;
+            if (order.receiver_name) state.receiver = order.receiver_name;
+            if (order.message) state.wish = order.message;
+            if (order.payload) {
+              if (order.payload.presetKey && PRESETS[order.payload.presetKey]) {
+                state.presetKey = order.payload.presetKey;
+              }
+              if (order.payload.confessLine) state.confessLine = order.payload.confessLine;
+              if (order.payload.theme && THEMES[order.payload.theme]) state.theme = order.payload.theme;
+              if (order.payload.photoDataUrl) state.photoDataUrl = order.payload.photoDataUrl;
+            }
+            applyThemeVisuals(state.theme);
+            if (state.phase === 3) recomputeMorphTargets();
+          }
+        });
+      }
+    });
+  </script>
+  <script src="../../../shared/tiktok-mode.js"></script>
+</body>
+</html>

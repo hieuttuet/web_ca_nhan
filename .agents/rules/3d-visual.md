@@ -144,3 +144,32 @@ Mỗi template không được dừng ở mức "cảnh 3D tĩnh/lặp lại nh�
    - **Texture Equirectangular & Hào quang Sprite chuẩn**: Texture bề mặt trăng phải vẽ phủ kín khung hình chữ nhật `2:1` (`1024×512`, không cắt hình tròn) để khi bọc lên `SphereGeometry` không sinh góc tam giác tối; quầng sáng dùng `THREE.Sprite` đặt phía sau khối cầu (`z < 0`, `AdditiveBlending`, `depthWrite: false`) thay cho `PlaneGeometry` để tránh lỗi cắt xéo khối cầu.
    - **Giữ Trăng tối đến khi người dùng click trực tiếp**: Tách riêng biến độ sáng Mặt Trăng (`currentMoonBrightness`) khỏi độ sáng khu vườn. Sau khi thắp xong đèn lồng cuối, **Mặt Trăng vẫn giữ sắc tối dịu** kèm vòng mời chạm nhẹ và dòng gợi ý ngắn gọn (*"Hãy thắp sáng ánh trăng nữa nhé"*).
    - **Bừng sáng, hiện ảnh trên Trăng & mở Tâm Thư**: Chỉ khi người dùng click trực tiếp vào Mặt Trăng (`raycaster` kèm vùng chạm rộng `moonHitMesh`), trăng mới bừng sáng rực rỡ (`currentMoonBrightness → 1.0`), phóng lớn nhẹ nhàng, hiển thị **ảnh kỷ niệm đã chọn bên trong lòng Mặt Trăng** (`moonFaceGroup.lookAt(camera.position)`), thả mưa cánh hoa và sau ~`1.8–1.9s` tự động mở modal **Tâm Thư** trên nền tối mờ nhẹ xuyên thấu được cây và ảnh trăng phía sau.
+
+---
+
+## 10. Quy Tắc Thực Chiến Đúc Kết Từ Phản Hồi Người Dùng
+
+Áp dụng bắt buộc cho mọi template 2D/3D mới và nâng cấp để tránh lặp lại các lỗi trải nghiệm & thị giác:
+
+1. **Hiệu Ứng Mở Màn & Bối Cảnh Mặt Đất Tự Nhiên**:
+   - Các hiệu ứng bầu trời mở đầu (như mưa sao băng) phải chạy tự nhiên ngay khi tải trang (không bắt click mới bắt đầu), di chuyển lệch pha **cái trước cái sau** (không đều tăm tắp), mật độ gần sát hợp lý và có đầu sáng – đuôi kéo vệt rõ ràng.
+   - Mặt đất/nền cảnh phải khớp ngữ cảnh câu chuyện (đồi cỏ bông lau đom đóm, đồi tuyết, bàn gỗ...); tránh lạm dụng mặt nước họa tiết lặp hoặc vòng bia ngắm thô cứng khi không phù hợp.
+   - Vật thể vật lý như **ngọn lửa sưởi ấm** phải neo cố định trên mặt đất (có đá bếp/than hồng) và lớn dần theo tương tác thổi Micro / quạt màn hình, không cho bay lơ lửng vô căn cứ.
+
+2. **Chính Xác Dữ Liệu Ngày Nhập Trên 3D**:
+   - Khi người dùng nhập ngày sinh nhật hoặc ngày kỷ niệm, Bảng Khắc Tên 3D và Modal Tâm Thư phải hiển thị **chính xác ngày đã nhập (`DD/MM/YYYY`)**, tuyệt đối không thay thế bằng khoảng ngày chung của cung Hoàng Đạo.
+
+3. **Morphing Text Thuần Hạt Sắc Nét (Cấm Nhòe Sáng)**:
+   - Không vẽ `strokeText` quá dày hoặc đặt lớp `PlaneGeometry` phát sáng đục phía sau chữ Morphing khiến chữ bị nhòe bết.
+   - Luôn dùng **thuần hạt ánh sáng mật độ cao (`10.000–12.000` hạt)** lấy mẫu từ `fillText` sạch, trộn ngẫu nhiên mảng tọa độ mẫu (`Fisher-Yates`), jitter nhỏ (`±0.015`) và cỡ hạt vừa phải (`gl_PointSize` ~`26–28 / -mvPos.z`) để hạt vừa tách nét sắc sảo vừa giữ đủ độ sáng của chữ tiếng Việt.
+
+4. **Tự Do Xoay Đổi Góc Nhìn & Thu Phóng Ở Mọi Pha**:
+   - Hỗ trợ kéo xoay (`orbitYaw`/`orbitPitch`) và `wheel` zoom ở **tất cả các pha (0 → 3)** (bao gồm lúc đang xem sách/mô hình trước cao trào). Phân biệt rõ `dragDist <= 8px` (chạm tương tác / lật trang) và `dragDist > 8px` (xoay đổi góc nhìn mượt, không kích hoạt nhầm lật trang).
+
+5. **Tỷ Lệ Chủ Thể – Mật Độ Mảnh Ghép – Bảng Thông Tin Gọn**:
+   - Các mô hình ghép khối 3D (Rubik, tinh thể ghép mảnh) cần mật độ lưới mịn đẹp (`~100–130` mảnh thay vì khối thô thưa) và ưu tiên tỷ lệ chủ thể lớn nổi bật làm trung tâm.
+   - **Bảng Khắc Tên 3D** phải giữ kích thước gọn nhẹ tinh tế (`scale` hợp lý, tách thoáng trên `#phase-pill`), không phóng to lấn át Trái Tim/Chủ thể chính; khung ảnh quay quanh cần quỹ đạo đủ rộng để không che chắn tâm chủ thể.
+
+6. **Kiểm Tra Ảnh Chụp Thực Tế**:
+   - Trước khi báo hoàn thành chỉnh sửa/template mới, phải kiểm tra trực tiếp ảnh chụp render trên cả Desktop (`1280×800`+) và Mobile (`375–390px`) để đảm bảo độ nét chữ hạt, tỷ lệ chủ thể/bảng tên và bố cục HUD không tràn mép.
+
